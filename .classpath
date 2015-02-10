@@ -1,7 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="resources/lwjgl/jar/lwjgl.jar" sourcepath="resources/lwjgl/src.zip"/>
+	<classpathentry kind="src" path="res"/>
+	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry exported="true" kind="lib" path="resources/lwjgl/jar/lwjgl.jar" sourcepath="resources/lwjgl/src.zip"/>
+	<classpathentry exported="true" kind="lib" path="resources/kryonet-2.21/jars/production/onejar/kryonet-2.21-all.jar" sourcepath="resources/kryonet-2.21/java/src">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:platform:/resource/ProjectSC/resources/kryonet-2.21/javadoc/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry exported="true" kind="lib" path="resources/commons-logging-1.2/commons-logging-1.2.jar" sourcepath="resources/commons-logging-1.2/commons-logging-1.2.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:platform:/resource/ProjectSC/resources/commons-logging-1.2/commons-logging-1.2-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="resources/commons-logging-1.2/commons-logging-1.2-javadoc.jar"/>
+	<classpathentry kind="lib" path="resources/log4j-1.2.17.jar"/>
+	<classpathentry kind="lib" path="resources/slick-util/lib/slick-util.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
