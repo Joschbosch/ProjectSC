@@ -2,17 +2,12 @@ package de.projectsc.core;
 
 import static org.lwjgl.glfw.Callbacks.errorCallbackPrint;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_V;
-import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_1;
 import static org.lwjgl.glfw.GLFW.GLFW_RELEASE;
 import static org.lwjgl.glfw.GLFW.GLFW_RESIZABLE;
 import static org.lwjgl.glfw.GLFW.GLFW_VISIBLE;
 import static org.lwjgl.glfw.GLFW.glfwCreateWindow;
 import static org.lwjgl.glfw.GLFW.glfwDefaultWindowHints;
 import static org.lwjgl.glfw.GLFW.glfwDestroyWindow;
-import static org.lwjgl.glfw.GLFW.glfwGetCursorPos;
-import static org.lwjgl.glfw.GLFW.glfwGetKey;
-import static org.lwjgl.glfw.GLFW.glfwGetMouseButton;
 import static org.lwjgl.glfw.GLFW.glfwGetPrimaryMonitor;
 import static org.lwjgl.glfw.GLFW.glfwGetVideoMode;
 import static org.lwjgl.glfw.GLFW.glfwInit;
@@ -28,26 +23,21 @@ import static org.lwjgl.glfw.GLFW.glfwSwapBuffers;
 import static org.lwjgl.glfw.GLFW.glfwSwapInterval;
 import static org.lwjgl.glfw.GLFW.glfwWindowHint;
 import static org.lwjgl.glfw.GLFW.glfwWindowShouldClose;
-import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_FALSE;
 import static org.lwjgl.opengl.GL11.GL_TRUE;
-import static org.lwjgl.opengl.GL11.glClear;
-import static org.lwjgl.opengl.GL11.glClearColor;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
-import java.awt.Font;
 import java.nio.ByteBuffer;
-import java.nio.DoubleBuffer;
 
-import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWKeyCallback;
 import org.lwjgl.glfw.GLFWvidmode;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GLContext;
-import org.newdawn.slick.Color;
 import org.newdawn.slick.TrueTypeFont;
+
+import de.projectsc.core.data.Map;
+import de.projectsc.core.data.TileType;
 
 public class Window {
 
@@ -70,6 +60,10 @@ public class Window {
 
     private TrueTypeFont font;
 
+    private int width;
+
+    private int height;
+
     /**
      * Creates a GLFW window and its OpenGL context with the specified width,
      * height and title.
@@ -84,6 +78,9 @@ public class Window {
      *            Set to true, if you want v-sync
      */
     public Window(int width, int height, CharSequence title, boolean vsync) {
+
+        this.width = width;
+        this.height = height;
         // Setup an error callback. The default implementation
         // will print the error message in System.err.
         glfwSetErrorCallback(errorCallback = errorCallbackPrint(System.err));
@@ -132,8 +129,8 @@ public class Window {
         }
         glfwShowWindow(window);
         GLContext.createFromCurrent();
-        Font awtFont = new Font("Times New Roman", Font.BOLD, 24);
-        font = new TrueTypeFont(awtFont, true);
+        // Font awtFont = new Font("Times New Roman", Font.BOLD, 24);
+        // font = new TrueTypeFont(awtFont, true);
     }
 
     /**
@@ -195,29 +192,35 @@ public class Window {
         return this.vsync;
     }
 
-    public void render(float alpha) {
-        // Set the clear color
-        if (glfwGetKey(window, GLFW_KEY_V) == 1
-                || glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1) == 1) {
-            glClearColor(1.0f, 0.0f, 0.0f, 0.0f);
-            vsync = false;
-        } else {
-            glClearColor(0.0f, 1.0f, 0.0f, 0.0f);
-            vsync = true;
+    public void render(Map map) {
+        // init OpenGL
+        GL11.glMatrixMode(GL11.GL_PROJECTION);
+        GL11.glLoadIdentity();
+        GL11.glOrtho(0, 800, 0, 600, 1, -1);
+        GL11.glMatrixMode(GL11.GL_MODELVIEW);
+
+        // Clear the screen and depth buffer
+        GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
+        if (map != null) {
+            int tileSize = this.width / map.getWidth();
+            for (int i = 0; i < map.getWidth(); i++) {
+                for (int j = 0; j < map.getHeight(); j++) {
+                    // set the color of the quad (R,G,B,A)
+                    if (map.getTileAt(i, j).getType() == TileType.NOTHING) {
+                        GL11.glColor3f(1.0f, 1.0f, 1.0f);
+                    } else {
+                        GL11.glColor3f(0.0f, 1.0f, 0.0f);
+                    }
+                    GL11.glBegin(GL11.GL_QUADS);
+                    GL11.glVertex2f(i * tileSize, j * tileSize);
+                    GL11.glVertex2f(i * tileSize + tileSize, j * tileSize);
+                    GL11.glVertex2f(i * tileSize + tileSize, j * tileSize
+                            + tileSize);
+                    GL11.glVertex2f(i * tileSize, j * tileSize + tileSize);
+                    GL11.glEnd();
+                }
+            }
         }
-        DoubleBuffer b1 = BufferUtils.createDoubleBuffer(1);
-        DoubleBuffer b2 = BufferUtils.createDoubleBuffer(1);
-        glfwGetCursorPos(window, b1, b2);
-        Color.white.bind();
-        font.drawString(
-                100,
-                50,
-                "THE LIGHTWEIGHT JAVA GAMES LIBRARY" + b1.get(0) + "   "
-                        + b2.get(0), Color.yellow);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the
-                                                            // framebuffer
-        glfwSwapBuffers(window); // swap the color buffers
-        // invoked during this call.
-        glfwPollEvents();
+
     }
 }

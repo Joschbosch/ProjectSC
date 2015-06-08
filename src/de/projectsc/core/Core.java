@@ -3,6 +3,8 @@ package de.projectsc.core;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import de.projectsc.core.data.Map;
+
 public class Core {
 
     private static Log LOGGER = LogFactory.getLog(Core.class);
@@ -16,6 +18,8 @@ public class Core {
     private Timer timer;
 
     private Window window;
+
+    private Map map;
 
     /**
      * This should be called to initialize and start the game.
@@ -34,7 +38,7 @@ public class Core {
 
     private void init() {
         LOGGER.debug("Initialize");
-        window = new Window(640, 480, "ProjectSC", true);
+        window = new Window(640, 480, "ProjectSC", false);
         LOGGER.debug("Opened window ");
         this.timer = new Timer();
         running = true;
@@ -83,7 +87,8 @@ public class Core {
     }
 
     private void render(float alpha) {
-        window.render(alpha);
+        // window.render(alpha);
+        window.render(map);
     }
 
     private void update() {
@@ -92,5 +97,13 @@ public class Core {
 
     private void input() {
 
+    }
+
+    public void setMap(Map m) {
+        this.map = m;
+    }
+
+    public boolean isRunning() {
+        return running;
     }
 }
