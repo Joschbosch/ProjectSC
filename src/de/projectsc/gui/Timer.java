@@ -1,4 +1,4 @@
-package de.projectsc.core;
+package de.projectsc.gui;
 
 import static org.lwjgl.glfw.GLFW.glfwGetTime;
 
