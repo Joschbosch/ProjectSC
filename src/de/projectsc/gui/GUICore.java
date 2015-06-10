@@ -154,10 +154,6 @@ public class GUICore implements Runnable {
         currentState.update();
     }
 
-    private void input() {
-
-    }
-
     public boolean isRunning() {
         return running;
     }

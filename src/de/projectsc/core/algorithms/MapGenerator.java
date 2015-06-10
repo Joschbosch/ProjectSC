@@ -52,6 +52,13 @@ public final class MapGenerator {
             fillBackIn(map);
         }
         connect(map);
+        for (int i = 1; i < map.getWidth() - 1; i++) {
+            for (int j = 1; j < map.getHeight() - 1; j++) {
+                if (map.getTileAt(i, j).getType() == TileType.NOTHING) {
+                    map.setTileAt(i, j, TileType.WATER);
+                }
+            }
+        }
         return map;
     }
 

@@ -1,24 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="src" path="res"/>
+	<classpathentry kind="src" path="resources"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry exported="true" kind="lib" path="resources/kryonet-2.21/jars/production/onejar/kryonet-2.21-all.jar" sourcepath="resources/kryonet-2.21/java/src">
+	<classpathentry exported="true" kind="lib" path="project_resources/log4j-1.2.17.jar"/>
+	<classpathentry exported="true" kind="lib" path="project_resources/commons-logging-1.2/commons-logging-1.2-javadoc.jar"/>
+	<classpathentry exported="true" kind="lib" path="project_resources/commons-logging-1.2/commons-logging-1.2.jar"/>
+	<classpathentry kind="lib" path="project_resources/lwjgl/jar/lwjgl.jar" sourcepath="project_resources/lwjgl/src.zip">
 		<attributes>
-			<attribute name="javadoc_location" value="jar:platform:/resource/ProjectSC/resources/kryonet-2.21/javadoc/"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry exported="true" kind="lib" path="resources/commons-logging-1.2/commons-logging-1.2.jar" sourcepath="resources/commons-logging-1.2/commons-logging-1.2.jar">
-		<attributes>
-			<attribute name="javadoc_location" value="jar:platform:/resource/ProjectSC/resources/commons-logging-1.2/commons-logging-1.2-javadoc.jar!/"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="resources/commons-logging-1.2/commons-logging-1.2-javadoc.jar"/>
-	<classpathentry kind="lib" path="resources/log4j-1.2.17.jar"/>
-	<classpathentry kind="lib" path="resources/slick-util/lib/slick-util.jar"/>
-	<classpathentry kind="lib" path="resources/lwjgl/jar/lwjgl.jar">
-		<attributes>
-			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="ProjectSC/resources/lwjgl/native/windows/x64"/>
+			<attribute name="javadoc_location" value="jar:platform:/resource/ProjectSC/project_resources/lwjgl/doc/javadoc.zip!/"/>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="ProjectSC/project_resources/lwjgl/native"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="output" path="bin"/>

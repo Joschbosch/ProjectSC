@@ -110,7 +110,7 @@ public class Core implements Runnable {
     }
 
     // /*********** TEST CODE **************/
-    static int i = 0;
+    private static int i = 0;
 
     private Map createMap() {
         Map m = new Map(10 * 10, 10 * 10);

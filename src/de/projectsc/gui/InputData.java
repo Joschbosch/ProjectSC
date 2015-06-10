@@ -1,9 +1,15 @@
 /*
- * Copyright (C) 2015
+ * Copyright (C) 2015 Project SC
+ * 
+ * All rights reserved
  */
-
 package de.projectsc.gui;
 
+/**
+ * Data format to saend input to the gui correct gui state.
+ * 
+ * @author Josch Bosch
+ */
 public class InputData {
 
     /**

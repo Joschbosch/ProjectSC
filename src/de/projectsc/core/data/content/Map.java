@@ -5,6 +5,8 @@
  */
 package de.projectsc.core.data.content;
 
+import java.util.HashMap;
+
 /**
  * Represents the map.
  * 
@@ -12,19 +14,20 @@ package de.projectsc.core.data.content;
  */
 public class Map {
 
-    private final Tile nothing = new Tile(TileType.NOTHING);
-
-    private final Tile gras = new Tile(TileType.GRAS);
-
     private final int mapWidth;
 
     private final int mapHeight;
+
+    private java.util.Map<TileType, Tile> typeMap = new HashMap<>();
 
     private Tile[][] map;
 
     public Map(int width, int height) {
         mapWidth = width;
         mapHeight = height;
+        for (TileType type : TileType.values()) {
+            typeMap.put(type, new Tile(type));
+        }
 
         initMap();
     }
@@ -34,7 +37,7 @@ public class Map {
         map = new Tile[mapWidth][mapHeight];
         for (int i = 0; i < mapWidth; i++) {
             for (int j = 0; j < mapHeight; j++) {
-                map[i][j] = nothing;
+                map[i][j] = typeMap.get(TileType.NOTHING);
             }
         }
     }
@@ -62,11 +65,7 @@ public class Map {
      * @param type set tile at (i,j) to {@link TileType} type.
      */
     public void setTileAt(int i, int j, TileType type) {
-        if (type == TileType.GRAS) {
-            map[i][j] = gras;
-        } else if (type == TileType.NOTHING) {
-            map[i][j] = nothing;
-        }
+        map[i][j] = typeMap.get(type);
     }
 
     /**
