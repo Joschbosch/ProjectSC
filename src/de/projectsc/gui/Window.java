@@ -13,6 +13,7 @@ import static org.lwjgl.glfw.GLFW.GLFW_VISIBLE;
 import static org.lwjgl.glfw.GLFW.glfwCreateWindow;
 import static org.lwjgl.glfw.GLFW.glfwDefaultWindowHints;
 import static org.lwjgl.glfw.GLFW.glfwDestroyWindow;
+import static org.lwjgl.glfw.GLFW.glfwGetCursorPos;
 import static org.lwjgl.glfw.GLFW.glfwGetPrimaryMonitor;
 import static org.lwjgl.glfw.GLFW.glfwGetVideoMode;
 import static org.lwjgl.glfw.GLFW.glfwInit;
@@ -20,6 +21,8 @@ import static org.lwjgl.glfw.GLFW.glfwMakeContextCurrent;
 import static org.lwjgl.glfw.GLFW.glfwPollEvents;
 import static org.lwjgl.glfw.GLFW.glfwSetErrorCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetKeyCallback;
+import static org.lwjgl.glfw.GLFW.glfwSetMouseButtonCallback;
+import static org.lwjgl.glfw.GLFW.glfwSetScrollCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetWindowPos;
 import static org.lwjgl.glfw.GLFW.glfwSetWindowShouldClose;
 import static org.lwjgl.glfw.GLFW.glfwSetWindowTitle;
@@ -33,9 +36,14 @@ import static org.lwjgl.opengl.GL11.GL_TRUE;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 import java.nio.ByteBuffer;
+import java.nio.DoubleBuffer;
+import java.util.concurrent.BlockingQueue;
 
+import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWKeyCallback;
+import org.lwjgl.glfw.GLFWMouseButtonCallback;
+import org.lwjgl.glfw.GLFWScrollCallback;
 import org.lwjgl.glfw.GLFWvidmode;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GLContext;
@@ -70,6 +78,10 @@ public class Window {
 
     private final int height;
 
+    private final GLFWMouseButtonCallback mouseCallback;
+
+    private final GLFWScrollCallback scrollCallback;
+
     /**
      * Creates a GLFW window and its OpenGL context with the specified width, height and title.
      * 
@@ -78,7 +90,7 @@ public class Window {
      * @param title Title of the window
      * @param vsync Set to true, if you want v-sync
      */
-    public Window(int width, int height, CharSequence title, boolean vsync) {
+    public Window(int width, int height, CharSequence title, boolean vsync, final BlockingQueue<InputData> inputQueue) {
 
         this.width = width;
         this.height = height;
@@ -113,13 +125,39 @@ public class Window {
                 int mods) {
                 if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE) {
                     glfwSetWindowShouldClose(internalWindow, GL_TRUE); // We will detect
-                    // this in our
-                    // rendering loop
+                } else {
+                    DoubleBuffer x = BufferUtils.createDoubleBuffer(1);
+                    DoubleBuffer y = BufferUtils.createDoubleBuffer(1);
+                    glfwGetCursorPos(internalWindow, x, y);
+                    inputQueue.offer(new InputData(InputData.TYPE_KEY, key, action, mods, new double[] { x.get(), y.get() }));
                 }
             }
         };
         glfwSetKeyCallback(window, keyCallback);
+        mouseCallback = new GLFWMouseButtonCallback() {
 
+            @Override
+            public void invoke(long internalWindow, int button, int action, int mods) {
+                DoubleBuffer x = BufferUtils.createDoubleBuffer(1);
+                DoubleBuffer y = BufferUtils.createDoubleBuffer(1);
+                glfwGetCursorPos(internalWindow, x, y);
+                inputQueue.offer(new InputData(InputData.TYPE_MOUSE_KEY, button, action, mods, new double[] { x.get(), y.get() }));
+            }
+        };
+        glfwSetMouseButtonCallback(window, mouseCallback);
+        scrollCallback = new GLFWScrollCallback() {
+
+            @Override
+            public void invoke(long internalWindow, double xoffset, double yoffset) {
+                DoubleBuffer x = BufferUtils.createDoubleBuffer(1);
+                DoubleBuffer y = BufferUtils.createDoubleBuffer(1);
+                glfwGetCursorPos(internalWindow, x, y);
+                inputQueue.offer(new InputData(InputData.TYPE_MOUSE_SCROLL, (int) xoffset, (int) yoffset, 0, new double[] { x.get(),
+                    y.get() }));
+
+            }
+        };
+        glfwSetScrollCallback(window, scrollCallback);
         // Get the resolution of the primary monitor
         ByteBuffer vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
         // Center our window

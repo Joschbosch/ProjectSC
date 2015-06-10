@@ -11,6 +11,7 @@ import static de.projectsc.core.data.messages.GUIMessageConstants.START_GAME;
 
 import java.util.HashMap;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -52,6 +53,8 @@ public class GUICore implements Runnable {
 
     private final BlockingQueue<GUIMessage> incomingQueue;
 
+    private final BlockingQueue<InputData> inputQueue = new LinkedBlockingQueue<>();
+
     private State currentState;
 
     public GUICore(BlockingQueue<GUIMessage> outgoingQueue, BlockingQueue<GUIMessage> incomingQueue) {
@@ -80,7 +83,7 @@ public class GUICore implements Runnable {
 
     private void init() {
         LOGGER.debug("Initialize");
-        window = new Window(WIDTH, HEIGHT, "ProjectSC", false);
+        window = new Window(WIDTH, HEIGHT, "ProjectSC", false, inputQueue);
         LOGGER.debug("Opened window ");
         this.timer = new Timer();
         running = true;
@@ -92,8 +95,9 @@ public class GUICore implements Runnable {
         float interval = 1f / TARGET_UPS;
         float alpha;
         outgoingQueue.put(new GUIMessage(START_GAME, null));
-        stateMap.put(GUIState.GAME, new StateGameRunning(window));
+        stateMap.put(GUIState.GAME, new StateGameRunning(window, outgoingQueue));
         currentState = stateMap.get(GUIState.GAME);
+        currentState.initialize();
         LOGGER.debug("Starting Game");
         while (running) {
             if (window.isClosing()) {
@@ -102,9 +106,9 @@ public class GUICore implements Runnable {
                 LOGGER.debug("Send close requrest and close down");
             }
             retreiveCoreMessages();
+            currentState.handleInput(inputQueue);
             delta = timer.getDelta();
             accumulator += delta;
-            input();
             while (accumulator >= interval) {
                 update();
                 timer.updateUPS();

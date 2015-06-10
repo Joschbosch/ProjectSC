@@ -5,6 +5,10 @@
  */
 package de.projectsc.gui.states;
 
+import java.util.concurrent.BlockingQueue;
+
+import de.projectsc.gui.InputData;
+
 /**
  * Interface for all gui states.
  * 
@@ -37,4 +41,11 @@ public interface State {
      * Render state.
      */
     void render();
+
+    /**
+     * handle Input.
+     * 
+     * @param input queue with current inputs
+     */
+    void handleInput(BlockingQueue<InputData> input);
 }

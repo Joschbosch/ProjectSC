@@ -85,22 +85,6 @@ public class Core implements Runnable {
             }
         }).start();
         LOGGER.debug("Core initialized");
-
-        // *********** TEST CODE **************/
-        new Thread(new Runnable() {
-
-            @Override
-            public void run() {
-                try {
-                    while (!shutdown) {
-                        Thread.sleep(SLEEP_TIME * 10 * 2);
-                        guiIncomingQueue.put(new GUIMessage(START_GAME, null));
-                    }
-                } catch (InterruptedException e) {
-                }
-            }
-        }).start();
-        // *********** TEST CODE **************/
     }
 
     private void workNetwork() {
