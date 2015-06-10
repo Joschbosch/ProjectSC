@@ -1,13 +1,15 @@
 /*
- * Copyright (C) 2006-2015 DLR, Germany
+ * Copyright (C) 2015 Project SC
  * 
  * All rights reserved
- * 
- * http://www.rcenvironment.de/
  */
+package de.projectsc.core.data.messages;
 
-package de.projectsc.core.data;
-
+/**
+ * Implementation of {@link Message} for the GUI.
+ * 
+ * @author Josch Bosch
+ */
 public class GUIMessage extends Message {
 
     public GUIMessage(String msg, Object data) {

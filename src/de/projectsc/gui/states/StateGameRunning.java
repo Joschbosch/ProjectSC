@@ -1,22 +1,27 @@
 /*
- * Copyright (C) 2006-2015 DLR, Germany
+ * Copyright (C) 2015 Project SC
  * 
  * All rights reserved
- * 
- * http://www.rcenvironment.de/
  */
-
 package de.projectsc.gui.states;
 
 import org.lwjgl.opengl.GL11;
 
-import de.projectsc.core.data.Map;
-import de.projectsc.core.data.TileType;
+import de.projectsc.core.data.content.Map;
+import de.projectsc.core.data.content.TileType;
 import de.projectsc.gui.Window;
 
+/**
+ * 
+ * State when the game is running (drawing the map etc.).
+ * 
+ * @author Josch Bosch
+ */
 public class StateGameRunning implements State {
 
-    public static final GUIState state = GUIState.GAME;
+    private static final int MINUS_ONE = -1;
+
+    private static final GUIState STATE = GUIState.GAME;
 
     private Map currentMap;
 
@@ -50,7 +55,7 @@ public class StateGameRunning implements State {
     public void render() {
         GL11.glMatrixMode(GL11.GL_PROJECTION);
         GL11.glLoadIdentity();
-        GL11.glOrtho(0, 800, 0, 600, 1, -1);
+        GL11.glOrtho(0, window.getWidth(), 0, window.getHeight(), 1, MINUS_ONE);
         GL11.glMatrixMode(GL11.GL_MODELVIEW);
 
         // Clear the screen and depth buffer

@@ -1,3 +1,8 @@
+/*
+ * Copyright (C) 2015 Project SC
+ * 
+ * All rights reserved
+ */
 package de.projectsc.gui;
 
 import static org.lwjgl.glfw.Callbacks.errorCallbackPrint;
@@ -37,6 +42,11 @@ import org.lwjgl.opengl.GLContext;
 
 import de.projectsc.gui.states.State;
 
+/**
+ * Class for showing the GUI.
+ * 
+ * @author Josch Bosch
+ */
 public class Window {
 
     /**
@@ -52,7 +62,7 @@ public class Window {
      */
     private boolean vsync;
 
-    private GLFWErrorCallback errorCallback;
+    private final GLFWErrorCallback errorCallback;
 
     private final long window;
 
@@ -74,12 +84,13 @@ public class Window {
         this.height = height;
         // Setup an error callback. The default implementation
         // will print the error message in System.err.
-        glfwSetErrorCallback(errorCallback = errorCallbackPrint(System.err));
+        errorCallback = errorCallbackPrint(System.err);
+        glfwSetErrorCallback(errorCallback);
 
         // Initialize GLFW. Most GLFW functions will not work before doing this.
-        if (glfwInit() != GL11.GL_TRUE)
+        if (glfwInit() != GL11.GL_TRUE) {
             throw new IllegalStateException("Unable to initialize GLFW");
-
+        }
         // Configure our window
         glfwDefaultWindowHints(); // optional, the current window hints are
                                   // already the default
@@ -89,22 +100,25 @@ public class Window {
 
         // Create the window
         window = glfwCreateWindow(width, height, "Hello World!", NULL, NULL);
-        if (window == NULL)
+        if (window == NULL) {
             throw new RuntimeException("Failed to create the GLFW window");
+        }
 
         // Setup a key callback. It will be called every time a key is pressed,
         // repeated or released.
-        glfwSetKeyCallback(window, keyCallback = new GLFWKeyCallback() {
+        keyCallback = new GLFWKeyCallback() {
 
             @Override
-            public void invoke(long window, int key, int scancode, int action,
+            public void invoke(long internalWindow, int key, int scancode, int action,
                 int mods) {
-                if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE)
-                    glfwSetWindowShouldClose(window, GL_TRUE); // We will detect
-                                                               // this in our
-                                                               // rendering loop
+                if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE) {
+                    glfwSetWindowShouldClose(internalWindow, GL_TRUE); // We will detect
+                    // this in our
+                    // rendering loop
+                }
             }
-        });
+        };
+        glfwSetKeyCallback(window, keyCallback);
 
         // Get the resolution of the primary monitor
         ByteBuffer vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
@@ -135,7 +149,7 @@ public class Window {
     }
 
     /**
-     * Sets the window title
+     * Sets the window title.
      * 
      * @param title New window title
      */
@@ -162,11 +176,11 @@ public class Window {
     /**
      * Setter for v-sync.
      * 
-     * @param vsync Set to true to enable v-sync
+     * @param setVsync Set to true to enable v-sync
      */
-    public void setVSync(boolean vsync) {
-        this.vsync = vsync;
-        if (vsync) {
+    public void setVSync(boolean setVsync) {
+        this.vsync = setVsync;
+        if (setVsync) {
             glfwSwapInterval(1);
         } else {
             glfwSwapInterval(0);
@@ -182,11 +196,20 @@ public class Window {
         return this.vsync;
     }
 
+    /**
+     * Render the current state.
+     * 
+     * @param state to be rendered
+     */
     public void render(State state) {
         state.render();
     }
 
     public int getWidth() {
         return width;
+    }
+
+    public int getHeight() {
+        return height;
     }
 }

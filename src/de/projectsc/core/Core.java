@@ -1,11 +1,8 @@
 /*
- * Copyright (C) 2006-2015 DLR, Germany
+ * Copyright (C) 2015 Project SC
  * 
  * All rights reserved
- * 
- * http://www.rcenvironment.de/
  */
-
 package de.projectsc.core;
 
 import java.util.concurrent.BlockingQueue;
@@ -15,21 +12,30 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import de.projectsc.core.algorithms.MapGenerator;
-import de.projectsc.core.data.GUIMessage;
-import de.projectsc.core.data.Map;
-import de.projectsc.core.data.NetworkMessage;
+import de.projectsc.core.data.content.Map;
+import de.projectsc.core.data.messages.GUIMessage;
+import de.projectsc.core.data.messages.NetworkMessage;
 
+/**
+ * Core class for the client.
+ * 
+ * @author Josch Bosch
+ */
 public class Core implements Runnable {
 
-    private static Log LOGGER = LogFactory.getLog(Core.class);
+    private static final int SLEEP_TIME = 50;
 
-    BlockingQueue<GUIMessage> guiIncomingQueue;
+    private static final String ERROR_IN_CORE = "Error in Core: ";
 
-    BlockingQueue<GUIMessage> guiOutgoingQueue;
+    private static final Log LOGGER = LogFactory.getLog(Core.class);
 
-    BlockingQueue<NetworkMessage> networkIncomingQueue;
+    private BlockingQueue<GUIMessage> guiIncomingQueue;
 
-    BlockingQueue<NetworkMessage> networkOutgoingQueue;
+    private BlockingQueue<GUIMessage> guiOutgoingQueue;
+
+    private BlockingQueue<NetworkMessage> networkIncomingQueue;
+
+    private BlockingQueue<NetworkMessage> networkOutgoingQueue;
 
     private boolean shutdown;
 
@@ -50,9 +56,9 @@ public class Core implements Runnable {
             public void run() {
                 while (!shutdown) {
                     try {
-                        Thread.sleep(50);
+                        Thread.sleep(SLEEP_TIME);
                     } catch (InterruptedException e) {
-                        LOGGER.error("Error in Core: ", e);
+                        LOGGER.error(ERROR_IN_CORE, e);
                     }
 
                     workGUI();
@@ -66,9 +72,9 @@ public class Core implements Runnable {
             public void run() {
                 while (!shutdown) {
                     try {
-                        Thread.sleep(50);
+                        Thread.sleep(SLEEP_TIME);
                     } catch (InterruptedException e) {
-                        LOGGER.error("Error in Core: ", e);
+                        LOGGER.error(ERROR_IN_CORE, e);
                     }
                     workNetwork();
                 }
@@ -83,7 +89,7 @@ public class Core implements Runnable {
             public void run() {
                 try {
                     while (!shutdown) {
-                        Thread.sleep(1000);
+                        Thread.sleep(SLEEP_TIME * 10 * 2);
                         guiIncomingQueue.put(new GUIMessage("Start Game", null));
                     }
                 } catch (InterruptedException e) {
@@ -111,7 +117,7 @@ public class Core implements Runnable {
                 LOGGER.debug("Shutting down");
             }
         } catch (InterruptedException e) {
-            LOGGER.error("Error in Core: ", e);
+            LOGGER.error(ERROR_IN_CORE, e);
         }
     }
 
@@ -119,12 +125,11 @@ public class Core implements Runnable {
     static int i = 0;
 
     private Map createMap() {
-        Map m = new Map(100, 100);
+        Map m = new Map(10 * 10, 10 * 10);
         MapGenerator.createRandomMap(i++, m);
         return m;
     }
 
-    /*********** TEST CODE **************/
     public BlockingQueue<GUIMessage> getGuiIncomingQueue() {
         return guiIncomingQueue;
     }

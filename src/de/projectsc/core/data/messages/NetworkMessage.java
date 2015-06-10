@@ -1,13 +1,15 @@
 /*
- * Copyright (C) 2006-2015 DLR, Germany
+ * Copyright (C) 2015 Project SC
  * 
  * All rights reserved
- * 
- * http://www.rcenvironment.de/
  */
+package de.projectsc.core.data.messages;
 
-package de.projectsc.core.data;
-
+/**
+ * Message class for the network.
+ * 
+ * @author Josch Bosch
+ */
 public class NetworkMessage extends Message {
 
     public NetworkMessage(String msg, Object data) {

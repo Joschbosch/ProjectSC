@@ -1,22 +1,40 @@
+/*
+ * Copyright (C) 2015 Project SC
+ * 
+ * All rights reserved
+ */
 package de.projectsc.gui;
 
+import java.util.HashMap;
 import java.util.concurrent.BlockingQueue;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import de.projectsc.core.data.GUIMessage;
-import de.projectsc.core.data.Map;
+import de.projectsc.core.data.content.Map;
+import de.projectsc.core.data.messages.GUIMessage;
+import de.projectsc.gui.states.GUIState;
 import de.projectsc.gui.states.State;
 import de.projectsc.gui.states.StateGameRunning;
 
+/**
+ * Core class for the GUI.
+ * 
+ * @author Josch Bosch
+ */
 public class GUICore implements Runnable {
 
-    private static Log LOGGER = LogFactory.getLog(GUICore.class);
+    private static final int HEIGHT = 768;
 
-    public static final int TARGET_FPS = 75;
+    private static final int WIDTH = 1024;
+
+    private static final Log LOGGER = LogFactory.getLog(GUICore.class);
+
+    private static final int TARGET_FPS = 75;
 
     private static final float TARGET_UPS = 30;
+
+    private static java.util.Map<GUIState, State> stateMap;
 
     private boolean running;
 
@@ -35,6 +53,7 @@ public class GUICore implements Runnable {
     public GUICore(BlockingQueue<GUIMessage> outgoingQueue, BlockingQueue<GUIMessage> incomingQueue) {
         this.outgoingQueue = outgoingQueue;
         this.incomingQueue = incomingQueue;
+        stateMap = new HashMap<GUIState, State>();
     }
 
     /**
@@ -58,19 +77,20 @@ public class GUICore implements Runnable {
 
     private void init() {
         LOGGER.debug("Initialize");
-        window = new Window(640, 480, "ProjectSC", false);
+        window = new Window(WIDTH, HEIGHT, "ProjectSC", false);
         LOGGER.debug("Opened window ");
         this.timer = new Timer();
         running = true;
     }
 
-    public void startGameLoop() throws InterruptedException {
+    private void startGameLoop() throws InterruptedException {
         float delta;
         float accumulator = 0f;
         float interval = 1f / TARGET_UPS;
         float alpha;
         outgoingQueue.put(new GUIMessage("Start Game", null));
-        currentState = new StateGameRunning(window);
+        stateMap.put(GUIState.GAME, new StateGameRunning(window));
+        currentState = stateMap.get(GUIState.GAME);
         LOGGER.debug("Starting Game");
         while (running) {
             if (window.isClosing()) {

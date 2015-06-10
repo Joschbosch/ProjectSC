@@ -1,25 +1,54 @@
+/*
+ * Copyright (C) 2015 Project SC
+ * 
+ * All rights reserved
+ */
 package de.projectsc.core.algorithms;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
-import de.projectsc.core.data.Map;
-import de.projectsc.core.data.TileType;
+import de.projectsc.core.data.content.Map;
+import de.projectsc.core.data.content.TileType;
 
-public class MapGenerator {
+/**
+ * Generator for a new random map.
+ * 
+ * @author Josch Bosch
+ */
+public final class MapGenerator {
+
+    private static final int MINUS_ONE = -1;
+
     private static final int MAX_RETRIES_FOR_ROOMS = 150;
+
     private static final int MAX_ROOM_SIZE = 10;
+
     private static final int MIN_ROOM_SIZE = 2;
+
+    private static final int FILL_BACK_TRIES = 20;
+
     private static Random r;
 
+    private MapGenerator() {
+
+    }
+
+    /**
+     * Create a new map and returns it.
+     * 
+     * @param seed for the randomizer.
+     * @param map handle to fill
+     * @return newly created Map
+     */
     public static Map createRandomMap(int seed, Map map) {
 
         r = new Random(seed);
 
         createRooms(map);
         createPerfectMaze(map);
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < FILL_BACK_TRIES; i++) {
             fillBackIn(map);
         }
         connect(map);
@@ -30,10 +59,10 @@ public class MapGenerator {
         for (int i = 1; i < map.getWidth() - 1; i++) {
             for (int j = 1; j < map.getHeight() - 1; j++) {
                 if (map.getTileAt(i, j).getType() == TileType.NOTHING
-                        && (map.getTileAt(i + 1, j).getType() == TileType.GRAS && map
-                                .getTileAt(i - 1, j).getType() == TileType.GRAS)
-                        || (map.getTileAt(i, j + 1).getType() == TileType.GRAS && map
-                                .getTileAt(i, j - 1).getType() == TileType.GRAS)) {
+                    && (map.getTileAt(i + 1, j).getType() == TileType.GRAS && map
+                        .getTileAt(i - 1, j).getType() == TileType.GRAS)
+                    || (map.getTileAt(i, j + 1).getType() == TileType.GRAS && map
+                        .getTileAt(i, j - 1).getType() == TileType.GRAS)) {
                     map.setTileAt(i, j, TileType.GRAS);
 
                 }
@@ -45,7 +74,7 @@ public class MapGenerator {
         for (int i = 0; i < map.getWidth(); i++) {
             for (int j = 0; j < map.getHeight(); j++) {
                 if (map.getTileAt(i, j).getType() == TileType.GRAS
-                        && surroundedByThreeOrFour(i, j, map)) {
+                    && surroundedByThreeOrFour(i, j, map)) {
                     map.setTileAt(i, j, TileType.NOTHING);
                 }
             }
@@ -89,7 +118,7 @@ public class MapGenerator {
         for (int i = 1; i < map.getWidth() - 1; i++) {
             for (int j = 1; j < map.getHeight() - 1; j++) {
                 if (map.getTileAt(i, j).getType() == TileType.NOTHING
-                        && surroundedNothing(i, j, map)) {
+                    && surroundedNothing(i, j, map)) {
                     startMaze(i, j, map);
                 }
             }
@@ -100,17 +129,17 @@ public class MapGenerator {
         map.setTileAt(i, j, TileType.GRAS);
         List<Integer[]> directions = new LinkedList<Integer[]>();
         directions.add(new Integer[] { 1, 0 });
-        directions.add(new Integer[] { -1, 0 });
+        directions.add(new Integer[] { MINUS_ONE, 0 });
         directions.add(new Integer[] { 0, 1 });
-        directions.add(new Integer[] { 0, -1 });
+        directions.add(new Integer[] { 0, MINUS_ONE });
 
         while (!directions.isEmpty()) {
             Integer[] direction = directions.get(r.nextInt(directions.size()));
             if (map.inBounds(i + direction[0], j + direction[1])
-                    && map.getTileAt(i + direction[0], j + direction[1])
-                            .getType() == TileType.NOTHING
-                    && surroundedNothing(i + direction[0], j + direction[1], i,
-                            j, map)) {
+                && map.getTileAt(i + direction[0], j + direction[1])
+                    .getType() == TileType.NOTHING
+                && surroundedNothing(i + direction[0], j + direction[1], i,
+                    j, map)) {
                 startMaze(i + direction[0], j + direction[1], map);
             }
             directions.remove(direction);
@@ -118,24 +147,24 @@ public class MapGenerator {
     }
 
     private static boolean surroundedNothing(int i, int j, int exceptX,
-            int exceptY, Map map) {
+        int exceptY, Map map) {
         boolean nothing = map.inBounds(i, j);
 
         if (nothing) {
             if (i + 1 < map.getWidth() && i + 1 != exceptX
-                    && map.getTileAt(i + 1, j).getType() != TileType.NOTHING) {
+                && map.getTileAt(i + 1, j).getType() != TileType.NOTHING) {
                 nothing = false;
             }
             if (j + 1 < map.getHeight() && j + 1 != exceptY
-                    && map.getTileAt(i, j + 1).getType() != TileType.NOTHING) {
+                && map.getTileAt(i, j + 1).getType() != TileType.NOTHING) {
                 nothing = false;
             }
             if (i - 1 >= 0 && i - 1 != exceptX
-                    && map.getTileAt(i - 1, j).getType() != TileType.NOTHING) {
+                && map.getTileAt(i - 1, j).getType() != TileType.NOTHING) {
                 nothing = false;
             }
             if (j - 1 >= 0 && j - 1 != exceptY
-                    && map.getTileAt(i, j - 1).getType() != TileType.NOTHING) {
+                && map.getTileAt(i, j - 1).getType() != TileType.NOTHING) {
                 nothing = false;
             }
         }
@@ -176,30 +205,30 @@ public class MapGenerator {
     }
 
     private static void applyRoom(Room room, int roomPositionX,
-            int roomPositionY, Map map) {
-        for (int i = 0; i < room.roomTiles.length; i++) {
-            for (int j = 0; j < room.roomTiles[i].length; j++) {
+        int roomPositionY, Map map) {
+        for (int i = 0; i < room.getRoomTiles().length; i++) {
+            for (int j = 0; j < room.getRoomTiles()[i].length; j++) {
                 if (room.isFree(i, j)) {
                     map.setTileAt(i + roomPositionX, j + roomPositionY,
-                            TileType.GRAS);
+                        TileType.GRAS);
                 }
             }
         }
     }
 
     private static boolean checkIfRoomFits(Room room, int roomPositionX,
-            int roomPositionY, Map map) {
+        int roomPositionY, Map map) {
         boolean isFree = true;
 
-        if (roomPositionX + room.roomTiles.length >= map.getWidth()
-                || roomPositionY + room.roomTiles[0].length >= map.getHeight()) {
+        if (roomPositionX + room.getRoomTiles().length >= map.getWidth()
+            || roomPositionY + room.getRoomTiles()[0].length >= map.getHeight()) {
             isFree = false;
         }
         if (isFree) {
-            for (int i = 0; i < room.roomTiles.length; i++) {
-                for (int j = 0; j < room.roomTiles[i].length; j++) {
+            for (int i = 0; i < room.getRoomTiles().length; i++) {
+                for (int j = 0; j < room.getRoomTiles()[i].length; j++) {
                     if ((room.isFree(i, j) && map.getTileAt(i + roomPositionX,
-                            j + roomPositionY).getType() != TileType.NOTHING)) {
+                        j + roomPositionY).getType() != TileType.NOTHING)) {
                         isFree = false;
                     }
                 }

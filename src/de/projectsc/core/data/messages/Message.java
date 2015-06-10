@@ -1,14 +1,16 @@
 /*
- * Copyright (C) 2006-2015 DLR, Germany
+ * Copyright (C) 2015 Project SC
  * 
  * All rights reserved
- * 
- * http://www.rcenvironment.de/
  */
+package de.projectsc.core.data.messages;
 
-package de.projectsc.core.data;
-
-public class Message {
+/**
+ * Base class for messages.
+ * 
+ * @author Josch Bosch
+ */
+public abstract class Message {
 
     private final String message;
 

@@ -1,14 +1,40 @@
+/*
+ * Copyright (C) 2015 Project SC
+ * 
+ * All rights reserved
+ */
 package de.projectsc.gui.states;
 
+/**
+ * Interface for all gui states.
+ * 
+ * @author Josch Bosch
+ */
 public interface State {
 
-	void initialize();
+    /**
+     * Initialize the state.
+     */
+    void initialize();
 
-	void pause();
+    /**
+     * Pause state.
+     */
+    void pause();
 
-	void resume();
+    /**
+     * Resume state.
+     *
+     */
+    void resume();
 
-	void update();
+    /**
+     * Update state.
+     */
+    void update();
 
-	void render();
+    /**
+     * Render state.
+     */
+    void render();
 }
