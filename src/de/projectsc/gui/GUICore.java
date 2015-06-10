@@ -5,6 +5,10 @@
  */
 package de.projectsc.gui;
 
+import static de.projectsc.core.data.messages.GUIMessageConstants.CLOSE_DOWN_GUI;
+import static de.projectsc.core.data.messages.GUIMessageConstants.NEW_MAP;
+import static de.projectsc.core.data.messages.GUIMessageConstants.START_GAME;
+
 import java.util.HashMap;
 import java.util.concurrent.BlockingQueue;
 
@@ -34,7 +38,7 @@ public class GUICore implements Runnable {
 
     private static final float TARGET_UPS = 30;
 
-    private static java.util.Map<GUIState, State> stateMap;
+    private static java.util.Map<GUIState, State> stateMap = new HashMap<GUIState, State>();
 
     private boolean running;
 
@@ -53,7 +57,6 @@ public class GUICore implements Runnable {
     public GUICore(BlockingQueue<GUIMessage> outgoingQueue, BlockingQueue<GUIMessage> incomingQueue) {
         this.outgoingQueue = outgoingQueue;
         this.incomingQueue = incomingQueue;
-        stateMap = new HashMap<GUIState, State>();
     }
 
     /**
@@ -88,13 +91,13 @@ public class GUICore implements Runnable {
         float accumulator = 0f;
         float interval = 1f / TARGET_UPS;
         float alpha;
-        outgoingQueue.put(new GUIMessage("Start Game", null));
+        outgoingQueue.put(new GUIMessage(START_GAME, null));
         stateMap.put(GUIState.GAME, new StateGameRunning(window));
         currentState = stateMap.get(GUIState.GAME);
         LOGGER.debug("Starting Game");
         while (running) {
             if (window.isClosing()) {
-                outgoingQueue.put(new GUIMessage("Close Down", null));
+                outgoingQueue.put(new GUIMessage(CLOSE_DOWN_GUI, null));
                 running = false;
                 LOGGER.debug("Send close requrest and close down");
             }
@@ -121,13 +124,13 @@ public class GUICore implements Runnable {
     private void retreiveCoreMessages() {
         while (!incomingQueue.isEmpty()) {
             GUIMessage msg = incomingQueue.poll();
-            if (msg.getMessage().equals("New Map")) {
-                LOGGER.debug("Retrive new map!");
+            if (msg.getMessage().equals(NEW_MAP)) {
+                LOGGER.debug("Retrieve new map!");
                 map = (Map) msg.getData();
                 if (currentState instanceof StateGameRunning) {
                     ((StateGameRunning) currentState).setCurrentMap(map);
                 }
-            } else if (msg.getMessage().equals("Close Down")) {
+            } else if (msg.getMessage().equals(CLOSE_DOWN_GUI)) {
                 LOGGER.debug("Closing down");
                 running = false;
 

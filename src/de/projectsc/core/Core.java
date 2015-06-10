@@ -5,6 +5,10 @@
  */
 package de.projectsc.core;
 
+import static de.projectsc.core.data.messages.GUIMessageConstants.CLOSE_DOWN_GUI;
+import static de.projectsc.core.data.messages.GUIMessageConstants.NEW_MAP;
+import static de.projectsc.core.data.messages.GUIMessageConstants.START_GAME;
+
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -82,7 +86,7 @@ public class Core implements Runnable {
         }).start();
         LOGGER.debug("Core initialized");
 
-        /*********** TEST CODE **************/
+        // *********** TEST CODE **************/
         new Thread(new Runnable() {
 
             @Override
@@ -90,13 +94,13 @@ public class Core implements Runnable {
                 try {
                     while (!shutdown) {
                         Thread.sleep(SLEEP_TIME * 10 * 2);
-                        guiIncomingQueue.put(new GUIMessage("Start Game", null));
+                        guiIncomingQueue.put(new GUIMessage(START_GAME, null));
                     }
                 } catch (InterruptedException e) {
                 }
             }
         }).start();
-        /*********** TEST CODE **************/
+        // *********** TEST CODE **************/
     }
 
     private void workNetwork() {
@@ -107,12 +111,12 @@ public class Core implements Runnable {
         try {
             GUIMessage msg = guiIncomingQueue.take();
             LOGGER.debug("New Message: " + msg.getMessage());
-            if (msg.getMessage().contains("Start Game")) {
+            if (msg.getMessage().contains(START_GAME)) {
                 Map m = createMap();
-                guiOutgoingQueue.put(new GUIMessage("New Map", m));
-            } else if (msg.getMessage().contains("Close Down")) {
-                guiOutgoingQueue.offer(new GUIMessage("Close Down", null));
-                networkOutgoingQueue.offer(new NetworkMessage("Close Down", null));
+                guiOutgoingQueue.put(new GUIMessage(NEW_MAP, m));
+            } else if (msg.getMessage().contains(CLOSE_DOWN_GUI)) {
+                guiOutgoingQueue.offer(new GUIMessage(CLOSE_DOWN_GUI, null));
+                networkOutgoingQueue.offer(new NetworkMessage(CLOSE_DOWN_GUI, null));
                 shutdown = true;
                 LOGGER.debug("Shutting down");
             }
@@ -121,7 +125,7 @@ public class Core implements Runnable {
         }
     }
 
-    /*********** TEST CODE **************/
+    // /*********** TEST CODE **************/
     static int i = 0;
 
     private Map createMap() {
