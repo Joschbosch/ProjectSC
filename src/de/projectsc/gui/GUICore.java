@@ -1,0 +1,142 @@
+package de.projectsc.gui;
+
+import java.util.concurrent.BlockingQueue;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import de.projectsc.core.data.GUIMessage;
+import de.projectsc.core.data.Map;
+import de.projectsc.gui.states.State;
+import de.projectsc.gui.states.StateGameRunning;
+
+public class GUICore implements Runnable {
+
+    private static Log LOGGER = LogFactory.getLog(GUICore.class);
+
+    public static final int TARGET_FPS = 75;
+
+    private static final float TARGET_UPS = 30;
+
+    private boolean running;
+
+    private Timer timer;
+
+    private Window window;
+
+    private Map map;
+
+    private final BlockingQueue<GUIMessage> outgoingQueue;
+
+    private final BlockingQueue<GUIMessage> incomingQueue;
+
+    private State currentState;
+
+    public GUICore(BlockingQueue<GUIMessage> outgoingQueue, BlockingQueue<GUIMessage> incomingQueue) {
+        this.outgoingQueue = outgoingQueue;
+        this.incomingQueue = incomingQueue;
+    }
+
+    /**
+     * This should be called to initialize and start the game.
+     */
+    public void start() {
+        LOGGER.debug("Starting GUI ...");
+        init();
+        LOGGER.debug("Initialize done, starting gui loop ...");
+        try {
+            startGameLoop();
+        } catch (InterruptedException e) {
+            LOGGER.error("GUI Core: ", e);
+        }
+        dispose();
+    }
+
+    private void dispose() {
+
+    }
+
+    private void init() {
+        LOGGER.debug("Initialize");
+        window = new Window(640, 480, "ProjectSC", false);
+        LOGGER.debug("Opened window ");
+        this.timer = new Timer();
+        running = true;
+    }
+
+    public void startGameLoop() throws InterruptedException {
+        float delta;
+        float accumulator = 0f;
+        float interval = 1f / TARGET_UPS;
+        float alpha;
+        outgoingQueue.put(new GUIMessage("Start Game", null));
+        currentState = new StateGameRunning(window);
+        LOGGER.debug("Starting Game");
+        while (running) {
+            if (window.isClosing()) {
+                outgoingQueue.put(new GUIMessage("Close Down", null));
+                running = false;
+                LOGGER.debug("Send close requrest and close down");
+            }
+            retreiveCoreMessages();
+            delta = timer.getDelta();
+            accumulator += delta;
+            input();
+            while (accumulator >= interval) {
+                update();
+                timer.updateUPS();
+                accumulator -= interval;
+            }
+            alpha = accumulator / interval;
+            render(alpha);
+            timer.updateFPS();
+            timer.update();
+            window.update();
+            if (!window.isVSyncEnabled()) {
+                sync(TARGET_FPS);
+            }
+        }
+    }
+
+    private void retreiveCoreMessages() {
+        while (!incomingQueue.isEmpty()) {
+            GUIMessage msg = incomingQueue.poll();
+            if (msg.getMessage().equals("New Map")) {
+                LOGGER.debug("Retrive new map!");
+                map = (Map) msg.getData();
+                if (currentState instanceof StateGameRunning) {
+                    ((StateGameRunning) currentState).setCurrentMap(map);
+                }
+            } else if (msg.getMessage().equals("Close Down")) {
+                LOGGER.debug("Closing down");
+                running = false;
+
+            }
+        }
+    }
+
+    private void sync(int targetFps) {
+
+    }
+
+    private void render(float alpha) {
+        window.render(currentState);
+    }
+
+    private void update() {
+        currentState.update();
+    }
+
+    private void input() {
+
+    }
+
+    public boolean isRunning() {
+        return running;
+    }
+
+    @Override
+    public void run() {
+        start();
+    }
+}

@@ -1,110 +1,160 @@
+/*
+ * Copyright (C) 2006-2015 DLR, Germany
+ * 
+ * All rights reserved
+ * 
+ * http://www.rcenvironment.de/
+ */
+
 package de.projectsc.core;
+
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import de.projectsc.core.algorithms.MapGenerator;
+import de.projectsc.core.data.GUIMessage;
 import de.projectsc.core.data.Map;
-import de.projectsc.gui.Timer;
-import de.projectsc.gui.Window;
+import de.projectsc.core.data.NetworkMessage;
 
-public class Core {
+public class Core implements Runnable {
 
     private static Log LOGGER = LogFactory.getLog(Core.class);
 
-    public static final int TARGET_FPS = 75;
+    BlockingQueue<GUIMessage> guiIncomingQueue;
 
-    private static final float TARGET_UPS = 30;
+    BlockingQueue<GUIMessage> guiOutgoingQueue;
 
-    private boolean running;
+    BlockingQueue<NetworkMessage> networkIncomingQueue;
 
-    private Timer timer;
+    BlockingQueue<NetworkMessage> networkOutgoingQueue;
 
-    private Window window;
+    private boolean shutdown;
 
-    private Map map;
-
-    /**
-     * This should be called to initialize and start the game.
-     */
-    public void start() {
-        LOGGER.debug("Starting Core ...");
-        init();
-        LOGGER.debug("Initialize done, starting game loop ...");
-        startGameLoop();
-        dispose();
+    public Core() {
+        guiIncomingQueue = new LinkedBlockingQueue<>();
+        guiOutgoingQueue = new LinkedBlockingQueue<>();
+        networkIncomingQueue = new LinkedBlockingQueue<>();
+        networkOutgoingQueue = new LinkedBlockingQueue<>();
     }
 
-    private void dispose() {
+    @Override
+    public void run() {
+        LOGGER.debug("Starting core ... ");
+
+        new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                while (!shutdown) {
+                    try {
+                        Thread.sleep(50);
+                    } catch (InterruptedException e) {
+                        LOGGER.error("Error in Core: ", e);
+                    }
+
+                    workGUI();
+                }
+            }
+        }).start();
+
+        new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                while (!shutdown) {
+                    try {
+                        Thread.sleep(50);
+                    } catch (InterruptedException e) {
+                        LOGGER.error("Error in Core: ", e);
+                    }
+                    workNetwork();
+                }
+            }
+        }).start();
+        LOGGER.debug("Core initialized");
+
+        /*********** TEST CODE **************/
+        new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                try {
+                    while (!shutdown) {
+                        Thread.sleep(1000);
+                        guiIncomingQueue.put(new GUIMessage("Start Game", null));
+                    }
+                } catch (InterruptedException e) {
+                }
+            }
+        }).start();
+        /*********** TEST CODE **************/
+    }
+
+    private void workNetwork() {
 
     }
 
-    private void init() {
-        LOGGER.debug("Initialize");
-        window = new Window(640, 480, "ProjectSC", false);
-        LOGGER.debug("Opened window ");
-        this.timer = new Timer();
-        running = true;
-    }
-
-    public void startGameLoop() {
-        float delta;
-        float accumulator = 0f;
-        float interval = 1f / TARGET_UPS;
-        float alpha;
-        while (running) {
-            /* Check if game should close */
-            if (window.isClosing()) {
-                running = false;
+    private void workGUI() {
+        try {
+            GUIMessage msg = guiIncomingQueue.take();
+            LOGGER.debug("New Message: " + msg.getMessage());
+            if (msg.getMessage().contains("Start Game")) {
+                Map m = createMap();
+                guiOutgoingQueue.put(new GUIMessage("New Map", m));
+            } else if (msg.getMessage().contains("Close Down")) {
+                guiOutgoingQueue.offer(new GUIMessage("Close Down", null));
+                networkOutgoingQueue.offer(new NetworkMessage("Close Down", null));
+                shutdown = true;
+                LOGGER.debug("Shutting down");
             }
-            /* Get delta time and update the accumulator */
-            delta = timer.getDelta();
-            accumulator += delta;
-            /* Handle input */
-            input();
-            /* Update game and timer UPS if enough time has passed */
-            while (accumulator >= interval) {
-                update();
-                timer.updateUPS();
-                accumulator -= interval;
-            }
-            /* Calculate alpha value for interpolation */
-            alpha = accumulator / interval;
-            /* Render game and update timer FPS */
-            render(alpha);
-            timer.updateFPS();
-            /* Update timer */
-            timer.update();
-
-            /* Update window to show the new screen */
-            window.update();
-            /* Synchronize if v-sync is disabled */
-            if (!window.isVSyncEnabled()) {
-                sync(TARGET_FPS);
-            }
+        } catch (InterruptedException e) {
+            LOGGER.error("Error in Core: ", e);
         }
     }
 
-    private void sync(int targetFps) {
+    /*********** TEST CODE **************/
+    static int i = 0;
 
+    private Map createMap() {
+        Map m = new Map(100, 100);
+        MapGenerator.createRandomMap(i++, m);
+        return m;
     }
 
-    private void render(float alpha) {
-        window.render(map);
+    /*********** TEST CODE **************/
+    public BlockingQueue<GUIMessage> getGuiIncomingQueue() {
+        return guiIncomingQueue;
     }
 
-    private void update() {
-
+    public void setGuiIncomingQueue(BlockingQueue<GUIMessage> guiIncomingQueue) {
+        this.guiIncomingQueue = guiIncomingQueue;
     }
 
-    private void input() {
-
+    public BlockingQueue<GUIMessage> getGuiOutgoingQueue() {
+        return guiOutgoingQueue;
     }
 
-    public void setMap(Map m) {
-        this.map = m;
+    public void setGuiOutgoingQueue(BlockingQueue<GUIMessage> guiOutgoingQueue) {
+        this.guiOutgoingQueue = guiOutgoingQueue;
     }
 
-    public boolean isRunning() {
-        return running;
+    public BlockingQueue<NetworkMessage> getNetworkIncomingQueue() {
+        return networkIncomingQueue;
     }
+
+    public void setNetworkIncomingQueue(BlockingQueue<NetworkMessage> networkIncomingQueue) {
+        this.networkIncomingQueue = networkIncomingQueue;
+    }
+
+    public BlockingQueue<NetworkMessage> getNetworkOutgoingQueue() {
+        return networkOutgoingQueue;
+    }
+
+    public void setNetworkOutgoingQueue(BlockingQueue<NetworkMessage> networkOutgoingQueue) {
+        this.networkOutgoingQueue = networkOutgoingQueue;
+    }
+
 }
