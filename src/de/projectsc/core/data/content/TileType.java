@@ -14,19 +14,19 @@ public enum TileType {
     /**
     * 
     */
-    NOTHING(68, new float[] { 0.0f, 0.0f, 0.0f }),
+    NOTHING(67, new float[] { 0.0f, 0.0f, 0.0f }),
     /**
     * 
     */
-    GRAS(946, new float[] { 0.0f, 1.0f, 0.0f }),
+    GRAS(945, new float[] { 0.0f, 1.0f, 0.0f }),
     /**
     * 
     */
-    WATER(1217, new float[] { 0.0f, 0.0f, 1.0f }),
+    WATER(1216, new float[] { 0.0f, 0.0f, 1.0f }),
     /**
     * 
     */
-    ROCK(883, new float[] { 0.5f, 0.35f, 0.05f });
+    ROCK(882, new float[] { 0.5f, 0.35f, 0.05f });
 
     private final int tileId;
 

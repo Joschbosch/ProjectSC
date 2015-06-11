@@ -5,8 +5,6 @@
  */
 package de.projectsc.gui.states;
 
-import java.awt.Color;
-import java.awt.Font;
 import java.util.concurrent.BlockingQueue;
 
 import org.apache.commons.logging.Log;
@@ -18,7 +16,6 @@ import de.projectsc.core.data.content.Map;
 import de.projectsc.core.data.messages.GUIMessage;
 import de.projectsc.core.data.messages.GUIMessageConstants;
 import de.projectsc.gui.GameFont;
-import de.projectsc.gui.GraphicsUtils;
 import de.projectsc.gui.InputData;
 import de.projectsc.gui.Window;
 import de.projectsc.gui.tiles.TileSetStore;
@@ -79,29 +76,61 @@ public class StateGameRunning implements State {
         // Clear the screen and depth buffer
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 
-        final int tileSize = 32;
         if (currentMap != null) {
-            for (int i = 0; i < currentMap.getWidth(); i++) {
-                for (int j = 0; j < currentMap.getHeight(); j++) {
-                    int tile = currentMap.getTileAt(i, j).getType().getTileId();
-                    GL11.glColor3f(1.0f, 1.0f, 1.0f);
-                    GraphicsUtils.drawTile(i * tileSize, j * tileSize, tileSize, tile);
-                }
-            }
-
-            drawMiniMap(window.getWidth() - currentMap.getWidth() * 2, window.getHeight() - currentMap.getHeight() * 2, 2);
+            GL11.glColor3f(1.0f, 1.0f, 1.0f);
+            // glEnable(GL_TEXTURE_2D);
+            // glBindTexture(GL_TEXTURE_2D, TileSetStore.getTilesetID());
+            // // for (int j = 0; j < 1/*currentMap.getHeight()*/; j++) {
+            // // for (int i = 0; i < currentMap.getWidth(); i++) {
+            // int tile = currentMap.getTileAt(0, 0).getType().getTileId();
+            // Float[] tileCoords = TileSetStore.getTextureCoordinates(tile);
+            // GL11.glBegin(GL11.GL_TRIANGLE_STRIP);
+            // // First triangle
+            // GL11.glTexCoord2f(tileCoords[0], tileCoords[1]);
+            // GL11.glVertex3f(0, 0.0f, 0.0f); // vertex 0
+            //
+            // GL11.glTexCoord2f(tileCoords[0] + TileSetStore.getTileVertexSize()[0],
+            // tileCoords[1]);
+            // GL11.glVertex3f(32.0f, 0.0f, 0.0f); // vertex 1
+            //
+            // GL11.glTexCoord2f(tileCoords[0], tileCoords[1] +
+            // TileSetStore.getTileVertexSize()[1]);
+            // GL11.glVertex3f(0, 32.0f, 0.0f); // vertex 2
+            //
+            // GL11.glTexCoord2f(tileCoords[0] + TileSetStore.getTileVertexSize()[0], tileCoords[1]
+            // + TileSetStore.getTileVertexSize()[1]);
+            // GL11.glVertex3f(32.0f, 32.0f, 0.0f); // vertex 3
+            //
+            // GL11.glTexCoord2f(tileCoords[0] + TileSetStore.getTileVertexSize()[0],
+            // tileCoords[1]);
+            // GL11.glVertex3f(32f, 0f, 0.0f); // vertex 2
+            // GL11.glTexCoord2f(tileCoords[0] + TileSetStore.getTileVertexSize()[0],
+            // tileCoords[1]);
+            // GL11.glVertex3f(32f, 0f, 0.0f); // vertex 2
+            //
+            // GL11.glTexCoord2f(tileCoords[0], tileCoords[1] +
+            // TileSetStore.getTileVertexSize()[1]);
+            // GL11.glVertex3f(32.0f, 32.0f, 0.0f); // vertex 4
+            //
+            // GL11.glTexCoord2f(tileCoords[0] + TileSetStore.getTileVertexSize()[0],
+            // tileCoords[1]);
+            // GL11.glVertex3f(64.0f, 0, 0.0f); // vertex 4
+            //
+            // GL11.glTexCoord2f(tileCoords[0] + TileSetStore.getTileVertexSize()[0], tileCoords[1]
+            // + TileSetStore.getTileVertexSize()[1]);
+            // GL11.glVertex3f(64.0f, 32.0f, 0.0f); // vertex 5
+            //
+            // GL11.glEnd();
+            // // GraphicsUtils.drawTile(i * tileSize, j * tileSize, tileSize, tile);
+            // // }
+            // // }
+            // GL11.glDisable(GL_TEXTURE_2D);
+            // drawMiniMap(window.getWidth() - currentMap.getWidth() * 2, window.getHeight() -
+            // currentMap.getHeight() * 2, 2);
         }
         GL11.glColor3f(1.0f, 1.0f, 1.0f);
-        // TESTCODE
-        GraphicsUtils.drawTile(2 * tileSize, 2 * tileSize, tileSize, 2 * 63 + 1);
-        GraphicsUtils.drawText("Yippie!", textX++, 1 * 100, GameFont.getFont(GameFont.GLOBAL).deriveFont(Font.BOLD, 50), Color.RED);
-        if (textX > window.getWidth()) {
-            textX = 0;
-        }
-    }
 
-    // TESTCODE
-    private int textX = 0;
+    }
 
     private void drawMiniMap(int x, int y, int pointSize) {
         for (int i = 0; i < currentMap.getWidth(); i++) {

@@ -148,6 +148,8 @@ public class GUICore implements Runnable {
 
     private void render(float alpha) {
         window.render(currentState);
+        GraphicsUtils.drawText("FPS: " + timer.getFPS(), window.getWidth() - 50, 10);
+        timer.getFPS();
     }
 
     private void update() {

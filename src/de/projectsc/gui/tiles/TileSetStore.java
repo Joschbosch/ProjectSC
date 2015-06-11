@@ -26,7 +26,13 @@ public final class TileSetStore {
 
     private static final Log LOGGER = LogFactory.getLog(TileSetStore.class);
 
-    private static final Map<Integer, Integer> TILE_IDS = new HashMap<>();
+    private static final Map<Integer, Float[]> TILE_COORDINATES = new HashMap<>();
+
+    private static int tilesetID;
+
+    private static float tileVertexSize[];
+
+    public static final int TILE_SIZE = 32;
 
     private TileSetStore() {}
 
@@ -37,21 +43,20 @@ public final class TileSetStore {
         try {
             BufferedImage tileSets =
                 ImageIO.read(TileSetStore.class.getResource("/graphics/DungeonCrawl_ProjectUtumnoTileset.png"));
+            tilesetID = GraphicsUtils.loadTexture(tileSets);
             int index = 0;
             int i = 0;
             int j = 0;
-            final int tileSize = 32;
+            tileVertexSize = new float[] { 0.015625f, 0.02083333333333333333333333333333f };
             while (true) {
-                if (i * (tileSize + 1) >= tileSets.getWidth()) {
+                if (i * (TILE_SIZE + 1) >= tileSets.getWidth()) {
                     j++;
                     i = 0;
                 }
-                if (j * (tileSize + 1) > tileSets.getHeight()) {
+                if (j * (TILE_SIZE + 1) > tileSets.getHeight()) {
                     break;
                 }
-                BufferedImage currentTile = tileSets.getSubimage(i * tileSize, j * tileSize, tileSize, tileSize);
-                TILE_IDS.put(index++, GraphicsUtils.loadTexture(currentTile));
-                currentTile = null;
+                TILE_COORDINATES.put(index++, new Float[] { i * tileVertexSize[0], j * tileVertexSize[1] });
                 i++;
             }
         } catch (IOException e) {
@@ -59,4 +64,17 @@ public final class TileSetStore {
         }
 
     }
+
+    public static int getTilesetID() {
+        return tilesetID;
+    }
+
+    public static Float[] getTextureCoordinates(Integer tileID) {
+        return TILE_COORDINATES.get(tileID);
+    }
+
+    public static float[] getTileVertexSize() {
+        return tileVertexSize;
+    }
+
 }
