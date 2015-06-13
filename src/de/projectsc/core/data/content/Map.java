@@ -17,14 +17,16 @@ public class Map {
     private final int mapWidth;
 
     private final int mapHeight;
+    private final int mapLayer;
 
     private java.util.Map<TileType, Tile> typeMap = new HashMap<>();
 
-    private Tile[][] map;
+    private Tile[][][] map;
 
-    public Map(int width, int height) {
+    public Map(int width, int height, int layer) {
         mapWidth = width;
         mapHeight = height;
+        this.mapLayer = layer;
         for (TileType type : TileType.values()) {
             typeMap.put(type, new Tile(type));
         }
@@ -34,10 +36,12 @@ public class Map {
 
     private void initMap() {
 
-        map = new Tile[mapWidth][mapHeight];
+        map = new Tile[mapWidth][mapHeight][mapLayer];
         for (int i = 0; i < mapWidth; i++) {
             for (int j = 0; j < mapHeight; j++) {
-                map[i][j] = typeMap.get(TileType.NOTHING);
+                for (int k = 0; k < mapLayer; k++) {
+                map[i][j][k] = typeMap.get(TileType.NOTHING);
+                }
             }
         }
     }
@@ -47,8 +51,8 @@ public class Map {
      * @param y coordinate
      * @return tile at (x,y)
      */
-    public Tile getTileAt(int x, int y) {
-        return map[x][y];
+    public Tile getTileAt(int x, int y, int layer) {
+        return map[x][y][layer];
     }
 
     public int getWidth() {
@@ -59,13 +63,17 @@ public class Map {
         return mapHeight;
     }
 
+    public int getLayerCount() {
+        return mapLayer;
+    }
+
     /**
      * @param i coordinate
      * @param j coordinate
      * @param type set tile at (i,j) to {@link TileType} type.
      */
-    public void setTileAt(int i, int j, TileType type) {
-        map[i][j] = typeMap.get(type);
+    public void setTileAt(int i, int j, int layer, TileType type) {
+        map[i][j][layer] = typeMap.get(type);
     }
 
     /**

@@ -7,17 +7,20 @@ package de.projectsc.gui;
 
 import static de.projectsc.core.data.messages.GUIMessageConstants.CLOSE_DOWN_GUI;
 import static de.projectsc.core.data.messages.GUIMessageConstants.NEW_MAP;
-import static de.projectsc.core.data.messages.GUIMessageConstants.START_GAME;
 
 import java.util.HashMap;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.lwjgl.LWJGLException;
+import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.DisplayMode;
+import org.lwjgl.opengl.GL11;
 
 import de.projectsc.core.data.content.Map;
 import de.projectsc.core.data.messages.GUIMessage;
+import de.projectsc.core.data.messages.GUIMessageConstants;
 import de.projectsc.gui.states.GUIState;
 import de.projectsc.gui.states.State;
 import de.projectsc.gui.states.StateGameRunning;
@@ -29,15 +32,15 @@ import de.projectsc.gui.states.StateGameRunning;
  */
 public class GUICore implements Runnable {
 
-    private static final int HEIGHT = 768;
+    private static final int HEIGHT = 700;
 
-    private static final int WIDTH = 1024;
+    private static final int WIDTH = 700;
 
     private static final Log LOGGER = LogFactory.getLog(GUICore.class);
 
-    private static final int TARGET_FPS = 75;
+    private static final int TARGET_FPS = 500;
 
-    private static final float TARGET_UPS = 30;
+    private static final float TARGET_UPS = 300;
 
     private static java.util.Map<GUIState, State> stateMap = new HashMap<GUIState, State>();
 
@@ -45,15 +48,11 @@ public class GUICore implements Runnable {
 
     private Timer timer;
 
-    private Window window;
-
     private Map map;
 
     private final BlockingQueue<GUIMessage> outgoingQueue;
 
     private final BlockingQueue<GUIMessage> incomingQueue;
-
-    private final BlockingQueue<InputData> inputQueue = new LinkedBlockingQueue<>();
 
     private State currentState;
 
@@ -68,11 +67,17 @@ public class GUICore implements Runnable {
     public void start() {
         LOGGER.debug("Starting GUI ...");
         init();
-        LOGGER.debug("Initialize done, starting gui loop ...");
         try {
-            startGameLoop();
-        } catch (InterruptedException e) {
-            LOGGER.error("GUI Core: ", e);
+            outgoingQueue.put(new GUIMessage(GUIMessageConstants.START_GAME, null));
+            LOGGER.debug("Initialize done, send start game message ...");
+            stateMap.put(GUIState.GAME, new StateGameRunning(outgoingQueue));
+            currentState = stateMap.get(GUIState.GAME);
+            while (incomingQueue.isEmpty()) {
+                Thread.sleep(10);
+            }
+            retreiveCoreMessages();
+        } catch (InterruptedException e1) {
+            LOGGER.error("Could not send start Message", e1);
         }
         dispose();
     }
@@ -83,45 +88,35 @@ public class GUICore implements Runnable {
 
     private void init() {
         LOGGER.debug("Initialize");
-        window = new Window(WIDTH, HEIGHT, "ProjectSC", false, inputQueue);
+        try {
+            Display.setDisplayMode(new DisplayMode(WIDTH, HEIGHT));
+            Display.setTitle("Project SC");
+            Display.setVSyncEnabled(true);
+            Display.create();
+        } catch (LWJGLException e) {
+            LOGGER.error(e.getStackTrace());
+        }
         LOGGER.debug("Opened window ");
+        LOGGER.debug("OpenGL version: " + GL11.glGetString(GL11.GL_VERSION));
         this.timer = new Timer();
         running = true;
     }
 
     private void startGameLoop() throws InterruptedException {
-        float delta;
-        float accumulator = 0f;
-        float interval = 1f / TARGET_UPS;
-        float alpha;
-        outgoingQueue.put(new GUIMessage(START_GAME, null));
-        stateMap.put(GUIState.GAME, new StateGameRunning(window, outgoingQueue));
-        currentState = stateMap.get(GUIState.GAME);
-        currentState.initialize();
         LOGGER.debug("Starting Game");
+        timer.init();
         while (running) {
-            if (window.isClosing()) {
+            if (Display.isCloseRequested()) {
                 outgoingQueue.put(new GUIMessage(CLOSE_DOWN_GUI, null));
                 running = false;
                 LOGGER.debug("Send close requrest and close down");
             }
             retreiveCoreMessages();
-            currentState.handleInput(inputQueue);
-            delta = timer.getDelta();
-            accumulator += delta;
-            while (accumulator >= interval) {
-                update();
-                timer.updateUPS();
-                accumulator -= interval;
-            }
-            alpha = accumulator / interval;
-            render(alpha);
+            currentState.handleInput(timer.getDelta());
+            currentState.render(timer.getDelta());
             timer.updateFPS();
-            timer.update();
-            window.update();
-            if (!window.isVSyncEnabled()) {
-                sync(TARGET_FPS);
-            }
+            Display.sync(60);
+            Display.update();
         }
     }
 
@@ -130,9 +125,24 @@ public class GUICore implements Runnable {
             GUIMessage msg = incomingQueue.poll();
             if (msg.getMessage().equals(NEW_MAP)) {
                 LOGGER.debug("Retrieve new map!");
-                map = (Map) msg.getData();
-                if (currentState instanceof StateGameRunning) {
-                    ((StateGameRunning) currentState).setCurrentMap(map);
+                if (map == null) {
+                    LOGGER.debug("Starting game!");
+
+                    map = (Map) msg.getData();
+                    if (currentState instanceof StateGameRunning) {
+                        ((StateGameRunning) currentState).setCurrentMap(map);
+                        ((StateGameRunning) currentState).initialize();
+                    }
+                    try {
+                        startGameLoop();
+                    } catch (InterruptedException e) {
+                        LOGGER.error("GUI Core: ", e);
+                    }
+                } else {
+                    map = (Map) msg.getData();
+                    if (currentState instanceof StateGameRunning) {
+                        ((StateGameRunning) currentState).setCurrentMap(map);
+                    }
                 }
             } else if (msg.getMessage().equals(CLOSE_DOWN_GUI)) {
                 LOGGER.debug("Closing down");
@@ -140,20 +150,6 @@ public class GUICore implements Runnable {
 
             }
         }
-    }
-
-    private void sync(int targetFps) {
-
-    }
-
-    private void render(float alpha) {
-        window.render(currentState);
-        GraphicsUtils.drawText("FPS: " + timer.getFPS(), window.getWidth() - 50, 10);
-        timer.getFPS();
-    }
-
-    private void update() {
-        currentState.update();
     }
 
     public boolean isRunning() {

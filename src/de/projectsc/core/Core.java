@@ -113,7 +113,7 @@ public class Core implements Runnable {
     private static int i = 0;
 
     private Map createMap() {
-        Map m = new Map(10 * 10, 10 * 10);
+        Map m = new Map(10 * 10, 10 * 10, 1);
         MapGenerator.createRandomMap(i++, m);
         return m;
     }
