@@ -32,9 +32,9 @@ import de.projectsc.gui.states.StateGameRunning;
  */
 public class GUICore implements Runnable {
 
-    private static final int HEIGHT = 700;
+    private static final int HEIGHT = 1024;
 
-    private static final int WIDTH = 700;
+    private static final int WIDTH = 1280;
 
     private static final Log LOGGER = LogFactory.getLog(GUICore.class);
 

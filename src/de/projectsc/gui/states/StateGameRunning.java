@@ -5,26 +5,14 @@
  */
 package de.projectsc.gui.states;
 
-import static org.lwjgl.opengl.GL11.GL_BACK;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
-import static org.lwjgl.opengl.GL11.GL_CW;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
-import static org.lwjgl.opengl.GL11.GL_LEQUAL;
 import static org.lwjgl.opengl.GL11.glClear;
 import static org.lwjgl.opengl.GL11.glClearColor;
 import static org.lwjgl.opengl.GL11.glClearDepth;
-import static org.lwjgl.opengl.GL11.glCullFace;
-import static org.lwjgl.opengl.GL11.glDepthFunc;
-import static org.lwjgl.opengl.GL11.glDepthMask;
-import static org.lwjgl.opengl.GL11.glDepthRange;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glFrontFace;
 import static org.lwjgl.opengl.GL11.glViewport;
 import static org.lwjgl.opengl.GL20.glUniformMatrix4;
 import static org.lwjgl.opengl.GL20.glUseProgram;
-import static org.lwjgl.opengl.GL32.GL_DEPTH_CLAMP;
 
 import java.io.File;
 import java.io.IOException;
@@ -42,8 +30,8 @@ import org.apache.commons.logging.LogFactory;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
+import org.lwjgl.opengl.GL30;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
 
@@ -54,8 +42,10 @@ import de.projectsc.gui.Drawable;
 import de.projectsc.gui.GameFont;
 import de.projectsc.gui.content.GUICommand;
 import de.projectsc.gui.content.MiniMap;
+import de.projectsc.gui.render.Loader;
 import de.projectsc.gui.render.Mesh;
 import de.projectsc.gui.render.ProgramData;
+import de.projectsc.gui.render.RawModel;
 import de.projectsc.gui.render.Shader;
 import de.projectsc.gui.tiles.TileMap;
 
@@ -87,15 +77,16 @@ public class StateGameRunning implements State {
 
     private ProgramData uniformColor;
 
-    private int vsId;
+    private Model goat;
 
-    private int fsId;
+    private Loader loader;
 
-    private int pId;
+    private RawModel m;
 
     public StateGameRunning(BlockingQueue<GUIMessage> outgoingQueue) {
         this.outgoingQueue = outgoingQueue;
         camera = new Camera();
+        loader = new Loader();
     }
 
     @Override
@@ -107,20 +98,27 @@ public class StateGameRunning implements State {
 
         initOpenGL();
         planeMesh = new Mesh("UnitPlane.xml");
+
+        goat = new Model("goat.obj");
+        float[] vertices = { -0.5f, 0.5f, 0f, -0.5f, -0.5f, 0f, 0.5f, -0.5f, 0f, 0.5f, -0.5f, 0f, 0.5f, 0.5f, 0f, -0.5f, 0.5f, 0f
+        };
+
+        m = loader.loadToVAO(vertices);
     }
 
     private void initOpenGL() {
         initializeProgram();
 
-        glEnable(GL_CULL_FACE);
-        glCullFace(GL_BACK);
-        glFrontFace(GL_CW);
-        glEnable(GL_DEPTH_TEST);
-        glDepthMask(true);
-        glDepthFunc(GL_LEQUAL);
-        glDepthRange(0.0f, 1.0f);
-        glEnable(GL_DEPTH_CLAMP);
+        GL11.glEnable(GL11.GL_CULL_FACE);
+        GL11.glCullFace(GL11.GL_BACK);
+        // GL11.glFrontFace(GL11.GL_CW);
+        GL11.glEnable(GL11.GL_DEPTH_TEST);
+        GL11.glDepthMask(true);
+        GL11.glDepthFunc(GL11.GL_LEQUAL);
+        GL11.glDepthRange(0.0f, 1.0f);
+        // GL11.glEnable(GL30.GL_DEPTH_CLAMP);
         reshape(Display.getWidth(), Display.getHeight());
+
     }
 
     protected void reshape(int w, int h) {
@@ -146,13 +144,11 @@ public class StateGameRunning implements State {
         glUseProgram(uniformColor.theProgram);
         glUniformMatrix4(uniformColor.cameraToClipMatrixUnif, false, matrix44Buffer);
         glUseProgram(0);
-
         glViewport(0, 0, w, h);
     }
 
     private void initializeProgram() {
-        uniformColor = Shader.loadProgram("PosOnlyWorldTransform.vert", "ColorUniform.frag");
-        setupShaders();
+        uniformColor = Shader.loadProgram("tilemap.vert", "tilemap.frag");
     }
 
     private int loadShader(String filename, int type) {
@@ -175,27 +171,6 @@ public class StateGameRunning implements State {
         return shaderID;
     }
 
-    private void setupShaders() {
-        // Load the vertex shader
-        vsId = this.loadShader("tilemap.vert", GL20.GL_VERTEX_SHADER);
-        // Load the fragment shader
-        fsId = this.loadShader("tilemap.frag", GL20.GL_FRAGMENT_SHADER);
-
-        // Create a new shader program that links both shaders
-        pId = GL20.glCreateProgram();
-        GL20.glAttachShader(pId, vsId);
-        GL20.glAttachShader(pId, fsId);
-
-        // Color information will be attribute 1
-        GL20.glBindAttribLocation(pId, 3, "in_Color");
-        // Textute information will be attribute 2
-        GL20.glBindAttribLocation(pId, 1, "in_TextureCoord");
-
-        GL20.glLinkProgram(pId);
-        GL20.glValidateProgram(pId);
-
-    }
-
     @Override
     public void pause() {
 
@@ -206,13 +181,31 @@ public class StateGameRunning implements State {
 
     }
 
+    private void renderModel(RawModel model) {
+        GL30.glBindVertexArray(model.getVaoID());
+        GL20.glEnableVertexAttribArray(0);
+        GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, model.getVertexCount());
+        GL20.glDisableVertexAttribArray(0);
+        GL30.glBindVertexArray(0);
+    }
+
+    private void newRendering() {
+        renderModel(m);
+    }
+
     @Override
     public void render(long elapsedTime) {
         update();
+        oldRendering();
+        newRendering();
+
+    }
+
+    private void oldRendering() {
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         glClearDepth(1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+        //
         final Vector3f camPos = camera.resolveCamPosition();
         FloatBuffer matrix44Buffer = BufferUtils.createFloatBuffer(16);
         Matrix4f camMatrix = camera.calcLookAtMatrix(camPos, camera.getCamTarget(), new Vector3f(0.0f, 1.0f, 0.0f));
@@ -220,14 +213,10 @@ public class StateGameRunning implements State {
         matrix44Buffer.flip();
         glUseProgram(uniformColor.theProgram);
         glUniformMatrix4(uniformColor.worldToCameraMatrixUnif, false, matrix44Buffer);
-        glUseProgram(0);
 
-        for (int i = 0; i < 5; i++) {
-            for (int j = 0; j < 5; j++) {
+        for (int i = 0; i < currentMap.getWidth(); i++) {
+            for (int j = 0; j < currentMap.getHeight(); j++) {
                 // Render the ground plane.
-                GL20.glUseProgram(pId);
-                GL13.glActiveTexture(GL13.GL_TEXTURE0);
-                GL11.glBindTexture(GL11.GL_TEXTURE_2D, TileMap.getTilesetID());
                 Matrix4f modelMatrix = new Matrix4f();
                 modelMatrix.setIdentity();
                 modelMatrix.translate(new Vector3f(i, 0, j));
@@ -236,12 +225,30 @@ public class StateGameRunning implements State {
                 modelMatrix.m22 = 1.0f;
                 modelMatrix.store(matrix44Buffer);
                 matrix44Buffer.flip();
+
                 glUseProgram(uniformColor.theProgram);
                 glUniformMatrix4(uniformColor.modelToWorldMatrixUnif, false, matrix44Buffer);
-                GL20.glUniform4f(uniformColor.baseColorUnif, 1f, i > 0 ? 1 : 0, 0f, 1.0f);
+                float[] color = currentMap.getTileAt(i, j, 0).getType().getColor();
+                GL20.glUniform4f(uniformColor.baseColorUnif, color[0], color[1], color[2], 1);
                 planeMesh.render();
+                glUseProgram(0);
             }
         }
+        // GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_LINE);
+
+        GL11.glEnableClientState(GL11.GL_VERTEX_ARRAY);
+        // Render the ground plane.6
+        Matrix4f modelMatrix = new Matrix4f();
+        modelMatrix.setIdentity();
+        modelMatrix.translate(new Vector3f(0, 0, 0));
+        modelMatrix.scale(new Vector3f(10, 10, 10));
+        modelMatrix.store(matrix44Buffer);
+        matrix44Buffer.flip();
+        glUseProgram(uniformColor.theProgram);
+        glUniformMatrix4(uniformColor.modelToWorldMatrixUnif, false, matrix44Buffer);
+        GL20.glUniform4f(uniformColor.baseColorUnif, 1, 0, 0, 1);
+        // planeMesh.render();
+        goat.render();
         glUseProgram(0);
     }
 
@@ -252,7 +259,7 @@ public class StateGameRunning implements State {
 
     @Override
     public void terminate() {
-
+        loader.dispose();
     }
 
     public void setCurrentMap(Map map) {

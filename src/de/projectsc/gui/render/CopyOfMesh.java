@@ -57,11 +57,11 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-public class Mesh {
+public class CopyOfMesh {
 
-    private static Log LOGGER = LogFactory.getLog(Mesh.class);
+    private static Log LOGGER = LogFactory.getLog(CopyOfMesh.class);
 
-    public Mesh(String filename) {
+    public CopyOfMesh(String filename) {
         ArrayList<Attribute> attribs = new ArrayList<>(16);
         ArrayList<IndexData> indexData = new ArrayList<>();
         ArrayList<NamedVAO> namedVaoList = new ArrayList<>();
@@ -216,7 +216,7 @@ public class Mesh {
         }
 
         glBindVertexArray(oVAO);
-        int i = 0;
+
         for (RenderCmd cmd : primitives) {
             cmd.render();
         }
@@ -735,7 +735,6 @@ public class Mesh {
 
                 attributes.add(Integer.parseInt(attrib.getNodeValue()));
             }
-
         }
     }
 }

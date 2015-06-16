@@ -6,7 +6,6 @@
 	<classpathentry exported="true" kind="lib" path="project_resources/log4j-1.2.17.jar"/>
 	<classpathentry exported="true" kind="lib" path="project_resources/commons-logging-1.2/commons-logging-1.2-javadoc.jar"/>
 	<classpathentry exported="true" kind="lib" path="project_resources/commons-logging-1.2/commons-logging-1.2.jar"/>
-	<classpathentry kind="lib" path="resources/commons-io-2.4.jar"/>
 	<classpathentry kind="lib" path="lib/lwjgl/jar/AppleJavaExtensions.jar"/>
 	<classpathentry kind="lib" path="lib/lwjgl/jar/asm-debug-all.jar"/>
 	<classpathentry kind="lib" path="lib/lwjgl/jar/jinput.jar"/>
@@ -25,6 +24,6 @@
 	<classpathentry kind="lib" path="lib/lwjgl/jar/lzma.jar"/>
 	<classpathentry kind="lib" path="lib/lwjgl/jar/substance-7.2.1.jar"/>
 	<classpathentry kind="lib" path="lib/lwjgl/jar/trident-7.2.1.jar"/>
-	<classpathentry kind="lib" path="resources/slick-util.jar"/>
+	<classpathentry kind="lib" path="lib/commons-io-2.4.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
