@@ -24,11 +24,15 @@ import static org.lwjgl.opengl.GL20.glShaderSource;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.FloatBuffer;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL20;
+import org.lwjgl.util.vector.Matrix4f;
+import org.lwjgl.util.vector.Vector3f;
 
 /**
  * Everything that has to do with shaders (load them, bind them).
@@ -41,6 +45,8 @@ public abstract class Shader {
 
     private static final Log LOGGER = LogFactory.getLog(Shader.class);
 
+    private static FloatBuffer matrixBuffer = BufferUtils.createFloatBuffer(16);
+
     private int shaderProgram;
 
     private int vertexShader;
@@ -48,7 +54,8 @@ public abstract class Shader {
     private int fragmentShader;
 
     public Shader(String vertexShaderFileName, String fragmentShaderFileName) {
-
+        loadProgram(vertexShaderFileName, fragmentShaderFileName);
+        getAllUniformLocations();
     }
 
     /**
@@ -132,9 +139,38 @@ public abstract class Shader {
         return linkProgram(program);
     }
 
+    protected int getUniformLocation(String name) {
+        return GL20.glGetUniformLocation(shaderProgram, name);
+    }
+
+    protected abstract void getAllUniformLocations();
+
+    protected void loadFloat(int location, float value) {
+        GL20.glUniform1f(location, value);
+    }
+
+    protected void loadVector(int location, Vector3f value) {
+        GL20.glUniform3f(location, value.x, value.y, value.z);
+    }
+
+    protected void loadBoolean(int location, boolean value) {
+        float toLoad = 0;
+        if (value) {
+            toLoad = 1;
+        }
+        loadFloat(location, toLoad);
+    }
+
+    protected void loadMatrix(int location, Matrix4f matrix) {
+        matrix.store(matrixBuffer);
+        matrixBuffer.flip();
+        GL20.glUniformMatrix4(location, false, matrixBuffer);
+    }
+
     private int linkProgram(int program) {
         glAttachShader(program, vertexShader);
         glAttachShader(program, fragmentShader);
+        bindAttributes();
         glLinkProgram(program);
         int status = glGetProgrami(program, GL_LINK_STATUS);
         if (status == GL_FALSE) {

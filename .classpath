@@ -25,5 +25,6 @@
 	<classpathentry kind="lib" path="lib/lwjgl/jar/substance-7.2.1.jar"/>
 	<classpathentry kind="lib" path="lib/lwjgl/jar/trident-7.2.1.jar"/>
 	<classpathentry kind="lib" path="lib/commons-io-2.4.jar"/>
+	<classpathentry kind="lib" path="lib/slick-util/lib/slick-util.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

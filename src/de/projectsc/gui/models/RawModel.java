@@ -4,7 +4,7 @@
  * All rights reserved
  */
 
-package de.projectsc.gui.render;
+package de.projectsc.gui.models;
 
 /**
  * Stores the models vao.

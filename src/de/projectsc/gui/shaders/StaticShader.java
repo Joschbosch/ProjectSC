@@ -5,6 +5,10 @@
  */
 package de.projectsc.gui.shaders;
 
+import org.lwjgl.util.vector.Matrix4f;
+
+import de.projectsc.gui.NewCamera;
+
 /**
  * A shader program that does not much.
  * 
@@ -16,6 +20,12 @@ public class StaticShader extends Shader {
 
     private static final String FRAGMENT_FILE = "tutShader.frag";
 
+    private int locationTransformationMatrix;
+
+    private int locationProjectionMatrix;
+
+    private int locationViewMatrix;
+
     public StaticShader() {
         super(VERTEX_FILE, FRAGMENT_FILE);
     }
@@ -23,7 +33,26 @@ public class StaticShader extends Shader {
     @Override
     protected void bindAttributes() {
         super.bindAttribute(0, "position");
+        super.bindAttribute(1, "textureCoords");
 
     }
 
+    @Override
+    protected void getAllUniformLocations() {
+        locationTransformationMatrix = super.getUniformLocation("transformationMatrix");
+        locationProjectionMatrix = super.getUniformLocation("projectionMatrix");
+        locationViewMatrix = super.getUniformLocation("viewMatrix");
+    }
+
+    public void loadTransformationMatrix(Matrix4f matrix) {
+        super.loadMatrix(locationTransformationMatrix, matrix);
+    }
+
+    public void loadProjectionMatrix(Matrix4f matrix) {
+        super.loadMatrix(locationProjectionMatrix, matrix);
+    }
+
+    public void loadViewMatrix(NewCamera camera) {
+        super.loadMatrix(locationViewMatrix, camera.createViewMatrix());
+    }
 }

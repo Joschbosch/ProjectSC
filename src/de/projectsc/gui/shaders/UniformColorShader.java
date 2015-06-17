@@ -29,4 +29,10 @@ public class UniformColorShader extends Shader {
         bindAttribute(3, "baseColor");
     }
 
+    @Override
+    protected void getAllUniformLocations() {
+        // TODO Auto-generated method stub
+
+    }
+
 }
