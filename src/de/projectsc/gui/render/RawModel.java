@@ -1,21 +1,27 @@
 /*
- * Copyright (C) 2015 
+ * Copyright (C) 2015 Project SC
+ * 
+ * All rights reserved
  */
 
 package de.projectsc.gui.render;
 
-
+/**
+ * Stores the models vao.
+ * 
+ * @author Josch Bosch
+ */
 public class RawModel {
 
     private int vaoID;
+
+    private int vertexCount;
 
     public RawModel(int vaoID, int vertexCount) {
         super();
         this.vaoID = vaoID;
         this.vertexCount = vertexCount;
     }
-
-    private int vertexCount;
 
     public int getVaoID() {
         return vaoID;

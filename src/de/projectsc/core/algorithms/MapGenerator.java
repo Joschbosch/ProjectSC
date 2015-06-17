@@ -56,8 +56,8 @@ public final class MapGenerator {
             for (int j = 1; j < map.getHeight() - 1; j++) {
 
                 for (int k = 0; k < map.getLayerCount(); k++) {
-                    if (map.getTileAt(i, j,k).getType() == TileType.NOTHING) {
-                        map.setTileAt(i, j,k, TileType.WATER);
+                    if (map.getTileAt(i, j, k).getType() == TileType.NOTHING) {
+                        map.setTileAt(i, j, k, TileType.WATER);
                     }
                 }
             }
@@ -69,15 +69,15 @@ public final class MapGenerator {
         for (int i = 1; i < map.getWidth() - 1; i++) {
             for (int j = 1; j < map.getHeight() - 1; j++) {
                 for (int k = 0; k < map.getLayerCount(); k++) {
-                if (map.getTileAt(i, j,k).getType() == TileType.NOTHING
-                    && (map.getTileAt(i + 1, j,k).getType() == TileType.GRAS && map
-                        .getTileAt(i - 1, j,k).getType() == TileType.GRAS)
-                    || (map.getTileAt(i, j + 1,k).getType() == TileType.GRAS && map
-                        .getTileAt(i, j - 1,k).getType() == TileType.GRAS)) {
-                    map.setTileAt(i, j,k, TileType.GRAS);
+                    if (map.getTileAt(i, j, k).getType() == TileType.NOTHING
+                        && (map.getTileAt(i + 1, j, k).getType() == TileType.GRAS && map
+                            .getTileAt(i - 1, j, k).getType() == TileType.GRAS)
+                        || (map.getTileAt(i, j + 1, k).getType() == TileType.GRAS && map
+                            .getTileAt(i, j - 1, k).getType() == TileType.GRAS)) {
+                        map.setTileAt(i, j, k, TileType.GRAS);
 
+                    }
                 }
-            }
             }
         }
     }
@@ -85,9 +85,9 @@ public final class MapGenerator {
     private static void fillBackIn(Map map) {
         for (int i = 0; i < map.getWidth(); i++) {
             for (int j = 0; j < map.getHeight(); j++) {
-                if (map.getTileAt(i, j,0).getType() == TileType.GRAS
+                if (map.getTileAt(i, j, 0).getType() == TileType.GRAS
                     && surroundedByThreeOrFour(i, j, map)) {
-                    map.setTileAt(i, j,0, TileType.NOTHING);
+                    map.setTileAt(i, j, 0, TileType.NOTHING);
                 }
             }
         }
@@ -96,28 +96,28 @@ public final class MapGenerator {
     private static boolean surroundedByThreeOrFour(int i, int j, Map map) {
         int count = 0;
         if (map.inBounds(i + 1, j)) {
-            if (map.getTileAt(i + 1, j,0).getType() == TileType.NOTHING) {
+            if (map.getTileAt(i + 1, j, 0).getType() == TileType.NOTHING) {
                 count++;
             }
         } else {
             count++;
         }
         if (map.inBounds(i, j + 1)) {
-            if (map.getTileAt(i, j + 1,0).getType() == TileType.NOTHING) {
+            if (map.getTileAt(i, j + 1, 0).getType() == TileType.NOTHING) {
                 count++;
             }
         } else {
             count++;
         }
         if (map.inBounds(i - 1, j)) {
-            if (map.getTileAt(i - 1, j,0).getType() == TileType.NOTHING) {
+            if (map.getTileAt(i - 1, j, 0).getType() == TileType.NOTHING) {
                 count++;
             }
         } else {
             count++;
         }
         if (map.inBounds(i, j - 1)) {
-            if (map.getTileAt(i, j - 1,0).getType() == TileType.NOTHING) {
+            if (map.getTileAt(i, j - 1, 0).getType() == TileType.NOTHING) {
                 count++;
             }
         } else {
@@ -129,7 +129,7 @@ public final class MapGenerator {
     private static void createPerfectMaze(Map map) {
         for (int i = 1; i < map.getWidth() - 1; i++) {
             for (int j = 1; j < map.getHeight() - 1; j++) {
-                if (map.getTileAt(i, j,0).getType() == TileType.NOTHING
+                if (map.getTileAt(i, j, 0).getType() == TileType.NOTHING
                     && surroundedNothing(i, j, map)) {
                     startMaze(i, j, map);
                 }
@@ -138,7 +138,7 @@ public final class MapGenerator {
     }
 
     private static void startMaze(int i, int j, Map map) {
-        map.setTileAt(i, j,0, TileType.GRAS);
+        map.setTileAt(i, j, 0, TileType.GRAS);
         List<Integer[]> directions = new LinkedList<Integer[]>();
         directions.add(new Integer[] { 1, 0 });
         directions.add(new Integer[] { MINUS_ONE, 0 });
@@ -148,7 +148,7 @@ public final class MapGenerator {
         while (!directions.isEmpty()) {
             Integer[] direction = directions.get(r.nextInt(directions.size()));
             if (map.inBounds(i + direction[0], j + direction[1])
-                && map.getTileAt(i + direction[0], j + direction[1],0)
+                && map.getTileAt(i + direction[0], j + direction[1], 0)
                     .getType() == TileType.NOTHING
                 && surroundedNothing(i + direction[0], j + direction[1], i,
                     j, map)) {
@@ -164,19 +164,19 @@ public final class MapGenerator {
 
         if (nothing) {
             if (i + 1 < map.getWidth() && i + 1 != exceptX
-                && map.getTileAt(i + 1, j,0).getType() != TileType.NOTHING) {
+                && map.getTileAt(i + 1, j, 0).getType() != TileType.NOTHING) {
                 nothing = false;
             }
             if (j + 1 < map.getHeight() && j + 1 != exceptY
-                && map.getTileAt(i, j + 1,0).getType() != TileType.NOTHING) {
+                && map.getTileAt(i, j + 1, 0).getType() != TileType.NOTHING) {
                 nothing = false;
             }
             if (i - 1 >= 0 && i - 1 != exceptX
-                && map.getTileAt(i - 1, j,0).getType() != TileType.NOTHING) {
+                && map.getTileAt(i - 1, j, 0).getType() != TileType.NOTHING) {
                 nothing = false;
             }
             if (j - 1 >= 0 && j - 1 != exceptY
-                && map.getTileAt(i, j - 1,0).getType() != TileType.NOTHING) {
+                && map.getTileAt(i, j - 1, 0).getType() != TileType.NOTHING) {
                 nothing = false;
             }
         }
@@ -186,16 +186,16 @@ public final class MapGenerator {
     private static boolean surroundedNothing(int i, int j, Map map) {
         boolean nothing = map.inBounds(i, j);
         if (nothing) {
-            if (map.getTileAt(i + 1, j,0).getType() != TileType.NOTHING) {
+            if (map.getTileAt(i + 1, j, 0).getType() != TileType.NOTHING) {
                 nothing = false;
             }
-            if (map.getTileAt(i, j + 1,0).getType() != TileType.NOTHING) {
+            if (map.getTileAt(i, j + 1, 0).getType() != TileType.NOTHING) {
                 nothing = false;
             }
-            if (map.getTileAt(i - 1, j,0).getType() != TileType.NOTHING) {
+            if (map.getTileAt(i - 1, j, 0).getType() != TileType.NOTHING) {
                 nothing = false;
             }
-            if (map.getTileAt(i, j - 1,0).getType() != TileType.NOTHING) {
+            if (map.getTileAt(i, j - 1, 0).getType() != TileType.NOTHING) {
                 nothing = false;
             }
         }
@@ -221,7 +221,7 @@ public final class MapGenerator {
         for (int i = 0; i < room.getRoomTiles().length; i++) {
             for (int j = 0; j < room.getRoomTiles()[i].length; j++) {
                 if (room.isFree(i, j)) {
-                    map.setTileAt(i + roomPositionX, j + roomPositionY,0,
+                    map.setTileAt(i + roomPositionX, j + roomPositionY, 0,
                         TileType.GRAS);
                 }
             }
@@ -240,7 +240,7 @@ public final class MapGenerator {
             for (int i = 0; i < room.getRoomTiles().length; i++) {
                 for (int j = 0; j < room.getRoomTiles()[i].length; j++) {
                     if ((room.isFree(i, j) && map.getTileAt(i + roomPositionX,
-                        j + roomPositionY,0).getType() != TileType.NOTHING)) {
+                        j + roomPositionY, 0).getType() != TileType.NOTHING)) {
                         isFree = false;
                     }
                 }

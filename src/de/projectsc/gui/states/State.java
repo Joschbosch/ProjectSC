@@ -35,15 +35,20 @@ public interface State {
 
     /**
      * Render state.
+     * 
+     * @param elapsedTime since the last frame
      */
     void render(long elapsedTime);
 
     /**
      * handle Input.
      * 
-     * @param input queue with current inputs
+     * @param elapsedTime since the last frame
      */
     void handleInput(long elapsedTime);
 
+    /**
+     * Terminate status.
+     */
     void terminate();
 }

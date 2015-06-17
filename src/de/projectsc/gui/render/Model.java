@@ -2,7 +2,7 @@
  * Copyright (C) 2015 
  */
 
-package de.projectsc.gui.states;
+package de.projectsc.gui.render;
 
 import java.io.File;
 import java.io.IOException;

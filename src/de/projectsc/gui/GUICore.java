@@ -32,15 +32,13 @@ import de.projectsc.gui.states.StateGameRunning;
  */
 public class GUICore implements Runnable {
 
+    private static final int MAX_FRAME_RATE = 60;
+
     private static final int HEIGHT = 1024;
 
     private static final int WIDTH = 1280;
 
     private static final Log LOGGER = LogFactory.getLog(GUICore.class);
-
-    private static final int TARGET_FPS = 500;
-
-    private static final float TARGET_UPS = 300;
 
     private static java.util.Map<GUIState, State> stateMap = new HashMap<GUIState, State>();
 
@@ -109,13 +107,13 @@ public class GUICore implements Runnable {
             if (Display.isCloseRequested()) {
                 outgoingQueue.put(new GUIMessage(CLOSE_DOWN_GUI, null));
                 running = false;
-                LOGGER.debug("Send close requrest and close down");
+                LOGGER.debug("Send close request and close down");
             }
             retreiveCoreMessages();
             currentState.handleInput(timer.getDelta());
             currentState.render(timer.getDelta());
             timer.updateFPS();
-            Display.sync(60);
+            Display.sync(MAX_FRAME_RATE);
             Display.update();
         }
     }

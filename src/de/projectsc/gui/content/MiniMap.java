@@ -1,7 +1,8 @@
 /*
- * CopcornerPosition[1]right (C)WINDOW_BORDER15 
+ * Copyright (C) 2015 Project SC
+ * 
+ * All rights reserved
  */
-
 package de.projectsc.gui.content;
 
 import static org.lwjgl.opengl.GL11.GL_QUADS;
@@ -19,49 +20,56 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 
 import de.projectsc.core.data.content.Map;
-import de.projectsc.gui.MoveableDrawable;
+import de.projectsc.gui.OverlayMoveable;
 import de.projectsc.gui.states.StateGameRunning;
 import de.projectsc.gui.tiles.TileMap;
 
-public class MiniMap implements MoveableDrawable {
+/**
+ * Class for the minimap overlay.
+ * 
+ * @author Josch Bosch
+ */
+public class MiniMap implements OverlayMoveable {
 
     private static final int WINDOW_BORDER = 15;
 
-    private static final int pointSize = 2;
+    private static final int POINT_SIZE = 2;
 
-    private static final int DEFAULT_SIZE = pointSize * 100;
+    private static final int DEFAULT_SIZE = POINT_SIZE * 100;
 
     private static final Log LOGGER = LogFactory.getLog(MiniMap.class);
 
     private Map currentMap;
 
-    private int[] cornerPosition;
+    private final int[] cornerPosition;
 
     private int width;
 
     private int height;
 
-    private BlockingQueue<GUICommand> outputQueue;
+    private final BlockingQueue<GUICommand> outputQueue;
 
-    private boolean moving = false;
+    private final boolean moving = false;
 
     private int movingOffsetX;
 
     private int movingOffsetY;
 
-    private StateGameRunning stateGameRunning;
+    private final StateGameRunning stateGameRunning;
 
     public MiniMap(Map currentMap, BlockingQueue<GUICommand> drawableQueue, StateGameRunning stateGameRunning) {
+        LOGGER.debug("Initialize minimap ... ");
         cornerPosition = new int[2];
         if (currentMap != null) {
-            width = currentMap.getWidth() * pointSize;
-            height = currentMap.getHeight() * pointSize + WINDOW_BORDER;
+            width = currentMap.getWidth() * POINT_SIZE;
+            height = currentMap.getHeight() * POINT_SIZE + WINDOW_BORDER;
         } else {
             width = DEFAULT_SIZE;
             height = DEFAULT_SIZE + WINDOW_BORDER;
         }
         this.outputQueue = drawableQueue;
         this.stateGameRunning = stateGameRunning;
+        LOGGER.debug("Minimap initialized. ");
     }
 
     @Override
@@ -78,18 +86,19 @@ public class MiniMap implements MoveableDrawable {
                 float[] color = currentMap.getTileAt(i, j, 0).getType().getColor();
                 glColor3f(color[0], color[1], color[2]);
                 glBegin(GL_QUADS);
-                glVertex2f(cornerPosition[0] + (i * pointSize), cornerPosition[1] + (j * pointSize) + WINDOW_BORDER);
-                glVertex2f(cornerPosition[0] + (i * pointSize), cornerPosition[1] + (j * pointSize) + pointSize + WINDOW_BORDER);
-                glVertex2f(cornerPosition[0] + pointSize + (i * pointSize), cornerPosition[1] + pointSize + (j * pointSize) + WINDOW_BORDER);
-                glVertex2f(cornerPosition[0] + pointSize + (i * pointSize), cornerPosition[1] + (j * pointSize) + WINDOW_BORDER);
+                glVertex2f(cornerPosition[0] + (i * POINT_SIZE), cornerPosition[1] + (j * POINT_SIZE) + WINDOW_BORDER);
+                glVertex2f(cornerPosition[0] + (i * POINT_SIZE), cornerPosition[1] + (j * POINT_SIZE) + POINT_SIZE + WINDOW_BORDER);
+                glVertex2f(cornerPosition[0] + POINT_SIZE + (i * POINT_SIZE),
+                    cornerPosition[1] + POINT_SIZE + (j * POINT_SIZE) + WINDOW_BORDER);
+                glVertex2f(cornerPosition[0] + POINT_SIZE + (i * POINT_SIZE), cornerPosition[1] + (j * POINT_SIZE) + WINDOW_BORDER);
                 glEnd();
             }
         }
 
-        int rectX = cornerPosition[0] + pointSize;
-        int rectY = cornerPosition[1] + pointSize;
-        int rectWidth = Display.getWidth() / TileMap.TILE_SIZE * pointSize;
-        int rectHeight = Display.getHeight() / TileMap.TILE_SIZE * pointSize;
+        int rectX = cornerPosition[0] + POINT_SIZE;
+        int rectY = cornerPosition[1] + POINT_SIZE;
+        int rectWidth = Display.getWidth() / TileMap.TILE_SIZE * POINT_SIZE;
+        int rectHeight = Display.getHeight() / TileMap.TILE_SIZE * POINT_SIZE;
         glColor3f(1, 1, 1);
         glBegin(GL11.GL_LINES);
         glVertex2f(rectX, rectY + WINDOW_BORDER);
@@ -111,8 +120,8 @@ public class MiniMap implements MoveableDrawable {
     public void setCurrentMap(Map currentMap) {
         this.currentMap = currentMap;
         if (currentMap != null) {
-            width = currentMap.getWidth() * pointSize;
-            height = currentMap.getHeight() * pointSize;
+            width = currentMap.getWidth() * POINT_SIZE;
+            height = currentMap.getHeight() * POINT_SIZE;
         } else {
             width = DEFAULT_SIZE;
             height = DEFAULT_SIZE;
@@ -129,6 +138,12 @@ public class MiniMap implements MoveableDrawable {
         return false;
     }
 
+    /**
+     * Sets the current position to (x,y).
+     * 
+     * @param x coordinate
+     * @param y coordinate
+     */
     public void setCurrentPosition(int x, int y) {
         cornerPosition[0] = x;
         cornerPosition[1] = y;
@@ -151,7 +166,8 @@ public class MiniMap implements MoveableDrawable {
         // movingOffsetY = relativeY;
         // } else {
         // try {
-        // outputQueue.put(new GUICommand(GUICommand.CHANGE_LOCATION, new int[] { relativeX / pointSize,
+        // outputQueue.put(new GUICommand(GUICommand.CHANGE_LOCATION, new int[] { relativeX /
+        // pointSize,
         // (relativeY - WINDOW_BORDER) / pointSize }));
         // } catch (InterruptedException e) {
         // LOGGER.error(e.getStackTrace());

@@ -12,11 +12,7 @@ import static org.lwjgl.opengl.GL11.glClearColor;
 import static org.lwjgl.opengl.GL11.glClearDepth;
 import static org.lwjgl.opengl.GL11.glViewport;
 import static org.lwjgl.opengl.GL20.glUniformMatrix4;
-import static org.lwjgl.opengl.GL20.glUseProgram;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.nio.FloatBuffer;
 import java.util.LinkedList;
 import java.util.List;
@@ -24,7 +20,6 @@ import java.util.Stack;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.lwjgl.BufferUtils;
@@ -38,15 +33,17 @@ import org.lwjgl.util.vector.Vector3f;
 import de.projectsc.core.data.content.Map;
 import de.projectsc.core.data.messages.GUIMessage;
 import de.projectsc.gui.Camera;
-import de.projectsc.gui.Drawable;
 import de.projectsc.gui.GameFont;
+import de.projectsc.gui.Overlay;
 import de.projectsc.gui.content.GUICommand;
 import de.projectsc.gui.content.MiniMap;
 import de.projectsc.gui.render.Loader;
 import de.projectsc.gui.render.Mesh;
-import de.projectsc.gui.render.ProgramData;
+import de.projectsc.gui.render.Model;
 import de.projectsc.gui.render.RawModel;
-import de.projectsc.gui.render.Shader;
+import de.projectsc.gui.shaders.Shader;
+import de.projectsc.gui.shaders.StaticShader;
+import de.projectsc.gui.shaders.UniformColorShader;
 import de.projectsc.gui.tiles.TileMap;
 
 /**
@@ -65,21 +62,23 @@ public class StateGameRunning implements State {
 
     private final BlockingQueue<GUIMessage> outgoingQueue;
 
-    private List<Drawable> drawables = new LinkedList<>();
+    private final List<Overlay> drawables = new LinkedList<>();
 
     private MiniMap minimap;
 
     private final BlockingQueue<GUICommand> drawableQueue = new LinkedBlockingQueue<>();
 
-    private Camera camera;
+    private final Camera camera;
 
     private Mesh planeMesh;
 
-    private ProgramData uniformColor;
+    private Shader uniformColor;
+
+    private Shader staticShader;
 
     private Model goat;
 
-    private Loader loader;
+    private final Loader loader;
 
     private RawModel m;
 
@@ -100,10 +99,13 @@ public class StateGameRunning implements State {
         planeMesh = new Mesh("UnitPlane.xml");
 
         goat = new Model("goat.obj");
-        float[] vertices = { -0.5f, 0.5f, 0f, -0.5f, -0.5f, 0f, 0.5f, -0.5f, 0f, 0.5f, -0.5f, 0f, 0.5f, 0.5f, 0f, -0.5f, 0.5f, 0f
+        float[] vertices = { -0.5f, 0.5f, 0f,
+            -0.5f, -0.5f, 0f,
+            0.5f, -0.5f, 0f,
+            0.5f, 0.5f, 0f
         };
-
-        m = loader.loadToVAO(vertices);
+        int[] indices = { 0, 1, 3, 3, 1, 2 };
+        m = loader.loadToVAO(vertices, indices);
     }
 
     private void initOpenGL() {
@@ -141,34 +143,15 @@ public class StateGameRunning implements State {
         FloatBuffer matrix44Buffer = BufferUtils.createFloatBuffer(16);
         persMatrix.store(matrix44Buffer);
         matrix44Buffer.flip();
-        glUseProgram(uniformColor.theProgram);
-        glUniformMatrix4(uniformColor.cameraToClipMatrixUnif, false, matrix44Buffer);
-        glUseProgram(0);
+        uniformColor.start();
+        glUniformMatrix4(2, false, matrix44Buffer);
+        uniformColor.stop();
         glViewport(0, 0, w, h);
     }
 
     private void initializeProgram() {
-        uniformColor = Shader.loadProgram("tilemap.vert", "tilemap.frag");
-    }
-
-    private int loadShader(String filename, int type) {
-        int shaderID = 0;
-        String shaderSource = "";
-
-        try {
-            shaderSource = FileUtils.readFileToString(new File(getClass().getResource("/shader/" + filename).toURI()));
-        } catch (IOException | URISyntaxException e) {
-        }
-        shaderID = GL20.glCreateShader(type);
-        GL20.glShaderSource(shaderID, shaderSource);
-        GL20.glCompileShader(shaderID);
-
-        if (GL20.glGetShader(shaderID, GL20.GL_COMPILE_STATUS) == GL11.GL_FALSE) {
-            System.err.println("Could not compile shader.");
-            System.exit(-1);
-        }
-
-        return shaderID;
+        uniformColor = new UniformColorShader();
+        staticShader = new StaticShader();
     }
 
     @Override
@@ -184,7 +167,7 @@ public class StateGameRunning implements State {
     private void renderModel(RawModel model) {
         GL30.glBindVertexArray(model.getVaoID());
         GL20.glEnableVertexAttribArray(0);
-        GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, model.getVertexCount());
+        GL11.glDrawElements(GL11.GL_TRIANGLES, model.getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
         GL20.glDisableVertexAttribArray(0);
         GL30.glBindVertexArray(0);
     }
@@ -211,8 +194,8 @@ public class StateGameRunning implements State {
         Matrix4f camMatrix = camera.calcLookAtMatrix(camPos, camera.getCamTarget(), new Vector3f(0.0f, 1.0f, 0.0f));
         camMatrix.store(matrix44Buffer);
         matrix44Buffer.flip();
-        glUseProgram(uniformColor.theProgram);
-        glUniformMatrix4(uniformColor.worldToCameraMatrixUnif, false, matrix44Buffer);
+        uniformColor.start();
+        glUniformMatrix4(1, false, matrix44Buffer);
 
         for (int i = 0; i < currentMap.getWidth(); i++) {
             for (int j = 0; j < currentMap.getHeight(); j++) {
@@ -226,12 +209,12 @@ public class StateGameRunning implements State {
                 modelMatrix.store(matrix44Buffer);
                 matrix44Buffer.flip();
 
-                glUseProgram(uniformColor.theProgram);
-                glUniformMatrix4(uniformColor.modelToWorldMatrixUnif, false, matrix44Buffer);
+                uniformColor.start();
+                glUniformMatrix4(0, false, matrix44Buffer);
                 float[] color = currentMap.getTileAt(i, j, 0).getType().getColor();
-                GL20.glUniform4f(uniformColor.baseColorUnif, color[0], color[1], color[2], 1);
+                GL20.glUniform4f(3, color[0], color[1], color[2], 1);
                 planeMesh.render();
-                glUseProgram(0);
+                uniformColor.stop();
             }
         }
         // GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_LINE);
@@ -244,12 +227,12 @@ public class StateGameRunning implements State {
         modelMatrix.scale(new Vector3f(10, 10, 10));
         modelMatrix.store(matrix44Buffer);
         matrix44Buffer.flip();
-        glUseProgram(uniformColor.theProgram);
-        glUniformMatrix4(uniformColor.modelToWorldMatrixUnif, false, matrix44Buffer);
-        GL20.glUniform4f(uniformColor.baseColorUnif, 1, 0, 0, 1);
+        uniformColor.start();
+        glUniformMatrix4(0, false, matrix44Buffer);
+        GL20.glUniform4f(3, 1, 0, 0, 1);
         // planeMesh.render();
         goat.render();
-        glUseProgram(0);
+        uniformColor.stop();
     }
 
     @Override

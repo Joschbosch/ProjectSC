@@ -17,9 +17,10 @@ public class Map {
     private final int mapWidth;
 
     private final int mapHeight;
+
     private final int mapLayer;
 
-    private java.util.Map<TileType, Tile> typeMap = new HashMap<>();
+    private final java.util.Map<TileType, Tile> typeMap = new HashMap<>();
 
     private Tile[][][] map;
 
@@ -40,7 +41,7 @@ public class Map {
         for (int i = 0; i < mapWidth; i++) {
             for (int j = 0; j < mapHeight; j++) {
                 for (int k = 0; k < mapLayer; k++) {
-                map[i][j][k] = typeMap.get(TileType.NOTHING);
+                    map[i][j][k] = typeMap.get(TileType.NOTHING);
                 }
             }
         }

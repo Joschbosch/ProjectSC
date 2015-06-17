@@ -9,11 +9,13 @@ import org.lwjgl.Sys;
 import org.lwjgl.opengl.Display;
 
 /**
- * Timmer for the GUI.
+ * Timer for the GUI.
  * 
- * @author Sascha Zur
+ * @author Josch Bosch
  */
 public class Timer {
+
+    private static final int SECONDS_CONSTANT = 1000;
 
     /**
      * Frames per second.
@@ -46,22 +48,22 @@ public class Timer {
     }
 
     /**
-     * Get the accurate system time
+     * Get the accurate system time.
      * 
      * @return The system time in milliseconds
      */
     public long getTime() {
-        return (Sys.getTime() * 1000) / Sys.getTimerResolution();
+        return (Sys.getTime() * SECONDS_CONSTANT) / Sys.getTimerResolution();
     }
 
     /**
-     * Calculate the FPS and set it in the title bar
+     * Calculate the FPS and set it in the title bar.
      */
     public void updateFPS() {
-        if (getTime() - lastFPS > 1000) {
+        if (getTime() - lastFPS > SECONDS_CONSTANT) {
             Display.setTitle("FPS: " + fps);
             fps = 0;
-            lastFPS += 1000;
+            lastFPS += SECONDS_CONSTANT;
         }
         fps++;
     }

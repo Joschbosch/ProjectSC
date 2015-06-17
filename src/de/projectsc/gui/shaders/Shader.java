@@ -1,0 +1,146 @@
+/*
+ * Copyright (C) 2015 Project SC
+ * 
+ * All rights reserved
+ */
+package de.projectsc.gui.shaders;
+
+import static org.lwjgl.opengl.GL11.GL_FALSE;
+import static org.lwjgl.opengl.GL20.GL_COMPILE_STATUS;
+import static org.lwjgl.opengl.GL20.GL_FRAGMENT_SHADER;
+import static org.lwjgl.opengl.GL20.GL_LINK_STATUS;
+import static org.lwjgl.opengl.GL20.GL_VERTEX_SHADER;
+import static org.lwjgl.opengl.GL20.glAttachShader;
+import static org.lwjgl.opengl.GL20.glCompileShader;
+import static org.lwjgl.opengl.GL20.glCreateProgram;
+import static org.lwjgl.opengl.GL20.glCreateShader;
+import static org.lwjgl.opengl.GL20.glDeleteProgram;
+import static org.lwjgl.opengl.GL20.glDeleteShader;
+import static org.lwjgl.opengl.GL20.glGetProgrami;
+import static org.lwjgl.opengl.GL20.glGetShaderi;
+import static org.lwjgl.opengl.GL20.glLinkProgram;
+import static org.lwjgl.opengl.GL20.glShaderSource;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.lwjgl.opengl.GL20;
+
+/**
+ * Everything that has to do with shaders (load them, bind them).
+ * 
+ * @author Josch Bosch
+ */
+public abstract class Shader {
+
+    private static final int MINUS_ONE = -1;
+
+    private static final Log LOGGER = LogFactory.getLog(Shader.class);
+
+    private int shaderProgram;
+
+    private int vertexShader;
+
+    private int fragmentShader;
+
+    public Shader(String vertexShaderFileName, String fragmentShaderFileName) {
+
+    }
+
+    /**
+     * Loads the given shader files into a program.
+     * 
+     * @param vertexShaderFileName name of vshader
+     * @param fragmentShaderFileName name of fshader
+     */
+    public void loadProgram(String vertexShaderFileName, String fragmentShaderFileName) {
+        vertexShader = loadShader(GL_VERTEX_SHADER, vertexShaderFileName);
+        fragmentShader = loadShader(GL_FRAGMENT_SHADER, fragmentShaderFileName);
+        shaderProgram = createProgram();
+    }
+
+    /**
+     * Start shader program.
+     */
+    public void start() {
+        GL20.glUseProgram(shaderProgram);
+    }
+
+    /**
+     * 
+     * Stop shader program.
+     */
+    public void stop() {
+        GL20.glUseProgram(0);
+    }
+
+    protected abstract void bindAttributes();
+
+    protected void bindAttribute(int attribute, String variableName) {
+        GL20.glBindAttribLocation(shaderProgram, attribute, variableName);
+    }
+
+    /**
+     * Dispose all shader.
+     */
+    public void dispose() {
+        stop();
+        GL20.glDetachShader(shaderProgram, vertexShader);
+        GL20.glDetachShader(shaderProgram, fragmentShader);
+        GL20.glDeleteShader(vertexShader);
+        GL20.glDeleteShader(fragmentShader);
+    }
+
+    private int createProgram() {
+        int prog = linkProgram();
+        return prog;
+
+    }
+
+    private int loadShader(int shaderType, String shaderFilename) {
+        String shaderCode;
+        try {
+            shaderCode = FileUtils.readFileToString(new File(Shader.class.getResource("/shader/" + shaderFilename).toURI()));
+            return compileShader(shaderType, shaderCode);
+        } catch (IOException | URISyntaxException e) {
+            LOGGER.error(e.getStackTrace());
+        }
+        return MINUS_ONE;
+    }
+
+    private int compileShader(int shaderType, String shaderCode) {
+        int shader = glCreateShader(shaderType);
+
+        glShaderSource(shader, shaderCode);
+        glCompileShader(shader);
+
+        int status = glGetShaderi(shader, GL_COMPILE_STATUS);
+        if (status == GL_FALSE) {
+            glDeleteShader(shader);
+            LOGGER.error("Could not load shader: " + status);
+        }
+
+        return shader;
+    }
+
+    private int linkProgram() {
+        int program = glCreateProgram();
+        return linkProgram(program);
+    }
+
+    private int linkProgram(int program) {
+        glAttachShader(program, vertexShader);
+        glAttachShader(program, fragmentShader);
+        glLinkProgram(program);
+        int status = glGetProgrami(program, GL_LINK_STATUS);
+        if (status == GL_FALSE) {
+            glDeleteProgram(program);
+        }
+        return program;
+    }
+
+}
