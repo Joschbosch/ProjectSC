@@ -41,11 +41,13 @@ import org.lwjgl.util.vector.Vector3f;
  */
 public abstract class Shader {
 
+    private static final int FLOAT_BUFFER_SIZE = 16;
+
     private static final int MINUS_ONE = -1;
 
     private static final Log LOGGER = LogFactory.getLog(Shader.class);
 
-    private static FloatBuffer matrixBuffer = BufferUtils.createFloatBuffer(16);
+    private static FloatBuffer matrixBuffer = BufferUtils.createFloatBuffer(FLOAT_BUFFER_SIZE);
 
     private int shaderProgram;
 

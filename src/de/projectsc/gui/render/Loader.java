@@ -42,7 +42,9 @@ public class Loader {
     /**
      * Loading given data positions into a VAO.
      * 
-     * @param positions to load.
+     * @param positions to load
+     * @param textureCoordinates to apply to the model
+     * @param indices for vao
      * 
      * @return the model with the vao
      */
@@ -62,6 +64,12 @@ public class Loader {
         return vaoID;
     }
 
+    /**
+     * load texture from the given file.
+     * 
+     * @param filename of the texture.
+     * @return texture position
+     */
     public int loadTexture(String filename) {
         Texture texture = null;
         try {

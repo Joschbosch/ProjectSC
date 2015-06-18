@@ -1,11 +1,17 @@
 /*
- * Copyright (C) 2015
+ * Copyright (C) 2015 Project SC
+ * 
+ * All rights reserved
  */
-
 package de.projectsc.gui.models;
 
 import de.projectsc.gui.textures.ModelTexture;
 
+/**
+ * A model with a texture.
+ * 
+ * @author Josch Bosch
+ */
 public class TexturedModel {
 
     private final RawModel rawModel;

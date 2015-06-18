@@ -22,7 +22,7 @@ import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.core.data.content.Map;
 import de.projectsc.core.data.messages.GUIMessage;
-import de.projectsc.gui.NewCamera;
+import de.projectsc.gui.Camera;
 import de.projectsc.gui.Overlay;
 import de.projectsc.gui.content.GUICommand;
 import de.projectsc.gui.content.MiniMap;
@@ -63,7 +63,7 @@ public class StateGameRunning implements State {
 
     private final BlockingQueue<GUICommand> drawableQueue = new LinkedBlockingQueue<>();
 
-    private final NewCamera camera;
+    private final Camera camera;
 
     private Shader staticShader;
 
@@ -77,7 +77,7 @@ public class StateGameRunning implements State {
 
     public StateGameRunning(BlockingQueue<GUIMessage> outgoingQueue) {
         this.outgoingQueue = outgoingQueue;
-        camera = new NewCamera();
+        camera = new Camera();
         loader = new Loader();
     }
 

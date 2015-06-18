@@ -1,14 +1,34 @@
 /*
- * Copyright (C) 2015
+ * Copyright (C) 2015 Project SC
+ * 
+ * All rights reserved
  */
-
 package de.projectsc.gui.tools;
 
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
 
-public class Maths {
+/**
+ * Mathematics helper methods.
+ * 
+ * @author Josch Bosch
+ */
+public final class Maths {
 
+    private Maths() {
+
+    }
+
+    /**
+     * Create the transformation matrix for a model.
+     * 
+     * @param translation in (x,y,z) direction
+     * @param rx rotation in x direction
+     * @param ry rotation in y direction
+     * @param rz rotation in z direction
+     * @param scale factor for the model
+     * @return matrix with all transformation
+     */
     public static Matrix4f createTransformationMatrix(Vector3f translation, float rx, float ry, float rz, float scale) {
         Matrix4f matrix = new Matrix4f();
         matrix.setIdentity();

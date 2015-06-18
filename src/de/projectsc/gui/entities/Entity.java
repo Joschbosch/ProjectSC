@@ -1,13 +1,19 @@
 /*
- * Copyright (C) 2015
+ * Copyright (C) 2015 Project SC
+ * 
+ * All rights reserved
  */
-
 package de.projectsc.gui.entities;
 
 import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.gui.models.TexturedModel;
 
+/**
+ * The instance of a model.
+ * 
+ * @author Josch Bosch
+ */
 public class Entity {
 
     private TexturedModel model;
