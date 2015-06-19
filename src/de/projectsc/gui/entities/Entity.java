@@ -38,12 +38,26 @@ public class Entity {
         this.scale = scale;
     }
 
+    /**
+     * Moves the entity with the given deltas.
+     * 
+     * @param dx x delta
+     * @param dy y delta
+     * @param dz z delta
+     */
     public void increasePostion(float dx, float dy, float dz) {
         this.position.x += dx;
         this.position.y += dy;
         this.position.z += dz;
     }
 
+    /**
+     * Rotates the entity for the given deltas around the axis.
+     * 
+     * @param dx rotate on x axis
+     * @param dy rotate on y axis
+     * @param dz rotate on z axis
+     */
     public void increaseRotation(float dx, float dy, float dz) {
         this.rotX += dx;
         this.rotY += dy;

@@ -50,6 +50,7 @@ public class Map {
     /**
      * @param x coordinate
      * @param y coordinate
+     * @param layer coordinate
      * @return tile at (x,y)
      */
     public Tile getTileAt(int x, int y, int layer) {
@@ -71,6 +72,7 @@ public class Map {
     /**
      * @param i coordinate
      * @param j coordinate
+     * @param layer coordinate
      * @param type set tile at (i,j) to {@link TileType} type.
      */
     public void setTileAt(int i, int j, int layer, TileType type) {

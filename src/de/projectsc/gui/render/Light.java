@@ -1,11 +1,17 @@
 /*
- * Copyright (C) 2015
+ * Copyright (C) 2015 Project SC
+ * 
+ * All rights reserved
  */
-
 package de.projectsc.gui.render;
 
 import org.lwjgl.util.vector.Vector3f;
 
+/**
+ * All light information for rendering.
+ * 
+ * @author Josch Bosch
+ */
 public class Light {
 
     private Vector3f position;

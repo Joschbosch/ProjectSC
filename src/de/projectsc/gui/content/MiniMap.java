@@ -44,6 +44,7 @@ public class MiniMap implements OverlayMoveable {
 
     private int height;
 
+    @SuppressWarnings("unused")
     private final BlockingQueue<GUICommand> outputQueue;
 
     private final boolean moving = false;
@@ -52,6 +53,7 @@ public class MiniMap implements OverlayMoveable {
 
     private int movingOffsetY;
 
+    @SuppressWarnings("unused")
     private final StateGameRunning stateGameRunning;
 
     public MiniMap(Map currentMap, BlockingQueue<GUICommand> drawableQueue, StateGameRunning stateGameRunning) {
@@ -92,8 +94,8 @@ public class MiniMap implements OverlayMoveable {
             }
         }
 
-        int rectX = cornerPosition[0] + POINT_SIZE;
-        int rectY = cornerPosition[1] + POINT_SIZE;
+        // int rectX = cornerPosition[0] + POINT_SIZE;
+        // int rectY = cornerPosition[1] + POINT_SIZE;
         // int rectWidth = Display.getWidth() / TileMap.TILE_SIZE * POINT_SIZE;
         // int rectHeight = Display.getHeight() / TileMap.TILE_SIZE * POINT_SIZE;
         // glColor3f(1, 1, 1);

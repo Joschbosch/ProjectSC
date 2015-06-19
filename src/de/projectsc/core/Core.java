@@ -110,11 +110,10 @@ public class Core implements Runnable {
     }
 
     // /*********** TEST CODE **************/
-    private static int i = 0;
 
     private Map createMap() {
         Map m = new Map(10 * 10, 10 * 10, 1);
-        MapGenerator.createRandomMap(i++, m);
+        MapGenerator.createRandomMap(0, m);
         return m;
     }
 

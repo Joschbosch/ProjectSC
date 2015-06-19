@@ -16,6 +16,10 @@ import org.lwjgl.util.vector.Vector3f;
  */
 public class Camera {
 
+    private static final int FAST_MOVEMENT_SPEED_FACTOR = 10;
+
+    private static final float SLOW_MOVEMENT_SPEED = 0.02f;
+
     private final Vector3f position = new Vector3f(0, 0, 0);
 
     private float pitch = 0;
@@ -30,14 +34,27 @@ public class Camera {
      * Get keys and move camera.
      */
     public void move() {
+        float movementSpeed = SLOW_MOVEMENT_SPEED;
+        if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)) {
+            movementSpeed *= FAST_MOVEMENT_SPEED_FACTOR;
+        }
         if (Keyboard.isKeyDown(Keyboard.KEY_W)) {
-            position.z -= 0.02f;
+            position.z -= movementSpeed;
+        }
+        if (Keyboard.isKeyDown(Keyboard.KEY_S)) {
+            position.z += movementSpeed;
         }
         if (Keyboard.isKeyDown(Keyboard.KEY_D)) {
-            position.x += 0.02f;
+            position.x += movementSpeed;
         }
         if (Keyboard.isKeyDown(Keyboard.KEY_A)) {
-            position.x -= 0.02f;
+            position.x -= movementSpeed;
+        }
+        if (Keyboard.isKeyDown(Keyboard.KEY_Q)) {
+            position.y += movementSpeed;
+        }
+        if (Keyboard.isKeyDown(Keyboard.KEY_E)) {
+            position.y -= movementSpeed;
         }
     }
 

@@ -23,8 +23,18 @@ import de.projectsc.gui.tools.Maths;
  * 
  * @author Josch Bosch
  */
-public class Renderer {
+public final class Renderer {
 
+    private Renderer() {
+
+    }
+
+    /**
+     * Renders the given entity using the given shader to the current screen.
+     * 
+     * @param entity to render
+     * @param shader used for the rendering
+     */
     public static void renderModel(Entity entity, Shader shader) {
         TexturedModel tModel = entity.getModel();
         RawModel model = tModel.getRawModel();
