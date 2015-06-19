@@ -8,6 +8,7 @@ package de.projectsc.gui.shaders;
 import org.lwjgl.util.vector.Matrix4f;
 
 import de.projectsc.gui.Camera;
+import de.projectsc.gui.render.Light;
 
 /**
  * A shader program that does not much.
@@ -26,6 +27,10 @@ public class StaticShader extends Shader {
 
     private int locationViewMatrix;
 
+    private int locationLightPosition;
+
+    private int locationLightColor;
+
     public StaticShader() {
         super(VERTEX_FILE, FRAGMENT_FILE);
     }
@@ -34,6 +39,7 @@ public class StaticShader extends Shader {
     protected void bindAttributes() {
         super.bindAttribute(0, "position");
         super.bindAttribute(1, "textureCoords");
+        super.bindAttribute(2, "normals");
 
     }
 
@@ -42,6 +48,8 @@ public class StaticShader extends Shader {
         locationTransformationMatrix = super.getUniformLocation("transformationMatrix");
         locationProjectionMatrix = super.getUniformLocation("projectionMatrix");
         locationViewMatrix = super.getUniformLocation("viewMatrix");
+        locationLightPosition = super.getUniformLocation("lightPosition");
+        locationLightColor = super.getUniformLocation("lightColor");
     }
 
     /**
@@ -69,5 +77,15 @@ public class StaticShader extends Shader {
      */
     public void loadViewMatrix(Camera camera) {
         super.loadMatrix(locationViewMatrix, camera.createViewMatrix());
+    }
+
+    /**
+     * Loads up a light to the shader.
+     * 
+     * @param light to load
+     */
+    public void loadLight(Light light) {
+        super.loadVector(locationLightPosition, light.getPosition());
+        super.loadVector(locationLightColor, light.getColor());
     }
 }

@@ -16,13 +16,10 @@ import java.util.concurrent.BlockingQueue;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.GL11;
 
 import de.projectsc.core.data.content.Map;
 import de.projectsc.gui.OverlayMoveable;
 import de.projectsc.gui.states.StateGameRunning;
-import de.projectsc.gui.tiles.TileMap;
 
 /**
  * Class for the minimap overlay.
@@ -97,19 +94,19 @@ public class MiniMap implements OverlayMoveable {
 
         int rectX = cornerPosition[0] + POINT_SIZE;
         int rectY = cornerPosition[1] + POINT_SIZE;
-        int rectWidth = Display.getWidth() / TileMap.TILE_SIZE * POINT_SIZE;
-        int rectHeight = Display.getHeight() / TileMap.TILE_SIZE * POINT_SIZE;
-        glColor3f(1, 1, 1);
-        glBegin(GL11.GL_LINES);
-        glVertex2f(rectX, rectY + WINDOW_BORDER);
-        glVertex2f(rectX + rectWidth, rectY + WINDOW_BORDER);
-        glVertex2f(rectX + rectWidth, rectY + WINDOW_BORDER);
-        glVertex2f(rectX + rectWidth, rectY + rectHeight + WINDOW_BORDER);
-        glVertex2f(rectX + rectWidth, rectY + rectHeight + WINDOW_BORDER);
-        glVertex2f(rectX, rectY + rectHeight + WINDOW_BORDER);
-        glVertex2f(rectX, rectY + rectHeight + WINDOW_BORDER);
-        glVertex2f(rectX, rectY + WINDOW_BORDER);
-        glEnd();
+        // int rectWidth = Display.getWidth() / TileMap.TILE_SIZE * POINT_SIZE;
+        // int rectHeight = Display.getHeight() / TileMap.TILE_SIZE * POINT_SIZE;
+        // glColor3f(1, 1, 1);
+        // glBegin(GL11.GL_LINES);
+        // glVertex2f(rectX, rectY + WINDOW_BORDER);
+        // glVertex2f(rectX + rectWidth, rectY + WINDOW_BORDER);
+        // glVertex2f(rectX + rectWidth, rectY + WINDOW_BORDER);
+        // glVertex2f(rectX + rectWidth, rectY + rectHeight + WINDOW_BORDER);
+        // glVertex2f(rectX + rectWidth, rectY + rectHeight + WINDOW_BORDER);
+        // glVertex2f(rectX, rectY + rectHeight + WINDOW_BORDER);
+        // glVertex2f(rectX, rectY + rectHeight + WINDOW_BORDER);
+        // glVertex2f(rectX, rectY + WINDOW_BORDER);
+        // glEnd();
     }
 
     /**

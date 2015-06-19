@@ -5,8 +5,6 @@
  */
 package de.projectsc.gui.states;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -14,26 +12,24 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL13;
-import org.lwjgl.opengl.GL20;
-import org.lwjgl.opengl.GL30;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.core.data.content.Map;
 import de.projectsc.core.data.messages.GUIMessage;
 import de.projectsc.gui.Camera;
-import de.projectsc.gui.Overlay;
 import de.projectsc.gui.content.GUICommand;
 import de.projectsc.gui.content.MiniMap;
 import de.projectsc.gui.entities.Entity;
 import de.projectsc.gui.models.RawModel;
 import de.projectsc.gui.models.TexturedModel;
+import de.projectsc.gui.render.Light;
 import de.projectsc.gui.render.Loader;
+import de.projectsc.gui.render.ModelLoader;
+import de.projectsc.gui.render.Renderer;
 import de.projectsc.gui.shaders.Shader;
 import de.projectsc.gui.shaders.StaticShader;
 import de.projectsc.gui.textures.ModelTexture;
-import de.projectsc.gui.tools.Maths;
 
 /**
  * 
@@ -55,9 +51,8 @@ public class StateGameRunning implements State {
 
     private Map currentMap;
 
+    @SuppressWarnings("unused")
     private final BlockingQueue<GUIMessage> outgoingQueue;
-
-    private final List<Overlay> drawables = new LinkedList<>();
 
     private MiniMap minimap;
 
@@ -75,6 +70,8 @@ public class StateGameRunning implements State {
 
     private Matrix4f projectionMatrix;
 
+    private Light light;
+
     public StateGameRunning(BlockingQueue<GUIMessage> outgoingQueue) {
         this.outgoingQueue = outgoingQueue;
         camera = new Camera();
@@ -83,59 +80,39 @@ public class StateGameRunning implements State {
 
     @Override
     public void initialize() {
+        loadShader();
+        LOGGER.debug("Loading models and light ... ");
+        RawModel model = ModelLoader.loadModel("stall.obj", loader);
+        ModelTexture texture = new ModelTexture(loader.loadTexture("DungeonCrawl_ProjectUtumnoTileset.png"));
+        texturedModel = new TexturedModel(model, texture);
+        entity = new Entity(texturedModel, new Vector3f(0 - 1, 0, 0), 0, 0, 0, 1);
+        light = new Light(new Vector3f(0, 0, 0 - 2 * 10), new Vector3f(1, 1, 1));
+        LOGGER.debug("Models loaded");
+    }
+
+    private void loadShader() {
+        LOGGER.debug("Loading static shader ...");
         staticShader = new StaticShader();
         createProjectionMatrix();
         staticShader.start();
         ((StaticShader) staticShader).loadProjectionMatrix(projectionMatrix);
         staticShader.stop();
-        float[] vertices = { -0.5f, 0.5f, 0f,
-            -0.5f, -0.5f, 0f,
-            0.5f, -0.5f, 0f,
-            0.5f, 0.5f, 0f
-        };
-        int[] indices = { 0, 1, 3, 3, 1, 2 };
-        float[] textureCoords = {
-            0, 0, 0, 1, 1, 1, 1, 0
-        };
-        RawModel model = loader.loadToVAO(vertices, textureCoords, indices);
-        ModelTexture texture = new ModelTexture(loader.loadTexture("DungeonCrawl_ProjectUtumnoTileset.png"));
-        texturedModel = new TexturedModel(model, texture);
-        entity = new Entity(texturedModel, new Vector3f(-1, 0, 0), 0, 0, 0, 1);
+        LOGGER.debug("Static shader loaded.");
     }
 
     @Override
     public void pause() {
-
+        LOGGER.debug("Pause state" + STATE.name());
     }
 
     @Override
     public void resume() {
-
-    }
-
-    private void renderModel(Entity entity, Shader shader) {
-        TexturedModel tModel = entity.getModel();
-        RawModel model = tModel.getRawModel();
-        GL30.glBindVertexArray(model.getVaoID());
-        GL20.glEnableVertexAttribArray(0);
-        GL20.glEnableVertexAttribArray(1);
-
-        Matrix4f transformationMatrix =
-            Maths.createTransformationMatrix(entity.getPosition(), entity.getRotX(), entity.getRotY(), entity.getRotZ(), entity.getScale());
-
-        ((StaticShader) shader).loadTransformationMatrix(transformationMatrix);
-
-        GL13.glActiveTexture(GL13.GL_TEXTURE0);
-        GL11.glBindTexture(GL11.GL_TEXTURE_2D, texturedModel.getTexture().getTextureID());
-        GL11.glDrawElements(GL11.GL_TRIANGLES, model.getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
-        GL20.glDisableVertexAttribArray(0);
-        GL20.glDisableVertexAttribArray(1);
-        GL30.glBindVertexArray(0);
+        LOGGER.debug("Resume state" + STATE.name());
     }
 
     private void newRendering() {
         GL11.glEnable(GL11.GL_DEPTH_TEST);
-        renderModel(entity, staticShader);
+        Renderer.renderModel(entity, staticShader);
     }
 
     @Override
@@ -144,6 +121,7 @@ public class StateGameRunning implements State {
         camera.move();
         staticShader.start();
         ((StaticShader) staticShader).loadViewMatrix(camera);
+        ((StaticShader) staticShader).loadLight(light);
         staticShader.stop();
         newRendering();
     }
@@ -155,9 +133,15 @@ public class StateGameRunning implements State {
 
     @Override
     public void terminate() {
+        LOGGER.debug("Terminate state " + STATE.name());
         loader.dispose();
     }
 
+    /**
+     * Sets the current map to render.
+     * 
+     * @param map to render
+     */
     public void setCurrentMap(Map map) {
         if (minimap != null) {
             minimap.setCurrentMap(map);
@@ -176,6 +160,7 @@ public class StateGameRunning implements State {
         GUICommand command = drawableQueue.poll();
         while (command != null) {
             if (command.getMessage().equals(GUICommand.CHANGE_LOCATION)) {
+                LOGGER.debug("Chaning location");
             }
             command = drawableQueue.poll();
 

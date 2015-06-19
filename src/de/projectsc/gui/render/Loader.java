@@ -44,15 +44,17 @@ public class Loader {
      * 
      * @param positions to load
      * @param textureCoordinates to apply to the model
+     * @param normals of each face
      * @param indices for vao
      * 
      * @return the model with the vao
      */
-    public RawModel loadToVAO(float[] positions, float[] textureCoordinates, int[] indices) {
+    public RawModel loadToVAO(float[] positions, float[] textureCoordinates, float[] normals, int[] indices) {
         int vaoID = createVAO();
         bindIndicesBuffer(indices);
         storeDataInAttributeList(0, 3, positions);
         storeDataInAttributeList(1, 2, textureCoordinates);
+        storeDataInAttributeList(2, 3, normals);
         unbind();
         return new RawModel(vaoID, indices.length);
     }
