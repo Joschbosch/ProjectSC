@@ -56,8 +56,10 @@ public abstract class Shader {
     private int fragmentShader;
 
     public Shader(String vertexShaderFileName, String fragmentShaderFileName) {
-        loadProgram(vertexShaderFileName, fragmentShaderFileName);
-        getAllUniformLocations();
+        boolean done = loadProgram(vertexShaderFileName, fragmentShaderFileName);
+        if (done) {
+            getAllUniformLocations();
+        }
     }
 
     /**
@@ -65,11 +67,16 @@ public abstract class Shader {
      * 
      * @param vertexShaderFileName name of vshader
      * @param fragmentShaderFileName name of fshader
+     * @return true, if shader were loaded
      */
-    public void loadProgram(String vertexShaderFileName, String fragmentShaderFileName) {
+    public boolean loadProgram(String vertexShaderFileName, String fragmentShaderFileName) {
         vertexShader = loadShader(GL_VERTEX_SHADER, vertexShaderFileName);
         fragmentShader = loadShader(GL_FRAGMENT_SHADER, fragmentShaderFileName);
-        shaderProgram = createProgram();
+        if (vertexShader != 0 - 1 && fragmentShader != 0 - 1) {
+            shaderProgram = createProgram();
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -131,6 +138,7 @@ public abstract class Shader {
         if (status == GL_FALSE) {
             glDeleteShader(shader);
             LOGGER.error("Could not load shader: " + status);
+            return 0 - 1;
         }
 
         return shader;

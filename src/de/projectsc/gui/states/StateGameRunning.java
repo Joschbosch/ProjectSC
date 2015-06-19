@@ -27,7 +27,6 @@ import de.projectsc.gui.render.Light;
 import de.projectsc.gui.render.Loader;
 import de.projectsc.gui.render.ModelLoader;
 import de.projectsc.gui.render.Renderer;
-import de.projectsc.gui.shaders.Shader;
 import de.projectsc.gui.shaders.StaticShader;
 import de.projectsc.gui.textures.ModelTexture;
 
@@ -60,7 +59,7 @@ public class StateGameRunning implements State {
 
     private final Camera camera;
 
-    private Shader staticShader;
+    private StaticShader staticShader;
 
     private final Loader loader;
 
@@ -95,7 +94,7 @@ public class StateGameRunning implements State {
         staticShader = new StaticShader();
         createProjectionMatrix();
         staticShader.start();
-        ((StaticShader) staticShader).loadProjectionMatrix(projectionMatrix);
+        staticShader.loadProjectionMatrix(projectionMatrix);
         staticShader.stop();
         LOGGER.debug("Static shader loaded.");
     }
@@ -120,8 +119,8 @@ public class StateGameRunning implements State {
         update();
         camera.move();
         staticShader.start();
-        ((StaticShader) staticShader).loadViewMatrix(camera);
-        ((StaticShader) staticShader).loadLight(light);
+        staticShader.loadViewMatrix(camera);
+        staticShader.loadLight(light);
         staticShader.stop();
         newRendering();
     }
