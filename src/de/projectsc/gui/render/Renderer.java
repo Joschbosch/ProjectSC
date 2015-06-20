@@ -25,8 +25,10 @@ import de.projectsc.gui.tools.Maths;
  */
 public final class Renderer {
 
-    private Renderer() {
-
+    public void prepare() {
+        GL11.glClearColor(0, 0, 0, 1);
+        GL11.glEnable(GL11.GL_DEPTH_TEST);
+        GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
     }
 
     /**
@@ -35,7 +37,7 @@ public final class Renderer {
      * @param entity to render
      * @param shader used for the rendering
      */
-    public static void renderModel(Entity entity, Shader shader) {
+    public void render(Entity entity, Shader shader) {
         TexturedModel tModel = entity.getModel();
         RawModel model = tModel.getRawModel();
         GL30.glBindVertexArray(model.getVaoID());
@@ -45,7 +47,7 @@ public final class Renderer {
 
         Matrix4f transformationMatrix =
             Maths.createTransformationMatrix(entity.getPosition(), entity.getRotX(), entity.getRotY(), entity.getRotZ(), entity.getScale());
-
+        ((StaticShader) shader).loadShineValues(tModel.getTexture().getShineDamper(), tModel.getTexture().getReflectivity());
         ((StaticShader) shader).loadTransformationMatrix(transformationMatrix);
 
         GL13.glActiveTexture(GL13.GL_TEXTURE0);

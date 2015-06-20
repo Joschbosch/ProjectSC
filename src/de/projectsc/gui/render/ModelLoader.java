@@ -5,13 +5,14 @@
  */
 package de.projectsc.gui.render;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.lwjgl.util.vector.Vector2f;
@@ -43,7 +44,6 @@ public final class ModelLoader {
      */
     public static RawModel loadModel(String filename, Loader loader) {
         try {
-            List<String> lines = FileUtils.readLines(new File(ModelLoader.class.getResource("/meshes/" + filename).toURI()));
             List<Vector3f> vertices = new ArrayList<>();
             List<Vector2f> textures = new ArrayList<>();
             List<Vector3f> normals = new ArrayList<>();
@@ -54,41 +54,46 @@ public final class ModelLoader {
             float[] textureArray = null;
             int[] indicesArray = null;
 
-            for (String line : lines) {
-                String[] split = line.split("\\s");
-                switch (split[0]) {
-                case "v":
+            FileReader fr = new FileReader(new File(ModelLoader.class.getResource("/meshes/" + filename).toURI()));
+            BufferedReader reader = new BufferedReader(fr);
+            String line;
+
+            while (true) {
+                line = reader.readLine();
+                String[] split = line.split(" ");
+                if (line.startsWith("v ")) {
                     Vector3f vertex = new Vector3f(Float.parseFloat(split[1]), Float.parseFloat(split[2]), Float.parseFloat(split[3]));
                     vertices.add(vertex);
-                    break;
-
-                case "vt":
+                } else if (line.startsWith("vt ")) {
                     Vector2f vertexTexture = new Vector2f(Float.parseFloat(split[1]), Float.parseFloat(split[2]));
                     textures.add(vertexTexture);
-                    break;
-
-                case "vn":
+                } else if (line.startsWith("vn ")) {
                     Vector3f vertexNormal =
                         new Vector3f(Float.parseFloat(split[1]), Float.parseFloat(split[2]), Float.parseFloat(split[3]));
                     normals.add(vertexNormal);
-                    break;
-
-                case "f":
+                } else if (line.startsWith("f ")) {
                     textureArray = new float[vertices.size() * 2];
                     normalsArray = new float[vertices.size() * 3];
-                    String[] vertex1 = split[1].split(VERTEX_FACE_SEPARATOR);
-                    String[] vertex2 = split[2].split(VERTEX_FACE_SEPARATOR);
-                    String[] vertex3 = split[3].split(VERTEX_FACE_SEPARATOR);
-                    processVertex(vertex1, indices, textures, normals, textureArray, normalsArray);
-                    processVertex(vertex2, indices, textures, normals, textureArray, normalsArray);
-                    processVertex(vertex3, indices, textures, normals, textureArray, normalsArray);
                     break;
-
-                default:
-                    break;
-
                 }
             }
+
+            while (line != null) {
+
+                if (!line.startsWith("f ")) {
+                    line = reader.readLine();
+                    continue;
+                }
+                String[] split = line.split(" ");
+                String[] vertex1 = split[1].split(VERTEX_FACE_SEPARATOR);
+                String[] vertex2 = split[2].split(VERTEX_FACE_SEPARATOR);
+                String[] vertex3 = split[3].split(VERTEX_FACE_SEPARATOR);
+                processVertex(vertex1, indices, textures, normals, textureArray, normalsArray);
+                processVertex(vertex2, indices, textures, normals, textureArray, normalsArray);
+                processVertex(vertex3, indices, textures, normals, textureArray, normalsArray);
+                line = reader.readLine();
+            }
+            reader.close();
             verticesArray = new float[vertices.size() * 3];
             indicesArray = new int[indices.size()];
 
@@ -103,7 +108,6 @@ public final class ModelLoader {
             for (int i = 0; i < indices.size(); i++) {
                 indicesArray[i] = indices.get(i);
             }
-
             return loader.loadToVAO(verticesArray, textureArray, normalsArray, indicesArray);
         } catch (IOException | URISyntaxException e) {
             LOGGER.error("Could not load model " + filename + " :", e);

@@ -11,7 +11,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
 
@@ -57,45 +56,55 @@ public class StateGameRunning implements State {
 
     private final BlockingQueue<GUICommand> drawableQueue = new LinkedBlockingQueue<>();
 
-    private final Camera camera;
+    private Renderer renderer;
 
-    private StaticShader staticShader;
+    private Loader loader;
 
-    private final Loader loader;
+    private RawModel model;
+
+    private StaticShader shader;
 
     private TexturedModel texturedModel;
 
-    private Entity entity;
+    private Entity[] entity = new Entity[5];
 
     private Matrix4f projectionMatrix;
+
+    private Camera camera;
 
     private Light light;
 
     public StateGameRunning(BlockingQueue<GUIMessage> outgoingQueue) {
         this.outgoingQueue = outgoingQueue;
-        camera = new Camera();
-        loader = new Loader();
     }
 
     @Override
     public void initialize() {
-        loadShader();
         LOGGER.debug("Loading models and light ... ");
-        RawModel model = ModelLoader.loadModel("stall.obj", loader);
-        ModelTexture texture = new ModelTexture(loader.loadTexture("DungeonCrawl_ProjectUtumnoTileset.png"));
+        loader = new Loader();
+        camera = new Camera();
+        loadShader();
+        createProjectionMatrix();
+        shader.start();
+        shader.loadProjectionMatrix(projectionMatrix);
+        shader.stop();
+        renderer = new Renderer();
+
+        model = ModelLoader.loadModel("goat.obj", loader);
+        ModelTexture texture = new ModelTexture(loader.loadTexture("white.png"));
+        texture.setShineDamper(1);
+        texture.setReflectivity(1);
         texturedModel = new TexturedModel(model, texture);
-        entity = new Entity(texturedModel, new Vector3f(0 - 1, 0, 0), 0, 0, 0, 1);
-        light = new Light(new Vector3f(0, 0, 0 - 2 * 10), new Vector3f(1, 1, 1));
+        for (int i = 0; i < 5; i++) {
+            entity[i] = new Entity(texturedModel, new Vector3f(-5 + i * 3, 0, -5), 0, 0, 0, 1);
+        }
+        light = new Light(new Vector3f(0, 0, -0), new Vector3f(1f, 1f, 1f));
         LOGGER.debug("Models loaded");
     }
 
     private void loadShader() {
         LOGGER.debug("Loading static shader ...");
-        staticShader = new StaticShader();
-        createProjectionMatrix();
-        staticShader.start();
-        staticShader.loadProjectionMatrix(projectionMatrix);
-        staticShader.stop();
+        shader = new StaticShader();
         LOGGER.debug("Static shader loaded.");
     }
 
@@ -109,20 +118,20 @@ public class StateGameRunning implements State {
         LOGGER.debug("Resume state" + STATE.name());
     }
 
-    private void newRendering() {
-        GL11.glEnable(GL11.GL_DEPTH_TEST);
-        Renderer.renderModel(entity, staticShader);
-    }
-
     @Override
     public void render(long elapsedTime) {
-        update();
         camera.move();
-        staticShader.start();
-        staticShader.loadViewMatrix(camera);
-        staticShader.loadLight(light);
-        staticShader.stop();
-        newRendering();
+        renderer.prepare();
+        for (int i = 0; i < 5; i++) {
+            entity[i].increasePostion(0f, 0f, 0.001f);
+        }
+        shader.start();
+        shader.loadLight(light);
+        shader.loadViewMatrix(camera);
+        for (int i = 0; i < 5; i++) {
+            renderer.render(entity[i], shader);
+        }
+        shader.stop();
     }
 
     @Override
@@ -134,6 +143,7 @@ public class StateGameRunning implements State {
     public void terminate() {
         LOGGER.debug("Terminate state " + STATE.name());
         loader.dispose();
+        shader.dispose();
     }
 
     /**

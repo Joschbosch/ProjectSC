@@ -17,9 +17,9 @@ import de.projectsc.gui.render.Light;
  */
 public class StaticShader extends Shader {
 
-    private static final String VERTEX_FILE = "tutShader.vert";
+    private static final String VERTEX_FILE = "StaticShader.vert";
 
-    private static final String FRAGMENT_FILE = "tutShader.frag";
+    private static final String FRAGMENT_FILE = "StaticShader.frag";
 
     private int locationTransformationMatrix;
 
@@ -31,6 +31,10 @@ public class StaticShader extends Shader {
 
     private int locationLightColor;
 
+    private int locationShineDamper;
+
+    private int locationReflectivity;
+
     public StaticShader() {
         super(VERTEX_FILE, FRAGMENT_FILE);
     }
@@ -39,7 +43,7 @@ public class StaticShader extends Shader {
     protected void bindAttributes() {
         super.bindAttribute(0, "position");
         super.bindAttribute(1, "textureCoords");
-        super.bindAttribute(2, "normals");
+        super.bindAttribute(2, "normal");
 
     }
 
@@ -50,11 +54,13 @@ public class StaticShader extends Shader {
         locationViewMatrix = super.getUniformLocation("viewMatrix");
         locationLightPosition = super.getUniformLocation("lightPosition");
         locationLightColor = super.getUniformLocation("lightColor");
+        locationShineDamper = super.getUniformLocation("shineDamper");
+        locationReflectivity = super.getUniformLocation("reflectivity");
     }
 
     /**
      * Loads the transformation matrix.
-     * 
+     *
      * @param matrix to store the matrix in.
      */
     public void loadTransformationMatrix(Matrix4f matrix) {
@@ -63,7 +69,7 @@ public class StaticShader extends Shader {
 
     /**
      * Loads the projection matrix.
-     * 
+     *
      * @param matrix to store the projection matrix.
      */
     public void loadProjectionMatrix(Matrix4f matrix) {
@@ -72,7 +78,7 @@ public class StaticShader extends Shader {
 
     /**
      * Loads the current view matrix.
-     * 
+     *
      * @param camera for information
      */
     public void loadViewMatrix(Camera camera) {
@@ -81,11 +87,16 @@ public class StaticShader extends Shader {
 
     /**
      * Loads up a light to the shader.
-     * 
+     *
      * @param light to load
      */
     public void loadLight(Light light) {
         super.loadVector(locationLightPosition, light.getPosition());
         super.loadVector(locationLightColor, light.getColor());
+    }
+
+    public void loadShineValues(float damper, float reflectivity) {
+        super.loadFloat(locationShineDamper, damper);
+        super.loadFloat(locationReflectivity, reflectivity);
     }
 }
