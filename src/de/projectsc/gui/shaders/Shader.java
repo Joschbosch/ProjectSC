@@ -26,9 +26,9 @@ import org.lwjgl.util.vector.Vector3f;
  */
 public abstract class Shader {
 
-    private static final int FLOAT_BUFFER_SIZE = 16;
+    private static final int ERROR_LOG_LENGTH = 500;
 
-    private static final int MINUS_ONE = -1;
+    private static final int FLOAT_BUFFER_SIZE = 16;
 
     private static final Log LOGGER = LogFactory.getLog(Shader.class);
 
@@ -52,10 +52,16 @@ public abstract class Shader {
         getAllUniformLocations();
     }
 
+    /**
+     * Start shader.
+     */
     public void start() {
         GL20.glUseProgram(shaderProgram);
     }
 
+    /**
+     * Stop shader.
+     */
     public void stop() {
         GL20.glUseProgram(0);
     }
@@ -78,11 +84,14 @@ public abstract class Shader {
         GL20.glShaderSource(shaderID, shaderSource);
         GL20.glCompileShader(shaderID);
         if (GL20.glGetShaderi(shaderID, GL20.GL_COMPILE_STATUS) == GL11.GL_FALSE) {
-            LOGGER.error("Could not compile shader" + GL20.glGetShaderInfoLog(shaderID, 500));
+            LOGGER.error("Could not compile shader" + GL20.glGetShaderInfoLog(shaderID, ERROR_LOG_LENGTH));
         }
         return shaderID;
     }
 
+    /**
+     * Dispose everything.
+     */
     public void dispose() {
         stop();
         GL20.glDetachShader(shaderProgram, vertexShader);
@@ -94,12 +103,20 @@ public abstract class Shader {
 
     protected abstract void getAllUniformLocations();
 
+    /**
+     * @param uniformName in shader.
+     * @return location int of given variable.
+     */
     public int getUniformLocation(String uniformName) {
         return GL20.glGetUniformLocation(shaderProgram, uniformName);
     }
 
     protected void loadFloat(int location, float value) {
         GL20.glUniform1f(location, value);
+    }
+
+    protected void loadInt(int location, int value) {
+        GL20.glUniform1i(location, value);
     }
 
     protected void loadVector(int location, Vector3f value) {

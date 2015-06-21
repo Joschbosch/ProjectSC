@@ -11,7 +11,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.lwjgl.opengl.Display;
-import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.core.data.content.Map;
@@ -24,10 +23,13 @@ import de.projectsc.gui.models.RawModel;
 import de.projectsc.gui.models.TexturedModel;
 import de.projectsc.gui.render.Light;
 import de.projectsc.gui.render.Loader;
-import de.projectsc.gui.render.ModelLoader;
-import de.projectsc.gui.render.Renderer;
-import de.projectsc.gui.shaders.StaticShader;
+import de.projectsc.gui.render.MasterRenderer;
+import de.projectsc.gui.render.ModelData;
+import de.projectsc.gui.render.OBJFileLoader;
+import de.projectsc.gui.terrain.Terrain;
 import de.projectsc.gui.textures.ModelTexture;
+import de.projectsc.gui.textures.TerrainTexture;
+import de.projectsc.gui.textures.TerrainTexturePack;
 
 /**
  * 
@@ -41,12 +43,6 @@ public class StateGameRunning implements State {
 
     private static final GUIState STATE = GUIState.GAME;
 
-    private static final float FOV = 90f;
-
-    private static final float NEAR_PLANE = 0.1f;
-
-    private static final float FAR_PLANE = 1000f;
-
     private Map currentMap;
 
     @SuppressWarnings("unused")
@@ -56,23 +52,27 @@ public class StateGameRunning implements State {
 
     private final BlockingQueue<GUICommand> drawableQueue = new LinkedBlockingQueue<>();
 
-    private Renderer renderer;
-
     private Loader loader;
 
-    private RawModel model;
-
-    private StaticShader shader;
-
-    private TexturedModel texturedModel;
-
     private Entity[] entity = new Entity[5];
-
-    private Matrix4f projectionMatrix;
 
     private Camera camera;
 
     private Light light;
+
+    private MasterRenderer masterRenderer;
+
+    private Terrain terrain;
+
+    private Terrain terrain2;
+
+    private Entity farnEntity;
+
+    private Entity grassEntity;
+
+    private Terrain terrain3;
+
+    private Terrain terrain4;
 
     public StateGameRunning(BlockingQueue<GUIMessage> outgoingQueue) {
         this.outgoingQueue = outgoingQueue;
@@ -83,29 +83,53 @@ public class StateGameRunning implements State {
         LOGGER.debug("Loading models and light ... ");
         loader = new Loader();
         camera = new Camera();
-        loadShader();
-        createProjectionMatrix();
-        shader.start();
-        shader.loadProjectionMatrix(projectionMatrix);
-        shader.stop();
-        renderer = new Renderer();
-
-        model = ModelLoader.loadModel("goat.obj", loader);
-        ModelTexture texture = new ModelTexture(loader.loadTexture("white.png"));
-        texture.setShineDamper(1);
-        texture.setReflectivity(1);
-        texturedModel = new TexturedModel(model, texture);
-        for (int i = 0; i < 5; i++) {
-            entity[i] = new Entity(texturedModel, new Vector3f(-5 + i * 3, 0, -5), 0, 0, 0, 1);
-        }
-        light = new Light(new Vector3f(0, 0, -0), new Vector3f(1f, 1f, 1f));
-        LOGGER.debug("Models loaded");
+        masterRenderer = new MasterRenderer();
+        loadDemoObjects();
     }
 
-    private void loadShader() {
-        LOGGER.debug("Loading static shader ...");
-        shader = new StaticShader();
-        LOGGER.debug("Static shader loaded.");
+    private void loadDemoObjects() {
+        ModelData goatData = OBJFileLoader.loadOBJ("goat");
+        RawModel goatModel =
+            loader.loadToVAO(goatData.getVertices(), goatData.getTextureCoords(), goatData.getNormals(), goatData.getIndices());
+        ModelTexture goatTexture = new ModelTexture(loader.loadTexture("white.png"));
+        TexturedModel goatTexturedModel = new TexturedModel(goatModel, goatTexture);
+        for (int i = 0; i < 5; i++) {
+            entity[i] = new Entity(goatTexturedModel, new Vector3f(-5 + i * 3, 0, -5), 0, 0, 0, 1);
+        }
+
+        light = new Light(new Vector3f(0, 0, -0), new Vector3f(1f, 1f, 1f));
+
+        TerrainTexture backgroundTex = new TerrainTexture(loader.loadTexture("terrain/grass.png"));
+        TerrainTexture rTex = new TerrainTexture(loader.loadTexture("terrain/mud.png"));
+        TerrainTexture gTex = new TerrainTexture(loader.loadTexture("terrain/groundFlower.png"));
+        TerrainTexture bTex = new TerrainTexture(loader.loadTexture("terrain/path.png"));
+
+        TerrainTexturePack texturePack = new TerrainTexturePack(backgroundTex, rTex, gTex, bTex);
+        TerrainTexture blendMap = new TerrainTexture(loader.loadTexture("terrain/blendMap.png"));
+
+        terrain = new Terrain(-1, -1, texturePack, blendMap, loader);
+        terrain2 = new Terrain(0, -1, texturePack, blendMap, loader);
+        terrain3 = new Terrain(-1, 0, texturePack, blendMap, loader);
+        terrain4 = new Terrain(0, 0, texturePack, blendMap, loader);
+
+        farnEntity = loadModel("terrain/fern", "terrain/fern.png", new Vector3f(-5 + 3, 0, -5), 0, 0, 0, 0.1f);
+        farnEntity.getModel().getTexture().setFakeLighting(true);
+        farnEntity.getModel().getTexture().setHasTransparency(true);
+
+        grassEntity = loadModel("terrain/grassModel", "terrain/grassTexture.png", new Vector3f(0, 0, -5), 0, 0, 0, 0.1f);
+        grassEntity.getModel().getTexture().setHasTransparency(true);
+        grassEntity.getModel().getTexture().setFakeLighting(true);
+        LOGGER.debug("Models and light loaded");
+    }
+
+    private Entity loadModel(String name, String textureName, Vector3f position, float rotX, float rotY, float rotZ, float scale) {
+        ModelData data = OBJFileLoader.loadOBJ(name);
+        RawModel model =
+            loader.loadToVAO(data.getVertices(), data.getTextureCoords(), data.getNormals(), data.getIndices());
+        ModelTexture texture = new ModelTexture(loader.loadTexture(textureName));
+        TexturedModel texturedModel = new TexturedModel(model, texture);
+        Entity entity = new Entity(texturedModel, position, rotX, rotY, rotZ, scale);
+        return entity;
     }
 
     @Override
@@ -121,17 +145,20 @@ public class StateGameRunning implements State {
     @Override
     public void render(long elapsedTime) {
         camera.move();
-        renderer.prepare();
         for (int i = 0; i < 5; i++) {
             entity[i].increasePostion(0f, 0f, 0.001f);
+            masterRenderer.processEntity(entity[i]);
         }
-        shader.start();
-        shader.loadLight(light);
-        shader.loadViewMatrix(camera);
-        for (int i = 0; i < 5; i++) {
-            renderer.render(entity[i], shader);
-        }
-        shader.stop();
+        masterRenderer.processEntity(farnEntity);
+        masterRenderer.processEntity(grassEntity);
+
+        masterRenderer.processTerrain(terrain);
+        masterRenderer.processTerrain(terrain2);
+        masterRenderer.processTerrain(terrain3);
+        masterRenderer.processTerrain(terrain4);
+
+        masterRenderer.render(light, camera);
+
     }
 
     @Override
@@ -143,7 +170,7 @@ public class StateGameRunning implements State {
     public void terminate() {
         LOGGER.debug("Terminate state " + STATE.name());
         loader.dispose();
-        shader.dispose();
+        masterRenderer.dispose();
     }
 
     /**
@@ -180,19 +207,4 @@ public class StateGameRunning implements State {
         // camera.updatePosition(elapsedTime);
     }
 
-    private void createProjectionMatrix() {
-        float aspectRatio = (float) Display.getWidth() / (float) Display.getHeight();
-        float yScale = (float) ((1.f / Math.tan(Math.toRadians(FOV / 2f))) * aspectRatio);
-        float xScale = yScale / aspectRatio;
-        float frustrumLength = FAR_PLANE - NEAR_PLANE;
-
-        projectionMatrix = new Matrix4f();
-
-        projectionMatrix.m00 = xScale;
-        projectionMatrix.m11 = yScale;
-        projectionMatrix.m22 = -((FAR_PLANE + NEAR_PLANE) / frustrumLength);
-        projectionMatrix.m23 = 0 - 1;
-        projectionMatrix.m32 = -((2 * NEAR_PLANE * FAR_PLANE) / frustrumLength);
-        projectionMatrix.m33 = 0;
-    }
 }

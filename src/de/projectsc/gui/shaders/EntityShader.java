@@ -5,7 +5,10 @@
  */
 package de.projectsc.gui.shaders;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.lwjgl.util.vector.Matrix4f;
+import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.gui.Camera;
 import de.projectsc.gui.render.Light;
@@ -15,11 +18,13 @@ import de.projectsc.gui.render.Light;
  * 
  * @author Josch Bosch
  */
-public class StaticShader extends Shader {
+public class EntityShader extends Shader {
 
-    private static final String VERTEX_FILE = "StaticShader.vert";
+    private static final Log LOGGER = LogFactory.getLog(EntityShader.class);
 
-    private static final String FRAGMENT_FILE = "StaticShader.frag";
+    private static final String VERTEX_FILE = "entityShader.vert";
+
+    private static final String FRAGMENT_FILE = "entityShader.frag";
 
     private int locationTransformationMatrix;
 
@@ -33,10 +38,15 @@ public class StaticShader extends Shader {
 
     private int locationShineDamper;
 
+    private int locationUseFakeLighting;
+
     private int locationReflectivity;
 
-    public StaticShader() {
+    private int locationSkyColor;
+
+    public EntityShader() {
         super(VERTEX_FILE, FRAGMENT_FILE);
+        LOGGER.debug("Static shader loaded.");
     }
 
     @Override
@@ -56,6 +66,21 @@ public class StaticShader extends Shader {
         locationLightColor = super.getUniformLocation("lightColor");
         locationShineDamper = super.getUniformLocation("shineDamper");
         locationReflectivity = super.getUniformLocation("reflectivity");
+        locationUseFakeLighting = super.getUniformLocation("useFakeLighting");
+        locationSkyColor = super.getUniformLocation("skyColor");
+    }
+
+    public void loadSkyColor(float r, float g, float b) {
+        super.loadVector(locationSkyColor, new Vector3f(r, g, b));
+    }
+
+    /**
+     * Loads whether lighting should be faked.
+     * 
+     * @param useFake ?
+     */
+    public void loadUseFakeLighting(boolean useFake) {
+        super.loadBoolean(locationUseFakeLighting, useFake);
     }
 
     /**
@@ -95,6 +120,12 @@ public class StaticShader extends Shader {
         super.loadVector(locationLightColor, light.getColor());
     }
 
+    /**
+     * Loads shiny values for the shader.
+     * 
+     * @param damper value
+     * @param reflectivity value
+     */
     public void loadShineValues(float damper, float reflectivity) {
         super.loadFloat(locationShineDamper, damper);
         super.loadFloat(locationReflectivity, reflectivity);

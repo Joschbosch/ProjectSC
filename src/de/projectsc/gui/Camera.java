@@ -20,7 +20,7 @@ public class Camera {
 
     private static final float SLOW_MOVEMENT_SPEED = 0.02f;
 
-    private final Vector3f position = new Vector3f(0, 0, 0);
+    private final Vector3f position = new Vector3f(0, 0.5f, 0);
 
     private float pitch = 0;
 
