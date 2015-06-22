@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2015 
+ * Copyright (C) 2015 Project SC
+ * 
+ * All rights reserved
  */
 
 package de.projectsc.gui.render;
@@ -19,9 +21,14 @@ import de.projectsc.gui.terrain.Terrain;
 import de.projectsc.gui.textures.TerrainTexturePack;
 import de.projectsc.gui.tools.Maths;
 
+/**
+ * Render terrain data with own shader.
+ * 
+ * @author Josch Bosch
+ */
 public class TerrainRenderer {
 
-    private TerrainShader shader;
+    private final TerrainShader shader;
 
     public TerrainRenderer(TerrainShader shader, Matrix4f projectionMatrix) {
         this.shader = shader;
@@ -31,6 +38,11 @@ public class TerrainRenderer {
         shader.stop();
     }
 
+    /**
+     * Render given terrains.
+     * 
+     * @param terrains to render
+     */
     public void render(List<Terrain> terrains) {
         for (Terrain terrain : terrains) {
             prepareTerrain(terrain);
@@ -56,11 +68,11 @@ public class TerrainRenderer {
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, texturePack.getBackgroundTexture().getTextureID());
         GL13.glActiveTexture(GL13.GL_TEXTURE1);
-        GL11.glBindTexture(GL11.GL_TEXTURE_2D, texturePack.getrTexture().getTextureID());
+        GL11.glBindTexture(GL11.GL_TEXTURE_2D, texturePack.getRTexture().getTextureID());
         GL13.glActiveTexture(GL13.GL_TEXTURE2);
-        GL11.glBindTexture(GL11.GL_TEXTURE_2D, texturePack.getgTexture().getTextureID());
+        GL11.glBindTexture(GL11.GL_TEXTURE_2D, texturePack.getGTexture().getTextureID());
         GL13.glActiveTexture(GL13.GL_TEXTURE3);
-        GL11.glBindTexture(GL11.GL_TEXTURE_2D, texturePack.getbTexture().getTextureID());
+        GL11.glBindTexture(GL11.GL_TEXTURE_2D, texturePack.getBTexture().getTextureID());
         GL13.glActiveTexture(GL13.GL_TEXTURE4);
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, terrain.getBlendMap().getTextureID());
     }

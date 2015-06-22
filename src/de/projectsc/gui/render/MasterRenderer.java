@@ -15,9 +15,10 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Matrix4f;
 
-import de.projectsc.gui.Camera;
-import de.projectsc.gui.entities.Entity;
 import de.projectsc.gui.models.TexturedModel;
+import de.projectsc.gui.objects.Camera;
+import de.projectsc.gui.objects.Entity;
+import de.projectsc.gui.objects.Light;
 import de.projectsc.gui.shaders.EntityShader;
 import de.projectsc.gui.shaders.TerrainShader;
 import de.projectsc.gui.terrain.Terrain;
@@ -43,17 +44,17 @@ public class MasterRenderer {
 
     private Matrix4f projectionMatrix;
 
-    private EntityShader entityShader;
+    private final EntityShader entityShader;
 
-    private EntityRenderer entityRenderer;
+    private final EntityRenderer entityRenderer;
 
-    private TerrainShader terrainShader;
+    private final TerrainShader terrainShader;
 
-    private TerrainRenderer terrainRenderer;
+    private final TerrainRenderer terrainRenderer;
 
-    private Map<TexturedModel, List<Entity>> entities = new HashMap<>();
+    private final Map<TexturedModel, List<Entity>> entities = new HashMap<>();
 
-    private List<Terrain> terrains = new ArrayList<>();
+    private final List<Terrain> terrains = new ArrayList<>();
 
     public MasterRenderer() {
         enableCulling();
@@ -98,6 +99,11 @@ public class MasterRenderer {
 
     }
 
+    /**
+     * Add terrain to be rendered later.
+     * 
+     * @param terrain to render
+     */
     public void processTerrain(Terrain terrain) {
         terrains.add(terrain);
     }
@@ -127,11 +133,17 @@ public class MasterRenderer {
         terrainShader.dispose();
     }
 
+    /**
+     * Enable culling for not render too much back faces.
+     */
     public static void enableCulling() {
         GL11.glEnable(GL11.GL_CULL_FACE);
         GL11.glCullFace(GL11.GL_BACK);
     }
 
+    /**
+     * Disable culling for rendering transparent faces.
+     */
     public static void disableCulling() {
         GL11.glDisable(GL11.GL_CULL_FACE);
     }

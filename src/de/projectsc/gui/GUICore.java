@@ -32,7 +32,7 @@ import de.projectsc.gui.states.StateGameRunning;
  */
 public class GUICore implements Runnable {
 
-    private static final int MAX_FRAME_RATE = 60;
+    private static final int MAX_FRAME_RATE = 120;
 
     private static final int HEIGHT = 1024;
 
@@ -110,8 +110,9 @@ public class GUICore implements Runnable {
                 LOGGER.debug("Send close request and close down");
             }
             retreiveCoreMessages();
-            currentState.handleInput(timer.getDelta());
-            currentState.render(timer.getDelta());
+            int delta = timer.getDelta();
+            currentState.handleInput(delta);
+            currentState.render(delta);
             timer.updateFPS();
             Display.sync(MAX_FRAME_RATE);
             Display.update();

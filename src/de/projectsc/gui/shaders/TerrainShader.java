@@ -1,7 +1,8 @@
 /*
- * Copyright (C) 2015 
+ * Copyright (C) 2015 Project SC
+ * 
+ * All rights reserved
  */
-
 package de.projectsc.gui.shaders;
 
 import org.apache.commons.logging.Log;
@@ -9,9 +10,14 @@ import org.apache.commons.logging.LogFactory;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
 
-import de.projectsc.gui.Camera;
-import de.projectsc.gui.render.Light;
+import de.projectsc.gui.objects.Camera;
+import de.projectsc.gui.objects.Light;
 
+/**
+ * Shader only for the Terrain.
+ * 
+ * @author Josch Bosch
+ */
 public class TerrainShader extends Shader {
 
     private static final Log LOGGER = LogFactory.getLog(EntityShader.class);
@@ -76,6 +82,9 @@ public class TerrainShader extends Shader {
         locationBlendMap = super.getUniformLocation("blendMap");
     }
 
+    /**
+     * Conntect the textures for the blend mapping.
+     */
     public void connectTextureUnits() {
         super.loadInt(locationBackgroundTexture, 0);
         super.loadInt(locationRTexture, 1);
@@ -84,6 +93,13 @@ public class TerrainShader extends Shader {
         super.loadInt(locationBlendMap, 4);
     }
 
+    /**
+     * Give current color for the sky to the shader.
+     * 
+     * @param r value
+     * @param g value
+     * @param b value
+     */
     public void loadSkyColor(float r, float g, float b) {
         super.loadVector(locationSkyColor, new Vector3f(r, g, b));
     }

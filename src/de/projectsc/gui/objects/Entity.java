@@ -3,7 +3,7 @@
  * 
  * All rights reserved
  */
-package de.projectsc.gui.entities;
+package de.projectsc.gui.objects;
 
 import org.lwjgl.util.vector.Vector3f;
 

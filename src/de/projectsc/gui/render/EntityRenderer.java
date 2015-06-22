@@ -14,9 +14,9 @@ import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.util.vector.Matrix4f;
 
-import de.projectsc.gui.entities.Entity;
 import de.projectsc.gui.models.RawModel;
 import de.projectsc.gui.models.TexturedModel;
+import de.projectsc.gui.objects.Entity;
 import de.projectsc.gui.shaders.EntityShader;
 import de.projectsc.gui.textures.ModelTexture;
 import de.projectsc.gui.tools.Maths;
@@ -61,7 +61,7 @@ public class EntityRenderer {
         GL20.glEnableVertexAttribArray(1);
         GL20.glEnableVertexAttribArray(2);
         ModelTexture texture = tModel.getTexture();
-        if (texture.hasTransparency()) {
+        if (texture.isTransparent()) {
             MasterRenderer.disableCulling();
         }
         shader.loadShineValues(texture.getShineDamper(), texture.getReflectivity());

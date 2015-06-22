@@ -1,5 +1,5 @@
 /*
- * /* Copyright (C) 2015 Project SC
+ * Copyright (C) 2015 Project SC
  * 
  * All rights reserved
  */
@@ -18,7 +18,7 @@ public class ModelTexture {
 
     private float reflectivity = 0;
 
-    private boolean hasTransparency = false;
+    private boolean transparent = false;
 
     private boolean fakeLighting = false;
 
@@ -51,12 +51,12 @@ public class ModelTexture {
         this.reflectivity = reflectivity;
     }
 
-    public boolean hasTransparency() {
-        return hasTransparency;
+    public boolean isTransparent() {
+        return transparent;
     }
 
-    public void setHasTransparency(boolean hasTransparency) {
-        this.hasTransparency = hasTransparency;
+    public void setTransparent(boolean transparency) {
+        this.transparent = transparency;
     }
 
     public boolean isFakeLighting() {

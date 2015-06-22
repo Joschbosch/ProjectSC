@@ -1,18 +1,24 @@
 /*
- * Copyright (C) 2015 
+ * Copyright (C) 2015 Project SC
+ * 
+ * All rights reserved
  */
-
 package de.projectsc.gui.textures;
 
+/**
+ * A batch of terrain textures for blend mapping.
+ * 
+ * @author Josch Bosch
+ */
 public class TerrainTexturePack {
 
-    private TerrainTexture backgroundTexture;
+    private final TerrainTexture backgroundTexture;
 
-    private TerrainTexture rTexture;
+    private final TerrainTexture rTexture;
 
-    private TerrainTexture gTexture;
+    private final TerrainTexture gTexture;
 
-    private TerrainTexture bTexture;
+    private final TerrainTexture bTexture;
 
     public TerrainTexturePack(TerrainTexture backgroundTexture, TerrainTexture rTexture, TerrainTexture gTexture, TerrainTexture bTexture) {
         super();
@@ -26,15 +32,15 @@ public class TerrainTexturePack {
         return backgroundTexture;
     }
 
-    public TerrainTexture getrTexture() {
+    public TerrainTexture getRTexture() {
         return rTexture;
     }
 
-    public TerrainTexture getgTexture() {
+    public TerrainTexture getGTexture() {
         return gTexture;
     }
 
-    public TerrainTexture getbTexture() {
+    public TerrainTexture getBTexture() {
         return bTexture;
     }
 

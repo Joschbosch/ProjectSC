@@ -15,21 +15,22 @@ import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.core.data.content.Map;
 import de.projectsc.core.data.messages.GUIMessage;
-import de.projectsc.gui.Camera;
 import de.projectsc.gui.content.GUICommand;
 import de.projectsc.gui.content.MiniMap;
-import de.projectsc.gui.entities.Entity;
 import de.projectsc.gui.models.RawModel;
 import de.projectsc.gui.models.TexturedModel;
-import de.projectsc.gui.render.Light;
-import de.projectsc.gui.render.Loader;
+import de.projectsc.gui.objects.Camera;
+import de.projectsc.gui.objects.Entity;
+import de.projectsc.gui.objects.Light;
+import de.projectsc.gui.objects.Player;
 import de.projectsc.gui.render.MasterRenderer;
-import de.projectsc.gui.render.ModelData;
-import de.projectsc.gui.render.OBJFileLoader;
 import de.projectsc.gui.terrain.Terrain;
 import de.projectsc.gui.textures.ModelTexture;
 import de.projectsc.gui.textures.TerrainTexture;
 import de.projectsc.gui.textures.TerrainTexturePack;
+import de.projectsc.gui.tools.Loader;
+import de.projectsc.gui.tools.ModelData;
+import de.projectsc.gui.tools.OBJFileLoader;
 
 /**
  * 
@@ -54,7 +55,7 @@ public class StateGameRunning implements State {
 
     private Loader loader;
 
-    private Entity[] entity = new Entity[5];
+    private final Entity[] entities = new Entity[5];
 
     private Camera camera;
 
@@ -74,6 +75,8 @@ public class StateGameRunning implements State {
 
     private Terrain terrain4;
 
+    private Player player;
+
     public StateGameRunning(BlockingQueue<GUIMessage> outgoingQueue) {
         this.outgoingQueue = outgoingQueue;
     }
@@ -82,9 +85,16 @@ public class StateGameRunning implements State {
     public void initialize() {
         LOGGER.debug("Loading models and light ... ");
         loader = new Loader();
-        camera = new Camera();
-        masterRenderer = new MasterRenderer();
+
+        ModelData playerData = OBJFileLoader.loadOBJ("terrain/bunny");
+        RawModel playerModel =
+            loader.loadToVAO(playerData.getVertices(), playerData.getTextureCoords(), playerData.getNormals(), playerData.getIndices());
+        TexturedModel playerTexModel = new TexturedModel(playerModel, new ModelTexture(loader.loadTexture("white.png")));
         loadDemoObjects();
+        player = new Player(playerTexModel, new Vector3f(100f, 0f, -50f), 0, 0, 0, 1);
+        camera = new Camera(player);
+        masterRenderer = new MasterRenderer();
+
     }
 
     private void loadDemoObjects() {
@@ -94,7 +104,7 @@ public class StateGameRunning implements State {
         ModelTexture goatTexture = new ModelTexture(loader.loadTexture("white.png"));
         TexturedModel goatTexturedModel = new TexturedModel(goatModel, goatTexture);
         for (int i = 0; i < 5; i++) {
-            entity[i] = new Entity(goatTexturedModel, new Vector3f(-5 + i * 3, 0, -5), 0, 0, 0, 1);
+            entities[i] = new Entity(goatTexturedModel, new Vector3f(-5 + i * 3, 0, -5), 0, 0, 0, 1);
         }
 
         light = new Light(new Vector3f(0, 0, -0), new Vector3f(1f, 1f, 1f));
@@ -114,10 +124,10 @@ public class StateGameRunning implements State {
 
         farnEntity = loadModel("terrain/fern", "terrain/fern.png", new Vector3f(-5 + 3, 0, -5), 0, 0, 0, 0.1f);
         farnEntity.getModel().getTexture().setFakeLighting(true);
-        farnEntity.getModel().getTexture().setHasTransparency(true);
+        farnEntity.getModel().getTexture().setTransparent(true);
 
         grassEntity = loadModel("terrain/grassModel", "terrain/grassTexture.png", new Vector3f(0, 0, -5), 0, 0, 0, 0.1f);
-        grassEntity.getModel().getTexture().setHasTransparency(true);
+        grassEntity.getModel().getTexture().setTransparent(true);
         grassEntity.getModel().getTexture().setFakeLighting(true);
         LOGGER.debug("Models and light loaded");
     }
@@ -145,13 +155,14 @@ public class StateGameRunning implements State {
     @Override
     public void render(long elapsedTime) {
         camera.move();
+        player.move(elapsedTime);
         for (int i = 0; i < 5; i++) {
-            entity[i].increasePostion(0f, 0f, 0.001f);
-            masterRenderer.processEntity(entity[i]);
+            entities[i].increasePostion(0f, 0f, 0.001f);
+            masterRenderer.processEntity(entities[i]);
         }
         masterRenderer.processEntity(farnEntity);
         masterRenderer.processEntity(grassEntity);
-
+        masterRenderer.processEntity(player);
         masterRenderer.processTerrain(terrain);
         masterRenderer.processTerrain(terrain2);
         masterRenderer.processTerrain(terrain3);

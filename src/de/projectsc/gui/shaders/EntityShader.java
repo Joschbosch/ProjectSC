@@ -10,8 +10,8 @@ import org.apache.commons.logging.LogFactory;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
 
-import de.projectsc.gui.Camera;
-import de.projectsc.gui.render.Light;
+import de.projectsc.gui.objects.Camera;
+import de.projectsc.gui.objects.Light;
 
 /**
  * A shader program that does not much.
@@ -70,6 +70,13 @@ public class EntityShader extends Shader {
         locationSkyColor = super.getUniformLocation("skyColor");
     }
 
+    /**
+     * Give current color for the sky to the shader.
+     * 
+     * @param r value
+     * @param g value
+     * @param b value
+     */
     public void loadSkyColor(float r, float g, float b) {
         super.loadVector(locationSkyColor, new Vector3f(r, g, b));
     }

@@ -1,29 +1,35 @@
 /*
- * Copyright (C) 2015 
+ * Copyright (C) 2015 Project SC
+ * 
+ * All rights reserved
  */
-
 package de.projectsc.gui.terrain;
 
 import de.projectsc.gui.models.RawModel;
-import de.projectsc.gui.render.Loader;
 import de.projectsc.gui.textures.TerrainTexture;
 import de.projectsc.gui.textures.TerrainTexturePack;
+import de.projectsc.gui.tools.Loader;
 
+/**
+ * Representation of the terrain.
+ * 
+ * @author Josch Bosch
+ */
 public class Terrain {
 
-    private int VERTEX_COUNT = 128;
+    private static final int VERTEX_COUNT = 128;
 
-    private float SIZE = 800;
+    private static final float SIZE = 800;
 
-    private float x;
+    private final float x;
 
-    private float z;
+    private final float z;
 
-    private RawModel model;
+    private final RawModel model;
 
-    private TerrainTexturePack texture;
+    private final TerrainTexturePack texture;
 
-    private TerrainTexture blendMap;
+    private final TerrainTexture blendMap;
 
     public Terrain(float x, float z, TerrainTexturePack texture, TerrainTexture blendMap, Loader loader) {
         super();
