@@ -16,19 +16,23 @@ import org.lwjgl.util.vector.Vector3f;
  */
 public class Camera {
 
+    private static final int MAX_DISTANCE_TO_PLAYER = 100;
+
+    private static final float PLAYER_CENTER_Y_AXIS = 15.5f;
+
     private static final int DEGREES_180 = 180;
 
     private final Vector3f position = new Vector3f(0, 0.5f, 0);
 
     private float pitch = 20;
 
-    private float yaw = 0;
+    private float yaw = 10;
 
     private float roll = 0;
 
     private final Player player;
 
-    private float distanceFromPlayer = 50f;
+    private float distanceFromPlayer = 30f;
 
     private float angleAroundPlayer = 0;
 
@@ -55,7 +59,7 @@ public class Camera {
         float offsetZ = (float) (horizontalDistance * Math.cos(Math.toRadians(theta)));
         position.x = player.getPosition().x - offsetX;
         position.z = player.getPosition().z - offsetZ;
-        position.y = player.getPosition().y + verticalDistance;
+        position.y = player.getPosition().y + verticalDistance + PLAYER_CENTER_Y_AXIS;
 
     }
 
@@ -103,14 +107,24 @@ public class Camera {
     }
 
     private void calculateZoom() {
-        float zoomLevel = Mouse.getDWheel() * 0.1f;
+        float zoomLevel = Mouse.getDWheel() * 0.01f;
         distanceFromPlayer -= zoomLevel;
+        if (distanceFromPlayer < 0) {
+            distanceFromPlayer = 0;
+        } else if (distanceFromPlayer > MAX_DISTANCE_TO_PLAYER) {
+            distanceFromPlayer = MAX_DISTANCE_TO_PLAYER;
+        }
     }
 
     private void calculatePitch() {
         if (Mouse.isButtonDown(1)) {
             float pitchChange = Mouse.getDY() * 0.1f;
             pitch -= pitchChange;
+        }
+        if (pitch < -25.0) {
+            pitch = -25.0f;
+        } else if (pitch > 90) {
+            pitch = 90;
         }
     }
 

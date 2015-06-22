@@ -5,9 +5,12 @@
  */
 package de.projectsc.gui.shaders;
 
+import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.lwjgl.util.vector.Matrix4f;
+import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.gui.objects.Camera;
@@ -19,6 +22,8 @@ import de.projectsc.gui.objects.Light;
  * @author Josch Bosch
  */
 public class EntityShader extends Shader {
+
+    private static final int MAX_LIGHTS = 6;
 
     private static final Log LOGGER = LogFactory.getLog(EntityShader.class);
 
@@ -32,9 +37,11 @@ public class EntityShader extends Shader {
 
     private int locationViewMatrix;
 
-    private int locationLightPosition;
+    private int[] locationLightPosition;
 
-    private int locationLightColor;
+    private int[] locationLightColor;
+
+    private int[] locationAttenuation;
 
     private int locationShineDamper;
 
@@ -43,6 +50,10 @@ public class EntityShader extends Shader {
     private int locationReflectivity;
 
     private int locationSkyColor;
+
+    private int locationNumberOfRows;
+
+    private int locationOffset;
 
     public EntityShader() {
         super(VERTEX_FILE, FRAGMENT_FILE);
@@ -62,12 +73,28 @@ public class EntityShader extends Shader {
         locationTransformationMatrix = super.getUniformLocation("transformationMatrix");
         locationProjectionMatrix = super.getUniformLocation("projectionMatrix");
         locationViewMatrix = super.getUniformLocation("viewMatrix");
-        locationLightPosition = super.getUniformLocation("lightPosition");
-        locationLightColor = super.getUniformLocation("lightColor");
         locationShineDamper = super.getUniformLocation("shineDamper");
         locationReflectivity = super.getUniformLocation("reflectivity");
         locationUseFakeLighting = super.getUniformLocation("useFakeLighting");
         locationSkyColor = super.getUniformLocation("skyColor");
+        locationNumberOfRows = super.getUniformLocation("numberOfRows");
+        locationOffset = super.getUniformLocation("offset");
+        locationLightPosition = new int[MAX_LIGHTS];
+        locationLightColor = new int[MAX_LIGHTS];
+        locationAttenuation = new int[MAX_LIGHTS];
+        for (int i = 0; i < MAX_LIGHTS; i++) {
+            locationLightPosition[i] = getUniformLocation("lightPosition[" + i + "]");
+            locationLightColor[i] = getUniformLocation("lightColor[" + i + "]");
+            locationAttenuation[i] = getUniformLocation("attenuation[" + i + "]");
+        }
+    }
+
+    public void loadNumberRows(int number) {
+        loadFloat(locationNumberOfRows, number);
+    }
+
+    public void loadOffset(float x, float y) {
+        loadVector(locationOffset, new Vector2f(x, y));
     }
 
     /**
@@ -118,13 +145,23 @@ public class EntityShader extends Shader {
     }
 
     /**
-     * Loads up a light to the shader.
+     * Loads up lights to the shader.
      *
-     * @param light to load
+     * @param lights to load
      */
-    public void loadLight(Light light) {
-        super.loadVector(locationLightPosition, light.getPosition());
-        super.loadVector(locationLightColor, light.getColor());
+    public void loadLights(List<Light> lights) {
+        for (int i = 0; i < MAX_LIGHTS; i++) {
+            if (i < lights.size()) {
+                loadVector(locationLightPosition[i], lights.get(i).getPosition());
+                loadVector(locationLightColor[i], lights.get(i).getColor());
+                loadVector(locationAttenuation[i], lights.get(i).getAttenuation());
+            } else {
+                loadVector(locationLightPosition[i], new Vector3f(0.0f, 0.0f, 0.0f));
+                loadVector(locationLightColor[i], new Vector3f(0.0f, 0.0f, 0.0f));
+                loadVector(locationAttenuation[i], new Vector3f(1.0f, 0.0f, 0.0f));
+            }
+        }
+
     }
 
     /**

@@ -80,17 +80,17 @@ public class MasterRenderer {
      * @param light to use
      * @param camera to use
      */
-    public void render(Light light, Camera camera) {
+    public void render(List<Light> lights, Camera camera) {
         prepare();
         entityShader.start();
         entityShader.loadSkyColor(SKY_R, SKY_G, SKY_B);
-        entityShader.loadLight(light);
+        entityShader.loadLights(lights);
         entityShader.loadViewMatrix(camera);
         entityRenderer.render(entities);
         entityShader.stop();
         terrainShader.start();
         terrainShader.loadSkyColor(SKY_R, SKY_G, SKY_B);
-        terrainShader.loadLight(light);
+        terrainShader.loadLights(lights);
         terrainShader.loadViewMatrix(camera);
         terrainRenderer.render(terrains);
         terrainShader.stop();

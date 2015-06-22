@@ -10,6 +10,7 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.gui.models.TexturedModel;
+import de.projectsc.gui.terrain.Terrain;
 
 /**
  * Class for the player character, a special {@link Entity}.
@@ -30,8 +31,6 @@ public class Player extends Entity {
 
     private static final float JUMP_POWER = 30;
 
-    private static final float TERRAIN_HEIGHT = 0;
-
     private float currentSpeed = 0;
 
     private float currentTurnSpeed = 0;
@@ -49,7 +48,7 @@ public class Player extends Entity {
      * 
      * @param delta elapsed time
      */
-    public void move(float delta) {
+    public void move(float delta, Terrain terrain) {
         delta = (delta / SECONDS_1000_0F);
         checkInputs();
         super.increaseRotation(0, currentTurnSpeed * delta, 0);
@@ -59,9 +58,10 @@ public class Player extends Entity {
         increasePostion(dx, 0, dz);
         upwardsSpeed += GRAVITY * delta;
         increasePostion(0, upwardsSpeed * delta, 0);
-        if (getPosition().y < TERRAIN_HEIGHT) {
+        float terrainHeight = terrain.getHeightOfTerrain(getPosition().x, getPosition().z);
+        if (getPosition().y < terrainHeight) {
             upwardsSpeed = 0;
-            getPosition().y = TERRAIN_HEIGHT;
+            getPosition().y = terrainHeight;
             jumping = false;
         }
     }
