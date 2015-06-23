@@ -5,6 +5,7 @@
  */
 package de.projectsc.gui.states;
 
+import java.awt.Font;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
@@ -15,9 +16,12 @@ import org.apache.commons.logging.LogFactory;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
+import org.newdawn.slick.Color;
+import org.newdawn.slick.TrueTypeFont;
 
 import de.projectsc.core.data.content.Map;
 import de.projectsc.core.data.messages.GUIMessage;
+import de.projectsc.gui.GameFont;
 import de.projectsc.gui.content.GUICommand;
 import de.projectsc.gui.content.MiniMap;
 import de.projectsc.gui.models.RawModel;
@@ -34,6 +38,7 @@ import de.projectsc.gui.textures.TerrainTexture;
 import de.projectsc.gui.textures.TerrainTexturePack;
 import de.projectsc.gui.tools.Loader;
 import de.projectsc.gui.tools.ModelData;
+import de.projectsc.gui.tools.MousePicker;
 import de.projectsc.gui.tools.OBJFileLoader;
 import de.projectsc.gui.ui.UITexture;
 
@@ -76,6 +81,14 @@ public class StateGameRunning implements State {
 
     private UIRenderer uiRenderer;
 
+    private MousePicker mousePicker;
+
+    private Entity lamp;
+
+    private TrueTypeFont font;
+
+    private Entity goat;
+
     public StateGameRunning(BlockingQueue<GUIMessage> outgoingQueue) {
         this.outgoingQueue = outgoingQueue;
     }
@@ -83,11 +96,13 @@ public class StateGameRunning implements State {
     @Override
     public void initialize() {
         LOGGER.debug("Loading models and light ... ");
+        GameFont.loadFonts();
+        font = GameFont.getFont(GameFont.GLOBAL, Font.PLAIN, 13, true);
         loader = new Loader();
         loadPlayer();
-        loadDemoObjects();
         camera = new Camera(player);
-        masterRenderer = new MasterRenderer();
+        masterRenderer = new MasterRenderer(loader);
+        loadDemoObjects();
     }
 
     private void loadPlayer() {
@@ -100,12 +115,6 @@ public class StateGameRunning implements State {
     }
 
     private void loadDemoObjects() {
-        lights = new ArrayList<>();
-        lights.add(new Light(new Vector3f(0, 1000, -7000), new Vector3f(1f, 1f, 1f)));
-        lights.add(new Light(new Vector3f(185, 25, -293), new Vector3f(2f, 0f, 0f), new Vector3f(1, 0.01f, 0.002f)));
-        lights.add(new Light(new Vector3f(370, 25, -300), new Vector3f(0f, 2f, 2f), new Vector3f(1, 0.01f, 0.002f)));
-        lights.add(new Light(new Vector3f(293, 25, -305), new Vector3f(2f, 2f, 0f), new Vector3f(1, 0.01f, 0.002f)));
-
         TerrainTexture backgroundTex = new TerrainTexture(loader.loadTexture("terrain/grass.png"));
         TerrainTexture rTex = new TerrainTexture(loader.loadTexture("terrain/mud.png"));
         TerrainTexture gTex = new TerrainTexture(loader.loadTexture("terrain/groundFlower.png"));
@@ -115,6 +124,16 @@ public class StateGameRunning implements State {
         TerrainTexture blendMap = new TerrainTexture(loader.loadTexture("terrain/blendMap.png"));
 
         terrain = new Terrain(-0.5f, -0.5f, texturePack, blendMap, loader, "heightmap.png");
+        mousePicker = new MousePicker(camera, masterRenderer.getProjectionMatrix(), terrain);
+
+        lights = new ArrayList<>();
+        lights.add(new Light(new Vector3f(0, 1000, 0), new Vector3f(1f, 1f, 1f)));
+        lights.add(new Light(new Vector3f(185, terrain.getHeightOfTerrain(185, -293) + 13f, -293), new Vector3f(2f, 0f, 0f),
+            new Vector3f(1, 0.01f, 0.002f)));
+        lights.add(new Light(new Vector3f(370, terrain.getHeightOfTerrain(370, -300) + 13f, -300), new Vector3f(0f, 2f, 2f), new Vector3f(
+            1, 0.01f, 0.002f)));
+        lights.add(new Light(new Vector3f(293, terrain.getHeightOfTerrain(293, -305) + 13f, -305), new Vector3f(2f, 2f, 0f), new Vector3f(
+            1, 0.01f, 0.002f)));
 
         worldEntities = new ArrayList<>();
         ModelData goatData = OBJFileLoader.loadOBJ("goat");
@@ -122,7 +141,10 @@ public class StateGameRunning implements State {
             loader.loadToVAO(goatData.getVertices(), goatData.getTextureCoords(), goatData.getNormals(), goatData.getIndices());
         ModelTexture goatTexture = new ModelTexture(loader.loadTexture("white.png"));
         TexturedModel goatTexturedModel = new TexturedModel(goatModel, goatTexture);
-        for (int i = 0; i < 5; i++) {
+        goat = new Entity(goatTexturedModel, new Vector3f(-5, terrain.getHeightOfTerrain(-5, -5), -5), 0,
+            0, 0, 7f);
+        worldEntities.add(goat);
+        for (int i = 1; i < 5; i++) {
             worldEntities.add(new Entity(goatTexturedModel, new Vector3f(-5 + i * 10, terrain.getHeightOfTerrain(-5 + i * 10, -5), -5), 0,
                 0, 0, 7f));
         }
@@ -132,9 +154,17 @@ public class StateGameRunning implements State {
         addWorldModel(50, "terrain/tree", "terrain/tree.png", 15f, 1);
         addWorldModel(50, "terrain/lowPolyTree", "terrain/lowPolyTree.png", 2f, 1);
         addWorldModel(100, "terrain/fern", "terrain/flower.png", 1f, 1);
+
+        TexturedModel lampmodel = loadModel("lamp", "lamp.png", 1);
+        lampmodel.getTexture().setFakeLighting(true);
+        lamp = new Entity(lampmodel, new Vector3f(185, terrain.getHeightOfTerrain(185, -293), -293), 0, 0, 0, 1);
+        worldEntities.add(lamp);
+        worldEntities.add(new Entity(lampmodel, new Vector3f(370, terrain.getHeightOfTerrain(370, -300), -300), 0, 0, 0, 1));
+        worldEntities.add(new Entity(lampmodel, new Vector3f(293, terrain.getHeightOfTerrain(293, -305), -305), 0, 0, 0, 1));
+
         ui = new ArrayList<>();
         UITexture uiTex =
-            new UITexture(loader.loadTexture("DungeonCrawl_ProjectUtumnoTileset.png"), new Vector2f(0.5f, 0.5f), new Vector2f(0.25f, 0.25f));
+            new UITexture(loader.loadTexture("health.png"), new Vector2f(0.5f, 0.5f), new Vector2f(0.25f, 0.25f));
         ui.add(uiTex);
         uiRenderer = new UIRenderer(loader);
 
@@ -180,14 +210,25 @@ public class StateGameRunning implements State {
     public void render(long elapsedTime) {
         player.move(elapsedTime, terrain);
         camera.move();
+        mousePicker.update();
+
+        goat.setPosition(new Vector3f(goat.getPosition().x, terrain.getHeightOfTerrain(goat.getPosition().x, goat.getPosition().z + 1),
+            goat.getPosition().z + 1));
+        Vector3f currentTerrainPoint = mousePicker.getCurrentTerrainPoint();
+        if (currentTerrainPoint != null) {
+            lamp.setPosition(currentTerrainPoint);
+            lights.get(1).setPosition(new Vector3f(currentTerrainPoint.x, currentTerrainPoint.y + 13, currentTerrainPoint.z));
+
+        }
         masterRenderer.processTerrain(terrain);
         for (Entity e : worldEntities) {
             masterRenderer.processEntity(e);
         }
         masterRenderer.processEntity(player);
-        masterRenderer.render(lights, camera);
+        masterRenderer.render(lights, camera, elapsedTime);
 
         uiRenderer.render(ui);
+        font.drawString(0.0f, 0.0f, "Time : " + elapsedTime, Color.red);
 
     }
 

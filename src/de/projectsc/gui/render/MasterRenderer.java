@@ -20,8 +20,10 @@ import de.projectsc.gui.objects.Camera;
 import de.projectsc.gui.objects.Entity;
 import de.projectsc.gui.objects.Light;
 import de.projectsc.gui.shaders.EntityShader;
+import de.projectsc.gui.shaders.SkyboxRenderer;
 import de.projectsc.gui.shaders.TerrainShader;
 import de.projectsc.gui.terrain.Terrain;
+import de.projectsc.gui.tools.Loader;
 
 /**
  * Coordinates rendering of multiple entites.
@@ -36,11 +38,11 @@ public class MasterRenderer {
 
     private static final float FAR_PLANE = 1000f;
 
-    private static final float SKY_R = 0.5f;
+    private static final float SKY_R = 0.54f;
 
-    private static final float SKY_G = 0.7f;
+    private static final float SKY_G = 0.62f;
 
-    private static final float SKY_B = 0.99f;
+    private static final float SKY_B = 0.69f;
 
     private Matrix4f projectionMatrix;
 
@@ -52,17 +54,20 @@ public class MasterRenderer {
 
     private final TerrainRenderer terrainRenderer;
 
+    private SkyboxRenderer skyboxRenderer;
+
     private final Map<TexturedModel, List<Entity>> entities = new HashMap<>();
 
     private final List<Terrain> terrains = new ArrayList<>();
 
-    public MasterRenderer() {
+    public MasterRenderer(Loader loader) {
         enableCulling();
         createProjectionMatrix();
         entityShader = new EntityShader();
         entityRenderer = new EntityRenderer(entityShader, projectionMatrix);
         terrainShader = new TerrainShader();
         terrainRenderer = new TerrainRenderer(terrainShader, projectionMatrix);
+        skyboxRenderer = new SkyboxRenderer(loader, projectionMatrix);
     }
 
     /**
@@ -79,8 +84,9 @@ public class MasterRenderer {
      * 
      * @param lights to use
      * @param camera to use
+     * @param elapsedTime
      */
-    public void render(List<Light> lights, Camera camera) {
+    public void render(List<Light> lights, Camera camera, long elapsedTime) {
         prepare();
         entityShader.start();
         entityShader.loadSkyColor(SKY_R, SKY_G, SKY_B);
@@ -94,9 +100,9 @@ public class MasterRenderer {
         terrainShader.loadViewMatrix(camera);
         terrainRenderer.render(terrains);
         terrainShader.stop();
+        skyboxRenderer.render(elapsedTime, camera, SKY_R, SKY_G, SKY_B);
         entities.clear();
         terrains.clear();
-
     }
 
     /**
@@ -162,5 +168,9 @@ public class MasterRenderer {
         projectionMatrix.m23 = 0 - 1;
         projectionMatrix.m32 = -((2 * NEAR_PLANE * FAR_PLANE) / frustrumLength);
         projectionMatrix.m33 = 0;
+    }
+
+    public Matrix4f getProjectionMatrix() {
+        return projectionMatrix;
     }
 }

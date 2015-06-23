@@ -73,4 +73,5 @@ public final class Maths {
         Matrix4f.scale(new Vector3f(scale, scale, scale), matrix, matrix);
         return matrix;
     }
+
 }

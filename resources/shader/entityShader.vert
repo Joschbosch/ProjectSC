@@ -19,8 +19,8 @@ uniform float useFakeLighting;
 uniform float numberOfRows;
 uniform vec2 offset;
 
-const float density = 0.003;
-const float gradient = 1.5;
+const float density = 0.0035;
+const float gradient = 5;
 
 void main (void){
 	vec4 worldPosition = transformationMatrix * vec4(position, 1.0);
