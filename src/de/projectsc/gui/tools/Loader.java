@@ -62,6 +62,12 @@ public class Loader {
         return new RawModel(vaoID, indices.length);
     }
 
+    /**
+     * Loads just a vertex positions array to a VAO and returns the model for it.
+     * 
+     * @param positions to load
+     * @return the model
+     */
     public RawModel loadToVAO(float[] positions) {
         int vaoID = createVAO();
         storeDataInAttributeList(0, 2, positions);

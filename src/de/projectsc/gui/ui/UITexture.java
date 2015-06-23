@@ -1,18 +1,24 @@
 /*
- * Copyright (C) 2015 
+ * Copyright (C) 2015 Project SC
+ * 
+ * All rights reserved
  */
-
 package de.projectsc.gui.ui;
 
 import org.lwjgl.util.vector.Vector2f;
 
+/**
+ * Texture class for all UI elements.
+ * 
+ * @author Josch Bosch
+ */
 public class UITexture {
 
-    private int texture;
+    private final int texture;
 
-    private Vector2f position;
+    private final Vector2f position;
 
-    private Vector2f scale;
+    private final Vector2f scale;
 
     public UITexture(int texture, Vector2f position, Vector2f scale) {
         super();

@@ -20,6 +20,16 @@ public final class Maths {
 
     }
 
+    /**
+     * 
+     * Calculates the barry center of a vertex.
+     * 
+     * @param p1 vertex 1
+     * @param p2 vertex 2
+     * @param p3 vertex 3
+     * @param pos on the vertex
+     * @return height of the position in the vertex
+     */
     public static float barryCentric(Vector3f p1, Vector3f p2, Vector3f p3, Vector2f pos) {
         float det = (p2.z - p3.z) * (p1.x - p3.x) + (p3.x - p2.x) * (p1.z - p3.z);
         float l1 = ((p2.z - p3.z) * (pos.x - p3.x) + (p3.x - p2.x) * (pos.y - p3.z)) / det;
@@ -28,6 +38,13 @@ public final class Maths {
         return l1 * p1.y + l2 * p2.y + l3 * p3.y;
     }
 
+    /**
+     * creates a transformation matrix for the UI.
+     * 
+     * @param translation of ui element
+     * @param scale of element
+     * @return transformation matrix.
+     */
     public static Matrix4f createTransformationMatrix(Vector2f translation, Vector2f scale) {
         Matrix4f matrix = new Matrix4f();
         matrix.setIdentity();

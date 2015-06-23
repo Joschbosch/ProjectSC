@@ -30,7 +30,10 @@ import de.projectsc.gui.tools.Maths;
  */
 public class Terrain {
 
-    public static final float SIZE = 800;
+    /**
+     * Size of one terrain element.
+     */
+    public static final float SIZE = 1200;
 
     private static final float MAXIMUM_HEIGHT = 40;
 
@@ -38,9 +41,9 @@ public class Terrain {
 
     private static final Log LOGGER = LogFactory.getLog(Terrain.class);
 
-    private final float x;
+    private final float xCoord;
 
-    private final float z;
+    private final float zCoord;
 
     private final RawModel model;
 
@@ -52,34 +55,41 @@ public class Terrain {
 
     public Terrain(float x, float z, TerrainTexturePack texture, TerrainTexture blendMap, Loader loader, String heightmapFilename) {
         super();
-        this.x = x * SIZE;
-        this.z = z * SIZE;
+        this.xCoord = x * SIZE;
+        this.zCoord = z * SIZE;
         this.texture = texture;
         this.blendMap = blendMap;
         this.model = generateTerrain(loader, heightmapFilename);
     }
 
-    public float getHeightOfTerrain(float x, float z) {
-        float terrainX = x - this.x;
-        float terrainZ = z - this.z;
+    /**
+     * Calculates the height of the Terrain at world position (x,z).
+     * 
+     * @param xWorld coordinate
+     * @param zWorld coordinate
+     * @return height
+     */
+    public float getHeightOfTerrain(float xWorld, float zWorld) {
+        float terrainX = xWorld - this.xCoord;
+        float terrainZ = zWorld - this.zCoord;
         float gridSize = SIZE / ((float) heights.length - 1);
         int gridX = (int) Math.floor(terrainX / gridSize);
         int gridZ = (int) Math.floor(terrainZ / gridSize);
         if (gridX >= heights.length - 1 || gridZ >= heights.length - 1 || gridX < 0 || gridZ < 0) {
             return 0;
         }
-        float xCoord = (terrainX % gridSize) / gridSize;
-        float zCoord = (terrainZ % gridSize) / gridSize;
+        float xCoordPlayer = (terrainX % gridSize) / gridSize;
+        float zCoordPlayer = (terrainZ % gridSize) / gridSize;
 
         float answer = 0.0f;
-        if (xCoord <= (1 - zCoord)) {
+        if (xCoordPlayer <= (1 - zCoordPlayer)) {
             answer = Maths.barryCentric(new Vector3f(0, heights[gridX][gridZ], 0), new Vector3f(1,
                 heights[gridX + 1][gridZ], 0), new Vector3f(0,
-                heights[gridX][gridZ + 1], 1), new Vector2f(xCoord, zCoord));
+                heights[gridX][gridZ + 1], 1), new Vector2f(xCoordPlayer, zCoordPlayer));
         } else {
             answer = Maths.barryCentric(new Vector3f(1, heights[gridX + 1][gridZ], 0), new Vector3f(1,
                 heights[gridX + 1][gridZ + 1], 1), new Vector3f(0,
-                heights[gridX][gridZ + 1], 1), new Vector2f(xCoord, zCoord));
+                heights[gridX][gridZ + 1], 1), new Vector2f(xCoordPlayer, zCoordPlayer));
         }
         return answer;
     }
@@ -158,11 +168,11 @@ public class Terrain {
     }
 
     public float getX() {
-        return x;
+        return xCoord;
     }
 
     public float getZ() {
-        return z;
+        return zCoord;
     }
 
     public RawModel getModel() {

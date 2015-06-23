@@ -84,17 +84,19 @@ public class StateGameRunning implements State {
     public void initialize() {
         LOGGER.debug("Loading models and light ... ");
         loader = new Loader();
+        loadPlayer();
+        loadDemoObjects();
+        camera = new Camera(player);
+        masterRenderer = new MasterRenderer();
+    }
 
+    private void loadPlayer() {
         ModelData playerData = OBJFileLoader.loadOBJ("person");
         RawModel playerModel =
             loader.loadToVAO(playerData.getVertices(), playerData.getTextureCoords(), playerData.getNormals(), playerData.getIndices());
         TexturedModel playerTexModel = new TexturedModel(playerModel, new ModelTexture(loader.loadTexture("person.png")));
-        loadDemoObjects();
         player = new Player(playerTexModel, new Vector3f(1f, 0f, -50f), 0, 0, 0, 1.4f);
         player.getModel().getTexture().setReflectivity(2f);
-        camera = new Camera(player);
-        masterRenderer = new MasterRenderer();
-
     }
 
     private void loadDemoObjects() {
@@ -219,9 +221,6 @@ public class StateGameRunning implements State {
 
     @Override
     public void handleInput(long elapsedTime) {
-
-        handleKeyInput(elapsedTime);
-
         GUICommand command = drawableQueue.poll();
         while (command != null) {
             if (command.getMessage().equals(GUICommand.CHANGE_LOCATION)) {
@@ -230,10 +229,6 @@ public class StateGameRunning implements State {
             command = drawableQueue.poll();
 
         }
-    }
-
-    private void handleKeyInput(long elapsedTime) {
-        // camera.updatePosition(elapsedTime);
     }
 
 }

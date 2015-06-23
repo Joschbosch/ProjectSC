@@ -83,16 +83,27 @@ public class EntityShader extends Shader {
         locationLightColor = new int[MAX_LIGHTS];
         locationAttenuation = new int[MAX_LIGHTS];
         for (int i = 0; i < MAX_LIGHTS; i++) {
-            locationLightPosition[i] = getUniformLocation("lightPosition[" + i + "]");
-            locationLightColor[i] = getUniformLocation("lightColor[" + i + "]");
-            locationAttenuation[i] = getUniformLocation("attenuation[" + i + "]");
+            locationLightPosition[i] = getUniformLocation(String.format("lightPosition[%s]", i));
+            locationLightColor[i] = getUniformLocation(String.format("lightColor[%s]", i));
+            locationAttenuation[i] = getUniformLocation(String.format("attenuation[%s]", i));
         }
     }
 
+    /**
+     * Loads the number of texture rows to the shader.
+     * 
+     * @param number to upload
+     */
     public void loadNumberRows(int number) {
         loadFloat(locationNumberOfRows, number);
     }
 
+    /**
+     * Loads the texture offset to the shader.
+     * 
+     * @param x coordinate
+     * @param y coordinate
+     */
     public void loadOffset(float x, float y) {
         loadVector(locationOffset, new Vector2f(x, y));
     }

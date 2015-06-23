@@ -8,25 +8,35 @@ package de.projectsc.gui.shaders;
 
 import org.lwjgl.util.vector.Matrix4f;
 
+/**
+ * Shader for all UI elements.
+ * 
+ * @author Josch Bosch
+ */
 public class UIShader extends Shader {
 
     private static final String VERTEX_FILE = "uiShader.vert";
 
     private static final String FRAGMENT_FILE = "uiShader.frag";
 
-    private int location_transformationMatrix;
+    private int locationTransformationMatrix;
 
     public UIShader() {
         super(VERTEX_FILE, FRAGMENT_FILE);
     }
 
+    /**
+     * Loads the transformation matrix to the shader.
+     * 
+     * @param matrix transformation matrix
+     */
     public void loadTransformation(Matrix4f matrix) {
-        super.loadMatrix(location_transformationMatrix, matrix);
+        super.loadMatrix(locationTransformationMatrix, matrix);
     }
 
     @Override
     protected void getAllUniformLocations() {
-        location_transformationMatrix = super.getUniformLocation("transformationMatrix");
+        locationTransformationMatrix = super.getUniformLocation("transformationMatrix");
     }
 
     @Override

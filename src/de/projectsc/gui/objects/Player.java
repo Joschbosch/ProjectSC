@@ -47,6 +47,7 @@ public class Player extends Entity {
      * Move the player.
      * 
      * @param delta elapsed time
+     * @param terrain to render
      */
     public void move(float delta, Terrain terrain) {
         delta = (delta / SECONDS_1000_0F);

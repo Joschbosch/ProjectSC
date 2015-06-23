@@ -16,6 +16,16 @@ import org.lwjgl.util.vector.Vector3f;
  */
 public class Camera {
 
+    private static final float ANGLE_AROUND_PLAYER_FACTOR = 0.3f;
+
+    private static final float PITCH_FACTOR = 0.1f;
+
+    private static final float MOUSE_WHEEL_ZOOM_FACTOR = 0.01f;
+
+    private static final int MAXIMUM_PITCH_ANGLE = 90;
+
+    private static final float MINIMUM_PITCH_ANGLE = -25.0f;
+
     private static final int MAX_DISTANCE_TO_PLAYER = 100;
 
     private static final float PLAYER_CENTER_Y_AXIS = 15.5f;
@@ -24,7 +34,7 @@ public class Camera {
 
     private final Vector3f position = new Vector3f(0, 0.5f, 0);
 
-    private float pitch = 20;
+    private float pitch = 2 * 10;
 
     private float yaw = 10;
 
@@ -32,7 +42,7 @@ public class Camera {
 
     private final Player player;
 
-    private float distanceFromPlayer = 30f;
+    private float distanceFromPlayer = 3 * 10f;
 
     private float angleAroundPlayer = 0;
 
@@ -107,7 +117,7 @@ public class Camera {
     }
 
     private void calculateZoom() {
-        float zoomLevel = Mouse.getDWheel() * 0.01f;
+        float zoomLevel = Mouse.getDWheel() * MOUSE_WHEEL_ZOOM_FACTOR;
         distanceFromPlayer -= zoomLevel;
         if (distanceFromPlayer < 0) {
             distanceFromPlayer = 0;
@@ -118,19 +128,19 @@ public class Camera {
 
     private void calculatePitch() {
         if (Mouse.isButtonDown(1)) {
-            float pitchChange = Mouse.getDY() * 0.1f;
+            float pitchChange = Mouse.getDY() * PITCH_FACTOR;
             pitch -= pitchChange;
         }
-        if (pitch < -25.0) {
-            pitch = -25.0f;
-        } else if (pitch > 90) {
-            pitch = 90;
+        if (pitch < MINIMUM_PITCH_ANGLE) {
+            pitch = MINIMUM_PITCH_ANGLE;
+        } else if (pitch > MAXIMUM_PITCH_ANGLE) {
+            pitch = MAXIMUM_PITCH_ANGLE;
         }
     }
 
     private void calculateAngleAroundPlayer() {
         if (Mouse.isButtonDown(0)) {
-            float angleChange = Mouse.getDX() * 0.3f;
+            float angleChange = Mouse.getDX() * ANGLE_AROUND_PLAYER_FACTOR;
             angleAroundPlayer -= angleChange;
         }
     }

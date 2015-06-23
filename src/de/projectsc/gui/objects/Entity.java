@@ -77,11 +77,21 @@ public class Entity {
         this.rotZ += dz;
     }
 
+    /**
+     * Returns the X offset for a texture map.
+     * 
+     * @return position
+     */
     public float getTextureOffsetX() {
         int column = textureIndex % model.getTexture().getNumberOfRows();
         return ((float) column / (float) model.getTexture().getNumberOfRows());
     }
 
+    /**
+     * Returns the Y offset for a texture map.
+     * 
+     * @return position
+     */
     public float getTextureOffsetY() {
         int row = textureIndex / model.getTexture().getNumberOfRows();
         return ((float) row / (float) model.getTexture().getNumberOfRows());

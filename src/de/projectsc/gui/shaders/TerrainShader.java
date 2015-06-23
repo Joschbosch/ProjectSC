@@ -88,9 +88,9 @@ public class TerrainShader extends Shader {
         locationLightColor = new int[MAX_LIGHTS];
         locationAttenuation = new int[MAX_LIGHTS];
         for (int i = 0; i < MAX_LIGHTS; i++) {
-            locationLightPosition[i] = getUniformLocation("lightPosition[" + i + "]");
-            locationLightColor[i] = getUniformLocation("lightColor[" + i + "]");
-            locationAttenuation[i] = getUniformLocation("attenuation[" + i + "]");
+            locationLightPosition[i] = getUniformLocation(String.format("lightPosition[%s]", i));
+            locationLightColor[i] = getUniformLocation(String.format("lightColor[%s]", i));
+            locationAttenuation[i] = getUniformLocation(String.format("attenuation[%s]", i));
         }
 
     }

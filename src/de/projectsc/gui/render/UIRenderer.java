@@ -1,7 +1,8 @@
 /*
- * Copyright (C) 2015 
+ * Copyright (C) 2015 Project SC
+ * 
+ * All rights reserved
  */
-
 package de.projectsc.gui.render;
 
 import java.util.List;
@@ -18,26 +19,36 @@ import de.projectsc.gui.tools.Loader;
 import de.projectsc.gui.tools.Maths;
 import de.projectsc.gui.ui.UITexture;
 
+/**
+ * Renderer class for all UI elements.
+ * 
+ * @author Josch Bosch
+ */
 public class UIRenderer {
 
     private final RawModel quad;
 
-    private UIShader shader;
+    private final UIShader shader;
 
     public UIRenderer(Loader loader) {
-        float[] positions = { 0 - 1, 1, 0 - 1, -1, 1, 1, 1, 0 - 1 };
+        float[] positions = { 0 - 1, 1, 0 - 1, 0 - 1, 1, 1, 1, 0 - 1 };
         quad = loader.loadToVAO(positions);
         shader = new UIShader();
     }
 
-    public void render(List<UITexture> uis) {
+    /**
+     * Render all ui elements.
+     * 
+     * @param uiElements to render
+     */
+    public void render(List<UITexture> uiElements) {
         shader.start();
         GL30.glBindVertexArray(quad.getVaoID());
         GL20.glEnableVertexAttribArray(0);
         GL11.glEnable(GL11.GL_BLEND);
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         GL11.glDisable(GL11.GL_DEPTH_TEST);
-        for (UITexture ui : uis) {
+        for (UITexture ui : uiElements) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0);
             GL11.glBindTexture(GL11.GL_TEXTURE_2D, ui.getTexture());
             Matrix4f matrix = Maths.createTransformationMatrix(ui.getPosition(), ui.getScale());
@@ -52,6 +63,9 @@ public class UIRenderer {
         shader.stop();
     }
 
+    /**
+     * Dispose everything.
+     */
     public void dispose() {
         shader.dispose();
     }

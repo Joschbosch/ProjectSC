@@ -77,7 +77,7 @@ public class MasterRenderer {
     /**
      * General render method .
      * 
-     * @param light to use
+     * @param lights to use
      * @param camera to use
      */
     public void render(List<Light> lights, Camera camera) {
