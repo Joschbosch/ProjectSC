@@ -89,16 +89,20 @@ public class Loader {
         return vaoID;
     }
 
+    public int loadTexture(String filename) {
+        return loadTexture(filename, "PNG");
+    }
+
     /**
      * load texture from the given file.
      * 
      * @param filename of the texture.
      * @return texture position
      */
-    public int loadTexture(String filename) {
+    public int loadTexture(String filename, String fileType) {
         Texture texture = null;
         try {
-            texture = TextureLoader.getTexture("PNG", Loader.class.getResourceAsStream("/graphics/" + filename));
+            texture = TextureLoader.getTexture(fileType, Loader.class.getResourceAsStream("/graphics/" + filename));
             GL30.glGenerateMipmap(GL11.GL_TEXTURE_2D);
             GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR_MIPMAP_LINEAR);
             GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL14.GL_TEXTURE_LOD_BIAS, MIPMAP_BIAS);

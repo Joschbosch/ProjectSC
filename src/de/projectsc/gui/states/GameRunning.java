@@ -138,7 +138,7 @@ public class GameRunning implements State {
         mousePicker = new MousePicker(camera, masterRenderer.getProjectionMatrix(), terrain);
 
         lights = new ArrayList<>();
-        lights.add(new Light(new Vector3f(0, 1000, 0), new Vector3f(1f, 1f, 1f)));
+        lights.add(new Light(new Vector3f(0, 500, 0), new Vector3f(1f, 1f, 1f)));
         lights.add(new Light(new Vector3f(185, terrain.getHeightOfTerrain(185, -293) + 13f, -293), new Vector3f(2f, 0f, 0f),
             new Vector3f(1, 0.01f, 0.002f)));
         lights.add(new Light(new Vector3f(370, terrain.getHeightOfTerrain(370, -300) + 13f, -300), new Vector3f(0f, 2f, 2f), new Vector3f(
@@ -152,7 +152,7 @@ public class GameRunning implements State {
             loader.loadToVAO(goatData.getVertices(), goatData.getTextureCoords(), goatData.getNormals(), goatData.getIndices());
         ModelTexture goatTexture = new ModelTexture(loader.loadTexture("white.png"));
         TexturedModel goatTexturedModel = new TexturedModel(goatModel, goatTexture);
-        goat = new Entity(goatTexturedModel, new Vector3f(-5, terrain.getHeightOfTerrain(-5, -5), -5), 0,
+        goat = new Entity(goatTexturedModel, new Vector3f(-5 + 20, terrain.getHeightOfTerrain(-5, -5), -5), 0,
             0, 0, 7f);
         worldEntities.add(goat);
         for (int i = 1; i < 5; i++) {
@@ -174,16 +174,17 @@ public class GameRunning implements State {
         worldEntities.add(new Entity(lampmodel, new Vector3f(293, terrain.getHeightOfTerrain(293, -305), -305), 0, 0, 0, 1));
 
         waters = new ArrayList<WaterTile>();
-        waters.add(new WaterTile(0, 0, 0));
+        waters.add(new WaterTile(0, 0, -20));
+        waters.add(new WaterTile(0 - 370, 0 - 340, -20));
         ui = new ArrayList<>();
         UITexture uiTex =
-            new UITexture(loader.loadTexture("health.png"), new Vector2f(0.5f, 0.5f), new Vector2f(0.25f, 0.25f));
-        ui.add(uiTex);
+            new UITexture(loader.loadTexture("health.png"), new Vector2f(-0.75f, -0.9f), new Vector2f(0.25f, 0.25f));
         uiRenderer = new UIRenderer(loader);
 
         UITexture reflectionUI = new UITexture(waterfbo.getReflectionTexture(), new Vector2f(-0.5f, 0.5f), new Vector2f(0.25f, 0.25f));
         UITexture refractionUI = new UITexture(waterfbo.getRefractionTexture(), new Vector2f(0.5f, 0.5f), new Vector2f(0.25f, 0.25f));
 
+        ui.add(uiTex);
         ui.add(reflectionUI);
         ui.add(refractionUI);
         LOGGER.debug("Models and light loaded");
@@ -243,7 +244,7 @@ public class GameRunning implements State {
         float distance = 2 * (camera.getPosition().y - waters.get(0).getHeight());
         camera.getPosition().y -= distance;
         camera.invertPitch();
-        masterRenderer.renderScene(terrain, worldEntities, player, lights, camera, elapsedTime, new Vector4f(0, 1, 0, waters.get(0)
+        masterRenderer.renderScene(terrain, worldEntities, player, lights, camera, elapsedTime, new Vector4f(0, 1, 0, -waters.get(0)
             .getHeight()));
         camera.getPosition().y += distance;
         camera.invertPitch();
@@ -254,9 +255,10 @@ public class GameRunning implements State {
 
         waterfbo.unbindCurrentFrameBuffer();
         masterRenderer.renderScene(terrain, worldEntities, player, lights, camera, elapsedTime, new Vector4f(0, 1, 0, 100000));
-        waterRenderer.render(waters, camera);
+        waterRenderer.render(waters, camera, elapsedTime);
         uiRenderer.render(ui);
         // font.drawString(0.0f, 0.0f, "Time : " + elapsedTime, Color.red);
+        System.out.println(player.getPosition());
 
     }
 

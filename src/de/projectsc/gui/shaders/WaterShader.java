@@ -30,6 +30,10 @@ public class WaterShader extends Shader {
 
     private int locationReflectionTexture;
 
+    private int locationdudvTexture;
+
+    private int locationMoveFactor;
+
     public WaterShader() {
         super(VERTEX_FILE, FRAGMENT_FILE);
     }
@@ -46,6 +50,12 @@ public class WaterShader extends Shader {
         locationModelMatrix = getUniformLocation("modelMatrix");
         locationRefractionTexture = getUniformLocation("refractionTexture");
         locationReflectionTexture = getUniformLocation("reflectionTexture");
+        locationdudvTexture = getUniformLocation("dudvTexture");
+        locationMoveFactor = getUniformLocation("moveFactor");
+    }
+
+    public void loadMoveFactor(float factor) {
+        loadFloat(locationMoveFactor, factor);
     }
 
     /**
@@ -83,6 +93,7 @@ public class WaterShader extends Shader {
     public void loadTextures() {
         loadInt(locationReflectionTexture, 0);
         loadInt(locationRefractionTexture, 1);
+        loadInt(locationdudvTexture, 2);
     }
 
 }

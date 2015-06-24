@@ -29,15 +29,24 @@ import de.projectsc.gui.tools.Maths;
  */
 public class WaterRenderer {
 
+    private static final String DUDV_MAP = "terrain/waterDUDV.png";
+
+    private static final float WAVE_SPEED = 0.03f;
+
     private RawModel quad;
 
     private final WaterShader shader;
 
     private final WaterFrameBuffers fbos;
 
+    private int dudvTexture;
+
+    private float moveFactor = 0;
+
     public WaterRenderer(Loader loader, Matrix4f projectionMatrix, WaterFrameBuffers fbos) {
         this.shader = new WaterShader();
         this.fbos = fbos;
+        dudvTexture = loader.loadTexture(DUDV_MAP);
         shader.start();
         shader.loadTextures();
         shader.loadProjectionMatrix(projectionMatrix);
@@ -52,8 +61,8 @@ public class WaterRenderer {
      * @param water tiles to render
      * @param camera current camera
      */
-    public void render(List<WaterTile> water, Camera camera) {
-        prepareRender(camera);
+    public void render(List<WaterTile> water, Camera camera, float delta) {
+        prepareRender(camera, delta);
         for (WaterTile tile : water) {
             Matrix4f modelMatrix = Maths.createTransformationMatrix(
                 new Vector3f(tile.getX(), tile.getHeight(), tile.getZ()), 0, 0, 0,
@@ -64,15 +73,21 @@ public class WaterRenderer {
         unbind();
     }
 
-    private void prepareRender(Camera camera) {
+    private void prepareRender(Camera camera, float delta) {
         shader.start();
         shader.loadViewMatrix(camera);
+        moveFactor += WAVE_SPEED * delta / 1000.0f;
+        moveFactor %= 1;
+        float waveyMoveFactor = (float) Math.sin(moveFactor * 2 * Math.PI) / 2f + 0.5f;
+        shader.loadMoveFactor(waveyMoveFactor);
         GL30.glBindVertexArray(quad.getVaoID());
         GL20.glEnableVertexAttribArray(0);
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, fbos.getReflectionTexture());
         GL13.glActiveTexture(GL13.GL_TEXTURE1);
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, fbos.getRefractionTexture());
+        GL13.glActiveTexture(GL13.GL_TEXTURE2);
+        GL11.glBindTexture(GL11.GL_TEXTURE_2D, dudvTexture);
     }
 
     private void unbind() {

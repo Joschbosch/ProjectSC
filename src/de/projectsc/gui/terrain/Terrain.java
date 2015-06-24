@@ -35,7 +35,7 @@ public class Terrain {
      */
     public static final float SIZE = 1200;
 
-    private static final float MAXIMUM_HEIGHT = 40;
+    private static final float MAXIMUM_HEIGHT = 100;
 
     private static final float MAX_PIXEL_COLOR = 256 * 256 * 256;
 

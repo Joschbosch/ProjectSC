@@ -17,11 +17,11 @@ import de.projectsc.gui.objects.FrameBufferObject;
  */
 public class WaterFrameBuffers extends FrameBufferObject {
 
-    protected static final int REFLECTION_WIDTH = 320;
+    protected static final int REFLECTION_WIDTH = 1280;
 
     protected static final int REFRACTION_WIDTH = 1280;
 
-    private static final int REFLECTION_HEIGHT = 180;
+    private static final int REFLECTION_HEIGHT = 720;
 
     private static final int REFRACTION_HEIGHT = 720;
 
