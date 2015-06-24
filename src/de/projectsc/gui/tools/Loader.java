@@ -72,6 +72,7 @@ public class Loader {
      * Loads just a vertex positions array to a VAO and returns the model for it.
      * 
      * @param positions to load
+     * @param dimensions 2 or 3
      * @return the model
      */
     public RawModel loadToVAO(float[] positions, int dimensions) {
@@ -141,6 +142,12 @@ public class Loader {
         return buffer;
     }
 
+    /**
+     * Loads the cube map for the sky box.
+     * 
+     * @param textureFiles for all faces to load.
+     * @return position
+     */
     public int loadCubeMap(String[] textureFiles) {
         int texID = GL11.glGenTextures();
         GL13.glActiveTexture(GL13.GL_TEXTURE0);
@@ -165,7 +172,6 @@ public class Loader {
         int height = 0;
         ByteBuffer buffer = null;
         try {
-            System.out.println(fileName);
             PNGDecoder decoder = new PNGDecoder(Loader.class.getResourceAsStream(fileName));
             width = decoder.getWidth();
             height = decoder.getHeight();

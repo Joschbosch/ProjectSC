@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2015 
+ * Copyright (C) 2015 Project SC
+ * 
+ * All rights reserved
  */
 
 package de.projectsc.gui.shaders;
@@ -9,6 +11,11 @@ import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.gui.objects.Camera;
 
+/**
+ * Shader just for the sky box.
+ * 
+ * @author Josch Bosch
+ */
 public class SkyboxShader extends Shader {
 
     private static final double TIMER_1_SEC = 1000.0;
@@ -52,23 +59,39 @@ public class SkyboxShader extends Shader {
         super.bindAttribute(0, "position");
     }
 
+    /**
+     * Load up projection matrix.
+     * 
+     * @param matrix to load.
+     */
     public void loadProjectionMatrix(Matrix4f matrix) {
         super.loadMatrix(locationProjectionMatrix, matrix);
     }
 
+    /**
+     * Load up blend factor.
+     * 
+     * @param factor to load.
+     */
     public void loadBlendFactor(float factor) {
         super.loadFloat(locationBlendFactor, factor);
     }
 
+    /**
+     * Connect face textures.
+     */
     public void connectTextureUnits() {
         super.loadInt(locationCubeMap, 0);
         super.loadInt(locationCubeMap2, 1);
     }
 
-    public void loadProjectionMatrix(float blend) {
-        super.loadFloat(locationBlendFactor, blend);
-    }
-
+    /**
+     * Load up view matrix which is altered before so that the skybox is always relative to the
+     * camera and rotates a bit.
+     * 
+     * @param camera cam
+     * @param delta time elapsed
+     */
     public void loadViewMatrix(Camera camera, long delta) {
         Matrix4f matrix = camera.createViewMatrix();
         matrix.m30 = 0;
@@ -80,6 +103,13 @@ public class SkyboxShader extends Shader {
         super.loadMatrix(locationViewMatrix, matrix);
     }
 
+    /**
+     * Load up fog color.
+     * 
+     * @param r value
+     * @param g value
+     * @param b value
+     */
     public void loadFogColor(float r, float g, float b) {
         loadVector(locationFogColor, new Vector3f(r, g, b));
     }

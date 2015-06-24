@@ -152,4 +152,11 @@ public class Camera {
     private float calculateVerticalDistance() {
         return (float) (distanceFromPlayer * Math.sin(Math.toRadians(pitch)));
     }
+
+    /**
+     * Inverts current pitch of the camera (e.g. used for water reflection).
+     */
+    public void invertPitch() {
+        pitch = -pitch;
+    }
 }

@@ -12,6 +12,7 @@ import org.apache.commons.logging.LogFactory;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
+import org.lwjgl.util.vector.Vector4f;
 
 import de.projectsc.gui.objects.Camera;
 import de.projectsc.gui.objects.Light;
@@ -55,6 +56,8 @@ public class EntityShader extends Shader {
 
     private int locationOffset;
 
+    private int locationPlane;
+
     public EntityShader() {
         super(VERTEX_FILE, FRAGMENT_FILE);
         LOGGER.debug("Static shader loaded.");
@@ -79,6 +82,7 @@ public class EntityShader extends Shader {
         locationSkyColor = super.getUniformLocation("skyColor");
         locationNumberOfRows = super.getUniformLocation("numberOfRows");
         locationOffset = super.getUniformLocation("offset");
+        locationPlane = super.getUniformLocation("plane");
         locationLightPosition = new int[MAX_LIGHTS];
         locationLightColor = new int[MAX_LIGHTS];
         locationAttenuation = new int[MAX_LIGHTS];
@@ -87,6 +91,15 @@ public class EntityShader extends Shader {
             locationLightColor[i] = getUniformLocation(String.format("lightColor[%s]", i));
             locationAttenuation[i] = getUniformLocation(String.format("attenuation[%s]", i));
         }
+    }
+
+    /**
+     * Load clipping plane to shader.
+     * 
+     * @param plane to upload.
+     */
+    public void loadClipPlane(Vector4f plane) {
+        loadVector(locationPlane, plane);
     }
 
     /**

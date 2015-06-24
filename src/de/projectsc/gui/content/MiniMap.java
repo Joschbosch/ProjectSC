@@ -19,7 +19,7 @@ import org.lwjgl.input.Mouse;
 
 import de.projectsc.core.data.content.Map;
 import de.projectsc.gui.OverlayMoveable;
-import de.projectsc.gui.states.StateGameRunning;
+import de.projectsc.gui.states.GameRunning;
 
 /**
  * Class for the minimap overlay.
@@ -54,9 +54,9 @@ public class MiniMap implements OverlayMoveable {
     private int movingOffsetY;
 
     @SuppressWarnings("unused")
-    private final StateGameRunning stateGameRunning;
+    private final GameRunning stateGameRunning;
 
-    public MiniMap(Map currentMap, BlockingQueue<GUICommand> drawableQueue, StateGameRunning stateGameRunning) {
+    public MiniMap(Map currentMap, BlockingQueue<GUICommand> drawableQueue, GameRunning stateGameRunning) {
         LOGGER.debug("Initialize minimap ... ");
         cornerPosition = new int[2];
         if (currentMap != null) {

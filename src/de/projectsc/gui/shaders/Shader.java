@@ -19,6 +19,7 @@ import org.lwjgl.opengl.GL20;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
+import org.lwjgl.util.vector.Vector4f;
 
 /**
  * Everything that has to do with shaders (load them, bind them).
@@ -35,11 +36,11 @@ public abstract class Shader {
 
     private static FloatBuffer matrixBuffer = BufferUtils.createFloatBuffer(FLOAT_BUFFER_SIZE);
 
-    private int shaderProgram;
+    private final int shaderProgram;
 
-    private int vertexShader;
+    private final int vertexShader;
 
-    private int fragmentShader;
+    private final int fragmentShader;
 
     public Shader(String vertexFile, String fragmentFile) {
         vertexShader = loadShader(vertexFile, GL20.GL_VERTEX_SHADER);
@@ -122,6 +123,10 @@ public abstract class Shader {
 
     protected void loadVector(int location, Vector3f value) {
         GL20.glUniform3f(location, value.x, value.y, value.z);
+    }
+
+    protected void loadVector(int location, Vector4f value) {
+        GL20.glUniform4f(location, value.x, value.y, value.z, value.w);
     }
 
     protected void loadVector(int location, Vector2f value) {

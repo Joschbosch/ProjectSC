@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2015 
+ * Copyright (C) 2015 Project SC
+ * 
+ * All rights reserved
  */
 
 package de.projectsc.gui.tools;
@@ -14,6 +16,11 @@ import org.lwjgl.util.vector.Vector4f;
 import de.projectsc.gui.objects.Camera;
 import de.projectsc.gui.terrain.Terrain;
 
+/**
+ * Calculates the vertex on the terrain from the mouse cursor.
+ * 
+ * @author Josch Bosch
+ */
 public class MousePicker {
 
     private static final int RECURSION_COUNT = 200;
@@ -22,13 +29,13 @@ public class MousePicker {
 
     private Vector3f currentRay = new Vector3f();
 
-    private Matrix4f projectionMatrix;
+    private final Matrix4f projectionMatrix;
 
     private Matrix4f viewMatrix;
 
-    private Camera camera;
+    private final Camera camera;
 
-    private Terrain terrain;
+    private final Terrain terrain;
 
     private Vector3f currentTerrainPoint;
 
@@ -47,6 +54,9 @@ public class MousePicker {
         return currentRay;
     }
 
+    /**
+     * Update picker to current camera position.
+     */
     public void update() {
         viewMatrix = camera.createViewMatrix();
         currentRay = calculateMouseRay();
@@ -61,7 +71,7 @@ public class MousePicker {
         float mouseX = Mouse.getX();
         float mouseY = Mouse.getY();
         Vector2f normalizedCoords = getNormalisedDeviceCoordinates(mouseX, mouseY);
-        Vector4f clipCoords = new Vector4f(normalizedCoords.x, normalizedCoords.y, -1.0f, 1.0f);
+        Vector4f clipCoords = new Vector4f(normalizedCoords.x, normalizedCoords.y, 0 - 1.0f, 1.0f);
         Vector4f eyeCoords = toEyeCoords(clipCoords);
         Vector3f worldRay = toWorldCoords(eyeCoords);
         return worldRay;
@@ -78,7 +88,7 @@ public class MousePicker {
     private Vector4f toEyeCoords(Vector4f clipCoords) {
         Matrix4f invertedProjection = Matrix4f.invert(projectionMatrix, null);
         Vector4f eyeCoords = Matrix4f.transform(invertedProjection, clipCoords, null);
-        return new Vector4f(eyeCoords.x, eyeCoords.y, -1f, 0f);
+        return new Vector4f(eyeCoords.x, eyeCoords.y, 0 - 1f, 0f);
     }
 
     private Vector2f getNormalisedDeviceCoordinates(float mouseX, float mouseY) {
@@ -98,8 +108,8 @@ public class MousePicker {
         float half = start + ((finish - start) / 2f);
         if (count >= RECURSION_COUNT) {
             Vector3f endPoint = getPointOnRay(ray, half);
-            Terrain terrain = getTerrain(endPoint.getX(), endPoint.getZ());
-            if (terrain != null) {
+            Terrain terrainSearch = getTerrain(endPoint.getX(), endPoint.getZ());
+            if (terrainSearch != null) {
                 return endPoint;
             } else {
                 return null;
@@ -115,24 +125,16 @@ public class MousePicker {
     private boolean intersectionInRange(float start, float finish, Vector3f ray) {
         Vector3f startPoint = getPointOnRay(ray, start);
         Vector3f endPoint = getPointOnRay(ray, finish);
-        if (!isUnderGround(startPoint) && isUnderGround(endPoint)) {
-            return true;
-        } else {
-            return false;
-        }
+        return !isUnderGround(startPoint) && isUnderGround(endPoint);
     }
 
     private boolean isUnderGround(Vector3f testPoint) {
-        Terrain terrain = getTerrain(testPoint.getX(), testPoint.getZ());
+        Terrain currentTerrain = getTerrain(testPoint.getX(), testPoint.getZ());
         float height = 0;
-        if (terrain != null) {
-            height = terrain.getHeightOfTerrain(testPoint.getX(), testPoint.getZ());
+        if (currentTerrain != null) {
+            height = currentTerrain.getHeightOfTerrain(testPoint.getX(), testPoint.getZ());
         }
-        if (testPoint.y < height) {
-            return true;
-        } else {
-            return false;
-        }
+        return testPoint.y < height;
     }
 
     private Terrain getTerrain(float worldX, float worldZ) {

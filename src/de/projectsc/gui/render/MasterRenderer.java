@@ -13,14 +13,16 @@ import java.util.Map;
 
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL30;
 import org.lwjgl.util.vector.Matrix4f;
+import org.lwjgl.util.vector.Vector4f;
 
 import de.projectsc.gui.models.TexturedModel;
 import de.projectsc.gui.objects.Camera;
 import de.projectsc.gui.objects.Entity;
 import de.projectsc.gui.objects.Light;
+import de.projectsc.gui.objects.Player;
 import de.projectsc.gui.shaders.EntityShader;
-import de.projectsc.gui.shaders.SkyboxRenderer;
 import de.projectsc.gui.shaders.TerrainShader;
 import de.projectsc.gui.terrain.Terrain;
 import de.projectsc.gui.tools.Loader;
@@ -54,7 +56,7 @@ public class MasterRenderer {
 
     private final TerrainRenderer terrainRenderer;
 
-    private SkyboxRenderer skyboxRenderer;
+    private final SkyboxRenderer skyboxRenderer;
 
     private final Map<TexturedModel, List<Entity>> entities = new HashMap<>();
 
@@ -62,6 +64,7 @@ public class MasterRenderer {
 
     public MasterRenderer(Loader loader) {
         enableCulling();
+        GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
         createProjectionMatrix();
         entityShader = new EntityShader();
         entityRenderer = new EntityRenderer(entityShader, projectionMatrix);
@@ -80,21 +83,45 @@ public class MasterRenderer {
     }
 
     /**
+     * Render the whole scene with all objects.
+     * 
+     * @param terrain to render
+     * @param worldEntities to render
+     * @param player to render
+     * @param lights to render
+     * @param camera for view
+     * @param elapsedTime since last frame
+     * @param clipPlane to clip the world
+     */
+    public void renderScene(Terrain terrain, List<Entity> worldEntities, Player player, List<Light> lights,
+        Camera camera, long elapsedTime, Vector4f clipPlane) {
+        processTerrain(terrain);
+        for (Entity e : worldEntities) {
+            processEntity(e);
+        }
+        processEntity(player);
+        render(lights, camera, elapsedTime, clipPlane);
+    }
+
+    /**
      * General render method .
      * 
      * @param lights to use
      * @param camera to use
-     * @param elapsedTime
+     * @param elapsedTime since last frame
+     * @param clipPlane to clip the world
      */
-    public void render(List<Light> lights, Camera camera, long elapsedTime) {
+    public void render(List<Light> lights, Camera camera, long elapsedTime, Vector4f clipPlane) {
         prepare();
         entityShader.start();
+        entityShader.loadClipPlane(clipPlane);
         entityShader.loadSkyColor(SKY_R, SKY_G, SKY_B);
         entityShader.loadLights(lights);
         entityShader.loadViewMatrix(camera);
         entityRenderer.render(entities);
         entityShader.stop();
         terrainShader.start();
+        terrainShader.loadClipPlane(clipPlane);
         terrainShader.loadSkyColor(SKY_R, SKY_G, SKY_B);
         terrainShader.loadLights(lights);
         terrainShader.loadViewMatrix(camera);
@@ -135,6 +162,7 @@ public class MasterRenderer {
      * Delete everything.
      */
     public void dispose() {
+        GL11.glDisable(GL30.GL_CLIP_DISTANCE0);
         entityShader.dispose();
         terrainShader.dispose();
     }
@@ -173,4 +201,5 @@ public class MasterRenderer {
     public Matrix4f getProjectionMatrix() {
         return projectionMatrix;
     }
+
 }

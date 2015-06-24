@@ -1,18 +1,25 @@
 /*
- * Copyright (C) 2015 
+ * Copyright (C) 2015 Project SC
+ * 
+ * All rights reserved
  */
 
 package de.projectsc.gui.textures;
 
 import java.nio.ByteBuffer;
 
+/**
+ * Data from a loaded texture.
+ * 
+ * @author Josch Bosch
+ */
 public class TextureData {
 
-    private int width;
+    private final int width;
 
-    private int height;
+    private final int height;
 
-    private ByteBuffer buffer;
+    private final ByteBuffer buffer;
 
     public TextureData(int width, int height, ByteBuffer buffer) {
         super();

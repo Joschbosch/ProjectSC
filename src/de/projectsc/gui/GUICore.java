@@ -23,7 +23,7 @@ import de.projectsc.core.data.messages.GUIMessage;
 import de.projectsc.core.data.messages.GUIMessageConstants;
 import de.projectsc.gui.states.GUIState;
 import de.projectsc.gui.states.State;
-import de.projectsc.gui.states.StateGameRunning;
+import de.projectsc.gui.states.GameRunning;
 
 /**
  * Core class for the GUI.
@@ -68,7 +68,7 @@ public class GUICore implements Runnable {
         try {
             outgoingQueue.put(new GUIMessage(GUIMessageConstants.START_GAME, null));
             LOGGER.debug("Initialize done, send start game message ...");
-            stateMap.put(GUIState.GAME, new StateGameRunning(outgoingQueue));
+            stateMap.put(GUIState.GAME, new GameRunning(outgoingQueue));
             currentState = stateMap.get(GUIState.GAME);
             while (incomingQueue.isEmpty()) {
                 Thread.sleep(10);
@@ -128,9 +128,9 @@ public class GUICore implements Runnable {
                     LOGGER.debug("Starting game!");
 
                     map = (Map) msg.getData();
-                    if (currentState instanceof StateGameRunning) {
-                        ((StateGameRunning) currentState).setCurrentMap(map);
-                        ((StateGameRunning) currentState).initialize();
+                    if (currentState instanceof GameRunning) {
+                        ((GameRunning) currentState).setCurrentMap(map);
+                        ((GameRunning) currentState).initialize();
                     }
                     try {
                         startGameLoop();
@@ -139,8 +139,8 @@ public class GUICore implements Runnable {
                     }
                 } else {
                     map = (Map) msg.getData();
-                    if (currentState instanceof StateGameRunning) {
-                        ((StateGameRunning) currentState).setCurrentMap(map);
+                    if (currentState instanceof GameRunning) {
+                        ((GameRunning) currentState).setCurrentMap(map);
                     }
                 }
             } else if (msg.getMessage().equals(CLOSE_DOWN_GUI)) {

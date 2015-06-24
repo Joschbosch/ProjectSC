@@ -11,6 +11,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
+import org.lwjgl.util.vector.Vector4f;
 
 import de.projectsc.gui.objects.Camera;
 import de.projectsc.gui.objects.Light;
@@ -58,6 +59,8 @@ public class TerrainShader extends Shader {
 
     private int locationBlendMap;
 
+    private int locationPlane;
+
     public TerrainShader() {
         super(VERTEX_FILE, FRAGMENT_FILE);
         LOGGER.debug("Terrain shader loaded.");
@@ -84,6 +87,7 @@ public class TerrainShader extends Shader {
         locationGTexture = super.getUniformLocation("gTexture");
         locationBTexture = super.getUniformLocation("bTexture");
         locationBlendMap = super.getUniformLocation("blendMap");
+        locationPlane = super.getUniformLocation("plane");
         locationLightPosition = new int[MAX_LIGHTS];
         locationLightColor = new int[MAX_LIGHTS];
         locationAttenuation = new int[MAX_LIGHTS];
@@ -104,6 +108,15 @@ public class TerrainShader extends Shader {
         super.loadInt(locationGTexture, 2);
         super.loadInt(locationBTexture, 3);
         super.loadInt(locationBlendMap, 4);
+    }
+
+    /**
+     * Load up clipping plane.
+     * 
+     * @param plane to upload
+     */
+    public void loadClipPlane(Vector4f plane) {
+        loadVector(locationPlane, plane);
     }
 
     /**

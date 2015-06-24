@@ -18,12 +18,16 @@ uniform float useFakeLighting;
 
 uniform float numberOfRows;
 uniform vec2 offset;
+uniform vec4 plane;
 
 const float density = 0.0035;
 const float gradient = 5;
 
 void main (void){
 	vec4 worldPosition = transformationMatrix * vec4(position, 1.0);
+	
+	gl_ClipDistance[0] = dot(worldPosition, plane);
+	
 	vec4 positionRelativeToCamera = viewMatrix * worldPosition;
 	
 	gl_Position = projectionMatrix * positionRelativeToCamera;
