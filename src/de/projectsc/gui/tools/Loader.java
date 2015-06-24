@@ -89,6 +89,12 @@ public class Loader {
         return vaoID;
     }
 
+    /**
+     * Load texture with PNG format.
+     * 
+     * @param filename to load
+     * @return location of texture
+     */
     public int loadTexture(String filename) {
         return loadTexture(filename, "PNG");
     }
@@ -97,6 +103,7 @@ public class Loader {
      * load texture from the given file.
      * 
      * @param filename of the texture.
+     * @param fileType of the image
      * @return texture position
      */
     public int loadTexture(String filename, String fileType) {

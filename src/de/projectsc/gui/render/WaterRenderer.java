@@ -29,6 +29,8 @@ import de.projectsc.gui.tools.Maths;
  */
 public class WaterRenderer {
 
+    private static final float TIME_SCALE = 1000.0f;
+
     private static final String DUDV_MAP = "terrain/waterDUDV.png";
 
     private static final float WAVE_SPEED = 0.03f;
@@ -60,6 +62,7 @@ public class WaterRenderer {
      * 
      * @param water tiles to render
      * @param camera current camera
+     * @param delta elapsed time since last frame
      */
     public void render(List<WaterTile> water, Camera camera, float delta) {
         prepareRender(camera, delta);
@@ -76,9 +79,9 @@ public class WaterRenderer {
     private void prepareRender(Camera camera, float delta) {
         shader.start();
         shader.loadViewMatrix(camera);
-        moveFactor += WAVE_SPEED * delta / 1000.0f;
+        moveFactor += WAVE_SPEED * delta / TIME_SCALE;
         moveFactor %= 1;
-        float waveyMoveFactor = (float) Math.sin(moveFactor * 2 * Math.PI) / 2f + 0.5f;
+        float waveyMoveFactor = (float) Math.sin(moveFactor * 2 * Math.PI) / 2f + (1.0f / 2.0f);
         shader.loadMoveFactor(waveyMoveFactor);
         GL30.glBindVertexArray(quad.getVaoID());
         GL20.glEnableVertexAttribArray(0);

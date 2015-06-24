@@ -54,6 +54,11 @@ public class WaterShader extends Shader {
         locationMoveFactor = getUniformLocation("moveFactor");
     }
 
+    /**
+     * Load up move factor of waves.
+     * 
+     * @param factor to upload
+     */
     public void loadMoveFactor(float factor) {
         loadFloat(locationMoveFactor, factor);
     }
