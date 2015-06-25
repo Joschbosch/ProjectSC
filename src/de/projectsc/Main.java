@@ -5,8 +5,9 @@
  */
 package de.projectsc;
 
-import de.projectsc.core.Core;
-import de.projectsc.gui.GUICore;
+import de.projectsc.client.core.ClientCore;
+import de.projectsc.client.gui.GUICore;
+import de.projectsc.client.network.ClientNetworkCore;
 
 /**
  * Main class.
@@ -25,9 +26,16 @@ public class Main {
      * @param args command line parameters
      */
     public static void main(String[] args) {
-        Core core = new Core();
-        final GUICore gui = new GUICore(core.getGuiIncomingQueue(), core.getGuiOutgoingQueue());
-        new Thread(core).start();
-        new Thread(gui).start();
+
+        if (args.length < 1 || args[0] == null || args[0].isEmpty()) {
+            ClientCore core = new ClientCore();
+            final GUICore gui = new GUICore(core.getGuiIncomingQueue(), core.getGuiOutgoingQueue());
+            final ClientNetworkCore network = new ClientNetworkCore(core.getNetworkIncomingQueue(), core.getNetworkOutgoingQueue());
+            new Thread(core).start();
+            new Thread(network).start();
+            new Thread(gui).start();
+        } else {
+
+        }
     }
 }
