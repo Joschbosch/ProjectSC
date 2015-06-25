@@ -16,13 +16,13 @@ import org.lwjgl.util.vector.Matrix4f;
 
 import de.projectsc.client.gui.models.RawModel;
 import de.projectsc.client.gui.models.TexturedModel;
-import de.projectsc.client.gui.objects.Entity;
+import de.projectsc.client.gui.objects.GraphicalEntity;
 import de.projectsc.client.gui.shaders.EntityShader;
 import de.projectsc.client.gui.textures.ModelTexture;
 import de.projectsc.client.gui.tools.Maths;
 
 /**
- * This class will get {@link Entity} objects to render onto the screen.
+ * This class will get {@link GraphicalEntity} objects to render onto the screen.
  * 
  * @author Josch Bosch
  */
@@ -42,11 +42,11 @@ public class EntityRenderer {
      * 
      * @param entities to render.
      */
-    public void render(Map<TexturedModel, List<Entity>> entities) {
+    public void render(Map<TexturedModel, List<GraphicalEntity>> entities) {
         for (TexturedModel model : entities.keySet()) {
             prepareTexturedModel(model);
-            List<Entity> batch = entities.get(model);
-            for (Entity e : batch) {
+            List<GraphicalEntity> batch = entities.get(model);
+            for (GraphicalEntity e : batch) {
                 prepareInstance(e);
                 GL11.glDrawElements(GL11.GL_TRIANGLES, e.getModel().getRawModel().getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
             }
@@ -79,7 +79,7 @@ public class EntityRenderer {
         MasterRenderer.enableCulling();
     }
 
-    private void prepareInstance(Entity entity) {
+    private void prepareInstance(GraphicalEntity entity) {
         Matrix4f transformationMatrix =
             Maths.createTransformationMatrix(entity.getPosition(), entity.getRotX(), entity.getRotY(), entity.getRotZ(), entity.getScale());
         shader.loadTransformationMatrix(transformationMatrix);

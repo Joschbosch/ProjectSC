@@ -3,7 +3,7 @@
  * 
  * All rights reserved
  */
-package de.projectsc.client.core.data.messages;
+package de.projectsc.core.data.messages;
 
 /**
  * Message class for the network.

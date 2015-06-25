@@ -5,9 +5,13 @@
  */
 package de.projectsc.client.gui.objects;
 
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.Display;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
+
+import de.projectsc.client.gui.Timer;
 
 /**
  * Class for moving around in the world.
@@ -16,11 +20,13 @@ import org.lwjgl.util.vector.Vector3f;
  */
 public class Camera {
 
+    private static final boolean MOBA_MODE = true;
+
     private static final float ANGLE_AROUND_PLAYER_FACTOR = 0.3f;
 
     private static final float PITCH_FACTOR = 0.1f;
 
-    private static final float MOUSE_WHEEL_ZOOM_FACTOR = 0.01f;
+    private static final float MOUSE_WHEEL_ZOOM_FACTOR = 0.05f;
 
     private static final int MAXIMUM_PITCH_ANGLE = 90;
 
@@ -32,35 +38,107 @@ public class Camera {
 
     private static final int DEGREES_180 = 180;
 
-    private final Vector3f position = new Vector3f(0, 0.5f, 0);
+    private static final int FAST_MOVEMENT_SPEED_FACTOR = 5;
 
-    private float pitch = 2 * 10;
+    private static final float MOVEMENT_SPEED = 60f;
 
-    private float yaw = 10;
+    private static final int SCROLL_MARGIN = 15;
+
+    private final Vector3f position = new Vector3f(0, 80f, 0);
+
+    private float pitch = 5 * 10;
+
+    private float yaw = 0;
 
     private float roll = 0;
 
-    private final Player player;
+    private final GraphicalEntity player;
 
     private float distanceFromPlayer = 3 * 10f;
 
     private float angleAroundPlayer = 0;
 
-    public Camera(Player player) {
+    private float currentSpeedX;
+
+    private float currentSpeedZ;
+
+    private GraphicalEntity boundToEntity = null;
+
+    public Camera(GraphicalEntity player) {
         this.player = player;
     }
 
     /**
      * Get keys and move camera.
      */
-    public void move() {
-        calculateZoom();
-        calculatePitch();
-        calculateAngleAroundPlayer();
-        float horizontalDistance = calculateHorizontalDistance();
-        float verticalDistance = calculateVerticalDistance();
-        calculateCameraPosition(horizontalDistance, verticalDistance);
-        this.yaw = DEGREES_180 - (player.getRotY() + angleAroundPlayer);
+    public void move(float delta) {
+        if (!MOBA_MODE) {
+            calculateZoom();
+            calculatePitch();
+            calculateAngleAroundPlayer();
+            float horizontalDistance = calculateHorizontalDistance();
+            float verticalDistance = calculateVerticalDistance();
+            calculateCameraPosition(horizontalDistance, verticalDistance);
+            this.yaw = DEGREES_180 - (player.getRotY() + angleAroundPlayer);
+        } else {
+            checkInputs();
+            if (boundToEntity == null) {
+                calculateZoom();
+                calculateCameraPosition(delta);
+            } else {
+                float horizontalDistance = calculateHorizontalDistance();
+                float verticalDistance = calculateVerticalDistance();
+                calculateCameraPosition(horizontalDistance, verticalDistance);
+            }
+        }
+    }
+
+    private void checkInputs() {
+        float movementSpeed = MOVEMENT_SPEED;
+        if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)) {
+            movementSpeed *= FAST_MOVEMENT_SPEED_FACTOR;
+        }
+        if (Keyboard.isKeyDown(Keyboard.KEY_A)) {
+            currentSpeedX = -movementSpeed;
+        } else if (Keyboard.isKeyDown(Keyboard.KEY_D)) {
+            currentSpeedX = movementSpeed;
+        } else {
+            currentSpeedX = 0;
+        }
+        if (Keyboard.isKeyDown(Keyboard.KEY_W)) {
+            currentSpeedZ = -movementSpeed;
+        } else if (Keyboard.isKeyDown(Keyboard.KEY_S)) {
+            currentSpeedZ = movementSpeed;
+        } else {
+            currentSpeedZ = 0;
+        }
+        if (isBetween(Mouse.getX(), 0, SCROLL_MARGIN)) {
+            currentSpeedX = -FAST_MOVEMENT_SPEED_FACTOR * movementSpeed;
+        } else if (isBetween(Mouse.getX(), Display.getWidth() - SCROLL_MARGIN, Display.getWidth())) {
+            currentSpeedX = FAST_MOVEMENT_SPEED_FACTOR * movementSpeed;
+        } else if (isBetween(Mouse.getX(), SCROLL_MARGIN, 2 * SCROLL_MARGIN)) {
+            currentSpeedX = -movementSpeed;
+        } else if (isBetween(Mouse.getX(), Display.getWidth() - 2 * SCROLL_MARGIN, Display.getWidth() - SCROLL_MARGIN)) {
+            currentSpeedX = movementSpeed;
+        }
+        if (isBetween(Mouse.getY(), 0, SCROLL_MARGIN)) {
+            currentSpeedZ = FAST_MOVEMENT_SPEED_FACTOR * movementSpeed;
+        } else if (isBetween(Mouse.getY(), Display.getHeight() - SCROLL_MARGIN, Display.getWidth())) {
+            currentSpeedZ = -FAST_MOVEMENT_SPEED_FACTOR * movementSpeed;
+        } else if (isBetween(Mouse.getY(), SCROLL_MARGIN, 2 * SCROLL_MARGIN)) {
+            currentSpeedZ = movementSpeed;
+        } else if (isBetween(Mouse.getY(), Display.getHeight() - 2 * SCROLL_MARGIN, Display.getWidth() - SCROLL_MARGIN)) {
+            currentSpeedZ = -movementSpeed;
+        }
+    }
+
+    private boolean isBetween(float value, int lower, int upper) {
+        return value <= upper && value >= lower;
+    }
+
+    private void calculateCameraPosition(float delta) {
+        position.x = position.x + delta / Timer.SECONDS_CONSTANT * currentSpeedX;
+        position.z = position.z + delta / Timer.SECONDS_CONSTANT * currentSpeedZ;
     }
 
     private void calculateCameraPosition(float horizontalDistance, float verticalDistance) {
@@ -70,7 +148,6 @@ public class Camera {
         position.x = player.getPosition().x - offsetX;
         position.z = player.getPosition().z - offsetZ;
         position.y = player.getPosition().y + verticalDistance + PLAYER_CENTER_Y_AXIS;
-
     }
 
     /**
@@ -117,12 +194,21 @@ public class Camera {
     }
 
     private void calculateZoom() {
-        float zoomLevel = Mouse.getDWheel() * MOUSE_WHEEL_ZOOM_FACTOR;
-        distanceFromPlayer -= zoomLevel;
-        if (distanceFromPlayer < 0) {
-            distanceFromPlayer = 0;
-        } else if (distanceFromPlayer > MAX_DISTANCE_TO_PLAYER) {
-            distanceFromPlayer = MAX_DISTANCE_TO_PLAYER;
+        if (!MOBA_MODE) {
+            float zoomLevel = Mouse.getDWheel() * MOUSE_WHEEL_ZOOM_FACTOR;
+            distanceFromPlayer -= zoomLevel;
+            if (distanceFromPlayer < 0) {
+                distanceFromPlayer = 0;
+            } else if (distanceFromPlayer > MAX_DISTANCE_TO_PLAYER) {
+                distanceFromPlayer = MAX_DISTANCE_TO_PLAYER;
+            }
+        } else {
+            float zoomLevel = Mouse.getDWheel() * MOUSE_WHEEL_ZOOM_FACTOR;
+            if (position.y <= 80 && zoomLevel < 0 || position.y >= 50 && zoomLevel > 0) {
+                position.y -= zoomLevel;
+                pitch -= zoomLevel;
+                position.z -= zoomLevel;
+            }
         }
     }
 
@@ -158,5 +244,13 @@ public class Camera {
      */
     public void invertPitch() {
         pitch = -pitch;
+    }
+
+    public void bindToEntity(GraphicalEntity entity) {
+        if (boundToEntity == null) {
+            boundToEntity = entity;
+        } else {
+            boundToEntity = null;
+        }
     }
 }

@@ -2,7 +2,7 @@
  * Copyright (C) 2015
  */
 
-package de.projectsc.client.core.data.messages;
+package de.projectsc.core.data.messages;
 
 public class MessageConstants {
 

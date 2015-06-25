@@ -8,6 +8,8 @@ package de.projectsc;
 import de.projectsc.client.core.ClientCore;
 import de.projectsc.client.gui.GUICore;
 import de.projectsc.client.network.ClientNetworkCore;
+import de.projectsc.server.core.ServerCore;
+import de.projectsc.server.network.ServerNetworkCore;
 
 /**
  * Main class.
@@ -26,16 +28,30 @@ public class Main {
      * @param args command line parameters
      */
     public static void main(String[] args) {
+        ClientCore core = new ClientCore();
+        ServerCore serverCore = new ServerCore();
+        ServerNetworkCore serverNetwork =
+            new ServerNetworkCore(serverCore.getNetworkSendQueue(), serverCore.getNetworkReceiveQueue());
+        new Thread(serverCore).start();
+        new Thread(serverNetwork).start();
 
-        if (args.length < 1 || args[0] == null || args[0].isEmpty()) {
-            ClientCore core = new ClientCore();
-            final GUICore gui = new GUICore(core.getGuiIncomingQueue(), core.getGuiOutgoingQueue());
-            final ClientNetworkCore network = new ClientNetworkCore(core.getNetworkIncomingQueue(), core.getNetworkOutgoingQueue());
-            new Thread(core).start();
-            new Thread(network).start();
-            new Thread(gui).start();
-        } else {
+        final GUICore gui = new GUICore(core.getGuiIncomingQueue(), core.getGuiOutgoingQueue());
+        final ClientNetworkCore network =
+            new ClientNetworkCore(core.getNetworkSendQueue(), core.getNetworkReceiveQueue(), serverNetwork.clientSendQueueFaking,
+                serverNetwork.clientReceiveQueueFaking);
+        new Thread(core).start();
+        new Thread(network).start();
+        new Thread(gui).start();
 
-        }
+        // while (true) {
+        // try {
+        // Thread.sleep(100);
+        // System.out.println(serverCore.getNetworkSendQueue().size() + "  " + serverCore.getNetworkReceiveQueue().size() + "  "
+        // + core.getNetworkSendQueue().size() + "  " + core.getNetworkReceiveQueue().size() + "  "
+        // + core.getGuiOutgoingQueue().size() + "  " + core.getGuiIncomingQueue().size());
+        // System.out.println(serverNetwork.clientSendQueueFaking.size() + "  " + serverNetwork.clientReceiveQueueFaking.size());
+        // } catch (InterruptedException e) {
+        // }
+        // }
     }
 }

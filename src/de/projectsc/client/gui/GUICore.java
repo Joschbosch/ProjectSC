@@ -5,10 +5,10 @@
  */
 package de.projectsc.client.gui;
 
-import static de.projectsc.client.core.data.messages.GUIMessageConstants.NEW_MAP;
-import static de.projectsc.client.core.data.messages.MessageConstants.CLOSE_DOWN;
+import static de.projectsc.core.data.messages.MessageConstants.CLOSE_DOWN;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 
 import org.apache.commons.logging.Log;
@@ -18,12 +18,11 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 
-import de.projectsc.client.core.data.content.Map;
-import de.projectsc.client.core.data.messages.GUIMessage;
-import de.projectsc.client.core.data.messages.GUIMessageConstants;
 import de.projectsc.client.gui.states.GUIState;
 import de.projectsc.client.gui.states.GameRunning;
+import de.projectsc.client.gui.states.Menue;
 import de.projectsc.client.gui.states.State;
+import de.projectsc.core.WorldEntity;
 
 /**
  * Core class for the GUI.
@@ -46,8 +45,6 @@ public class GUICore implements Runnable {
 
     private Timer timer;
 
-    private Map map;
-
     private final BlockingQueue<GUIMessage> outgoingQueue;
 
     private final BlockingQueue<GUIMessage> incomingQueue;
@@ -65,23 +62,6 @@ public class GUICore implements Runnable {
     public void start() {
         LOGGER.debug("Starting GUI ...");
         init();
-        try {
-            outgoingQueue.put(new GUIMessage(GUIMessageConstants.START_GAME, null));
-            LOGGER.debug("Initialize done, send start game message ...");
-            stateMap.put(GUIState.GAME, new GameRunning(outgoingQueue));
-            currentState = stateMap.get(GUIState.GAME);
-            while (incomingQueue.isEmpty()) {
-                Thread.sleep(10);
-            }
-            retreiveCoreMessages();
-        } catch (InterruptedException e1) {
-            LOGGER.error("Could not send start Message", e1);
-        }
-        dispose();
-    }
-
-    private void dispose() {
-
     }
 
     private void init() {
@@ -97,12 +77,16 @@ public class GUICore implements Runnable {
         LOGGER.debug("Opened window ");
         LOGGER.debug("OpenGL version: " + GL11.glGetString(GL11.GL_VERSION));
         this.timer = new Timer();
-        running = true;
+        stateMap.put(GUIState.GAME, new GameRunning(outgoingQueue));
+        stateMap.put(GUIState.MAIN_MENUE, new Menue());
+        currentState = stateMap.get(GUIState.MAIN_MENUE);
     }
 
-    private void startGameLoop() throws InterruptedException {
-        LOGGER.debug("Starting Game");
+    private void startRenderingLoop() throws InterruptedException {
+        LOGGER.debug("Starting GUI ...");
         timer.init();
+        running = true;
+        outgoingQueue.offer(new GUIMessage(GUIMessageConstants.GUI_INITIALIZED, null));
         while (running) {
             if (Display.isCloseRequested()) {
                 outgoingQueue.put(new GUIMessage(CLOSE_DOWN, null));
@@ -120,33 +104,20 @@ public class GUICore implements Runnable {
     }
 
     private void retreiveCoreMessages() {
-        while (!incomingQueue.isEmpty()) {
-            GUIMessage msg = incomingQueue.poll();
-            if (msg.getMessage().equals(NEW_MAP)) {
-                LOGGER.debug("Retrieve new map!");
-                if (map == null) {
-                    LOGGER.debug("Starting game!");
-
-                    map = (Map) msg.getData();
-                    if (currentState instanceof GameRunning) {
-                        ((GameRunning) currentState).setCurrentMap(map);
-                        ((GameRunning) currentState).initialize();
-                    }
-                    try {
-                        startGameLoop();
-                    } catch (InterruptedException e) {
-                        LOGGER.error("GUI Core: ", e);
-                    }
-                } else {
-                    map = (Map) msg.getData();
-                    if (currentState instanceof GameRunning) {
-                        ((GameRunning) currentState).setCurrentMap(map);
-                    }
+        GUIMessage msg;
+        msg = incomingQueue.poll();
+        if (msg != null) {
+            if (msg.getMessage().equals(GUIMessageConstants.INIT_GAME)) {
+                LOGGER.debug("Initialize game!");
+                currentState = stateMap.get(GUIState.GAME);
+                if (currentState instanceof GameRunning) {
+                    ((GameRunning) currentState).setWorldEntities((Map<Integer, WorldEntity>) msg.getData());
+                    ((GameRunning) currentState).initialize();
                 }
+                LOGGER.debug("Starting game!");
             } else if (msg.getMessage().equals(CLOSE_DOWN)) {
                 LOGGER.debug("Closing down");
                 running = false;
-
             }
         }
     }
@@ -158,5 +129,11 @@ public class GUICore implements Runnable {
     @Override
     public void run() {
         start();
+        try {
+            startRenderingLoop();
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            LOGGER.error("Error in rendering loop: ", e);
+        }
     }
 }

@@ -33,7 +33,7 @@ public class Terrain {
     /**
      * Size of one terrain element.
      */
-    public static final float SIZE = 1200;
+    public static final float SIZE = 1000;
 
     private static final float MAXIMUM_HEIGHT = 100;
 
@@ -115,7 +115,7 @@ public class Terrain {
         for (int i = 0; i < vertCount; i++) {
             for (int j = 0; j < vertCount; j++) {
                 vertices[vertexPointer * 3] = j / ((float) vertCount - 1) * SIZE;
-                float height = getHeight(j, i, image);
+                float height = 0;// getHeight(j, i, image);
                 heights[j][i] = height;
                 vertices[vertexPointer * 3 + 1] = height;
                 vertices[vertexPointer * 3 + 2] = i / ((float) vertCount - 1) * SIZE;
@@ -157,14 +157,15 @@ public class Terrain {
     }
 
     private float getHeight(int x, int z, BufferedImage map) {
-        if (x < 0 || x >= map.getHeight() || z < 0 || z >= map.getWidth()) {
-            return 0;
-        }
-        float height = map.getRGB(x, z);
-        height += MAX_PIXEL_COLOR / 2f;
-        height /= MAX_PIXEL_COLOR / 2f;
-        height *= MAXIMUM_HEIGHT;
-        return height;
+        return 0;
+        // if (x < 0 || x >= map.getHeight() || z < 0 || z >= map.getWidth()) {
+        // return 0;
+        // }
+        // float height = map.getRGB(x, z);
+        // height += MAX_PIXEL_COLOR / 2f;
+        // height /= MAX_PIXEL_COLOR / 2f;
+        // height *= MAXIMUM_HEIGHT;
+        // return height;
     }
 
     public float getX() {

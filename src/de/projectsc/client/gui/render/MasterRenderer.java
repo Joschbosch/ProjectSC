@@ -19,9 +19,8 @@ import org.lwjgl.util.vector.Vector4f;
 
 import de.projectsc.client.gui.models.TexturedModel;
 import de.projectsc.client.gui.objects.Camera;
-import de.projectsc.client.gui.objects.Entity;
+import de.projectsc.client.gui.objects.GraphicalEntity;
 import de.projectsc.client.gui.objects.Light;
-import de.projectsc.client.gui.objects.Player;
 import de.projectsc.client.gui.shaders.EntityShader;
 import de.projectsc.client.gui.shaders.TerrainShader;
 import de.projectsc.client.gui.terrain.Terrain;
@@ -58,7 +57,7 @@ public class MasterRenderer {
 
     private final SkyboxRenderer skyboxRenderer;
 
-    private final Map<TexturedModel, List<Entity>> entities = new HashMap<>();
+    private final Map<TexturedModel, List<GraphicalEntity>> entities = new HashMap<>();
 
     private final List<Terrain> terrains = new ArrayList<>();
 
@@ -93,10 +92,10 @@ public class MasterRenderer {
      * @param elapsedTime since last frame
      * @param clipPlane to clip the world
      */
-    public void renderScene(Terrain terrain, List<Entity> worldEntities, Player player, List<Light> lights,
+    public void renderScene(Terrain terrain, List<GraphicalEntity> worldEntities, GraphicalEntity player, List<Light> lights,
         Camera camera, long elapsedTime, Vector4f clipPlane) {
         processTerrain(terrain);
-        for (Entity e : worldEntities) {
+        for (GraphicalEntity e : worldEntities) {
             processEntity(e);
         }
         processEntity(player);
@@ -146,13 +145,13 @@ public class MasterRenderer {
      * 
      * @param entity to render.
      */
-    public void processEntity(Entity entity) {
+    public void processEntity(GraphicalEntity entity) {
         TexturedModel entityModel = entity.getModel();
-        List<Entity> batch = entities.get(entityModel);
+        List<GraphicalEntity> batch = entities.get(entityModel);
         if (batch != null) {
             batch.add(entity);
         } else {
-            List<Entity> newBatch = new ArrayList<>();
+            List<GraphicalEntity> newBatch = new ArrayList<>();
             newBatch.add(entity);
             entities.put(entityModel, newBatch);
         }

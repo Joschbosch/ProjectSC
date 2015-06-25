@@ -3,7 +3,9 @@
  * 
  * All rights reserved
  */
-package de.projectsc.client.core.data.messages;
+package de.projectsc.client.gui;
+
+import de.projectsc.core.data.messages.Message;
 
 /**
  * Implementation of {@link Message} for the GUI.

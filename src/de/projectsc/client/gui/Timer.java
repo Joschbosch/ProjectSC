@@ -15,7 +15,7 @@ import org.lwjgl.opengl.Display;
  */
 public class Timer {
 
-    private static final int SECONDS_CONSTANT = 1000;
+    public static final float SECONDS_CONSTANT = 1000f;
 
     /**
      * Frames per second.
@@ -53,7 +53,7 @@ public class Timer {
      * @return The system time in milliseconds
      */
     public long getTime() {
-        return (Sys.getTime() * SECONDS_CONSTANT) / Sys.getTimerResolution();
+        return (Sys.getTime() * (int) SECONDS_CONSTANT) / Sys.getTimerResolution();
     }
 
     /**
