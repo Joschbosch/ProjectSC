@@ -94,14 +94,11 @@ public class ServerCore implements Runnable {
                 networkSendQueue.offer(new ServerMessage("Start game", gameTime));
 
                 long previous = System.currentTimeMillis();
-                long lag = 0;
                 while (!shutdown) {
                     long current = System.currentTimeMillis();
                     long elapsed = current - previous;
                     previous = current;
-                    lag += elapsed;
                     gameTime += elapsed;
-
                     workEventQueue();
                     moveGoats(elapsed);
                     try {
@@ -140,23 +137,24 @@ public class ServerCore implements Runnable {
     }
 
     private void moveGoats(long elapsedTime) {
-        boolean move = false;
         for (WorldEntity e : entities) {
-            e.move(elapsedTime);
-            Vector3f diff = Vector3f.sub(e.getPosition(), e.getCurrentTarget(), null);
-            if (diff.lengthSquared() < 1) {
+            if (e.getType() != EntityType.BACKGROUND_OBJECT && e.getType() != EntityType.SOLID_BACKGROUND_OBJECT) {
+                e.move(elapsedTime);
+                // if (e.getBoundingBox() != null && CollisionDetection.intersects(e, entities)) {
+                // e.move(-elapsedTime);
+                // }
+                networkSendQueue.offer(new ServerMessage(NetworkMessageConstants.NEW_LOCATION, new float[] { e.getID(),
+                    e.getPosition().x, e.getPosition().z, e.getRotY() }));
             }
-            networkSendQueue.offer(new ServerMessage(NetworkMessageConstants.NEW_LOCATION, new float[] { e.getID(),
-                e.getPosition().x, e.getPosition().z, e.getRotY() }));
         }
     }
 
     private void createWorldEntities() {
-        loadStaticMapObject(100, "terrain/fern", "terrain/fernTextureAtlas.png", 1f);
-        loadStaticMapObject(100, "terrain/grassModel", "terrain/grassTexture.png", 1f);
-        loadStaticMapObject(50, "terrain/tree", "terrain/tree.png", 15f);
-        loadStaticMapObject(50, "terrain/lowPolyTree", "terrain/lowPolyTree.png", 2f);
-        loadStaticMapObject(100, "terrain/fern", "terrain/flower.png", 1f);
+        loadStaticMapObject(100, EntityType.BACKGROUND_OBJECT, "terrain/fern", "terrain/fernTextureAtlas.png", 1f);
+        loadStaticMapObject(100, EntityType.BACKGROUND_OBJECT, "terrain/grassModel", "terrain/grassTexture.png", 1f);
+        loadStaticMapObject(50, EntityType.SOLID_BACKGROUND_OBJECT, "terrain/tree", "terrain/tree.png", 15f);
+        loadStaticMapObject(50, EntityType.SOLID_BACKGROUND_OBJECT, "terrain/lowPolyTree", "terrain/lowPolyTree.png", 2f);
+        loadStaticMapObject(100, EntityType.BACKGROUND_OBJECT, "terrain/fern", "terrain/flower.png", 1f);
         loadMovingEntities();
 
     }
@@ -169,11 +167,11 @@ public class ServerCore implements Runnable {
         }
     }
 
-    private void loadStaticMapObject(int count, String model, String texture, float scale) {
+    private void loadStaticMapObject(int count, EntityType type, String model, String texture, float scale) {
         for (int i = 0; i < count; i++) {
             float randomX = (float) (Math.random() * Terrain.SIZE - Terrain.SIZE / 2);
             float randomZ = (float) (Math.random() * Terrain.SIZE - Terrain.SIZE / 2);
-            entities.add(new WorldEntity(EntityType.BACKGROUND_OBJECT, model, texture, new Vector3f(
+            entities.add(new WorldEntity(type, model, texture, new Vector3f(
                 randomX, 0, randomZ), 0, 0, 0, scale));
         }
     }

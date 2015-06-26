@@ -5,7 +5,6 @@
  */
 package de.projectsc.client.gui.states;
 
-import java.awt.Font;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +19,6 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
-import org.newdawn.slick.TrueTypeFont;
 
 import de.projectsc.client.gui.GUIMessage;
 import de.projectsc.client.gui.GUIMessageConstants;
@@ -81,15 +79,11 @@ public class GameRunning implements State {
 
     private List<UITexture> ui;
 
+    private List<UITexture> boundingBoxes;
+
     private UIRenderer uiRenderer;
 
     private MousePicker mousePicker;
-
-    private GraphicalEntity lamp;
-
-    private TrueTypeFont font;
-
-    private GraphicalEntity[] goat;
 
     private List<WaterTile> waters;
 
@@ -99,6 +93,8 @@ public class GameRunning implements State {
 
     private boolean wireframeMode = false;
 
+    private boolean renderBoundingBoxes = false;
+
     public GameRunning(BlockingQueue<GUIMessage> outgoingQueue) {
         this.outgoingQueue = outgoingQueue;
     }
@@ -107,7 +103,6 @@ public class GameRunning implements State {
     public void initialize() {
         LOGGER.debug("Loading models and light ... ");
         GameFont.loadFonts();
-        font = GameFont.getFont(GameFont.GLOBAL, Font.PLAIN, 13, true);
         loader = new Loader();
         loadEntityModels();
         camera = new Camera(player);
@@ -115,6 +110,7 @@ public class GameRunning implements State {
         waterfbo = new WaterFrameBuffers();
         waterRenderer = new WaterRenderer(loader, masterRenderer.getProjectionMatrix(), waterfbo);
         loadDemoObjects();
+
     }
 
     private void loadEntityModels() {
@@ -147,27 +143,18 @@ public class GameRunning implements State {
 
         lights = new ArrayList<>();
         lights.add(new Light(new Vector3f(0, 500, 0), new Vector3f(1f, 1f, 1f)));
-        lights.add(new Light(new Vector3f(185, terrain.getHeightOfTerrain(185, -293) + 13f, -293), new Vector3f(2f, 0f, 0f),
-            new Vector3f(1, 0.01f, 0.002f)));
-        lights.add(new Light(new Vector3f(370, terrain.getHeightOfTerrain(370, -300) + 13f, -300), new Vector3f(0f, 2f, 2f), new Vector3f(
-            1, 0.01f, 0.002f)));
-        lights.add(new Light(new Vector3f(293, terrain.getHeightOfTerrain(293, -305) + 13f, -305), new Vector3f(2f, 2f, 0f), new Vector3f(
-            1, 0.01f, 0.002f)));
 
-        waters = new ArrayList<WaterTile>();
-        waters.add(new WaterTile(0, 0, -20));
-        waters.add(new WaterTile(0 - 370, 0 - 340, -20));
         ui = new ArrayList<>();
         UITexture uiTex =
             new UITexture(loader.loadTexture("health.png"), new Vector2f(-0.75f, -0.9f), new Vector2f(0.25f, 0.25f));
         uiRenderer = new UIRenderer(loader);
-
         UITexture reflectionUI = new UITexture(waterfbo.getReflectionTexture(), new Vector2f(-0.5f, 0.5f), new Vector2f(0.25f, 0.25f));
         UITexture refractionUI = new UITexture(waterfbo.getRefractionTexture(), new Vector2f(0.5f, 0.5f), new Vector2f(0.25f, 0.25f));
 
         ui.add(uiTex);
-        ui.add(reflectionUI);
-        ui.add(refractionUI);
+        // ui.add(reflectionUI);
+        // ui.add(refractionUI);
+
         LOGGER.debug("Models and light loaded");
     }
 
@@ -186,22 +173,29 @@ public class GameRunning implements State {
         input();
         camera.move(elapsedTime);
         mousePicker.update();
-        waterfbo.bindReflectionFrameBuffer();
-        float distance = 2 * (camera.getPosition().y - waters.get(0).getHeight());
-        camera.getPosition().y -= distance;
-        camera.invertPitch();
-        masterRenderer.renderScene(terrain, renderEntities, player, lights, camera, elapsedTime, new Vector4f(0, 1, 0, -waters.get(0)
-            .getHeight()));
-        camera.getPosition().y += distance;
-        camera.invertPitch();
+        if (waters != null && waters.size() > 0) {
+            waterfbo.bindReflectionFrameBuffer();
 
-        waterfbo.bindRefractionFrameBuffer();
-        masterRenderer.renderScene(terrain, renderEntities, player, lights, camera, elapsedTime, new Vector4f(0, 0 - 1, 0, waters.get(0)
-            .getHeight()));
+            float distance = 2 * (camera.getPosition().y - waters.get(0).getHeight());
+            camera.getPosition().y -= distance;
+            camera.invertPitch();
+            masterRenderer.renderScene(terrain, renderEntities, player, lights, camera, elapsedTime, new Vector4f(0, 1, 0, -waters.get(0)
+                .getHeight()));
+            camera.getPosition().y += distance;
+            camera.invertPitch();
 
-        waterfbo.unbindCurrentFrameBuffer();
+            waterfbo.bindRefractionFrameBuffer();
+            masterRenderer.renderScene(terrain, renderEntities, player, lights, camera, elapsedTime, new Vector4f(0, 0 - 1, 0, waters
+                .get(0)
+                .getHeight()));
+
+            waterfbo.unbindCurrentFrameBuffer();
+        }
         masterRenderer.renderScene(terrain, renderEntities, player, lights, camera, elapsedTime, new Vector4f(0, 1, 0, 100000));
-        waterRenderer.render(waters, camera, elapsedTime);
+        if (waters != null && waters.size() > 0) {
+            waterRenderer.render(waters, camera, elapsedTime);
+        }
+
         uiRenderer.render(ui);
         // font.drawString(0.0f, 0.0f, "Time : " + elapsedTime, Color.red);
 
@@ -216,6 +210,13 @@ public class GameRunning implements State {
                 } else {
                     wireframeMode = true;
                     GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_LINE);
+                }
+            }
+            if (Keyboard.getEventKey() == Keyboard.KEY_B && Keyboard.getEventKeyState()) {
+                if (renderBoundingBoxes) {
+                    renderBoundingBoxes = false;
+                } else {
+                    renderBoundingBoxes = true;
                 }
             }
             if (Keyboard.getEventKey() == Keyboard.KEY_P && Keyboard.getEventKeyState()) {
@@ -239,6 +240,7 @@ public class GameRunning implements State {
         loader.dispose();
         masterRenderer.dispose();
         uiRenderer.dispose();
+
         waterfbo.dispose();
         waterRenderer.dispose();
     }
