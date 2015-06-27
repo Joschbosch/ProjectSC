@@ -15,6 +15,9 @@ import org.lwjgl.opengl.Display;
  */
 public class Timer {
 
+    /**
+     * Constant to turn time into seconds.
+     */
     public static final float SECONDS_CONSTANT = 1000f;
 
     /**

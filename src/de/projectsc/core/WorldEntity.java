@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2015 
+ * Copyright (C) 2015 Project SC
+ * 
+ * All rights reserved
  */
 
 package de.projectsc.core;
@@ -14,15 +16,22 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.lwjgl.util.vector.Vector3f;
 
+import de.projectsc.client.gui.Timer;
+
+/**
+ * An entity in the world.
+ * 
+ * @author Josch Bosch
+ */
 public class WorldEntity {
 
-    private static final float SECONDS_1000_0F = 1000.0f;
+    // private static final float TURN_SPEED = 160f;
+    //
+    // private static final float GRAVITY = -50;
 
-    private static final float TURN_SPEED = 160f;
+    // private static final float JUMP_POWER = 30;
 
-    private static final float GRAVITY = -50;
-
-    private static final float JUMP_POWER = 30;
+    private static final int MOVEMENT_SPEED = 20;
 
     private static final Log LOGGER = LogFactory.getLog(WorldEntity.class);
 
@@ -46,9 +55,9 @@ public class WorldEntity {
 
     private float currentTurnSpeed = 0;
 
-    private float upwardsSpeed = 0;
+    // private float upwardsSpeed = 0;
 
-    private boolean jumping = false;
+    // private boolean jumping = false;
 
     private int id;
 
@@ -70,6 +79,21 @@ public class WorldEntity {
         this.setModel(model);
         this.setTexture(texture);
         setBoundingBox(readBoundingBox());
+    }
+
+    public WorldEntity(int id, EntityType type, String model, String texture, Vector3f position, float rotX, float rotY, float rotZ,
+        float scale) {
+        this.id = id;
+        this.position = position;
+        this.setCurrentTarget(position);
+        this.rotX = rotX;
+        this.rotY = rotY;
+        this.rotZ = rotZ;
+        this.scale = scale;
+        this.setModel(model);
+        this.setTexture(texture);
+        setBoundingBox(readBoundingBox());
+
     }
 
     private AABB readBoundingBox() {
@@ -117,32 +141,16 @@ public class WorldEntity {
         return null;
     }
 
-    public WorldEntity(int id, EntityType type, String model, String texture, Vector3f position, float rotX, float rotY, float rotZ,
-        float scale) {
-        this.id = id;
-        this.position = position;
-        this.setCurrentTarget(position);
-        this.rotX = rotX;
-        this.rotY = rotY;
-        this.rotZ = rotZ;
-        this.scale = scale;
-        this.setModel(model);
-        this.setTexture(texture);
-        setBoundingBox(readBoundingBox());
-
-    }
-
     /**
      * Move the player.
      * 
      * @param delta elapsed time
-     * @param terrain to render
      */
     public void move(float delta) {
-        delta = (delta / SECONDS_1000_0F);
+        delta = (delta / Timer.SECONDS_CONSTANT);
         increaseRotation(0, currentTurnSpeed * delta, 0);
         if (Vector3f.sub(getPosition(), getCurrentTarget(), null).lengthSquared() > 3) {
-            currentSpeed = 20;
+            currentSpeed = MOVEMENT_SPEED;
         } else {
             currentSpeed = 0;
         }
@@ -152,6 +160,11 @@ public class WorldEntity {
         increasePostion(dx, 0, dz);
     }
 
+    /**
+     * Sets a target position for the entity.
+     * 
+     * @param currentTarget position
+     */
     public void setCurrentTarget(Vector3f currentTarget) {
         this.currentTarget = currentTarget;
         float rotate = (float) Math.toDegrees(Vector3f.angle(Vector3f.sub(currentTarget, position, null), new Vector3f(0, 0, 1)));
@@ -162,12 +175,12 @@ public class WorldEntity {
 
     }
 
-    private void jump() {
-        if (!jumping) {
-            upwardsSpeed = JUMP_POWER;
-            jumping = true;
-        }
-    }
+    // private void jump() {
+    // if (!jumping) {
+    // upwardsSpeed = JUMP_POWER;
+    // jumping = true;
+    // }
+    // }
 
     /**
      * Moves the entity with the given deltas.
@@ -196,8 +209,6 @@ public class WorldEntity {
     }
 
     public Vector3f getLocationBoundingBoxMinimum() {
-        System.out.println(boundingBox);
-        System.out.println(position);
         return Vector3f.add(boundingBox.getMin(), position, null);
     }
 

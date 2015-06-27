@@ -1,7 +1,8 @@
 /*
- * Copyright (C) 2015
+ * Copyright (C) 2015 Project SC
+ * 
+ * All rights reserved
  */
-
 package de.projectsc.client.network;
 
 import java.util.concurrent.BlockingQueue;
@@ -16,6 +17,11 @@ import de.projectsc.core.data.messages.MessageConstants;
 import de.projectsc.core.data.messages.NetworkMessage;
 import de.projectsc.core.data.messages.NetworkMessageConstants;
 
+/**
+ * Core class for client network communication.
+ *
+ * @author Josch Bosch
+ */
 public class ClientNetworkCore implements Runnable {
 
     private static final Log LOGGER = LogFactory.getLog(ClientNetworkCore.class);

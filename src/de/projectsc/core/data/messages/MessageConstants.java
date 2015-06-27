@@ -1,13 +1,21 @@
 /*
- * Copyright (C) 2015
+ * Copyright (C) 2015 Project SC
+ * 
+ * All rights reserved
  */
-
 package de.projectsc.core.data.messages;
 
-public class MessageConstants {
+/**
+ * Constant class for messages.
+ * 
+ * @author Josch Bosch
+ */
+public final class MessageConstants {
 
     /**
      * Constant.
      */
     public static final String CLOSE_DOWN = "Close Down";
+
+    private MessageConstants() {};
 }

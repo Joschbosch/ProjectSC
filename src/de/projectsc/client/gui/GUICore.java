@@ -103,6 +103,7 @@ public class GUICore implements Runnable {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private void retreiveCoreMessages() {
         GUIMessage msg;
         msg = incomingQueue.poll();

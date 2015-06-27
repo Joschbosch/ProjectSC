@@ -20,6 +20,10 @@ import de.projectsc.client.gui.Timer;
  */
 public class Camera {
 
+    private static final int MINIMUM_Y_POSITION = 50;
+
+    private static final int MAXIMUM_Y_POSITION = 80;
+
     private static final boolean MOBA_MODE = true;
 
     private static final float ANGLE_AROUND_PLAYER_FACTOR = 0.3f;
@@ -70,6 +74,8 @@ public class Camera {
 
     /**
      * Get keys and move camera.
+     * 
+     * @param delta elapsed time.
      */
     public void move(float delta) {
         if (!MOBA_MODE) {
@@ -204,7 +210,7 @@ public class Camera {
             }
         } else {
             float zoomLevel = Mouse.getDWheel() * MOUSE_WHEEL_ZOOM_FACTOR;
-            if (position.y <= 80 && zoomLevel < 0 || position.y >= 50 && zoomLevel > 0) {
+            if (position.y <= MAXIMUM_Y_POSITION && zoomLevel < 0 || position.y >= MINIMUM_Y_POSITION && zoomLevel > 0) {
                 position.y -= zoomLevel;
                 pitch -= zoomLevel;
                 position.z -= zoomLevel;
@@ -246,6 +252,11 @@ public class Camera {
         pitch = -pitch;
     }
 
+    /**
+     * Bind camera to world entity and follow it.
+     * 
+     * @param entity to bind to.
+     */
     public void bindToEntity(GraphicalEntity entity) {
         if (boundToEntity == null) {
             boundToEntity = entity;

@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2015 
+ * Copyright (C) 2015 Project SC
+ * 
+ * All rights reserved
  */
 
 package de.projectsc.client.core;
@@ -11,5 +13,13 @@ package de.projectsc.client.core;
  */
 public final class ClientMessageConstants {
 
+    /**
+     * Client is ready to start message.
+     */
     public static final String CLIENT_READY = "Client ready";
+
+    private ClientMessageConstants() {
+
+    }
+
 }

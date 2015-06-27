@@ -1,7 +1,8 @@
 /*
- * Copyright (C) 2015 
+ * Copyright (C) 2015 Project SC
+ * 
+ * All rights reserved
  */
-
 package de.projectsc.server.core;
 
 import java.util.LinkedList;
@@ -22,14 +23,23 @@ import de.projectsc.core.Player;
 import de.projectsc.core.WorldEntity;
 import de.projectsc.core.data.messages.MessageConstants;
 import de.projectsc.core.data.messages.NetworkMessageConstants;
+import de.projectsc.server.core.tasks.GameTimeUpdateTask;
+import de.projectsc.server.core.tasks.UpdateTask;
 
+/**
+ * Core of server.
+ * 
+ * @author Josch Bosch
+ */
 public class ServerCore implements Runnable {
 
-    private static final int SLEEP_TIME = 50;
+    private static final int START_GAME_TIME = -30000;
+
+    private static final String CORE_ERROR = "Core Error: ";
 
     private static final Log LOGGER = LogFactory.getLog(ServerCore.class);
 
-    protected static final long MS_PER_UPDATE = 50;
+    private static final long MS_PER_UPDATE = 50;
 
     private BlockingQueue<ServerMessage> networkSendQueue;
 
@@ -40,8 +50,6 @@ public class ServerCore implements Runnable {
     private List<WorldEntity> entities = new LinkedList<>();
 
     private Player worldPlayer;
-
-    private long lastUpdate = 0;
 
     private long gameTime = 0;
 
@@ -64,9 +72,9 @@ public class ServerCore implements Runnable {
             public void run() {
                 while (!shutdown) {
                     try {
-                        Thread.sleep(SLEEP_TIME);
+                        Thread.sleep(MS_PER_UPDATE);
                     } catch (InterruptedException e) {
-                        LOGGER.error("Core Error: ", e);
+                        LOGGER.error(CORE_ERROR, e);
                     }
 
                     workNetwork();
@@ -81,16 +89,16 @@ public class ServerCore implements Runnable {
                 createWorldEntities();
                 while (!startGame.get()) {
                     try {
-                        Thread.sleep(SLEEP_TIME);
+                        Thread.sleep(MS_PER_UPDATE);
                     } catch (InterruptedException e) {
-                        LOGGER.error("Core Error: ", e);
+                        LOGGER.error(CORE_ERROR, e);
                     }
                 }
                 networkSendQueue.offer(new ServerMessage(NetworkMessageConstants.INITIALIZE_GAME, entities));
-                gameTime = -30000;
+                gameTime = START_GAME_TIME;
                 futureQueue = new FutureEventQueue();
-                futureQueue.add(new FutureEvent(-20000, new GameTimeUpdateTask()));
-                futureQueue.add(new FutureEvent(-20000, new UpdateTask()));
+                futureQueue.add(new FutureEvent(START_GAME_TIME, new GameTimeUpdateTask()));
+                futureQueue.add(new FutureEvent(START_GAME_TIME, new UpdateTask()));
                 networkSendQueue.offer(new ServerMessage("Start game", gameTime));
 
                 long previous = System.currentTimeMillis();
@@ -102,9 +110,9 @@ public class ServerCore implements Runnable {
                     workEventQueue();
                     moveGoats(elapsed);
                     try {
-                        Thread.sleep(20);
+                        Thread.sleep(MS_PER_UPDATE);
                     } catch (InterruptedException e) {
-                        LOGGER.error("Core Error: ", e);
+                        LOGGER.error(CORE_ERROR, e);
                     }
                 }
 
@@ -119,19 +127,20 @@ public class ServerCore implements Runnable {
             FutureEvent event = futureQueue.remove();
             if (event.getTask() instanceof GameTimeUpdateTask) {
                 networkSendQueue.offer(new ServerMessage(NetworkMessageConstants.GAME_TIME_UPDATE, gameTime));
-                futureQueue.offer(new FutureEvent(event.getExecutionTime() + 1000, new GameTimeUpdateTask()));
+                futureQueue.offer(new FutureEvent(event.getExecutionTime() + 10 * 10 * 10, new GameTimeUpdateTask()));
             } else if (event.getTask() instanceof UpdateTask) {
                 for (WorldEntity e : entities) {
                     if (e.getModel().equals("goat")) {
                         Vector3f position = e.getPosition();
-                        float newX = (float) ((Math.random() * 400 - 200) + position.x);
-                        float newZ = (float) ((Math.random() * 400 - 200) + position.z);
+                        float newX = (float) ((Math.random() * 2 * 2 * 10 * 10 - 2 * 10 * 10) + position.x);
+                        float newZ = (float) ((Math.random() * 2 * 2 * 10 * 10 - 2 * 10 * 10) + position.z);
                         e.setCurrentTarget(new Vector3f(newX, 0, newZ));
                         networkSendQueue.offer(new ServerMessage(NetworkMessageConstants.NEW_LOCATION, new int[] { e.getID(),
                             (int) newX, (int) newZ }));
                     }
                 }
-                futureQueue.offer(new FutureEvent((long) (event.getExecutionTime() + Math.random() * 2000 + 300), new UpdateTask()));
+                futureQueue.offer(new FutureEvent((long) (event.getExecutionTime() + Math.random() * 2 * 10 * 10 * 10 + 3 * 10 * 10),
+                    new UpdateTask()));
             }
         }
     }

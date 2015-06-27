@@ -1,9 +1,17 @@
 /*
- * Copyright (C) 2015 
+ * Copyright (C) 2015 Project SC
+ * 
+ * All rights reserved
  */
 
 package de.projectsc.server.core;
 
+/**
+ * 
+ * Event that will be triggered in the future.
+ * 
+ * @author Josch Bosch
+ */
 public class FutureEvent implements Comparable<FutureEvent> {
 
     private long executionTime;

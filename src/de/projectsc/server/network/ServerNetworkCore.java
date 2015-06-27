@@ -1,7 +1,8 @@
 /*
- * Copyright (C) 2015 
+ * Copyright (C) 2015 Project SC
+ * 
+ * All rights reserved
  */
-
 package de.projectsc.server.network;
 
 import java.util.concurrent.BlockingQueue;
@@ -14,15 +15,26 @@ import de.projectsc.core.data.messages.MessageConstants;
 import de.projectsc.core.data.messages.NetworkMessage;
 import de.projectsc.server.core.ServerMessage;
 
+/**
+ * Core class for server network.
+ * 
+ * @author Josch Bosch
+ */
 public class ServerNetworkCore implements Runnable {
 
     private static final Log LOGGER = LogFactory.getLog(ServerNetworkCore.class);
 
+    /**
+     * FAKE! Until network is there.
+     */
     public BlockingQueue<NetworkMessage> clientSendQueueFaking;
 
+    /**
+     * FAKE! Until network is there.
+     */
     public BlockingQueue<NetworkMessage> clientReceiveQueueFaking;
 
-    boolean running = false;
+    private boolean running = false;
 
     private BlockingQueue<ServerMessage> sendQueue;
 

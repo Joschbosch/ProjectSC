@@ -3,14 +3,18 @@
  * 
  * All rights reserved
  */
+
 package de.projectsc.server.core;
 
+
 /**
- * 
- * Interface for future event tasks.
+ * Class for the collision detection on the server.
  * 
  * @author Josch Bosch
  */
-public interface Task {
+public final class CollisionDetection {
 
+    private CollisionDetection() {
+
+    }
 }

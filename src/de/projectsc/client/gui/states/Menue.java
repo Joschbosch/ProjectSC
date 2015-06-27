@@ -1,9 +1,16 @@
 /*
- * Copyright (C) 2015 
+ * Copyright (C) 2015 Project SC
+ * 
+ * All rights reserved
  */
 
 package de.projectsc.client.gui.states;
 
+/**
+ * Menue state class.
+ * 
+ * @author Josch Bosch
+ */
 public class Menue implements State {
 
     @Override

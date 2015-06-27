@@ -35,9 +35,9 @@ public class Terrain {
      */
     public static final float SIZE = 1000;
 
-    private static final float MAXIMUM_HEIGHT = 100;
-
-    private static final float MAX_PIXEL_COLOR = 256 * 256 * 256;
+    // private static final float MAXIMUM_HEIGHT = 100;
+    //
+    // private static final float MAX_PIXEL_COLOR = 256 * 256 * 256;
 
     private static final Log LOGGER = LogFactory.getLog(Terrain.class);
 
@@ -115,7 +115,7 @@ public class Terrain {
         for (int i = 0; i < vertCount; i++) {
             for (int j = 0; j < vertCount; j++) {
                 vertices[vertexPointer * 3] = j / ((float) vertCount - 1) * SIZE;
-                float height = 0;// getHeight(j, i, image);
+                float height = getHeight(j, i, image);
                 heights[j][i] = height;
                 vertices[vertexPointer * 3 + 1] = height;
                 vertices[vertexPointer * 3 + 2] = i / ((float) vertCount - 1) * SIZE;

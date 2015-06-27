@@ -30,6 +30,8 @@ import de.projectsc.core.data.messages.NetworkMessageConstants;
  */
 public class ClientCore implements Runnable {
 
+    private static final int TICK_TIME = 50;
+
     private static final int SLEEP_TIME = 10;
 
     private static final String ERROR_IN_CORE = "Error in Core: ";
@@ -47,6 +49,10 @@ public class ClientCore implements Runnable {
     private AtomicBoolean guiReady = new AtomicBoolean(false);
 
     private AtomicBoolean networkReady = new AtomicBoolean(false);
+
+    private long gameTime = 0;
+
+    private Map<Integer, WorldEntity> worldEntities;
 
     private boolean shutdown;
 
@@ -97,7 +103,7 @@ public class ClientCore implements Runnable {
         gameTime = System.currentTimeMillis();
         while (!guiReady.get() || !networkReady.get()) {
             try {
-                Thread.sleep(50);
+                Thread.sleep(TICK_TIME);
             } catch (InterruptedException e) {
             }
         }
@@ -105,7 +111,7 @@ public class ClientCore implements Runnable {
 
         while (!gameStarted) {
             try {
-                Thread.sleep(50);
+                Thread.sleep(TICK_TIME);
             } catch (InterruptedException e) {
             }
         }
@@ -128,19 +134,12 @@ public class ClientCore implements Runnable {
         }
     }
 
-    private long gameTime = 0;
-
-    private Map<Integer, WorldEntity> worldEntities;
-
     private void workNetwork() {
         while (!networkReceiveQueue.isEmpty()) {
             ClientMessage message;
             message = networkReceiveQueue.poll();
             if (message != null) {
-                if (message.getMessage().equals("BATCH")) {
-                } else {
-                    processMessage(message);
-                }
+                processMessage(message);
             }
         }
     }
@@ -148,17 +147,17 @@ public class ClientCore implements Runnable {
     private void processMessage(ClientMessage message) {
         if (message.getMessage().equals(GUIMessageConstants.INIT_GAME)) {
             LOGGER.debug("Client core received message: " + message.getMessage());
-            long time = System.currentTimeMillis();
-            List<WorldEntity> incomingEntities = (List<WorldEntity>) message.getData();
-            worldEntities = new TreeMap<>();
-            for (WorldEntity e : incomingEntities) {
-                worldEntities.put(e.getID(),
-                    new WorldEntity(e.getID(), e.getType(), e.getModel(), e.getTexture(), new Vector3f(e.getPosition().x, e
-                        .getPosition().y, e.getPosition().z), e.getRotX(), e.getRotY(), e
-                        .getRotZ(), e.getScale()));
+            if (message.getData() instanceof List<?>) {
+                @SuppressWarnings("unchecked") List<WorldEntity> incomingEntities = (List<WorldEntity>) message.getData();
+                worldEntities = new TreeMap<>();
+                for (WorldEntity e : incomingEntities) {
+                    worldEntities.put(e.getID(),
+                        new WorldEntity(e.getID(), e.getType(), e.getModel(), e.getTexture(), new Vector3f(e.getPosition().x, e
+                            .getPosition().y, e.getPosition().z), e.getRotX(), e.getRotY(), e
+                            .getRotZ(), e.getScale()));
+                }
+                guiOutgoingQueue.offer(new GUIMessage(GUIMessageConstants.INIT_GAME, worldEntities));
             }
-            LOGGER.debug(String.format("Received new entities and needed %s ms", System.currentTimeMillis() - time));
-            guiOutgoingQueue.offer(new GUIMessage(GUIMessageConstants.INIT_GAME, worldEntities));
         } else if (message.getMessage().equals(NetworkMessageConstants.NEW_LOCATION)) {
             if (message.getData() instanceof float[]) {
                 float[] data = (float[]) message.getData();
