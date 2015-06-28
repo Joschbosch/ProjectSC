@@ -17,7 +17,6 @@ import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.client.core.ClientMessageConstants;
 import de.projectsc.client.gui.GUIMessageConstants;
-import de.projectsc.client.gui.terrain.Terrain;
 import de.projectsc.core.EntityType;
 import de.projectsc.core.Player;
 import de.projectsc.core.WorldEntity;
@@ -178,8 +177,8 @@ public class ServerCore implements Runnable {
 
     private void loadStaticMapObject(int count, EntityType type, String model, String texture, float scale) {
         for (int i = 0; i < count; i++) {
-            float randomX = (float) (Math.random() * Terrain.SIZE - Terrain.SIZE / 2);
-            float randomZ = (float) (Math.random() * Terrain.SIZE - Terrain.SIZE / 2);
+            float randomX = (float) (Math.random() * 1000 - 1000 / 2);
+            float randomZ = (float) (Math.random() * 1000 - 1000 / 2);
             entities.add(new WorldEntity(type, model, texture, new Vector3f(
                 randomX, 0, randomZ), 0, 0, 0, scale));
         }

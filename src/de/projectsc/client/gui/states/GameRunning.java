@@ -32,7 +32,7 @@ import de.projectsc.client.gui.objects.Light;
 import de.projectsc.client.gui.render.MasterRenderer;
 import de.projectsc.client.gui.render.UIRenderer;
 import de.projectsc.client.gui.render.WaterRenderer;
-import de.projectsc.client.gui.terrain.Terrain;
+import de.projectsc.client.gui.terrain.TerrainModel;
 import de.projectsc.client.gui.terrain.water.WaterFrameBuffers;
 import de.projectsc.client.gui.terrain.water.WaterTile;
 import de.projectsc.client.gui.textures.ModelTexture;
@@ -43,6 +43,8 @@ import de.projectsc.client.gui.tools.ModelData;
 import de.projectsc.client.gui.tools.MousePicker;
 import de.projectsc.client.gui.tools.OBJFileLoader;
 import de.projectsc.client.gui.ui.UITexture;
+import de.projectsc.core.Terrain;
+import de.projectsc.core.TerrainLoader;
 import de.projectsc.core.WorldEntity;
 
 /**
@@ -69,7 +71,7 @@ public class GameRunning implements State {
 
     private MasterRenderer masterRenderer;
 
-    private Terrain terrain;
+    private TerrainModel terrainModel;
 
     private Map<Integer, WorldEntity> worldEntities;
 
@@ -94,6 +96,8 @@ public class GameRunning implements State {
     private boolean wireframeMode = false;
 
     private boolean renderBoundingBoxes = false;
+
+    private boolean renderObjects = true;
 
     public GameRunning(BlockingQueue<GUIMessage> outgoingQueue) {
         this.outgoingQueue = outgoingQueue;
@@ -130,19 +134,15 @@ public class GameRunning implements State {
     }
 
     private void loadDemoObjects() {
-        TerrainTexture backgroundTex = new TerrainTexture(loader.loadTexture("terrain/grass.png"));
-        TerrainTexture rTex = new TerrainTexture(loader.loadTexture("terrain/mud.png"));
-        TerrainTexture gTex = new TerrainTexture(loader.loadTexture("terrain/groundFlower.png"));
-        TerrainTexture bTex = new TerrainTexture(loader.loadTexture("terrain/path.png"));
-
-        TerrainTexturePack texturePack = new TerrainTexturePack(backgroundTex, rTex, gTex, bTex);
-        TerrainTexture blendMap = new TerrainTexture(loader.loadTexture("terrain/blendMap.png"));
-
-        terrain = new Terrain(-0.5f, -0.5f, texturePack, blendMap, loader, "heightmap.png");
-        mousePicker = new MousePicker(camera, masterRenderer.getProjectionMatrix(), terrain);
-
         lights = new ArrayList<>();
-        lights.add(new Light(new Vector3f(0, 500, 0), new Vector3f(1f, 1f, 1f)));
+        lights.add(new Light(new Vector3f(0, 500, 0), new Vector3f(1f, 1f, 1f), "sonne"));
+        Terrain terra =
+            new Terrain(new int[2048][2048], new float[2048][2048], "terrain/grass.png", "terrain/mud.png", "terrain/groundFlower.png",
+                "terrain/path.png", lights);
+
+        TerrainLoader.storeTerrain(terra, "newMap.psc");
+        loadTerrain();
+        mousePicker = new MousePicker(camera, masterRenderer.getProjectionMatrix(), terrainModel);
 
         ui = new ArrayList<>();
         UITexture uiTex =
@@ -156,6 +156,17 @@ public class GameRunning implements State {
         // ui.add(refractionUI);
 
         LOGGER.debug("Models and light loaded");
+    }
+
+    private void loadTerrain() {
+        Terrain terrain = TerrainLoader.loadTerrain("newMap.psc");
+        TerrainTexture backgroundTex = new TerrainTexture(loader.loadTexture(terrain.getBgTexture()));
+        TerrainTexture rTex = new TerrainTexture(loader.loadTexture(terrain.getrTexture()));
+        TerrainTexture gTex = new TerrainTexture(loader.loadTexture(terrain.getgTexture()));
+        TerrainTexture bTex = new TerrainTexture(loader.loadTexture(terrain.getBgTexture()));
+        TerrainTexturePack texturePack = new TerrainTexturePack(backgroundTex, rTex, gTex, bTex);
+        TerrainTexture blendMap = new TerrainTexture(loader.loadTexture(TerrainLoader.createBlendMap(terrain)));
+        terrainModel = new TerrainModel(terrain, 0, 0, texturePack, blendMap, loader);
     }
 
     @Override
@@ -173,25 +184,27 @@ public class GameRunning implements State {
         input();
         camera.move(elapsedTime);
         mousePicker.update();
+
         if (waters != null && waters.size() > 0) {
             waterfbo.bindReflectionFrameBuffer();
 
             float distance = 2 * (camera.getPosition().y - waters.get(0).getHeight());
             camera.getPosition().y -= distance;
             camera.invertPitch();
-            masterRenderer.renderScene(terrain, renderEntities, player, lights, camera, elapsedTime, new Vector4f(0, 1, 0, -waters.get(0)
-                .getHeight()));
+            masterRenderer.renderScene(terrainModel, renderEntities, player, lights, camera, elapsedTime, new Vector4f(0, 1, 0, -waters
+                .get(0)
+                .getHeight()), renderObjects);
             camera.getPosition().y += distance;
             camera.invertPitch();
 
             waterfbo.bindRefractionFrameBuffer();
-            masterRenderer.renderScene(terrain, renderEntities, player, lights, camera, elapsedTime, new Vector4f(0, 0 - 1, 0, waters
-                .get(0)
-                .getHeight()));
+            masterRenderer.renderScene(terrainModel, renderEntities, player, lights, camera, elapsedTime, new Vector4f(0, 0 - 1, 0, waters
+                .get(0).getHeight()), renderObjects);
 
             waterfbo.unbindCurrentFrameBuffer();
         }
-        masterRenderer.renderScene(terrain, renderEntities, player, lights, camera, elapsedTime, new Vector4f(0, 1, 0, 100000));
+        masterRenderer.renderScene(terrainModel, renderEntities, player, lights, camera, elapsedTime, new Vector4f(0, 1, 0, 100000),
+            renderObjects);
         if (waters != null && waters.size() > 0) {
             waterRenderer.render(waters, camera, elapsedTime);
         }

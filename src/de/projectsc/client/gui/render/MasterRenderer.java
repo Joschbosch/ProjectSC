@@ -23,7 +23,7 @@ import de.projectsc.client.gui.objects.GraphicalEntity;
 import de.projectsc.client.gui.objects.Light;
 import de.projectsc.client.gui.shaders.EntityShader;
 import de.projectsc.client.gui.shaders.TerrainShader;
-import de.projectsc.client.gui.terrain.Terrain;
+import de.projectsc.client.gui.terrain.TerrainModel;
 import de.projectsc.client.gui.tools.Loader;
 
 /**
@@ -59,7 +59,7 @@ public class MasterRenderer {
 
     private final Map<TexturedModel, List<GraphicalEntity>> entities = new HashMap<>();
 
-    private final List<Terrain> terrains = new ArrayList<>();
+    private final List<TerrainModel> terrains = new ArrayList<>();
 
     public MasterRenderer(Loader loader) {
         enableCulling();
@@ -91,14 +91,17 @@ public class MasterRenderer {
      * @param camera for view
      * @param elapsedTime since last frame
      * @param clipPlane to clip the world
+     * @param renderObjects
      */
-    public void renderScene(Terrain terrain, List<GraphicalEntity> worldEntities, GraphicalEntity player, List<Light> lights,
-        Camera camera, long elapsedTime, Vector4f clipPlane) {
+    public void renderScene(TerrainModel terrain, List<GraphicalEntity> worldEntities, GraphicalEntity player, List<Light> lights,
+        Camera camera, long elapsedTime, Vector4f clipPlane, boolean renderObjects) {
         processTerrain(terrain);
-        for (GraphicalEntity e : worldEntities) {
-            processEntity(e);
+        if (renderObjects) {
+            for (GraphicalEntity e : worldEntities) {
+                processEntity(e);
+            }
+            processEntity(player);
         }
-        processEntity(player);
         render(lights, camera, elapsedTime, clipPlane);
     }
 
@@ -136,7 +139,7 @@ public class MasterRenderer {
      * 
      * @param terrain to render
      */
-    public void processTerrain(Terrain terrain) {
+    public void processTerrain(TerrainModel terrain) {
         terrains.add(terrain);
     }
 

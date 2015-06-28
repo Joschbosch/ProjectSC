@@ -14,7 +14,7 @@ import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
 import de.projectsc.client.gui.objects.Camera;
-import de.projectsc.client.gui.terrain.Terrain;
+import de.projectsc.client.gui.terrain.TerrainModel;
 
 /**
  * Calculates the vertex on the terrain from the mouse cursor.
@@ -35,11 +35,11 @@ public class MousePicker {
 
     private final Camera camera;
 
-    private final Terrain terrain;
+    private final TerrainModel terrain;
 
     private Vector3f currentTerrainPoint;
 
-    public MousePicker(Camera cam, Matrix4f projection, Terrain terrain) {
+    public MousePicker(Camera cam, Matrix4f projection, TerrainModel terrain) {
         camera = cam;
         projectionMatrix = projection;
         viewMatrix = camera.createViewMatrix();
@@ -108,7 +108,7 @@ public class MousePicker {
         float half = start + ((finish - start) / 2f);
         if (count >= RECURSION_COUNT) {
             Vector3f endPoint = getPointOnRay(ray, half);
-            Terrain terrainSearch = getTerrain(endPoint.getX(), endPoint.getZ());
+            TerrainModel terrainSearch = getTerrain(endPoint.getX(), endPoint.getZ());
             if (terrainSearch != null) {
                 return endPoint;
             } else {
@@ -129,7 +129,7 @@ public class MousePicker {
     }
 
     private boolean isUnderGround(Vector3f testPoint) {
-        Terrain currentTerrain = getTerrain(testPoint.getX(), testPoint.getZ());
+        TerrainModel currentTerrain = getTerrain(testPoint.getX(), testPoint.getZ());
         float height = 0;
         if (currentTerrain != null) {
             height = currentTerrain.getHeightOfTerrain(testPoint.getX(), testPoint.getZ());
@@ -137,7 +137,7 @@ public class MousePicker {
         return testPoint.y < height;
     }
 
-    private Terrain getTerrain(float worldX, float worldZ) {
+    private TerrainModel getTerrain(float worldX, float worldZ) {
         return terrain;
     }
 

@@ -6,7 +6,11 @@
 
 package de.projectsc.client.gui.tools;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -96,7 +100,22 @@ public class Loader {
      * @return location of texture
      */
     public int loadTexture(String filename) {
-        return loadTexture(filename, "PNG");
+        return loadTexture(Loader.class.getResourceAsStream("/graphics/" + filename), "PNG");
+    }
+
+    /**
+     * Load texture from a file location.
+     * 
+     * @param file to load
+     * @return location of texture
+     */
+    public int loadTexture(File file) {
+        try {
+            return loadTexture(new FileInputStream(file), "PNG");
+        } catch (FileNotFoundException e) {
+            LOGGER.error(e);
+        }
+        return -1;
     }
 
     /**
@@ -106,15 +125,15 @@ public class Loader {
      * @param fileType of the image
      * @return texture position
      */
-    public int loadTexture(String filename, String fileType) {
+    public int loadTexture(InputStream fileStream, String fileType) {
         Texture texture = null;
         try {
-            texture = TextureLoader.getTexture(fileType, Loader.class.getResourceAsStream("/graphics/" + filename));
+            texture = TextureLoader.getTexture(fileType, fileStream);
             GL30.glGenerateMipmap(GL11.GL_TEXTURE_2D);
             GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR_MIPMAP_LINEAR);
             GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL14.GL_TEXTURE_LOD_BIAS, MIPMAP_BIAS);
         } catch (IOException e) {
-            LOGGER.error("Could not load texture: " + filename + " :", e);
+            LOGGER.error("Could not load texture:", e);
         }
         int textureID = texture.getTextureID();
         textures.add(textureID);
