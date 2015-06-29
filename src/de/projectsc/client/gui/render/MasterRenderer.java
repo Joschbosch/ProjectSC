@@ -85,16 +85,21 @@ public class MasterRenderer {
      * Render the whole scene with all objects.
      * 
      * @param terrain to render
-     * @param worldEntities to render
+     * @param staticWorldEntities to render
+     * @param dynamicRenderEntities
      * @param lights to render
      * @param camera for view
      * @param elapsedTime since last frame
      * @param clipPlane to clip the world
      */
-    public void renderScene(TerrainModel terrain, List<GraphicalEntity> worldEntities, List<Light> lights,
+    public void renderScene(TerrainModel terrain, List<GraphicalEntity> staticWorldEntities, List<GraphicalEntity> dynamicRenderEntities,
+        List<Light> lights,
         Camera camera, long elapsedTime, Vector4f clipPlane) {
         processTerrain(terrain);
-        for (GraphicalEntity e : worldEntities) {
+        for (GraphicalEntity e : staticWorldEntities) {
+            processEntity(e);
+        }
+        for (GraphicalEntity e : dynamicRenderEntities) {
             processEntity(e);
         }
         render(lights, camera, elapsedTime, clipPlane);

@@ -121,10 +121,12 @@ public final class TerrainLoader {
                     Vector3f position = new Vector3f(positionValues[0], positionValues[1], positionValues[2]);
                     Float[] rotationValues = mapper.readValue(objectNode.get(ROTATION), new Float[3].getClass());
                     Vector3f rotation = new Vector3f(rotationValues[0], rotationValues[1], rotationValues[2]);
+                    System.out.println("P1" + rotation.y);
                     WorldEntity e =
                         new WorldEntity(objectNode.get(ID).asInt(), EntityType.valueOf(objectNode.get(TYPE).asText()), objectNode.get(
                             MODEL).asText(), objectNode.get(TEXTURE).asText(), position, rotation, (float) objectNode.get(SCALE)
                             .asDouble());
+                    // e.setRotY(0);
                     staticObjects.put(objectNode.get(ID).asInt(), e);
                 }
             }

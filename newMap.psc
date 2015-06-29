@@ -12,7 +12,7 @@
   },
   "staticObjects" : [ {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 0,
@@ -20,7 +20,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 1,
@@ -28,7 +28,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 2,
@@ -36,7 +36,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 3,
@@ -44,7 +44,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 4,
@@ -52,7 +52,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 5,
@@ -60,7 +60,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 6,
@@ -68,7 +68,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 7,
@@ -76,7 +76,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 8,
@@ -84,7 +84,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 9,
@@ -92,7 +92,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 10,
@@ -100,7 +100,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 11,
@@ -108,7 +108,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 12,
@@ -116,7 +116,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 13,
@@ -124,7 +124,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 14,
@@ -132,7 +132,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 15,
@@ -140,7 +140,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 16,
@@ -148,7 +148,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 17,
@@ -156,7 +156,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 18,
@@ -164,7 +164,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 19,
@@ -172,7 +172,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 20,
@@ -180,7 +180,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 21,
@@ -188,7 +188,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 22,
@@ -196,7 +196,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 23,
@@ -204,7 +204,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 24,
@@ -212,7 +212,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 25,
@@ -220,7 +220,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 26,
@@ -228,7 +228,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 27,
@@ -236,7 +236,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 28,
@@ -244,7 +244,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 29,
@@ -252,7 +252,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 30,
@@ -260,7 +260,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 31,
@@ -268,7 +268,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 32,
@@ -276,7 +276,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 33,
@@ -284,7 +284,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 34,
@@ -292,7 +292,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 35,
@@ -300,7 +300,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 36,
@@ -308,7 +308,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 37,
@@ -316,7 +316,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 38,
@@ -324,7 +324,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 39,
@@ -332,7 +332,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 40,
@@ -340,7 +340,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 41,
@@ -348,7 +348,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 42,
@@ -356,7 +356,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 43,
@@ -364,7 +364,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 44,
@@ -372,7 +372,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 45,
@@ -380,7 +380,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 46,
@@ -388,7 +388,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 47,
@@ -396,7 +396,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 48,
@@ -404,7 +404,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 49,
@@ -412,7 +412,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 50,
@@ -420,7 +420,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 51,
@@ -428,7 +428,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 52,
@@ -436,7 +436,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 53,
@@ -444,7 +444,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 54,
@@ -452,7 +452,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 55,
@@ -460,7 +460,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 56,
@@ -468,7 +468,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 57,
@@ -476,7 +476,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 58,
@@ -484,7 +484,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 59,
@@ -492,7 +492,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 60,
@@ -500,7 +500,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 61,
@@ -508,7 +508,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 62,
@@ -516,7 +516,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 63,
@@ -524,7 +524,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 64,
@@ -532,7 +532,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 65,
@@ -540,7 +540,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 66,
@@ -548,7 +548,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 67,
@@ -556,7 +556,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 68,
@@ -564,7 +564,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 69,
@@ -572,7 +572,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 70,
@@ -580,7 +580,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 71,
@@ -588,7 +588,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 72,
@@ -596,7 +596,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 73,
@@ -604,7 +604,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 74,
@@ -612,7 +612,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 75,
@@ -620,7 +620,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 76,
@@ -628,7 +628,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 77,
@@ -636,7 +636,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 78,
@@ -644,7 +644,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 79,
@@ -652,7 +652,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 80,
@@ -660,7 +660,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 81,
@@ -668,7 +668,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 82,
@@ -676,7 +676,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 83,
@@ -684,7 +684,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 84,
@@ -692,7 +692,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 85,
@@ -700,7 +700,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 86,
@@ -708,7 +708,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 87,
@@ -716,7 +716,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 88,
@@ -724,7 +724,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 89,
@@ -732,7 +732,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 90,
@@ -740,7 +740,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 91,
@@ -748,7 +748,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 92,
@@ -756,7 +756,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 93,
@@ -764,7 +764,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 94,
@@ -772,7 +772,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 95,
@@ -780,7 +780,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 96,
@@ -788,7 +788,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 97,
@@ -796,7 +796,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 98,
@@ -804,7 +804,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/fernTextureAtlas.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 99,
@@ -812,7 +812,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 100,
@@ -820,7 +820,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 101,
@@ -828,7 +828,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 102,
@@ -836,7 +836,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 103,
@@ -844,7 +844,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 104,
@@ -852,7 +852,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 105,
@@ -860,7 +860,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 106,
@@ -868,7 +868,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 107,
@@ -876,7 +876,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 108,
@@ -884,7 +884,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 109,
@@ -892,7 +892,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 110,
@@ -900,7 +900,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 111,
@@ -908,7 +908,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 112,
@@ -916,7 +916,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 113,
@@ -924,7 +924,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 114,
@@ -932,7 +932,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 115,
@@ -940,7 +940,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 116,
@@ -948,7 +948,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 117,
@@ -956,7 +956,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 118,
@@ -964,7 +964,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 119,
@@ -972,7 +972,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 120,
@@ -980,7 +980,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 121,
@@ -988,7 +988,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 122,
@@ -996,7 +996,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 123,
@@ -1004,7 +1004,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 124,
@@ -1012,7 +1012,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 125,
@@ -1020,7 +1020,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 126,
@@ -1028,7 +1028,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 127,
@@ -1036,7 +1036,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 128,
@@ -1044,7 +1044,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 129,
@@ -1052,7 +1052,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 130,
@@ -1060,7 +1060,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 131,
@@ -1068,7 +1068,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 132,
@@ -1076,7 +1076,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 133,
@@ -1084,7 +1084,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 134,
@@ -1092,7 +1092,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 135,
@@ -1100,7 +1100,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 136,
@@ -1108,7 +1108,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 137,
@@ -1116,7 +1116,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 138,
@@ -1124,7 +1124,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 139,
@@ -1132,7 +1132,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 140,
@@ -1140,7 +1140,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 141,
@@ -1148,7 +1148,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 142,
@@ -1156,7 +1156,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 143,
@@ -1164,7 +1164,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 144,
@@ -1172,7 +1172,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 145,
@@ -1180,7 +1180,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 146,
@@ -1188,7 +1188,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 147,
@@ -1196,7 +1196,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 148,
@@ -1204,7 +1204,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 149,
@@ -1212,7 +1212,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 150,
@@ -1220,7 +1220,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 151,
@@ -1228,7 +1228,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 152,
@@ -1236,7 +1236,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 153,
@@ -1244,7 +1244,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 154,
@@ -1252,7 +1252,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 155,
@@ -1260,7 +1260,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 156,
@@ -1268,7 +1268,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 157,
@@ -1276,7 +1276,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 158,
@@ -1284,7 +1284,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 159,
@@ -1292,7 +1292,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 160,
@@ -1300,7 +1300,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 161,
@@ -1308,7 +1308,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 162,
@@ -1316,7 +1316,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 163,
@@ -1324,7 +1324,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 164,
@@ -1332,7 +1332,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 165,
@@ -1340,7 +1340,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 166,
@@ -1348,7 +1348,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 167,
@@ -1356,7 +1356,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 168,
@@ -1364,7 +1364,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 169,
@@ -1372,7 +1372,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 170,
@@ -1380,7 +1380,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 171,
@@ -1388,7 +1388,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 172,
@@ -1396,7 +1396,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 173,
@@ -1404,7 +1404,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 174,
@@ -1412,7 +1412,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 175,
@@ -1420,7 +1420,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 176,
@@ -1428,7 +1428,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 177,
@@ -1436,7 +1436,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 178,
@@ -1444,7 +1444,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 179,
@@ -1452,7 +1452,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 180,
@@ -1460,7 +1460,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 181,
@@ -1468,7 +1468,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 182,
@@ -1476,7 +1476,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 183,
@@ -1484,7 +1484,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 184,
@@ -1492,7 +1492,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 185,
@@ -1500,7 +1500,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 186,
@@ -1508,7 +1508,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 187,
@@ -1516,7 +1516,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 188,
@@ -1524,7 +1524,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 189,
@@ -1532,7 +1532,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 190,
@@ -1540,7 +1540,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 191,
@@ -1548,7 +1548,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 192,
@@ -1556,7 +1556,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 193,
@@ -1564,7 +1564,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 194,
@@ -1572,7 +1572,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 195,
@@ -1580,7 +1580,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 196,
@@ -1588,7 +1588,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 197,
@@ -1596,7 +1596,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 198,
@@ -1604,7 +1604,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/grassTexture.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/grassModel",
     "id" : 199,
@@ -1612,7 +1612,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/tree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 15.0,
     "model" : "terrain/tree",
     "id" : 200,
@@ -1620,7 +1620,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/tree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 15.0,
     "model" : "terrain/tree",
     "id" : 201,
@@ -1628,7 +1628,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/tree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 15.0,
     "model" : "terrain/tree",
     "id" : 202,
@@ -1636,7 +1636,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/tree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 15.0,
     "model" : "terrain/tree",
     "id" : 203,
@@ -1644,7 +1644,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/tree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 15.0,
     "model" : "terrain/tree",
     "id" : 204,
@@ -1652,7 +1652,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/tree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 15.0,
     "model" : "terrain/tree",
     "id" : 205,
@@ -1660,7 +1660,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/tree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 15.0,
     "model" : "terrain/tree",
     "id" : 206,
@@ -1668,7 +1668,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/tree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 15.0,
     "model" : "terrain/tree",
     "id" : 207,
@@ -1676,7 +1676,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/tree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 15.0,
     "model" : "terrain/tree",
     "id" : 208,
@@ -1684,7 +1684,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/tree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 15.0,
     "model" : "terrain/tree",
     "id" : 209,
@@ -1692,7 +1692,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/tree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 15.0,
     "model" : "terrain/tree",
     "id" : 210,
@@ -1700,7 +1700,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/tree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 15.0,
     "model" : "terrain/tree",
     "id" : 211,
@@ -1708,7 +1708,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/tree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 15.0,
     "model" : "terrain/tree",
     "id" : 212,
@@ -1716,7 +1716,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/tree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 15.0,
     "model" : "terrain/tree",
     "id" : 213,
@@ -1724,7 +1724,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/tree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 15.0,
     "model" : "terrain/tree",
     "id" : 214,
@@ -1732,7 +1732,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/tree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 15.0,
     "model" : "terrain/tree",
     "id" : 215,
@@ -1740,7 +1740,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/tree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 15.0,
     "model" : "terrain/tree",
     "id" : 216,
@@ -1748,7 +1748,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/tree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 15.0,
     "model" : "terrain/tree",
     "id" : 217,
@@ -1756,7 +1756,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/tree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 15.0,
     "model" : "terrain/tree",
     "id" : 218,
@@ -1764,7 +1764,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/tree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 15.0,
     "model" : "terrain/tree",
     "id" : 219,
@@ -1772,7 +1772,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/tree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 15.0,
     "model" : "terrain/tree",
     "id" : 220,
@@ -1780,7 +1780,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/tree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 15.0,
     "model" : "terrain/tree",
     "id" : 221,
@@ -1788,7 +1788,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/tree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 15.0,
     "model" : "terrain/tree",
     "id" : 222,
@@ -1796,7 +1796,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/tree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 15.0,
     "model" : "terrain/tree",
     "id" : 223,
@@ -1804,7 +1804,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/tree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 15.0,
     "model" : "terrain/tree",
     "id" : 224,
@@ -1812,7 +1812,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/tree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 15.0,
     "model" : "terrain/tree",
     "id" : 225,
@@ -1820,7 +1820,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/tree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 15.0,
     "model" : "terrain/tree",
     "id" : 226,
@@ -1828,7 +1828,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/tree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 15.0,
     "model" : "terrain/tree",
     "id" : 227,
@@ -1836,7 +1836,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/tree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 15.0,
     "model" : "terrain/tree",
     "id" : 228,
@@ -1844,7 +1844,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/tree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 15.0,
     "model" : "terrain/tree",
     "id" : 229,
@@ -1852,7 +1852,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/tree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 15.0,
     "model" : "terrain/tree",
     "id" : 230,
@@ -1860,7 +1860,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/tree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 15.0,
     "model" : "terrain/tree",
     "id" : 231,
@@ -1868,7 +1868,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/tree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 15.0,
     "model" : "terrain/tree",
     "id" : 232,
@@ -1876,7 +1876,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/tree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 15.0,
     "model" : "terrain/tree",
     "id" : 233,
@@ -1884,7 +1884,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/tree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 15.0,
     "model" : "terrain/tree",
     "id" : 234,
@@ -1892,7 +1892,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/tree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 15.0,
     "model" : "terrain/tree",
     "id" : 235,
@@ -1900,7 +1900,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/tree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 15.0,
     "model" : "terrain/tree",
     "id" : 236,
@@ -1908,7 +1908,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/tree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 15.0,
     "model" : "terrain/tree",
     "id" : 237,
@@ -1916,7 +1916,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/tree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 15.0,
     "model" : "terrain/tree",
     "id" : 238,
@@ -1924,7 +1924,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/tree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 15.0,
     "model" : "terrain/tree",
     "id" : 239,
@@ -1932,7 +1932,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/tree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 15.0,
     "model" : "terrain/tree",
     "id" : 240,
@@ -1940,7 +1940,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/tree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 15.0,
     "model" : "terrain/tree",
     "id" : 241,
@@ -1948,7 +1948,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/tree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 15.0,
     "model" : "terrain/tree",
     "id" : 242,
@@ -1956,7 +1956,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/tree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 15.0,
     "model" : "terrain/tree",
     "id" : 243,
@@ -1964,7 +1964,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/tree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 15.0,
     "model" : "terrain/tree",
     "id" : 244,
@@ -1972,7 +1972,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/tree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 15.0,
     "model" : "terrain/tree",
     "id" : 245,
@@ -1980,7 +1980,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/tree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 15.0,
     "model" : "terrain/tree",
     "id" : 246,
@@ -1988,7 +1988,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/tree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 15.0,
     "model" : "terrain/tree",
     "id" : 247,
@@ -1996,7 +1996,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/tree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 15.0,
     "model" : "terrain/tree",
     "id" : 248,
@@ -2004,7 +2004,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/tree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 15.0,
     "model" : "terrain/tree",
     "id" : 249,
@@ -2012,7 +2012,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/lowPolyTree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 2.0,
     "model" : "terrain/lowPolyTree",
     "id" : 250,
@@ -2020,7 +2020,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/lowPolyTree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 2.0,
     "model" : "terrain/lowPolyTree",
     "id" : 251,
@@ -2028,7 +2028,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/lowPolyTree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 2.0,
     "model" : "terrain/lowPolyTree",
     "id" : 252,
@@ -2036,7 +2036,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/lowPolyTree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 2.0,
     "model" : "terrain/lowPolyTree",
     "id" : 253,
@@ -2044,7 +2044,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/lowPolyTree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 2.0,
     "model" : "terrain/lowPolyTree",
     "id" : 254,
@@ -2052,7 +2052,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/lowPolyTree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 2.0,
     "model" : "terrain/lowPolyTree",
     "id" : 255,
@@ -2060,7 +2060,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/lowPolyTree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 2.0,
     "model" : "terrain/lowPolyTree",
     "id" : 256,
@@ -2068,7 +2068,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/lowPolyTree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 2.0,
     "model" : "terrain/lowPolyTree",
     "id" : 257,
@@ -2076,7 +2076,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/lowPolyTree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 2.0,
     "model" : "terrain/lowPolyTree",
     "id" : 258,
@@ -2084,7 +2084,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/lowPolyTree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 2.0,
     "model" : "terrain/lowPolyTree",
     "id" : 259,
@@ -2092,7 +2092,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/lowPolyTree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 2.0,
     "model" : "terrain/lowPolyTree",
     "id" : 260,
@@ -2100,7 +2100,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/lowPolyTree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 2.0,
     "model" : "terrain/lowPolyTree",
     "id" : 261,
@@ -2108,7 +2108,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/lowPolyTree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 2.0,
     "model" : "terrain/lowPolyTree",
     "id" : 262,
@@ -2116,7 +2116,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/lowPolyTree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 2.0,
     "model" : "terrain/lowPolyTree",
     "id" : 263,
@@ -2124,7 +2124,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/lowPolyTree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 2.0,
     "model" : "terrain/lowPolyTree",
     "id" : 264,
@@ -2132,7 +2132,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/lowPolyTree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 2.0,
     "model" : "terrain/lowPolyTree",
     "id" : 265,
@@ -2140,7 +2140,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/lowPolyTree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 2.0,
     "model" : "terrain/lowPolyTree",
     "id" : 266,
@@ -2148,7 +2148,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/lowPolyTree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 2.0,
     "model" : "terrain/lowPolyTree",
     "id" : 267,
@@ -2156,7 +2156,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/lowPolyTree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 2.0,
     "model" : "terrain/lowPolyTree",
     "id" : 268,
@@ -2164,7 +2164,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/lowPolyTree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 2.0,
     "model" : "terrain/lowPolyTree",
     "id" : 269,
@@ -2172,7 +2172,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/lowPolyTree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 2.0,
     "model" : "terrain/lowPolyTree",
     "id" : 270,
@@ -2180,7 +2180,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/lowPolyTree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 2.0,
     "model" : "terrain/lowPolyTree",
     "id" : 271,
@@ -2188,7 +2188,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/lowPolyTree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 2.0,
     "model" : "terrain/lowPolyTree",
     "id" : 272,
@@ -2196,7 +2196,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/lowPolyTree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 2.0,
     "model" : "terrain/lowPolyTree",
     "id" : 273,
@@ -2204,7 +2204,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/lowPolyTree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 2.0,
     "model" : "terrain/lowPolyTree",
     "id" : 274,
@@ -2212,7 +2212,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/lowPolyTree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 2.0,
     "model" : "terrain/lowPolyTree",
     "id" : 275,
@@ -2220,7 +2220,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/lowPolyTree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 2.0,
     "model" : "terrain/lowPolyTree",
     "id" : 276,
@@ -2228,7 +2228,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/lowPolyTree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 2.0,
     "model" : "terrain/lowPolyTree",
     "id" : 277,
@@ -2236,7 +2236,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/lowPolyTree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 2.0,
     "model" : "terrain/lowPolyTree",
     "id" : 278,
@@ -2244,7 +2244,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/lowPolyTree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 2.0,
     "model" : "terrain/lowPolyTree",
     "id" : 279,
@@ -2252,7 +2252,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/lowPolyTree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 2.0,
     "model" : "terrain/lowPolyTree",
     "id" : 280,
@@ -2260,7 +2260,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/lowPolyTree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 2.0,
     "model" : "terrain/lowPolyTree",
     "id" : 281,
@@ -2268,7 +2268,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/lowPolyTree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 2.0,
     "model" : "terrain/lowPolyTree",
     "id" : 282,
@@ -2276,7 +2276,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/lowPolyTree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 2.0,
     "model" : "terrain/lowPolyTree",
     "id" : 283,
@@ -2284,7 +2284,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/lowPolyTree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 2.0,
     "model" : "terrain/lowPolyTree",
     "id" : 284,
@@ -2292,7 +2292,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/lowPolyTree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 2.0,
     "model" : "terrain/lowPolyTree",
     "id" : 285,
@@ -2300,7 +2300,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/lowPolyTree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 2.0,
     "model" : "terrain/lowPolyTree",
     "id" : 286,
@@ -2308,7 +2308,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/lowPolyTree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 2.0,
     "model" : "terrain/lowPolyTree",
     "id" : 287,
@@ -2316,7 +2316,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/lowPolyTree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 2.0,
     "model" : "terrain/lowPolyTree",
     "id" : 288,
@@ -2324,7 +2324,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/lowPolyTree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 2.0,
     "model" : "terrain/lowPolyTree",
     "id" : 289,
@@ -2332,7 +2332,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/lowPolyTree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 2.0,
     "model" : "terrain/lowPolyTree",
     "id" : 290,
@@ -2340,7 +2340,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/lowPolyTree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 2.0,
     "model" : "terrain/lowPolyTree",
     "id" : 291,
@@ -2348,7 +2348,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/lowPolyTree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 2.0,
     "model" : "terrain/lowPolyTree",
     "id" : 292,
@@ -2356,7 +2356,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/lowPolyTree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 2.0,
     "model" : "terrain/lowPolyTree",
     "id" : 293,
@@ -2364,7 +2364,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/lowPolyTree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 2.0,
     "model" : "terrain/lowPolyTree",
     "id" : 294,
@@ -2372,7 +2372,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/lowPolyTree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 2.0,
     "model" : "terrain/lowPolyTree",
     "id" : 295,
@@ -2380,7 +2380,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/lowPolyTree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 2.0,
     "model" : "terrain/lowPolyTree",
     "id" : 296,
@@ -2388,7 +2388,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/lowPolyTree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 2.0,
     "model" : "terrain/lowPolyTree",
     "id" : 297,
@@ -2396,7 +2396,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/lowPolyTree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 2.0,
     "model" : "terrain/lowPolyTree",
     "id" : 298,
@@ -2404,7 +2404,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/lowPolyTree.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 2.0,
     "model" : "terrain/lowPolyTree",
     "id" : 299,
@@ -2412,7 +2412,7 @@
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 300,
@@ -2420,7 +2420,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 301,
@@ -2428,7 +2428,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 302,
@@ -2436,7 +2436,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 303,
@@ -2444,7 +2444,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 304,
@@ -2452,7 +2452,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 305,
@@ -2460,7 +2460,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 306,
@@ -2468,7 +2468,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 307,
@@ -2476,7 +2476,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 308,
@@ -2484,7 +2484,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 309,
@@ -2492,7 +2492,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 310,
@@ -2500,7 +2500,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 311,
@@ -2508,7 +2508,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 312,
@@ -2516,7 +2516,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 313,
@@ -2524,7 +2524,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 314,
@@ -2532,7 +2532,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 315,
@@ -2540,7 +2540,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 316,
@@ -2548,7 +2548,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 317,
@@ -2556,7 +2556,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 318,
@@ -2564,7 +2564,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 319,
@@ -2572,7 +2572,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 320,
@@ -2580,7 +2580,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 321,
@@ -2588,7 +2588,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 322,
@@ -2596,7 +2596,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 323,
@@ -2604,7 +2604,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 324,
@@ -2612,7 +2612,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 325,
@@ -2620,7 +2620,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 326,
@@ -2628,7 +2628,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 327,
@@ -2636,7 +2636,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 328,
@@ -2644,7 +2644,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 329,
@@ -2652,7 +2652,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 330,
@@ -2660,7 +2660,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 331,
@@ -2668,7 +2668,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 332,
@@ -2676,7 +2676,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 333,
@@ -2684,7 +2684,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 334,
@@ -2692,7 +2692,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 335,
@@ -2700,7 +2700,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 336,
@@ -2708,7 +2708,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 337,
@@ -2716,7 +2716,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 338,
@@ -2724,7 +2724,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 339,
@@ -2732,7 +2732,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 340,
@@ -2740,7 +2740,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 341,
@@ -2748,7 +2748,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 342,
@@ -2756,7 +2756,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 343,
@@ -2764,7 +2764,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 344,
@@ -2772,7 +2772,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 345,
@@ -2780,7 +2780,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 346,
@@ -2788,7 +2788,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 347,
@@ -2796,7 +2796,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 348,
@@ -2804,7 +2804,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 349,
@@ -2812,7 +2812,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 350,
@@ -2820,7 +2820,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 351,
@@ -2828,7 +2828,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 352,
@@ -2836,7 +2836,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 353,
@@ -2844,7 +2844,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 354,
@@ -2852,7 +2852,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 355,
@@ -2860,7 +2860,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 356,
@@ -2868,7 +2868,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 357,
@@ -2876,7 +2876,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 358,
@@ -2884,7 +2884,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 359,
@@ -2892,7 +2892,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 360,
@@ -2900,7 +2900,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 361,
@@ -2908,7 +2908,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 362,
@@ -2916,7 +2916,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 363,
@@ -2924,7 +2924,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 364,
@@ -2932,7 +2932,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 365,
@@ -2940,7 +2940,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 366,
@@ -2948,7 +2948,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 367,
@@ -2956,7 +2956,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 368,
@@ -2964,7 +2964,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 369,
@@ -2972,7 +2972,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 370,
@@ -2980,7 +2980,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 371,
@@ -2988,7 +2988,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 372,
@@ -2996,7 +2996,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 373,
@@ -3004,7 +3004,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 374,
@@ -3012,7 +3012,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 375,
@@ -3020,7 +3020,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 376,
@@ -3028,7 +3028,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 377,
@@ -3036,7 +3036,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 378,
@@ -3044,7 +3044,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 379,
@@ -3052,7 +3052,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 380,
@@ -3060,7 +3060,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 381,
@@ -3068,7 +3068,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 382,
@@ -3076,7 +3076,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 383,
@@ -3084,7 +3084,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 384,
@@ -3092,7 +3092,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 385,
@@ -3100,7 +3100,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 386,
@@ -3108,7 +3108,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 387,
@@ -3116,7 +3116,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 388,
@@ -3124,7 +3124,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 389,
@@ -3132,7 +3132,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 390,
@@ -3140,7 +3140,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 391,
@@ -3148,7 +3148,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 392,
@@ -3156,7 +3156,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 393,
@@ -3164,7 +3164,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 394,
@@ -3172,7 +3172,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 395,
@@ -3180,7 +3180,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 396,
@@ -3188,7 +3188,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 397,
@@ -3196,7 +3196,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 398,
@@ -3204,7 +3204,7 @@
     "type" : "BACKGROUND_OBJECT"
   }, {
     "texture" : "terrain/flower.png",
-    "rotation" : [ 0.0, "NaN", 0.0 ],
+    "rotation" : [ 0.0, 0.0, 0.0 ],
     "scale" : 1.0,
     "model" : "terrain/fern",
     "id" : 399,

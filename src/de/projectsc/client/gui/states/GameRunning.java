@@ -74,9 +74,9 @@ public class GameRunning implements State {
 
     private TerrainModel terrainModel;
 
-    private Map<Integer, WorldEntity> worldEntities;
+    private Map<Integer, WorldEntity> staticEntities;
 
-    private List<GraphicalEntity> renderEntities;
+    private List<GraphicalEntity> staticRenderEntities;
 
     private GraphicalEntity player;
 
@@ -96,8 +96,13 @@ public class GameRunning implements State {
 
     private boolean renderBoundingBoxes = false;
 
+    private Map<Integer, WorldEntity> movingEntities;
+
+    private List<GraphicalEntity> dynamicRenderEntities;
+
     public GameRunning(BlockingQueue<GUIMessage> outgoingQueue) {
         this.outgoingQueue = outgoingQueue;
+        movingEntities = new TreeMap<>();
     }
 
     @Override
@@ -105,23 +110,32 @@ public class GameRunning implements State {
         LOGGER.debug("Loading models and light ... ");
         GameFont.loadFonts();
         loader = new Loader();
-        camera = new Camera(player);
         masterRenderer = new MasterRenderer(loader);
         waterfbo = new WaterFrameBuffers();
         waterRenderer = new WaterRenderer(loader, masterRenderer.getProjectionMatrix(), waterfbo);
         loadDemoObjects();
-        loadEntityModels();
-
+        staticRenderEntities = new ArrayList<>();
+        loadEntityModels(staticRenderEntities, staticEntities);
+        dynamicRenderEntities = new ArrayList<>();
+        int i = 0;
+        for (WorldEntity e : movingEntities.values()) {
+            e.setRotY(0);
+            e.getPosition().x = 300 + i++ * 10;
+            e.getPosition().z = 300;
+        }
+        loadEntityModels(dynamicRenderEntities, movingEntities);
+        camera = new Camera(player);
+        mousePicker = new MousePicker(camera, masterRenderer.getProjectionMatrix(), terrainModel);
         LOGGER.debug("Terrain, models and lights loaded");
     }
 
-    private void loadEntityModels() {
-        renderEntities = new ArrayList<>();
+    private void loadEntityModels(List<GraphicalEntity> renderList, Map<Integer, WorldEntity> entityList) {
+
         Map<String, Integer> textureMap = new HashMap<>();
-        for (WorldEntity e : worldEntities.values()) {
+        for (WorldEntity e : entityList.values()) {
             ModelData data = OBJFileLoader.loadOBJ(e.getModel());
             RawModel model = loader.loadToVAO(data.getVertices(), data.getTextureCoords(), data.getNormals(), data.getIndices());
-            int texture = -1;
+            int texture = 0 - 1;
             if (textureMap.containsKey(e.getTexture())) {
                 texture = textureMap.get(e.getTexture());
             } else {
@@ -130,7 +144,7 @@ public class GameRunning implements State {
             }
             ModelTexture modelTexture = new ModelTexture(texture);
             GraphicalEntity graphicalEntity = new GraphicalEntity(e, new TexturedModel(model, modelTexture));
-            renderEntities.add(graphicalEntity);
+            renderList.add(graphicalEntity);
             if (e.getModel().equals("person")) {
                 player = graphicalEntity;
             }
@@ -138,17 +152,7 @@ public class GameRunning implements State {
     }
 
     private void loadDemoObjects() {
-        // lights = new ArrayList<>();
-        // lights.add(new Light(new Vector3f(0, 500, 0), new Vector3f(1f, 1f, 1f), "sonne"));
-        // Terrain terra =
-        // new Terrain(new int[512][512], new float[512][512], "terrain/grass.png",
-        // "terrain/mud.png", "terrain/groundFlower.png",
-        // "terrain/path.png", lights);
-        //
-        // TerrainLoader.storeTerrain(terra, "newMap.psc");
-        loadTerrain("newMap");
-        System.out.println("pos2: " + worldEntities.get(0).getPosition());
-        mousePicker = new MousePicker(camera, masterRenderer.getProjectionMatrix(), terrainModel);
+        loadTerrain("map");
 
         ui = new ArrayList<>();
         UITexture uiTex =
@@ -177,8 +181,10 @@ public class GameRunning implements State {
 
         terrainModel = new TerrainModel(terrain, 0, 0, texturePack, blendMap, loader);
         lights = terrain.getStaticLights();
-        worldEntities.putAll(terrain.getStaticObjects());
-        System.out.println("pos: " + worldEntities.get(0).getPosition());
+        if (staticEntities == null) {
+            staticEntities = new TreeMap<>();
+        }
+        staticEntities.putAll(terrain.getStaticObjects());
     }
 
     @Override
@@ -203,18 +209,21 @@ public class GameRunning implements State {
             float distance = 2 * (camera.getPosition().y - waters.get(0).getHeight());
             camera.getPosition().y -= distance;
             camera.invertPitch();
-            masterRenderer.renderScene(terrainModel, renderEntities, lights, camera, elapsedTime, new Vector4f(0, 1, 0, -waters
-                .get(0).getHeight()));
+            masterRenderer.renderScene(terrainModel, staticRenderEntities, dynamicRenderEntities, lights, camera, elapsedTime,
+                new Vector4f(0, 1, 0, -waters
+                    .get(0).getHeight()));
             camera.getPosition().y += distance;
             camera.invertPitch();
 
             waterfbo.bindRefractionFrameBuffer();
-            masterRenderer.renderScene(terrainModel, renderEntities, lights, camera, elapsedTime, new Vector4f(0, 0 - 1, 0, waters
-                .get(0).getHeight()));
+            masterRenderer.renderScene(terrainModel, staticRenderEntities, dynamicRenderEntities, lights, camera, elapsedTime,
+                new Vector4f(0, 0 - 1, 0, waters
+                    .get(0).getHeight()));
 
             waterfbo.unbindCurrentFrameBuffer();
         }
-        masterRenderer.renderScene(terrainModel, renderEntities, lights, camera, elapsedTime, new Vector4f(0, 1, 0, 100000));
+        masterRenderer.renderScene(terrainModel, staticRenderEntities, dynamicRenderEntities, lights, camera, elapsedTime, new Vector4f(0,
+            1, 0, 100000));
         if (waters != null && waters.size() > 0) {
             waterRenderer.render(waters, camera, elapsedTime);
         }
@@ -280,12 +289,12 @@ public class GameRunning implements State {
         }
     }
 
-    public void setWorldEntities(Map<Integer, WorldEntity> data) {
-        if (worldEntities == null) {
-            worldEntities = new TreeMap<>();
-        }
-        // this.worldEntities = data;
+    public void addWorldEntity(WorldEntity e) {
+        movingEntities.put(e.getID(), e);
+    }
 
+    public void removeWorldEntity(int id) {
+        movingEntities.remove(id);
     }
 
 }

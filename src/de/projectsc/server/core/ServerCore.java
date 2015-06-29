@@ -60,6 +60,8 @@ public class ServerCore implements Runnable {
 
     private FutureEventQueue futureQueue;
 
+    private Terrain terrain;
+
     public ServerCore() {
         networkSendQueue = new LinkedBlockingQueue<>();
         networkReceiveQueue = new LinkedBlockingQueue<>();
@@ -102,7 +104,9 @@ public class ServerCore implements Runnable {
                     if (e.getType() != EntityType.BACKGROUND_OBJECT && e.getType() != EntityType.SOLID_BACKGROUND_OBJECT) {
                         entitiesToSend.add(e);
                     }
+
                 }
+                System.out.println(entitiesToSend);
                 networkSendQueue.offer(new ServerMessage(NetworkMessageConstants.INITIALIZE_GAME, entitiesToSend));
                 gameTime = START_GAME_TIME;
                 futureQueue = new FutureEventQueue();
@@ -138,48 +142,45 @@ public class ServerCore implements Runnable {
                 networkSendQueue.offer(new ServerMessage(NetworkMessageConstants.GAME_TIME_UPDATE, gameTime));
                 futureQueue.offer(new FutureEvent(event.getExecutionTime() + 10 * 10 * 10, new GameTimeUpdateTask()));
             } else if (event.getTask() instanceof UpdateTask) {
-                // for (WorldEntity e : entities.values()) {
-                // if (e.getModel().equals("goat")) {
-                // Vector3f position = e.getPosition();
-                // float newX = (float) ((Math.random() * 2 * 2 * 10 * 10 - 2 * 10 * 10) + position.x);
-                // float newZ = (float) ((Math.random() * 2 * 2 * 10 * 10 - 2 * 10 * 10) + position.z);
-                // e.setCurrentTarget(new Vector3f(newX, 0, newZ));
-                // networkSendQueue.offer(new ServerMessage(NetworkMessageConstants.NEW_LOCATION, new int[] { e.getID(),
-                // (int) newX, (int) newZ }));
-                // }
-                // }
-                // futureQueue.offer(new FutureEvent((long) (event.getExecutionTime() + Math.random() * 2 * 10 * 10 * 10 + 3 * 10 * 10),
-                // new UpdateTask()));
+                for (WorldEntity e : entities.values()) {
+                    if (e.getModel().equals("goat")) {
+                        Vector3f position = e.getPosition();
+                        float newX = (float) ((Math.random() * 2 * 2 * 10 * 10 - 2 * 10 * 10) + position.x);
+                        float newZ = (float) ((Math.random() * 2 * 2 * 10 * 10 - 2 * 10 * 10) + position.z);
+                        e.setCurrentTarget(new Vector3f(newX, 0, newZ));
+                        networkSendQueue.offer(new ServerMessage(NetworkMessageConstants.NEW_LOCATION, new int[] { e.getID(),
+                            (int) newX, (int) newZ }));
+                    }
+                }
+                futureQueue.offer(new FutureEvent((long) (event.getExecutionTime() + Math.random() * 2 * 10 * 10 * 10 + 3 * 10 * 10),
+                    new UpdateTask()));
             }
         }
     }
 
     private void moveGoats(long elapsedTime) {
-        // for (WorldEntity e : entities.values()) {
-        // if (e.getType() != EntityType.BACKGROUND_OBJECT && e.getType() != EntityType.SOLID_BACKGROUND_OBJECT) {
-        // e.move(elapsedTime);
-        // // if (e.getBoundingBox() != null && CollisionDetection.intersects(e, entities)) {
-        // // e.move(-elapsedTime);
-        // // }
-        // networkSendQueue.offer(new ServerMessage(NetworkMessageConstants.NEW_LOCATION, new float[] { e.getID(),
-        // e.getPosition().x, e.getPosition().z, e.getRotY() }));
-        // }
-        // }
+        for (WorldEntity e : entities.values()) {
+            if (e.getType() != EntityType.BACKGROUND_OBJECT && e.getType() != EntityType.SOLID_BACKGROUND_OBJECT) {
+                e.move(elapsedTime);
+                networkSendQueue.offer(new ServerMessage(NetworkMessageConstants.NEW_LOCATION, new float[] { e.getID(),
+                    e.getPosition().x, e.getPosition().z, e.getRotY() }));
+            }
+        }
     }
 
     private void createWorldEntities() {
-        Terrain terrain = TerrainLoader.loadTerrain("newMap.psc");
+        terrain = TerrainLoader.loadTerrain("newMap.psc");
         loadMovingEntities();
 
     }
 
     private void loadMovingEntities() {
-        worldPlayer = new Player(new Vector3f(1f, 0f, -50f), new Vector3f(0, 0, 0), 1.4f);
+        worldPlayer = new Player(new Vector3f(50f, 0f, 50f), new Vector3f(0, 0, 0), 1.4f);
         entities.put(worldPlayer.getID(), worldPlayer);
         for (int i = 0; i < 5; i++) {
             WorldEntity worldEntity =
-                new WorldEntity(EntityType.MOVEABLE_OBJECT, "goat", "white.png", new Vector3f(-5 + i * 10, 0, -5), new Vector3f(0,
-                    0, 0), 7f);
+                new WorldEntity(EntityType.MOVEABLE_OBJECT, "goat", "white.png", new Vector3f(55 + i * 10, 0, 50), new Vector3f(0,
+                    1.0f, 0), 7f);
             entities.put(worldEntity.getID(), worldEntity);
         }
     }

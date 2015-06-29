@@ -112,7 +112,9 @@ public class GUICore implements Runnable {
                 LOGGER.debug("Initialize game!");
                 currentState = stateMap.get(GUIState.GAME);
                 if (currentState instanceof GameRunning) {
-                    ((GameRunning) currentState).setWorldEntities((Map<Integer, WorldEntity>) msg.getData());
+                    for (WorldEntity e : ((Map<Integer, WorldEntity>) msg.getData()).values()) {
+                        ((GameRunning) currentState).addWorldEntity(e);
+                    }
                     ((GameRunning) currentState).initialize();
                 }
                 LOGGER.debug("Starting game!");

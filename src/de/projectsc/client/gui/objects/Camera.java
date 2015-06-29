@@ -70,6 +70,10 @@ public class Camera {
 
     public Camera(GraphicalEntity player) {
         this.player = player;
+        if (player != null) {
+            position.x = player.getPosition().x;
+            position.z = player.getPosition().z + 80;
+        }
     }
 
     /**

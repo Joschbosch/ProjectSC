@@ -41,7 +41,7 @@ public class WorldEntity {
 
     private Vector3f position;
 
-    private final Vector3f rotation;
+    private Vector3f rotation;
 
     private float scale;
 
@@ -50,10 +50,6 @@ public class WorldEntity {
     private float currentSpeed = 0;
 
     private final float currentTurnSpeed = 0;
-
-    // private float upwardsSpeed = 0;
-
-    // private boolean jumping = false;
 
     private final int id;
 
@@ -72,7 +68,8 @@ public class WorldEntity {
         this.type = type;
         this.setModel(model);
         this.setTexture(texture);
-        setBoundingBox(readBoundingBox());
+        // setBoundingBox(readBoundingBox());
+        System.out.println("Post 1: " + rotation.y);
     }
 
     public WorldEntity(int id, EntityType type, String model, String texture, Vector3f position, Vector3f rotation, float scale) {
@@ -84,8 +81,8 @@ public class WorldEntity {
         this.scale = scale;
         this.setModel(model);
         this.setTexture(texture);
-        setBoundingBox(readBoundingBox());
-
+        // setBoundingBox(readBoundingBox());
+        System.out.println("Post 2: " + rotation.y);
     }
 
     private AABB readBoundingBox() {
@@ -123,8 +120,9 @@ public class WorldEntity {
                     }
                 }
                 AABB box = new AABB(min, max);
-                LOGGER.debug("Read bounding box for " + model + ": min=" + min + " max =" + max + " center=" + box.getCenter() + " Size = "
-                    + box.getSize());
+                // LOGGER.debug("Read bounding box for " + model + ": min=" + min + " max =" + max + " center=" + box.getCenter() +
+                // " Size = "
+                // + box.getSize());
                 return box;
             } catch (IOException | URISyntaxException e) {
                 LOGGER.error("Could not read bounding box: " + model, e);
@@ -284,4 +282,18 @@ public class WorldEntity {
         this.boundingBox = boundingBox;
     }
 
+    @Override
+    public String toString() {
+        String result = "";
+        result += getModel() + "\n";
+        result += getTexture() + "\n";
+        result += getID() + "\n";
+        result += getPosition() + "\n";
+        result += getRotX() + "\n";
+        result += getRotY() + "\n";
+        result += getRotZ() + "\n";
+        result += getScale() + "\n";
+        result += getType() + "\n";
+        return result;
+    }
 }

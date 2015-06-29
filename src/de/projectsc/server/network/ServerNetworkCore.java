@@ -5,14 +5,17 @@
  */
 package de.projectsc.server.network;
 
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import de.projectsc.core.WorldEntity;
 import de.projectsc.core.data.messages.MessageConstants;
 import de.projectsc.core.data.messages.NetworkMessage;
+import de.projectsc.core.data.messages.NetworkMessageConstants;
 import de.projectsc.server.core.ServerMessage;
 
 /**
@@ -48,6 +51,11 @@ public class ServerNetworkCore implements Runnable {
     }
 
     private void sendMessage(ServerMessage msg) {
+        if (msg.getMessage().equals(NetworkMessageConstants.INITIALIZE_GAME)) {
+            System.out.println("init");
+            List<WorldEntity> data = (List<WorldEntity>) msg.getData();
+            System.out.println(data);
+        }
         clientSendQueueFaking.offer(new NetworkMessage(msg.getMessage(), msg.getData()));
     }
 
