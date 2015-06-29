@@ -79,7 +79,7 @@ public class WorldEntity {
         this.id = id;
         this.position = position;
         this.rotation = rotation;
-
+        this.type = type;
         this.setCurrentTarget(position);
         this.scale = scale;
         this.setModel(model);

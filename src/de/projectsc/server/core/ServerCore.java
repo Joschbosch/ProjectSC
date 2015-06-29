@@ -138,33 +138,33 @@ public class ServerCore implements Runnable {
                 networkSendQueue.offer(new ServerMessage(NetworkMessageConstants.GAME_TIME_UPDATE, gameTime));
                 futureQueue.offer(new FutureEvent(event.getExecutionTime() + 10 * 10 * 10, new GameTimeUpdateTask()));
             } else if (event.getTask() instanceof UpdateTask) {
-                for (WorldEntity e : entities.values()) {
-                    if (e.getModel().equals("goat")) {
-                        Vector3f position = e.getPosition();
-                        float newX = (float) ((Math.random() * 2 * 2 * 10 * 10 - 2 * 10 * 10) + position.x);
-                        float newZ = (float) ((Math.random() * 2 * 2 * 10 * 10 - 2 * 10 * 10) + position.z);
-                        e.setCurrentTarget(new Vector3f(newX, 0, newZ));
-                        networkSendQueue.offer(new ServerMessage(NetworkMessageConstants.NEW_LOCATION, new int[] { e.getID(),
-                            (int) newX, (int) newZ }));
-                    }
-                }
-                futureQueue.offer(new FutureEvent((long) (event.getExecutionTime() + Math.random() * 2 * 10 * 10 * 10 + 3 * 10 * 10),
-                    new UpdateTask()));
+                // for (WorldEntity e : entities.values()) {
+                // if (e.getModel().equals("goat")) {
+                // Vector3f position = e.getPosition();
+                // float newX = (float) ((Math.random() * 2 * 2 * 10 * 10 - 2 * 10 * 10) + position.x);
+                // float newZ = (float) ((Math.random() * 2 * 2 * 10 * 10 - 2 * 10 * 10) + position.z);
+                // e.setCurrentTarget(new Vector3f(newX, 0, newZ));
+                // networkSendQueue.offer(new ServerMessage(NetworkMessageConstants.NEW_LOCATION, new int[] { e.getID(),
+                // (int) newX, (int) newZ }));
+                // }
+                // }
+                // futureQueue.offer(new FutureEvent((long) (event.getExecutionTime() + Math.random() * 2 * 10 * 10 * 10 + 3 * 10 * 10),
+                // new UpdateTask()));
             }
         }
     }
 
     private void moveGoats(long elapsedTime) {
-        for (WorldEntity e : entities.values()) {
-            if (e.getType() != EntityType.BACKGROUND_OBJECT && e.getType() != EntityType.SOLID_BACKGROUND_OBJECT) {
-                e.move(elapsedTime);
-                // if (e.getBoundingBox() != null && CollisionDetection.intersects(e, entities)) {
-                // e.move(-elapsedTime);
-                // }
-                networkSendQueue.offer(new ServerMessage(NetworkMessageConstants.NEW_LOCATION, new float[] { e.getID(),
-                    e.getPosition().x, e.getPosition().z, e.getRotY() }));
-            }
-        }
+        // for (WorldEntity e : entities.values()) {
+        // if (e.getType() != EntityType.BACKGROUND_OBJECT && e.getType() != EntityType.SOLID_BACKGROUND_OBJECT) {
+        // e.move(elapsedTime);
+        // // if (e.getBoundingBox() != null && CollisionDetection.intersects(e, entities)) {
+        // // e.move(-elapsedTime);
+        // // }
+        // networkSendQueue.offer(new ServerMessage(NetworkMessageConstants.NEW_LOCATION, new float[] { e.getID(),
+        // e.getPosition().x, e.getPosition().z, e.getRotY() }));
+        // }
+        // }
     }
 
     private void createWorldEntities() {
@@ -180,16 +180,6 @@ public class ServerCore implements Runnable {
             WorldEntity worldEntity =
                 new WorldEntity(EntityType.MOVEABLE_OBJECT, "goat", "white.png", new Vector3f(-5 + i * 10, 0, -5), new Vector3f(0,
                     0, 0), 7f);
-            entities.put(worldEntity.getID(), worldEntity);
-        }
-    }
-
-    private void loadStaticMapObject(int count, EntityType type, String model, String texture, float scale) {
-        for (int i = 0; i < count; i++) {
-            float randomX = (float) (Math.random() * 1000 - 1000 / 2);
-            float randomZ = (float) (Math.random() * 1000 - 1000 / 2);
-            WorldEntity worldEntity = new WorldEntity(type, model, texture, new Vector3f(
-                randomX, 0, randomZ), new Vector3f(0, 0, 0), scale);
             entities.put(worldEntity.getID(), worldEntity);
         }
     }

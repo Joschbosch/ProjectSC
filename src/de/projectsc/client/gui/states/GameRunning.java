@@ -6,8 +6,10 @@
 package de.projectsc.client.gui.states;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -103,23 +105,31 @@ public class GameRunning implements State {
         LOGGER.debug("Loading models and light ... ");
         GameFont.loadFonts();
         loader = new Loader();
-        loadEntityModels();
         camera = new Camera(player);
         masterRenderer = new MasterRenderer(loader);
         waterfbo = new WaterFrameBuffers();
         waterRenderer = new WaterRenderer(loader, masterRenderer.getProjectionMatrix(), waterfbo);
         loadDemoObjects();
+        loadEntityModels();
+
         LOGGER.debug("Terrain, models and lights loaded");
     }
 
     private void loadEntityModels() {
         renderEntities = new ArrayList<>();
+        Map<String, Integer> textureMap = new HashMap<>();
         for (WorldEntity e : worldEntities.values()) {
             ModelData data = OBJFileLoader.loadOBJ(e.getModel());
-            RawModel goatModel =
-                loader.loadToVAO(data.getVertices(), data.getTextureCoords(), data.getNormals(), data.getIndices());
-            ModelTexture goatTexture = new ModelTexture(loader.loadTexture(e.getTexture()));
-            GraphicalEntity graphicalEntity = new GraphicalEntity(e, new TexturedModel(goatModel, goatTexture));
+            RawModel model = loader.loadToVAO(data.getVertices(), data.getTextureCoords(), data.getNormals(), data.getIndices());
+            int texture = -1;
+            if (textureMap.containsKey(e.getTexture())) {
+                texture = textureMap.get(e.getTexture());
+            } else {
+                texture = loader.loadTexture(e.getTexture());
+                textureMap.put(e.getTexture(), texture);
+            }
+            ModelTexture modelTexture = new ModelTexture(texture);
+            GraphicalEntity graphicalEntity = new GraphicalEntity(e, new TexturedModel(model, modelTexture));
             renderEntities.add(graphicalEntity);
             if (e.getModel().equals("person")) {
                 player = graphicalEntity;
@@ -137,7 +147,7 @@ public class GameRunning implements State {
         //
         // TerrainLoader.storeTerrain(terra, "newMap.psc");
         loadTerrain("newMap");
-
+        System.out.println("pos2: " + worldEntities.get(0).getPosition());
         mousePicker = new MousePicker(camera, masterRenderer.getProjectionMatrix(), terrainModel);
 
         ui = new ArrayList<>();
@@ -164,9 +174,11 @@ public class GameRunning implements State {
         TerrainTexture bTex = new TerrainTexture(loader.loadTexture(terrain.getBgTexture()));
         TerrainTexturePack texturePack = new TerrainTexturePack(backgroundTex, rTex, gTex, bTex);
         TerrainTexture blendMap = new TerrainTexture(loader.loadTexture(TerrainLoader.createBlendMap(terrain)));
+
+        terrainModel = new TerrainModel(terrain, 0, 0, texturePack, blendMap, loader);
         lights = terrain.getStaticLights();
         worldEntities.putAll(terrain.getStaticObjects());
-        terrainModel = new TerrainModel(terrain, 0, 0, texturePack, blendMap, loader);
+        System.out.println("pos: " + worldEntities.get(0).getPosition());
     }
 
     @Override
@@ -269,7 +281,10 @@ public class GameRunning implements State {
     }
 
     public void setWorldEntities(Map<Integer, WorldEntity> data) {
-        this.worldEntities = data;
+        if (worldEntities == null) {
+            worldEntities = new TreeMap<>();
+        }
+        // this.worldEntities = data;
 
     }
 
