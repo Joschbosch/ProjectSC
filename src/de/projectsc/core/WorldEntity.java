@@ -41,11 +41,7 @@ public class WorldEntity {
 
     private Vector3f position;
 
-    private float rotX;
-
-    private float rotY;
-
-    private float rotZ;
+    private final Vector3f rotation;
 
     private float scale;
 
@@ -53,13 +49,13 @@ public class WorldEntity {
 
     private float currentSpeed = 0;
 
-    private float currentTurnSpeed = 0;
+    private final float currentTurnSpeed = 0;
 
     // private float upwardsSpeed = 0;
 
     // private boolean jumping = false;
 
-    private int id;
+    private final int id;
 
     private String model;
 
@@ -67,13 +63,11 @@ public class WorldEntity {
 
     private AABB boundingBox;
 
-    public WorldEntity(EntityType type, String model, String texture, Vector3f position, float rotX, float rotY, float rotZ, float scale) {
+    public WorldEntity(EntityType type, String model, String texture, Vector3f position, Vector3f rotation, float scale) {
         this.position = position;
-        this.setCurrentTarget(position);
-        this.rotX = rotX;
-        this.rotY = rotY;
-        this.rotZ = rotZ;
+        this.rotation = rotation;
         this.scale = scale;
+        this.setCurrentTarget(position);
         this.id = idCount++;
         this.type = type;
         this.setModel(model);
@@ -81,14 +75,12 @@ public class WorldEntity {
         setBoundingBox(readBoundingBox());
     }
 
-    public WorldEntity(int id, EntityType type, String model, String texture, Vector3f position, float rotX, float rotY, float rotZ,
-        float scale) {
+    public WorldEntity(int id, EntityType type, String model, String texture, Vector3f position, Vector3f rotation, float scale) {
         this.id = id;
         this.position = position;
+        this.rotation = rotation;
+
         this.setCurrentTarget(position);
-        this.rotX = rotX;
-        this.rotY = rotY;
-        this.rotZ = rotZ;
         this.scale = scale;
         this.setModel(model);
         this.setTexture(texture);
@@ -171,7 +163,7 @@ public class WorldEntity {
         if (currentTarget.x < position.x) {
             rotate = -rotate;
         }
-        this.rotY = rotate;
+        this.rotation.y = rotate;
 
     }
 
@@ -203,9 +195,9 @@ public class WorldEntity {
      * @param dz rotate on z axis
      */
     public void increaseRotation(float dx, float dy, float dz) {
-        this.rotX += dx;
-        this.rotY += dy;
-        this.rotZ += dz;
+        this.rotation.x += dx;
+        this.rotation.y += dy;
+        this.rotation.z += dz;
     }
 
     public Vector3f getLocationBoundingBoxMinimum() {
@@ -225,27 +217,27 @@ public class WorldEntity {
     }
 
     public float getRotX() {
-        return rotX;
+        return rotation.x;
     }
 
     public void setRotX(float rotX) {
-        this.rotX = rotX;
+        this.rotation.x = rotX;
     }
 
     public float getRotY() {
-        return rotY;
+        return rotation.y;
     }
 
     public void setRotY(float rotY) {
-        this.rotY = rotY;
+        this.rotation.y = rotY;
     }
 
     public float getRotZ() {
-        return rotZ;
+        return rotation.z;
     }
 
     public void setRotZ(float rotZ) {
-        this.rotZ = rotZ;
+        this.rotation.z = rotZ;
     }
 
     public float getScale() {

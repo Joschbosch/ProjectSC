@@ -46,9 +46,9 @@ public class ClientCore implements Runnable {
 
     private BlockingQueue<ClientMessage> networkReceiveQueue;
 
-    private AtomicBoolean guiReady = new AtomicBoolean(false);
+    private final AtomicBoolean guiReady = new AtomicBoolean(false);
 
-    private AtomicBoolean networkReady = new AtomicBoolean(false);
+    private final AtomicBoolean networkReady = new AtomicBoolean(false);
 
     private long gameTime = 0;
 
@@ -153,8 +153,8 @@ public class ClientCore implements Runnable {
                 for (WorldEntity e : incomingEntities) {
                     worldEntities.put(e.getID(),
                         new WorldEntity(e.getID(), e.getType(), e.getModel(), e.getTexture(), new Vector3f(e.getPosition().x, e
-                            .getPosition().y, e.getPosition().z), e.getRotX(), e.getRotY(), e
-                            .getRotZ(), e.getScale()));
+                            .getPosition().y, e.getPosition().z), new Vector3f(e.getRotX(), e.getRotY(), e
+                            .getRotZ()), e.getScale()));
                 }
                 guiOutgoingQueue.offer(new GUIMessage(GUIMessageConstants.INIT_GAME, worldEntities));
             }

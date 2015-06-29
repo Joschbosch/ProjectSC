@@ -7,6 +7,8 @@ package de.projectsc.server.core;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -19,6 +21,8 @@ import de.projectsc.client.core.ClientMessageConstants;
 import de.projectsc.client.gui.GUIMessageConstants;
 import de.projectsc.core.EntityType;
 import de.projectsc.core.Player;
+import de.projectsc.core.Terrain;
+import de.projectsc.core.TerrainLoader;
 import de.projectsc.core.WorldEntity;
 import de.projectsc.core.data.messages.MessageConstants;
 import de.projectsc.core.data.messages.NetworkMessageConstants;
@@ -46,13 +50,13 @@ public class ServerCore implements Runnable {
 
     private boolean shutdown;
 
-    private List<WorldEntity> entities = new LinkedList<>();
+    private final Map<Integer, WorldEntity> entities = new TreeMap<>();
 
     private Player worldPlayer;
 
     private long gameTime = 0;
 
-    private AtomicBoolean startGame = new AtomicBoolean(false);
+    private final AtomicBoolean startGame = new AtomicBoolean(false);
 
     private FutureEventQueue futureQueue;
 
@@ -93,7 +97,13 @@ public class ServerCore implements Runnable {
                         LOGGER.error(CORE_ERROR, e);
                     }
                 }
-                networkSendQueue.offer(new ServerMessage(NetworkMessageConstants.INITIALIZE_GAME, entities));
+                List<WorldEntity> entitiesToSend = new LinkedList<WorldEntity>();
+                for (WorldEntity e : entities.values()) {
+                    if (e.getType() != EntityType.BACKGROUND_OBJECT && e.getType() != EntityType.SOLID_BACKGROUND_OBJECT) {
+                        entitiesToSend.add(e);
+                    }
+                }
+                networkSendQueue.offer(new ServerMessage(NetworkMessageConstants.INITIALIZE_GAME, entitiesToSend));
                 gameTime = START_GAME_TIME;
                 futureQueue = new FutureEventQueue();
                 futureQueue.add(new FutureEvent(START_GAME_TIME, new GameTimeUpdateTask()));
@@ -128,7 +138,7 @@ public class ServerCore implements Runnable {
                 networkSendQueue.offer(new ServerMessage(NetworkMessageConstants.GAME_TIME_UPDATE, gameTime));
                 futureQueue.offer(new FutureEvent(event.getExecutionTime() + 10 * 10 * 10, new GameTimeUpdateTask()));
             } else if (event.getTask() instanceof UpdateTask) {
-                for (WorldEntity e : entities) {
+                for (WorldEntity e : entities.values()) {
                     if (e.getModel().equals("goat")) {
                         Vector3f position = e.getPosition();
                         float newX = (float) ((Math.random() * 2 * 2 * 10 * 10 - 2 * 10 * 10) + position.x);
@@ -145,7 +155,7 @@ public class ServerCore implements Runnable {
     }
 
     private void moveGoats(long elapsedTime) {
-        for (WorldEntity e : entities) {
+        for (WorldEntity e : entities.values()) {
             if (e.getType() != EntityType.BACKGROUND_OBJECT && e.getType() != EntityType.SOLID_BACKGROUND_OBJECT) {
                 e.move(elapsedTime);
                 // if (e.getBoundingBox() != null && CollisionDetection.intersects(e, entities)) {
@@ -158,20 +168,19 @@ public class ServerCore implements Runnable {
     }
 
     private void createWorldEntities() {
-        loadStaticMapObject(100, EntityType.BACKGROUND_OBJECT, "terrain/fern", "terrain/fernTextureAtlas.png", 1f);
-        loadStaticMapObject(100, EntityType.BACKGROUND_OBJECT, "terrain/grassModel", "terrain/grassTexture.png", 1f);
-        loadStaticMapObject(50, EntityType.SOLID_BACKGROUND_OBJECT, "terrain/tree", "terrain/tree.png", 15f);
-        loadStaticMapObject(50, EntityType.SOLID_BACKGROUND_OBJECT, "terrain/lowPolyTree", "terrain/lowPolyTree.png", 2f);
-        loadStaticMapObject(100, EntityType.BACKGROUND_OBJECT, "terrain/fern", "terrain/flower.png", 1f);
+        Terrain terrain = TerrainLoader.loadTerrain("newMap.psc");
         loadMovingEntities();
 
     }
 
     private void loadMovingEntities() {
-        worldPlayer = new Player(new Vector3f(1f, 0f, -50f), 0, 0, 0, 1.4f);
-        entities.add(worldPlayer);
+        worldPlayer = new Player(new Vector3f(1f, 0f, -50f), new Vector3f(0, 0, 0), 1.4f);
+        entities.put(worldPlayer.getID(), worldPlayer);
         for (int i = 0; i < 5; i++) {
-            entities.add(new WorldEntity(EntityType.MOVEABLE_OBJECT, "goat", "white.png", new Vector3f(-5 + i * 10, 0, -5), 0, 0, 0, 7f));
+            WorldEntity worldEntity =
+                new WorldEntity(EntityType.MOVEABLE_OBJECT, "goat", "white.png", new Vector3f(-5 + i * 10, 0, -5), new Vector3f(0,
+                    0, 0), 7f);
+            entities.put(worldEntity.getID(), worldEntity);
         }
     }
 
@@ -179,8 +188,9 @@ public class ServerCore implements Runnable {
         for (int i = 0; i < count; i++) {
             float randomX = (float) (Math.random() * 1000 - 1000 / 2);
             float randomZ = (float) (Math.random() * 1000 - 1000 / 2);
-            entities.add(new WorldEntity(type, model, texture, new Vector3f(
-                randomX, 0, randomZ), 0, 0, 0, scale));
+            WorldEntity worldEntity = new WorldEntity(type, model, texture, new Vector3f(
+                randomX, 0, randomZ), new Vector3f(0, 0, 0), scale);
+            entities.put(worldEntity.getID(), worldEntity);
         }
     }
 

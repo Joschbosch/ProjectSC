@@ -17,8 +17,8 @@ import de.projectsc.client.gui.objects.GraphicalEntity;
  */
 public class Player extends WorldEntity {
 
-    public Player(Vector3f position, float rotX, float rotY, float rotZ, float scale) {
-        super(EntityType.PLAYER, "person", "person.png", position, rotX, rotY, rotZ, scale);
+    public Player(Vector3f position, Vector3f rotation, float scale) {
+        super(EntityType.PLAYER, "person", "person.png", position, rotation, scale);
     }
 
 }

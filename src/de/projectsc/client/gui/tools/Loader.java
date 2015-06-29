@@ -115,13 +115,13 @@ public class Loader {
         } catch (FileNotFoundException e) {
             LOGGER.error(e);
         }
-        return -1;
+        return 0 - 1;
     }
 
     /**
      * load texture from the given file.
      * 
-     * @param filename of the texture.
+     * @param fileStream of the file to load
      * @param fileType of the image
      * @return texture position
      */

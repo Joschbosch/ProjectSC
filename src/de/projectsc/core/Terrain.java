@@ -1,43 +1,50 @@
 /*
- * Copyright (C) 2015 
+ * Copyright (C) 2015 Project SC
+ * 
+ * All rights reserved
  */
 
 package de.projectsc.core;
 
 import java.util.List;
+import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.client.gui.objects.Light;
 
+/**
+ * Holds all information about the static terrain.
+ * 
+ * @author Josch Bosch
+ */
 public class Terrain {
-
-    private static final Log LOGGER = LogFactory.getLog(Terrain.class);
 
     /**
      * Factor for a terrain offset. (1 tile has offset [0, TERRAIN_TILE_SIZE])
      */
     public static final float TERRAIN_TILE_SIZE = 4.0f;
 
-    private int mapSize;
+    private final int mapSize;
 
-    private int[][] tiles;
+    private final int[][] tiles;
 
-    private float[][] heights;
+    private final float[][] heights;
 
-    private String bgTexture;
+    private final String bgTexture;
 
-    private String rTexture;
+    private final String rTexture;
 
-    private String gTexture;
+    private final String gTexture;
 
-    private String bTexture;
+    private final String bTexture;
 
     private List<Light> staticLights;
 
-    public Terrain(int[][] tiles, float[][] heights, String bgTexture, String rTexture, String gTexture, String bTexture, List<Light> lights) {
+    private Map<Integer, WorldEntity> staticObjects;
+
+    public Terrain(int[][] tiles, float[][] heights, String bgTexture, String rTexture, String gTexture,
+        String bTexture, List<Light> lights, Map<Integer, WorldEntity> staticObjects) {
         this.tiles = tiles;
         this.mapSize = tiles.length;
         this.heights = heights;
@@ -46,8 +53,16 @@ public class Terrain {
         this.gTexture = gTexture;
         this.bTexture = bTexture;
         this.setStaticLights(lights);
+        this.staticObjects = staticObjects;
     }
 
+    /**
+     * Calculate normal vector of tile [x,y].
+     * 
+     * @param x coordinate.
+     * @param z coordinate.
+     * @return normal vector
+     */
     public Vector3f calculateNormal(int x, int z) {
         float heightL = getHeight(x - 1, z);
         float heightR = getHeight(x + 1, z);
@@ -58,6 +73,13 @@ public class Terrain {
         return normal;
     }
 
+    /**
+     * Return height of coordinate [x,z].
+     * 
+     * @param x coordinate
+     * @param z coordinate
+     * @return height
+     */
     public float getHeight(int x, int z) {
         if (x >= 0 && x < heights.length && z >= 0 && z < heights[0].length) {
             return heights[x][z];
@@ -89,15 +111,15 @@ public class Terrain {
         return bgTexture;
     }
 
-    public String getrTexture() {
+    public String getRTexture() {
         return rTexture;
     }
 
-    public String getgTexture() {
+    public String getGTexture() {
         return gTexture;
     }
 
-    public String getbTexture() {
+    public String getBTexture() {
         return bTexture;
     }
 
@@ -107,5 +129,13 @@ public class Terrain {
 
     public void setStaticLights(List<Light> staticLights) {
         this.staticLights = staticLights;
+    }
+
+    public Map<Integer, WorldEntity> getStaticObjects() {
+        return staticObjects;
+    }
+
+    public void setStaticObjects(Map<Integer, WorldEntity> staticObjects) {
+        this.staticObjects = staticObjects;
     }
 }
