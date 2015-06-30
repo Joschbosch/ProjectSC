@@ -3211,132 +3211,292 @@
     "position" : [ 363.52393, 0.0, -91.14182 ],
     "type" : "BACKGROUND_OBJECT"
   }, {
-    "texture" : "white.png",
+    "texture" : "house.png",
     "rotation" : [ 0.0, 0.0, 0.0 ],
-    "scale" : 0.5,
+    "scale" : 10.0,
     "model" : "house",
-    "id" : 400,
-    "position" : [ 0.0, 0.0, 0.0 ],
+    "id" : 1505,
+    "position" : [ 100.0, 0.0, 100.0 ],
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
-    "texture" : "white.png",
+    "texture" : "house.png",
     "rotation" : [ 0.0, 0.0, 0.0 ],
-    "scale" : 0.5,
+    "scale" : 10.0,
     "model" : "house",
-    "id" : 401,
-    "position" : [ 0.0, 310.0, 0.0 ],
+    "id" : 1506,
+    "position" : [ 100.0, 0.0, 160.0 ],
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
-    "texture" : "white.png",
+    "texture" : "house.png",
     "rotation" : [ 0.0, 0.0, 0.0 ],
-    "scale" : 0.5,
+    "scale" : 10.0,
     "model" : "house",
-    "id" : 402,
-    "position" : [ 0.0, 620.0, 0.0 ],
+    "id" : 1507,
+    "position" : [ 100.0, 0.0, 220.0 ],
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
-    "texture" : "white.png",
+    "texture" : "house.png",
     "rotation" : [ 0.0, 0.0, 0.0 ],
-    "scale" : 0.5,
+    "scale" : 10.0,
     "model" : "house",
-    "id" : 403,
-    "position" : [ 0.0, 930.0, 0.0 ],
+    "id" : 1508,
+    "position" : [ 100.0, 0.0, 280.0 ],
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
-    "texture" : "white.png",
+    "texture" : "house.png",
     "rotation" : [ 0.0, 0.0, 0.0 ],
-    "scale" : 0.5,
+    "scale" : 10.0,
     "model" : "house",
-    "id" : 404,
-    "position" : [ 0.0, 1240.0, 0.0 ],
+    "id" : 1509,
+    "position" : [ 100.0, 0.0, 340.0 ],
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
-    "texture" : "white.png",
+    "texture" : "house.png",
     "rotation" : [ 0.0, 0.0, 0.0 ],
-    "scale" : 0.5,
+    "scale" : 10.0,
     "model" : "house",
-    "id" : 405,
-    "position" : [ 250.0, 0.0, 0.0 ],
+    "id" : 1510,
+    "position" : [ 100.0, 0.0, 400.0 ],
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
-    "texture" : "white.png",
+    "texture" : "house.png",
     "rotation" : [ 0.0, 0.0, 0.0 ],
-    "scale" : 0.5,
+    "scale" : 10.0,
     "model" : "house",
-    "id" : 406,
-    "position" : [ 250.0, 1240.0, 0.0 ],
+    "id" : 1511,
+    "position" : [ 100.0, 0.0, 460.0 ],
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
-    "texture" : "white.png",
+    "texture" : "house.png",
     "rotation" : [ 0.0, 0.0, 0.0 ],
-    "scale" : 0.5,
+    "scale" : 10.0,
     "model" : "house",
-    "id" : 407,
-    "position" : [ 500.0, 0.0, 0.0 ],
+    "id" : 1512,
+    "position" : [ 100.0, 0.0, 520.0 ],
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
-    "texture" : "white.png",
+    "texture" : "house.png",
     "rotation" : [ 0.0, 0.0, 0.0 ],
-    "scale" : 0.5,
+    "scale" : 10.0,
     "model" : "house",
-    "id" : 408,
-    "position" : [ 500.0, 1240.0, 0.0 ],
+    "id" : 1513,
+    "position" : [ 100.0, 0.0, 580.0 ],
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
-    "texture" : "white.png",
+    "texture" : "house.png",
     "rotation" : [ 0.0, 0.0, 0.0 ],
-    "scale" : 0.5,
+    "scale" : 10.0,
     "model" : "house",
-    "id" : 409,
-    "position" : [ 750.0, 0.0, 0.0 ],
+    "id" : 1514,
+    "position" : [ 100.0, 0.0, 640.0 ],
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
-    "texture" : "white.png",
+    "texture" : "house.png",
     "rotation" : [ 0.0, 0.0, 0.0 ],
-    "scale" : 0.5,
+    "scale" : 10.0,
     "model" : "house",
-    "id" : 410,
-    "position" : [ 750.0, 1240.0, 0.0 ],
+    "id" : 1515,
+    "position" : [ 188.0, 0.0, 100.0 ],
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
-    "texture" : "white.png",
+    "texture" : "house.png",
     "rotation" : [ 0.0, 0.0, 0.0 ],
-    "scale" : 0.5,
+    "scale" : 10.0,
     "model" : "house",
-    "id" : 411,
-    "position" : [ 1000.0, 0.0, 0.0 ],
+    "id" : 1516,
+    "position" : [ 188.0, 0.0, 640.0 ],
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
-    "texture" : "white.png",
+    "texture" : "house.png",
     "rotation" : [ 0.0, 0.0, 0.0 ],
-    "scale" : 0.5,
+    "scale" : 10.0,
     "model" : "house",
-    "id" : 412,
-    "position" : [ 1000.0, 310.0, 0.0 ],
+    "id" : 1517,
+    "position" : [ 276.0, 0.0, 100.0 ],
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
-    "texture" : "white.png",
+    "texture" : "house.png",
     "rotation" : [ 0.0, 0.0, 0.0 ],
-    "scale" : 0.5,
+    "scale" : 10.0,
     "model" : "house",
-    "id" : 413,
-    "position" : [ 1000.0, 620.0, 0.0 ],
+    "id" : 1518,
+    "position" : [ 276.0, 0.0, 640.0 ],
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
-    "texture" : "white.png",
+    "texture" : "house.png",
     "rotation" : [ 0.0, 0.0, 0.0 ],
-    "scale" : 0.5,
+    "scale" : 10.0,
     "model" : "house",
-    "id" : 414,
-    "position" : [ 1000.0, 930.0, 0.0 ],
+    "id" : 1519,
+    "position" : [ 364.0, 0.0, 100.0 ],
     "type" : "SOLID_BACKGROUND_OBJECT"
   }, {
-    "texture" : "white.png",
+    "texture" : "house.png",
     "rotation" : [ 0.0, 0.0, 0.0 ],
-    "scale" : 0.5,
+    "scale" : 10.0,
     "model" : "house",
-    "id" : 415,
-    "position" : [ 1000.0, 1240.0, 0.0 ],
+    "id" : 1520,
+    "position" : [ 364.0, 0.0, 640.0 ],
+    "type" : "SOLID_BACKGROUND_OBJECT"
+  }, {
+    "texture" : "house.png",
+    "rotation" : [ 0.0, 0.0, 0.0 ],
+    "scale" : 10.0,
+    "model" : "house",
+    "id" : 1521,
+    "position" : [ 452.0, 0.0, 100.0 ],
+    "type" : "SOLID_BACKGROUND_OBJECT"
+  }, {
+    "texture" : "house.png",
+    "rotation" : [ 0.0, 0.0, 0.0 ],
+    "scale" : 10.0,
+    "model" : "house",
+    "id" : 1522,
+    "position" : [ 452.0, 0.0, 640.0 ],
+    "type" : "SOLID_BACKGROUND_OBJECT"
+  }, {
+    "texture" : "house.png",
+    "rotation" : [ 0.0, 0.0, 0.0 ],
+    "scale" : 10.0,
+    "model" : "house",
+    "id" : 1523,
+    "position" : [ 540.0, 0.0, 100.0 ],
+    "type" : "SOLID_BACKGROUND_OBJECT"
+  }, {
+    "texture" : "house.png",
+    "rotation" : [ 0.0, 0.0, 0.0 ],
+    "scale" : 10.0,
+    "model" : "house",
+    "id" : 1524,
+    "position" : [ 540.0, 0.0, 640.0 ],
+    "type" : "SOLID_BACKGROUND_OBJECT"
+  }, {
+    "texture" : "house.png",
+    "rotation" : [ 0.0, 0.0, 0.0 ],
+    "scale" : 10.0,
+    "model" : "house",
+    "id" : 1525,
+    "position" : [ 628.0, 0.0, 100.0 ],
+    "type" : "SOLID_BACKGROUND_OBJECT"
+  }, {
+    "texture" : "house.png",
+    "rotation" : [ 0.0, 0.0, 0.0 ],
+    "scale" : 10.0,
+    "model" : "house",
+    "id" : 1526,
+    "position" : [ 628.0, 0.0, 640.0 ],
+    "type" : "SOLID_BACKGROUND_OBJECT"
+  }, {
+    "texture" : "house.png",
+    "rotation" : [ 0.0, 0.0, 0.0 ],
+    "scale" : 10.0,
+    "model" : "house",
+    "id" : 1527,
+    "position" : [ 716.0, 0.0, 100.0 ],
+    "type" : "SOLID_BACKGROUND_OBJECT"
+  }, {
+    "texture" : "house.png",
+    "rotation" : [ 0.0, 0.0, 0.0 ],
+    "scale" : 10.0,
+    "model" : "house",
+    "id" : 1528,
+    "position" : [ 716.0, 0.0, 640.0 ],
+    "type" : "SOLID_BACKGROUND_OBJECT"
+  }, {
+    "texture" : "house.png",
+    "rotation" : [ 0.0, 0.0, 0.0 ],
+    "scale" : 10.0,
+    "model" : "house",
+    "id" : 1529,
+    "position" : [ 804.0, 0.0, 100.0 ],
+    "type" : "SOLID_BACKGROUND_OBJECT"
+  }, {
+    "texture" : "house.png",
+    "rotation" : [ 0.0, 0.0, 0.0 ],
+    "scale" : 10.0,
+    "model" : "house",
+    "id" : 1530,
+    "position" : [ 804.0, 0.0, 640.0 ],
+    "type" : "SOLID_BACKGROUND_OBJECT"
+  }, {
+    "texture" : "house.png",
+    "rotation" : [ 0.0, 0.0, 0.0 ],
+    "scale" : 10.0,
+    "model" : "house",
+    "id" : 1531,
+    "position" : [ 892.0, 0.0, 100.0 ],
+    "type" : "SOLID_BACKGROUND_OBJECT"
+  }, {
+    "texture" : "house.png",
+    "rotation" : [ 0.0, 0.0, 0.0 ],
+    "scale" : 10.0,
+    "model" : "house",
+    "id" : 1532,
+    "position" : [ 892.0, 0.0, 160.0 ],
+    "type" : "SOLID_BACKGROUND_OBJECT"
+  }, {
+    "texture" : "house.png",
+    "rotation" : [ 0.0, 0.0, 0.0 ],
+    "scale" : 10.0,
+    "model" : "house",
+    "id" : 1533,
+    "position" : [ 892.0, 0.0, 220.0 ],
+    "type" : "SOLID_BACKGROUND_OBJECT"
+  }, {
+    "texture" : "house.png",
+    "rotation" : [ 0.0, 0.0, 0.0 ],
+    "scale" : 10.0,
+    "model" : "house",
+    "id" : 1534,
+    "position" : [ 892.0, 0.0, 280.0 ],
+    "type" : "SOLID_BACKGROUND_OBJECT"
+  }, {
+    "texture" : "house.png",
+    "rotation" : [ 0.0, 0.0, 0.0 ],
+    "scale" : 10.0,
+    "model" : "house",
+    "id" : 1535,
+    "position" : [ 892.0, 0.0, 340.0 ],
+    "type" : "SOLID_BACKGROUND_OBJECT"
+  }, {
+    "texture" : "house.png",
+    "rotation" : [ 0.0, 0.0, 0.0 ],
+    "scale" : 10.0,
+    "model" : "house",
+    "id" : 1536,
+    "position" : [ 892.0, 0.0, 400.0 ],
+    "type" : "SOLID_BACKGROUND_OBJECT"
+  }, {
+    "texture" : "house.png",
+    "rotation" : [ 0.0, 0.0, 0.0 ],
+    "scale" : 10.0,
+    "model" : "house",
+    "id" : 1537,
+    "position" : [ 892.0, 0.0, 460.0 ],
+    "type" : "SOLID_BACKGROUND_OBJECT"
+  }, {
+    "texture" : "house.png",
+    "rotation" : [ 0.0, 0.0, 0.0 ],
+    "scale" : 10.0,
+    "model" : "house",
+    "id" : 1538,
+    "position" : [ 892.0, 0.0, 520.0 ],
+    "type" : "SOLID_BACKGROUND_OBJECT"
+  }, {
+    "texture" : "house.png",
+    "rotation" : [ 0.0, 0.0, 0.0 ],
+    "scale" : 10.0,
+    "model" : "house",
+    "id" : 1539,
+    "position" : [ 892.0, 0.0, 580.0 ],
+    "type" : "SOLID_BACKGROUND_OBJECT"
+  }, {
+    "texture" : "house.png",
+    "rotation" : [ 0.0, 0.0, 0.0 ],
+    "scale" : 10.0,
+    "model" : "house",
+    "id" : 1540,
+    "position" : [ 892.0, 0.0, 640.0 ],
     "type" : "SOLID_BACKGROUND_OBJECT"
   } ],
   "GTexture" : "terrain/groundFlower.png",

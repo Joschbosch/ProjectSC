@@ -6,12 +6,6 @@
 
 package de.projectsc.core;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.List;
-
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.lwjgl.util.vector.Vector3f;
@@ -31,7 +25,7 @@ public class WorldEntity {
 
     // private static final float JUMP_POWER = 30;
 
-    private static final int MOVEMENT_SPEED = 20;
+    private static final int MOVEMENT_SPEED = 30;
 
     private static final Log LOGGER = LogFactory.getLog(WorldEntity.class);
 
@@ -57,7 +51,7 @@ public class WorldEntity {
 
     private String texture;
 
-    private AABB boundingBox;
+    private BoundingBox boundingBox;
 
     public WorldEntity(EntityType type, String model, String texture, Vector3f position, Vector3f rotation, float scale) {
         this.position = position;
@@ -68,7 +62,7 @@ public class WorldEntity {
         this.type = type;
         this.setModel(model);
         this.setTexture(texture);
-        setBoundingBox(readBoundingBox());
+        boundingBox = BoundingBoxLoader.readBoundingBox(this);
     }
 
     public WorldEntity(int id, EntityType type, String model, String texture, Vector3f position, Vector3f rotation, float scale) {
@@ -83,57 +77,11 @@ public class WorldEntity {
         this.scale = scale;
         this.setModel(model);
         this.setTexture(texture);
-        setBoundingBox(readBoundingBox());
-    }
-
-    private AABB readBoundingBox() {
-        if (type != EntityType.BACKGROUND_OBJECT) {
-            try {
-                List<String> lines = FileUtils.readLines(new File(WorldEntity.class.getResource("/meshes/" + model + ".obj").toURI()));
-                Vector3f min = new Vector3f(Float.MAX_VALUE, Float.MAX_VALUE, Float.MAX_VALUE);
-                Vector3f max = new Vector3f(Float.MIN_VALUE, Float.MIN_VALUE, Float.MIN_VALUE);
-
-                for (String s : lines) {
-                    if (s.startsWith("v ")) {
-                        String[] split = s.split(" +");
-                        float x = Float.parseFloat(split[1]);
-                        float y = Float.parseFloat(split[2]);
-                        float z = Float.parseFloat(split[3]);
-                        if (min.x > x) {
-                            min.x = x;
-                        }
-                        if (min.y > y) {
-                            min.y = y;
-                        }
-                        if (min.z > z) {
-                            min.z = z;
-                        }
-                        if (max.x < x) {
-                            max.x = x;
-                        }
-                        if (max.y < y) {
-                            max.y = y;
-                        }
-                        if (max.z < z) {
-                            max.z = z;
-                        }
-                    }
-                }
-                AABB box = new AABB(min, max);
-                // LOGGER.debug("Read bounding box for " + model + ": min=" + min + " max =" + max +
-                // " center=" + box.getCenter() +
-                // " Size = "
-                // + box.getSize());
-                return box;
-            } catch (IOException | URISyntaxException e) {
-                LOGGER.error("Could not read bounding box: " + model, e);
-            }
-        }
-        return null;
+        boundingBox = BoundingBoxLoader.readBoundingBox(this);
     }
 
     /**
-     * Move the player.
+     * Move the entity.
      * 
      * @param delta elapsed time
      */
@@ -149,6 +97,27 @@ public class WorldEntity {
         float dx = (float) (distance * Math.sin(Math.toRadians(getRotY())));
         float dz = (float) (distance * Math.cos(Math.toRadians(getRotY())));
         increasePostion(dx, 0, dz);
+    }
+
+    /**
+     * Get next position of entity.
+     * 
+     * @param delta elapsed time
+     * @return new position.
+     */
+    public Vector3f getNextPosition(float delta) {
+        delta = (delta / Timer.SECONDS_CONSTANT);
+        increaseRotation(0, currentTurnSpeed * delta, 0);
+        if (Vector3f.sub(getPosition(), getCurrentTarget(), null).lengthSquared() > 3) {
+            currentSpeed = MOVEMENT_SPEED;
+        } else {
+            currentSpeed = 0;
+        }
+        float distance = currentSpeed * delta;
+        float dx = (float) (distance * Math.sin(Math.toRadians(getRotY())));
+        float dz = (float) (distance * Math.cos(Math.toRadians(getRotY())));
+        increasePostion(dx, 0, dz);
+        return new Vector3f(position.x + dx, position.y, position.z + dz);
     }
 
     /**
@@ -196,6 +165,7 @@ public class WorldEntity {
     }
 
     public Vector3f getLocationBoundingBoxMinimum() {
+        System.out.println(boundingBox);
         return Vector3f.add(boundingBox.getMin(), position, null);
     }
 
@@ -271,11 +241,11 @@ public class WorldEntity {
         return type;
     }
 
-    public AABB getBoundingBox() {
+    public BoundingBox getBoundingBox() {
         return boundingBox;
     }
 
-    public void setBoundingBox(AABB boundingBox) {
+    public void setBoundingBox(BoundingBox boundingBox) {
         this.boundingBox = boundingBox;
     }
 

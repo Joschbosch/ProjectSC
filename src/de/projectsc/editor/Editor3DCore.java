@@ -90,14 +90,18 @@ public class Editor3DCore implements Runnable {
     protected void initGL() {}
 
     protected void gameLoop() {
+        long time = System.currentTimeMillis();
         while (running) {
+            long now = System.currentTimeMillis();
+            long delta = now - time;
+            time = now;
             Display.update();
 
-            if (masterRenderer != null) {
-                camera.move(10);
+            if (terrainModel != null) {
+                camera.move(delta);
                 mousePicker.update();
                 masterRenderer.renderScene(terrainModel, new LinkedList<GraphicalEntity>(), new LinkedList<GraphicalEntity>(), lights,
-                    camera, 10, new Vector4f(0, 1, 0, 100000));
+                    camera, delta, new Vector4f(0, 1, 0, 100000));
             } else {
                 if (Keyboard.isKeyDown(Keyboard.KEY_SPACE)) {
                     GL11.glClearColor(1f, 0, 0, 0);
@@ -110,7 +114,7 @@ public class Editor3DCore implements Runnable {
             if (message != null) {
                 loadMap();
             }
-            Display.sync(10);
+            Display.sync(60);
         }
         Display.destroy();
     }

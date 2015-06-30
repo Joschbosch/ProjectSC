@@ -68,6 +68,8 @@ public class Camera {
 
     private GraphicalEntity boundToEntity = null;
 
+    private Object entityLockObject = new Object();
+
     public Camera(GraphicalEntity player) {
         this.player = player;
         if (player != null) {
@@ -91,14 +93,16 @@ public class Camera {
             calculateCameraPosition(horizontalDistance, verticalDistance);
             this.yaw = DEGREES_180 - (player.getRotY() + angleAroundPlayer);
         } else {
-            checkInputs();
-            if (boundToEntity == null) {
-                calculateZoom();
-                calculateCameraPosition(delta);
-            } else {
-                float horizontalDistance = calculateHorizontalDistance();
-                float verticalDistance = calculateVerticalDistance();
-                calculateCameraPosition(horizontalDistance, verticalDistance);
+            synchronized (entityLockObject) {
+                checkInputs();
+                if (boundToEntity == null) {
+                    calculateZoom();
+                    calculateCameraPosition(delta);
+                } else {
+                    float horizontalDistance = calculateHorizontalDistance();
+                    float verticalDistance = calculateVerticalDistance();
+                    calculateCameraPosition(horizontalDistance, verticalDistance);
+                }
             }
         }
     }
@@ -152,12 +156,8 @@ public class Camera {
     }
 
     private void calculateCameraPosition(float horizontalDistance, float verticalDistance) {
-        float theta = player.getRotY() + angleAroundPlayer;
-        float offsetX = (float) (horizontalDistance * Math.sin(Math.toRadians(theta)));
-        float offsetZ = (float) (horizontalDistance * Math.cos(Math.toRadians(theta)));
-        position.x = player.getPosition().x - offsetX;
-        position.z = player.getPosition().z - offsetZ;
-        position.y = player.getPosition().y + verticalDistance + PLAYER_CENTER_Y_AXIS;
+        position.x = boundToEntity.getPosition().x;
+        position.z = boundToEntity.getPosition().z + 80;
     }
 
     /**
@@ -262,10 +262,12 @@ public class Camera {
      * @param entity to bind to.
      */
     public void bindToEntity(GraphicalEntity entity) {
-        if (boundToEntity == null) {
-            boundToEntity = entity;
-        } else {
-            boundToEntity = null;
+        synchronized (entityLockObject) {
+            if (boundToEntity == null) {
+                boundToEntity = entity;
+            } else {
+                boundToEntity = null;
+            }
         }
     }
 }

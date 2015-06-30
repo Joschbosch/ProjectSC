@@ -14,6 +14,8 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -33,6 +35,8 @@ public final class OBJFileLoader {
 
     private static final String RES_LOC = "/meshes/";
 
+    private static Map<String, ModelData> loadedModels = new TreeMap<>();
+
     private OBJFileLoader() {
 
     }
@@ -44,6 +48,9 @@ public final class OBJFileLoader {
      * @return {@link ModelData} with all information
      */
     public static ModelData loadOBJ(String objFileName) {
+        if (loadedModels.containsKey(objFileName)) {
+            return loadedModels.get(objFileName);
+        }
         BufferedReader reader = null;
         try {
             FileReader isr = null;
@@ -109,6 +116,7 @@ public final class OBJFileLoader {
             int[] indicesArray = convertIndicesListToArray(indices);
             ModelData data = new ModelData(verticesArray, texturesArray, normalsArray, indicesArray,
                 furthest);
+            loadedModels.put(objFileName, data);
             return data;
         } else {
             LOGGER.error("Could not load model " + objFileName);

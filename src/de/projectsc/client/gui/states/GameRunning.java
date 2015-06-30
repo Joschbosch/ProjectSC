@@ -43,6 +43,7 @@ import de.projectsc.client.gui.tools.ModelData;
 import de.projectsc.client.gui.tools.MousePicker;
 import de.projectsc.client.gui.tools.OBJFileLoader;
 import de.projectsc.client.gui.ui.UITexture;
+import de.projectsc.core.EntityType;
 import de.projectsc.core.Terrain;
 import de.projectsc.core.TerrainLoader;
 import de.projectsc.core.WorldEntity;
@@ -130,10 +131,7 @@ public class GameRunning implements State {
 
         textureMap = new HashMap<>();
         for (WorldEntity e : entityList.values()) {
-            GraphicalEntity graphicalEntity = loadGraphicalEntity(renderList, e);
-            if (e.getModel().equals("person")) {
-                player = graphicalEntity;
-            }
+            loadGraphicalEntity(renderList, e);
         }
     }
 
@@ -150,17 +148,22 @@ public class GameRunning implements State {
         ModelTexture modelTexture = new ModelTexture(texture);
         GraphicalEntity graphicalEntity = new GraphicalEntity(e, new TexturedModel(model, modelTexture));
         renderList.add(graphicalEntity);
+        if (e.getType() == EntityType.PLAYER) {
+            player = graphicalEntity;
+            camera.getPosition().x = player.getPosition().x;
+            camera.getPosition().z = player.getPosition().z;
+        }
         return graphicalEntity;
     }
 
     private void loadDemoObjects() {
-        loadTerrain("map");
+        loadTerrain("housingMap");
 
         ui = new ArrayList<>();
+        uiRenderer = new UIRenderer(loader);
         // UITexture uiTex =
         // new UITexture(loader.loadTexture("health.png"), new Vector2f(-0.75f, -0.9f), new
         // Vector2f(0.25f, 0.25f));
-        // uiRenderer = new UIRenderer(loader);
         // ui.add(uiTex);
         // UITexture reflectionUI = new UITexture(waterfbo.getReflectionTexture(), new
         // Vector2f(-0.5f, 0.5f), new Vector2f(0.25f, 0.25f));

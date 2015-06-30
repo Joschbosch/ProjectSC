@@ -144,7 +144,7 @@ public class ServerCore implements Runnable {
                 futureQueue.offer(new FutureEvent(event.getExecutionTime() + 10 * 10 * 10, new GameTimeUpdateTask()));
             } else if (event.getTask() instanceof UpdateTask) {
                 for (WorldEntity e : entities.values()) {
-                    if (e.getModel().equals("goat")) {
+                    if (e.getType() == EntityType.MOVEABLE_OBJECT) {
                         Vector3f position = e.getPosition();
                         float newX = (float) ((Math.random() * 2 * 2 * 10 * 10 - 2 * 10 * 10) + position.x);
                         float newZ = (float) ((Math.random() * 2 * 2 * 10 * 10 - 2 * 10 * 10) + position.z);
@@ -170,19 +170,28 @@ public class ServerCore implements Runnable {
     }
 
     private void createWorldEntities() {
-        terrain = TerrainLoader.loadTerrain("newMap.psc");
-        staticEntities = terrain.getStaticObjects();
-        staticEntities.values();
-        // int xSize = 250;
-        // int zSize = 310;
-        // for (int i = 0; i < 5; i++) {
-        // for (int j = 0; j < 5; j++) {
-        // if (i == 0 || j == 0 || i == 4 || j == 4) {
+        terrain = TerrainLoader.loadTerrain("housingMap.psc");
+        // staticEntities = terrain.getStaticObjects();
+        // staticEntities.values();
+        // List<Integer> remove = new LinkedList<>();
+        // for (WorldEntity e : staticEntities.values()) {
+        // if (e.getModel().equals("house")) {
+        // remove.add(e.getID());
+        // }
+        // }
+        // for (Integer i : remove) {
+        // staticEntities.remove(i);
+        // }
+        // int xSize = 88;
+        // int zSize = 60;
+        // for (int i = 0; i < 10; i++) {
+        // for (int j = 0; j < 10; j++) {
+        // if (i == 0 || j == 0 || i == 9 || j == 9) {
         // WorldEntity worldEntity =
-        // new WorldEntity(EntityType.SOLID_BACKGROUND_OBJECT, "house", "white.png", new Vector3f(i
-        // * xSize, j * zSize, 0),
+        // new WorldEntity(EntityType.SOLID_BACKGROUND_OBJECT, "house", "house.png", new Vector3f(i
+        // * xSize + 100, 0, j * zSize + 100),
         // new Vector3f(
-        // 0, 0.0f, 0), 0.5f);
+        // 0, 0.0f, 0), 10f);
         // staticEntities.put(worldEntity.getID(), worldEntity);
         // }
         // }
@@ -193,11 +202,11 @@ public class ServerCore implements Runnable {
     }
 
     private void loadMovingEntities() {
-        worldPlayer = new Player(new Vector3f(50f, 0f, 50f), new Vector3f(0, 0, 0), 1.4f);
+        worldPlayer = new Player(new Vector3f(330f, 0f, 330f), new Vector3f(0, 0, 0), 1.4f);
         entities.put(worldPlayer.getID(), worldPlayer);
         for (int i = 0; i < 5; i++) {
             WorldEntity worldEntity =
-                new WorldEntity(EntityType.MOVEABLE_OBJECT, "goat", "white.png", new Vector3f(55 + i * 10, 0, 50), new Vector3f(0,
+                new WorldEntity(EntityType.MOVEABLE_OBJECT, "goat", "white.png", new Vector3f(340 + i * 10, 0, 340), new Vector3f(0,
                     1.0f, 0), 7f);
             entities.put(worldEntity.getID(), worldEntity);
         }
@@ -216,7 +225,9 @@ public class ServerCore implements Runnable {
                     LOGGER.debug("Got ping request with time " + (long) msg.getData());
                     networkSendQueue.offer(new ServerMessage("pong", new long[] { (long) msg.getData(), gameTime }));
                 } else if (msg.getMessage().equals(GUIMessageConstants.POINT_ON_MAP_CLICKED)) {
-                    worldPlayer.setCurrentTarget((Vector3f) msg.getData());
+                    if (startGame.get()) {
+                        worldPlayer.setCurrentTarget((Vector3f) msg.getData());
+                    }
                 } else if (msg.getMessage().equals(ClientMessageConstants.CLIENT_READY)) {
                     LOGGER.debug("Received client ready, starting game");
                     startGame.set(true);

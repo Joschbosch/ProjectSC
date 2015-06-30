@@ -52,7 +52,7 @@ public class ClientNetworkCore implements Runnable {
             retreiveCoreMessages();
             retrieveServerMessages();
             try {
-                Thread.sleep(10);
+                Thread.sleep(50);
             } catch (InterruptedException e) {
                 LOGGER.error("Error in client network:", e);
             }

@@ -46,11 +46,11 @@ public class Main {
         // while (true) {
         // try {
         // Thread.sleep(100);
-        // Logger.debug(serverCore.getNetworkSendQueue().size() + "  " +
+        // LogFactory.getLog(Main.class).debug(serverCore.getNetworkSendQueue().size() + "  " +
         // serverCore.getNetworkReceiveQueue().size() + "  "
         // + core.getNetworkSendQueue().size() + "  " + core.getNetworkReceiveQueue().size() + "  "
         // + core.getGuiOutgoingQueue().size() + "  " + core.getGuiIncomingQueue().size());
-        // Logger.debug(serverNetwork.clientSendQueueFaking.size() + "  " +
+        // LogFactory.getLog(Main.class).debug(serverNetwork.clientSendQueueFaking.size() + "  " +
         // serverNetwork.clientReceiveQueueFaking.size());
         // } catch (InterruptedException e) {
         // }

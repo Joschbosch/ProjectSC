@@ -20,6 +20,7 @@ import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.client.gui.GUIMessage;
 import de.projectsc.client.gui.GUIMessageConstants;
+import de.projectsc.core.EntityType;
 import de.projectsc.core.WorldEntity;
 import de.projectsc.core.data.messages.NetworkMessageConstants;
 
@@ -126,7 +127,9 @@ public class ClientCore implements Runnable {
             gameTime += delta;
             if (worldEntities != null) {
                 for (WorldEntity e : worldEntities.values()) {
-                    e.move(delta);
+                    if (e.getType() == EntityType.MOVEABLE_OBJECT || e.getType() == EntityType.PLAYER) {
+                        e.move(delta);
+                    }
                 }
             }
             try {
@@ -168,7 +171,7 @@ public class ClientCore implements Runnable {
                 worldEntity.setRotY(data[3]);
                 worldEntity.getPosition().x = data[1];
                 worldEntity.getPosition().y = 0;
-                worldEntity.getPosition().x = data[2];
+                worldEntity.getPosition().z = data[2];
             } else {
                 int[] data = (int[]) message.getData();
                 worldEntities.get(data[0]).setCurrentTarget(new Vector3f(data[1], 0, data[2]));
@@ -195,20 +198,22 @@ public class ClientCore implements Runnable {
 
     private void workGUI() {
         try {
-            GUIMessage msg = guiIncomingQueue.take();
-            LOGGER.debug("New Message: " + msg.getMessage());
-            if (msg.getMessage().contains(CLOSE_DOWN)) {
-                guiOutgoingQueue.offer(new GUIMessage(CLOSE_DOWN, null));
-                networkSendQueue.offer(new ClientMessage(CLOSE_DOWN, null));
-                shutdown = true;
-                LOGGER.debug("Shutting down");
-            } else if (msg.getMessage().equals(GUIMessageConstants.POINT_ON_MAP_CLICKED)) {
-                LOGGER.debug("Sending new click info: " + msg.getData());
-                networkSendQueue.offer(new ClientMessage(GUIMessageConstants.POINT_ON_MAP_CLICKED, msg.getData()));
-            } else if (msg.getMessage().equals(GUIMessageConstants.GUI_INITIALIZED)) {
-                guiReady.set(true);
-            } else if (msg.getMessage().equals(GUIMessageConstants.GUI_INITIALIZED)) {
-                gameGuiReady.set(true);
+            while (!guiIncomingQueue.isEmpty()) {
+                GUIMessage msg = guiIncomingQueue.take();
+                LOGGER.debug("New Message: " + msg.getMessage());
+                if (msg.getMessage().contains(CLOSE_DOWN)) {
+                    guiOutgoingQueue.offer(new GUIMessage(CLOSE_DOWN, null));
+                    networkSendQueue.offer(new ClientMessage(CLOSE_DOWN, null));
+                    shutdown = true;
+                    LOGGER.debug("Shutting down");
+                } else if (msg.getMessage().equals(GUIMessageConstants.POINT_ON_MAP_CLICKED)) {
+                    LOGGER.debug("Sending new click info: " + msg.getData());
+                    networkSendQueue.offer(new ClientMessage(GUIMessageConstants.POINT_ON_MAP_CLICKED, msg.getData()));
+                } else if (msg.getMessage().equals(GUIMessageConstants.GUI_INITIALIZED)) {
+                    guiReady.set(true);
+                } else if (msg.getMessage().equals(GUIMessageConstants.GUI_INITIALIZED)) {
+                    gameGuiReady.set(true);
+                }
             }
         } catch (InterruptedException e) {
             LOGGER.error(ERROR_IN_CORE, e);
