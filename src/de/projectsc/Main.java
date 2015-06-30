@@ -46,10 +46,12 @@ public class Main {
         // while (true) {
         // try {
         // Thread.sleep(100);
-        // System.out.println(serverCore.getNetworkSendQueue().size() + "  " + serverCore.getNetworkReceiveQueue().size() + "  "
+        // Logger.debug(serverCore.getNetworkSendQueue().size() + "  " +
+        // serverCore.getNetworkReceiveQueue().size() + "  "
         // + core.getNetworkSendQueue().size() + "  " + core.getNetworkReceiveQueue().size() + "  "
         // + core.getGuiOutgoingQueue().size() + "  " + core.getGuiIncomingQueue().size());
-        // System.out.println(serverNetwork.clientSendQueueFaking.size() + "  " + serverNetwork.clientReceiveQueueFaking.size());
+        // Logger.debug(serverNetwork.clientSendQueueFaking.size() + "  " +
+        // serverNetwork.clientReceiveQueueFaking.size());
         // } catch (InterruptedException e) {
         // }
         // }

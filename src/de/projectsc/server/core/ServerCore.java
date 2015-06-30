@@ -62,6 +62,8 @@ public class ServerCore implements Runnable {
 
     private Terrain terrain;
 
+    private Map<Integer, WorldEntity> staticEntities;
+
     public ServerCore() {
         networkSendQueue = new LinkedBlockingQueue<>();
         networkReceiveQueue = new LinkedBlockingQueue<>();
@@ -92,13 +94,6 @@ public class ServerCore implements Runnable {
             @Override
             public void run() {
                 createWorldEntities();
-                while (!startGame.get()) {
-                    try {
-                        Thread.sleep(MS_PER_UPDATE);
-                    } catch (InterruptedException e) {
-                        LOGGER.error(CORE_ERROR, e);
-                    }
-                }
                 List<WorldEntity> entitiesToSend = new LinkedList<WorldEntity>();
                 for (WorldEntity e : entities.values()) {
                     if (e.getType() != EntityType.BACKGROUND_OBJECT && e.getType() != EntityType.SOLID_BACKGROUND_OBJECT) {
@@ -106,12 +101,18 @@ public class ServerCore implements Runnable {
                     }
 
                 }
-                System.out.println(entitiesToSend);
                 networkSendQueue.offer(new ServerMessage(NetworkMessageConstants.INITIALIZE_GAME, entitiesToSend));
+                while (!startGame.get()) {
+                    try {
+                        Thread.sleep(MS_PER_UPDATE);
+                    } catch (InterruptedException e) {
+                        LOGGER.error(CORE_ERROR, e);
+                    }
+                }
                 gameTime = START_GAME_TIME;
                 futureQueue = new FutureEventQueue();
-                futureQueue.add(new FutureEvent(START_GAME_TIME, new GameTimeUpdateTask()));
-                futureQueue.add(new FutureEvent(START_GAME_TIME, new UpdateTask()));
+                futureQueue.add(new FutureEvent(START_GAME_TIME + 10000, new GameTimeUpdateTask()));
+                futureQueue.add(new FutureEvent(START_GAME_TIME + 10000, new UpdateTask()));
                 networkSendQueue.offer(new ServerMessage("Start game", gameTime));
 
                 long previous = System.currentTimeMillis();
@@ -170,6 +171,23 @@ public class ServerCore implements Runnable {
 
     private void createWorldEntities() {
         terrain = TerrainLoader.loadTerrain("newMap.psc");
+        staticEntities = terrain.getStaticObjects();
+        staticEntities.values();
+        // int xSize = 250;
+        // int zSize = 310;
+        // for (int i = 0; i < 5; i++) {
+        // for (int j = 0; j < 5; j++) {
+        // if (i == 0 || j == 0 || i == 4 || j == 4) {
+        // WorldEntity worldEntity =
+        // new WorldEntity(EntityType.SOLID_BACKGROUND_OBJECT, "house", "white.png", new Vector3f(i
+        // * xSize, j * zSize, 0),
+        // new Vector3f(
+        // 0, 0.0f, 0), 0.5f);
+        // staticEntities.put(worldEntity.getID(), worldEntity);
+        // }
+        // }
+        // }
+        // TerrainLoader.storeTerrain(terrain, "housingMap.psc");
         loadMovingEntities();
 
     }

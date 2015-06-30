@@ -18,7 +18,6 @@ import org.apache.commons.logging.LogFactory;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector4f;
 
 import de.projectsc.client.gui.GUIMessage;
@@ -56,6 +55,8 @@ import de.projectsc.core.WorldEntity;
  */
 public class GameRunning implements State {
 
+    private static final int CLIPPING_PLANE_NOT_RENDERING = 100000;
+
     private static final Log LOGGER = LogFactory.getLog(GameRunning.class);
 
     private static final GUIState STATE = GUIState.GAME;
@@ -72,6 +73,8 @@ public class GameRunning implements State {
 
     private MasterRenderer masterRenderer;
 
+    private UIRenderer uiRenderer;
+
     private TerrainModel terrainModel;
 
     private Map<Integer, WorldEntity> staticEntities;
@@ -81,8 +84,6 @@ public class GameRunning implements State {
     private GraphicalEntity player;
 
     private List<UITexture> ui;
-
-    private UIRenderer uiRenderer;
 
     private MousePicker mousePicker;
 
@@ -96,9 +97,11 @@ public class GameRunning implements State {
 
     private boolean renderBoundingBoxes = false;
 
-    private Map<Integer, WorldEntity> movingEntities;
+    private final Map<Integer, WorldEntity> movingEntities;
 
     private List<GraphicalEntity> dynamicRenderEntities;
+
+    private Map<String, Integer> textureMap;
 
     public GameRunning(BlockingQueue<GUIMessage> outgoingQueue) {
         this.outgoingQueue = outgoingQueue;
@@ -117,12 +120,6 @@ public class GameRunning implements State {
         staticRenderEntities = new ArrayList<>();
         loadEntityModels(staticRenderEntities, staticEntities);
         dynamicRenderEntities = new ArrayList<>();
-        int i = 0;
-        for (WorldEntity e : movingEntities.values()) {
-            e.setRotY(0);
-            e.getPosition().x = 300 + i++ * 10;
-            e.getPosition().z = 300;
-        }
         loadEntityModels(dynamicRenderEntities, movingEntities);
         camera = new Camera(player);
         mousePicker = new MousePicker(camera, masterRenderer.getProjectionMatrix(), terrainModel);
@@ -131,35 +128,40 @@ public class GameRunning implements State {
 
     private void loadEntityModels(List<GraphicalEntity> renderList, Map<Integer, WorldEntity> entityList) {
 
-        Map<String, Integer> textureMap = new HashMap<>();
+        textureMap = new HashMap<>();
         for (WorldEntity e : entityList.values()) {
-            ModelData data = OBJFileLoader.loadOBJ(e.getModel());
-            RawModel model = loader.loadToVAO(data.getVertices(), data.getTextureCoords(), data.getNormals(), data.getIndices());
-            int texture = 0 - 1;
-            if (textureMap.containsKey(e.getTexture())) {
-                texture = textureMap.get(e.getTexture());
-            } else {
-                texture = loader.loadTexture(e.getTexture());
-                textureMap.put(e.getTexture(), texture);
-            }
-            ModelTexture modelTexture = new ModelTexture(texture);
-            GraphicalEntity graphicalEntity = new GraphicalEntity(e, new TexturedModel(model, modelTexture));
-            renderList.add(graphicalEntity);
+            GraphicalEntity graphicalEntity = loadGraphicalEntity(renderList, e);
             if (e.getModel().equals("person")) {
                 player = graphicalEntity;
             }
         }
     }
 
+    private GraphicalEntity loadGraphicalEntity(List<GraphicalEntity> renderList, WorldEntity e) {
+        ModelData data = OBJFileLoader.loadOBJ(e.getModel());
+        RawModel model = loader.loadToVAO(data.getVertices(), data.getTextureCoords(), data.getNormals(), data.getIndices());
+        int texture = 0 - 1;
+        if (textureMap.containsKey(e.getTexture())) {
+            texture = textureMap.get(e.getTexture());
+        } else {
+            texture = loader.loadTexture(e.getTexture());
+            textureMap.put(e.getTexture(), texture);
+        }
+        ModelTexture modelTexture = new ModelTexture(texture);
+        GraphicalEntity graphicalEntity = new GraphicalEntity(e, new TexturedModel(model, modelTexture));
+        renderList.add(graphicalEntity);
+        return graphicalEntity;
+    }
+
     private void loadDemoObjects() {
         loadTerrain("map");
 
         ui = new ArrayList<>();
-        UITexture uiTex =
-            new UITexture(loader.loadTexture("health.png"), new Vector2f(-0.75f, -0.9f), new Vector2f(0.25f, 0.25f));
-        uiRenderer = new UIRenderer(loader);
-        ui.add(uiTex);
-
+        // UITexture uiTex =
+        // new UITexture(loader.loadTexture("health.png"), new Vector2f(-0.75f, -0.9f), new
+        // Vector2f(0.25f, 0.25f));
+        // uiRenderer = new UIRenderer(loader);
+        // ui.add(uiTex);
         // UITexture reflectionUI = new UITexture(waterfbo.getReflectionTexture(), new
         // Vector2f(-0.5f, 0.5f), new Vector2f(0.25f, 0.25f));
         // UITexture refractionUI = new UITexture(waterfbo.getRefractionTexture(), new
@@ -223,7 +225,7 @@ public class GameRunning implements State {
             waterfbo.unbindCurrentFrameBuffer();
         }
         masterRenderer.renderScene(terrainModel, staticRenderEntities, dynamicRenderEntities, lights, camera, elapsedTime, new Vector4f(0,
-            1, 0, 100000));
+            1, 0, CLIPPING_PLANE_NOT_RENDERING));
         if (waters != null && waters.size() > 0) {
             waterRenderer.render(waters, camera, elapsedTime);
         }
@@ -289,12 +291,30 @@ public class GameRunning implements State {
         }
     }
 
+    /**
+     * Add new entitiy to gui rednering.
+     * 
+     * @param e new entity
+     */
     public void addWorldEntity(WorldEntity e) {
         movingEntities.put(e.getID(), e);
+        loadGraphicalEntity(dynamicRenderEntities, e);
     }
 
+    /**
+     * Remove entity.
+     * 
+     * @param id of entity
+     */
     public void removeWorldEntity(int id) {
         movingEntities.remove(id);
+        GraphicalEntity remove = null;
+        for (GraphicalEntity e : dynamicRenderEntities) {
+            if (e.getEntity().getID().equals(id)) {
+                remove = e;
+            }
+        }
+        dynamicRenderEntities.remove(remove);
     }
 
 }

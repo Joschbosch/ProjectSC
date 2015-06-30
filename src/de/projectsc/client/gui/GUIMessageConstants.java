@@ -37,6 +37,11 @@ public final class GUIMessageConstants {
      */
     public static final String GUI_INITIALIZED = "GUI init done";
 
+    /**
+     * Constant.
+     */
+    public static final String GAME_GUI_INITIALIZED = "Game GUI initialized.";
+
     private GUIMessageConstants() {
 
     }

@@ -72,7 +72,7 @@ public class Camera {
         this.player = player;
         if (player != null) {
             position.x = player.getPosition().x;
-            position.z = player.getPosition().z + 80;
+            position.z = player.getPosition().z + distanceFromPlayer;
         }
     }
 

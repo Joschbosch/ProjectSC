@@ -37,11 +37,11 @@ public class WorldEntity {
 
     private static int idCount = 0;
 
-    private EntityType type;
+    private final EntityType type;
 
     private Vector3f position;
 
-    private Vector3f rotation;
+    private final Vector3f rotation;
 
     private float scale;
 
@@ -68,12 +68,14 @@ public class WorldEntity {
         this.type = type;
         this.setModel(model);
         this.setTexture(texture);
-        // setBoundingBox(readBoundingBox());
-        System.out.println("Post 1: " + rotation.y);
+        setBoundingBox(readBoundingBox());
     }
 
     public WorldEntity(int id, EntityType type, String model, String texture, Vector3f position, Vector3f rotation, float scale) {
         this.id = id;
+        if (idCount < id) {
+            idCount = id + 1;
+        }
         this.position = position;
         this.rotation = rotation;
         this.type = type;
@@ -81,8 +83,7 @@ public class WorldEntity {
         this.scale = scale;
         this.setModel(model);
         this.setTexture(texture);
-        // setBoundingBox(readBoundingBox());
-        System.out.println("Post 2: " + rotation.y);
+        setBoundingBox(readBoundingBox());
     }
 
     private AABB readBoundingBox() {
@@ -94,8 +95,7 @@ public class WorldEntity {
 
                 for (String s : lines) {
                     if (s.startsWith("v ")) {
-                        String[] split = s.split(" ");
-
+                        String[] split = s.split(" +");
                         float x = Float.parseFloat(split[1]);
                         float y = Float.parseFloat(split[2]);
                         float z = Float.parseFloat(split[3]);
@@ -120,7 +120,8 @@ public class WorldEntity {
                     }
                 }
                 AABB box = new AABB(min, max);
-                // LOGGER.debug("Read bounding box for " + model + ": min=" + min + " max =" + max + " center=" + box.getCenter() +
+                // LOGGER.debug("Read bounding box for " + model + ": min=" + min + " max =" + max +
+                // " center=" + box.getCenter() +
                 // " Size = "
                 // + box.getSize());
                 return box;
@@ -157,20 +158,16 @@ public class WorldEntity {
      */
     public void setCurrentTarget(Vector3f currentTarget) {
         this.currentTarget = currentTarget;
-        float rotate = (float) Math.toDegrees(Vector3f.angle(Vector3f.sub(currentTarget, position, null), new Vector3f(0, 0, 1)));
-        if (currentTarget.x < position.x) {
-            rotate = -rotate;
+        Vector3f sub = Vector3f.sub(currentTarget, position, null);
+        if (sub.length() != 0) {
+            float angle = Vector3f.angle(sub, new Vector3f(0, 0, 1));
+            float rotate = (float) Math.toDegrees(angle);
+            if (currentTarget.x < position.x) {
+                rotate = -rotate;
+            }
+            setRotY(rotate);
         }
-        this.rotation.y = rotate;
-
     }
-
-    // private void jump() {
-    // if (!jumping) {
-    // upwardsSpeed = JUMP_POWER;
-    // jumping = true;
-    // }
-    // }
 
     /**
      * Moves the entity with the given deltas.
@@ -193,9 +190,9 @@ public class WorldEntity {
      * @param dz rotate on z axis
      */
     public void increaseRotation(float dx, float dy, float dz) {
-        this.rotation.x += dx;
-        this.rotation.y += dy;
-        this.rotation.z += dz;
+        setRotX(getRotX() + dx);
+        setRotY(getRotY() + dy);
+        setRotZ(getRotZ() + dz);
     }
 
     public Vector3f getLocationBoundingBoxMinimum() {

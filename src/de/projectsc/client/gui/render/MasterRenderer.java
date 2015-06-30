@@ -85,8 +85,8 @@ public class MasterRenderer {
      * Render the whole scene with all objects.
      * 
      * @param terrain to render
-     * @param staticWorldEntities to render
-     * @param dynamicRenderEntities
+     * @param staticWorldEntities all static entities to render
+     * @param dynamicRenderEntities all dynamic entities to render
      * @param lights to render
      * @param camera for view
      * @param elapsedTime since last frame

@@ -50,6 +50,8 @@ public class ClientCore implements Runnable {
 
     private final AtomicBoolean networkReady = new AtomicBoolean(false);
 
+    private final AtomicBoolean gameGuiReady = new AtomicBoolean(false);
+
     private long gameTime = 0;
 
     private Map<Integer, WorldEntity> worldEntities;
@@ -115,6 +117,7 @@ public class ClientCore implements Runnable {
             } catch (InterruptedException e) {
             }
         }
+
         long last = System.currentTimeMillis();
         while (!shutdown) {
             long now = System.currentTimeMillis();
@@ -151,7 +154,6 @@ public class ClientCore implements Runnable {
                 @SuppressWarnings("unchecked") List<WorldEntity> incomingEntities = (List<WorldEntity>) message.getData();
                 worldEntities = new TreeMap<>();
                 for (WorldEntity e : incomingEntities) {
-                    System.out.println("P2");
                     worldEntities.put(e.getID(),
                         new WorldEntity(e.getID(), e.getType(), e.getModel(), e.getTexture(), new Vector3f(e.getPosition().x, e
                             .getPosition().y, e.getPosition().z), new Vector3f(e.getRotX(), e.getRotY(), e
@@ -160,18 +162,18 @@ public class ClientCore implements Runnable {
                 guiOutgoingQueue.offer(new GUIMessage(GUIMessageConstants.INIT_GAME, worldEntities));
             }
         } else if (message.getMessage().equals(NetworkMessageConstants.NEW_LOCATION)) {
-            // if (message.getData() instanceof float[]) {
-            // float[] data = (float[]) message.getData();
-            // WorldEntity worldEntity = worldEntities.get((int) data[0]);
-            // worldEntity.setRotY(data[3]);
-            // worldEntity.getPosition().x = data[1];
-            // worldEntity.getPosition().y = 0;
-            // worldEntity.getPosition().x = data[2];
-            // } else {
-            // int[] data = (int[]) message.getData();
-            // worldEntities.get(data[0]).setCurrentTarget(new Vector3f(data[1], 0, data[2]));
-            // LOGGER.debug(String.format("Got new target information for entity %s: %s | %s", data[0], data[1], data[2]));
-            // }
+            if (message.getData() instanceof float[]) {
+                float[] data = (float[]) message.getData();
+                WorldEntity worldEntity = worldEntities.get((int) data[0]);
+                worldEntity.setRotY(data[3]);
+                worldEntity.getPosition().x = data[1];
+                worldEntity.getPosition().y = 0;
+                worldEntity.getPosition().x = data[2];
+            } else {
+                int[] data = (int[]) message.getData();
+                worldEntities.get(data[0]).setCurrentTarget(new Vector3f(data[1], 0, data[2]));
+                LOGGER.debug(String.format("Got new target information for entity %s: %s | %s", data[0], data[1], data[2]));
+            }
         } else if (message.getMessage().equals("pong")) {
             long[] data = (long[]) message.getData();
             LOGGER.debug(String.format("Got pong with times (%s, %s) and ping = %s", data[0], data[1],
@@ -205,6 +207,8 @@ public class ClientCore implements Runnable {
                 networkSendQueue.offer(new ClientMessage(GUIMessageConstants.POINT_ON_MAP_CLICKED, msg.getData()));
             } else if (msg.getMessage().equals(GUIMessageConstants.GUI_INITIALIZED)) {
                 guiReady.set(true);
+            } else if (msg.getMessage().equals(GUIMessageConstants.GUI_INITIALIZED)) {
+                gameGuiReady.set(true);
             }
         } catch (InterruptedException e) {
             LOGGER.error(ERROR_IN_CORE, e);
