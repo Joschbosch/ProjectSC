@@ -53,6 +53,8 @@ public class WorldEntity {
 
     private BoundingBox boundingBox;
 
+    private boolean moved;
+
     public WorldEntity(EntityType type, String model, String texture, Vector3f position, Vector3f rotation, float scale) {
         this.position = position;
         this.rotation = rotation;
@@ -63,6 +65,7 @@ public class WorldEntity {
         this.setModel(model);
         this.setTexture(texture);
         boundingBox = BoundingBoxLoader.readBoundingBox(this);
+        moved = false;
     }
 
     public WorldEntity(int id, EntityType type, String model, String texture, Vector3f position, Vector3f rotation, float scale) {
@@ -78,6 +81,7 @@ public class WorldEntity {
         this.setModel(model);
         this.setTexture(texture);
         boundingBox = BoundingBoxLoader.readBoundingBox(this);
+        moved = false;
     }
 
     /**
@@ -97,6 +101,11 @@ public class WorldEntity {
         float dx = (float) (distance * Math.sin(Math.toRadians(getRotY())));
         float dz = (float) (distance * Math.cos(Math.toRadians(getRotY())));
         increasePostion(dx, 0, dz);
+        if (dx != 0 && dz != 0) {
+            moved = true;
+        } else {
+            moved = false;
+        }
     }
 
     /**
@@ -252,15 +261,23 @@ public class WorldEntity {
     @Override
     public String toString() {
         String result = "";
-        result += getModel() + "\n";
-        result += getTexture() + "\n";
-        result += getID() + "\n";
-        result += getPosition() + "\n";
-        result += getRotX() + "\n";
-        result += getRotY() + "\n";
-        result += getRotZ() + "\n";
-        result += getScale() + "\n";
-        result += getType() + "\n";
+        result += getModel() + ", ";
+        result += getTexture() + ", ";
+        result += getID() + ", ";
+        result += getPosition() + ", ";
+        result += getRotX() + ", ";
+        result += getRotY() + ", ";
+        result += getRotZ() + ", ";
+        result += getScale() + ", ";
+        result += getType() + "";
         return result;
+    }
+
+    public boolean hasMoved() {
+        return moved;
+    }
+
+    public void setMoved(boolean value) {
+        moved = value;
     }
 }

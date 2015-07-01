@@ -69,4 +69,10 @@ public class BoundingBox {
         this.center = center;
     }
 
+    @Override
+    public String toString() {
+        String result = String.format("Bounding box:\n\tMinium (%s)\n\tMaximum (%s)\n\tCenter (%s)\n\tSize (%s)", min, max, center, size);
+        return result;
+
+    }
 }
