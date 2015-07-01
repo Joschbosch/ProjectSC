@@ -4,16 +4,15 @@
 
 package de.projectsc.core.utils;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.TreeMap;
 
 import org.lwjgl.util.vector.Vector3f;
 
-import de.projectsc.core.BoundingBox;
 import de.projectsc.core.EntityType;
 import de.projectsc.core.WorldEntity;
 
@@ -21,7 +20,7 @@ public class OctTree {
 
     private final Queue<WorldEntity> pendingEntities = new LinkedList<WorldEntity>();
 
-    private Map<Integer, WorldEntity> entities = new TreeMap<Integer, WorldEntity>();
+    private PriorityQueue<WorldEntity> entities = new PriorityQueue<WorldEntity>();
 
     private boolean treeBuild = false;
 
@@ -33,7 +32,11 @@ public class OctTree {
 
     private byte activeChildren = 0;
 
-    private LinkedList<Float[]> interSectionList;
+    private LinkedList<Integer> interSectionList;
+
+    private int m_maxLifespan = 8; //
+
+    private int m_curLife = -1;
 
     public OctTree() {
         region = new BoundingBox(new Vector3f(0, 0, 0), new Vector3f(0, 0, 0));
@@ -45,7 +48,7 @@ public class OctTree {
         children = new OctTree[8];
     }
 
-    private OctTree(BoundingBox region, Map<Integer, WorldEntity> entities) {
+    private OctTree(BoundingBox region, PriorityQueue<WorldEntity> entities) {
         this.region = region;
         this.entities = entities;
         children = new OctTree[8];
@@ -55,11 +58,11 @@ public class OctTree {
         pendingEntities.add(e);
     }
 
-    public void updateTree() {
+    public void recalculateTree() {
         if (!treeBuild) {
             while (!pendingEntities.isEmpty()) {
                 WorldEntity e = pendingEntities.remove();
-                entities.put(new Integer(e.getID()), e);
+                entities.add(e);
             }
             buildTree();
         } else {
@@ -72,15 +75,14 @@ public class OctTree {
     }
 
     private void insert(WorldEntity e) {
-        System.out.println("insert " + hashCode());
-        if (entities.size() <= 1 && activeChildren == 0) {
-            entities.put(new Integer(e.getID()), e);
+        if (entities.size() <= 1 && !hasChildren()) {
+            entities.add(e);
             return;
         }
         Vector3f dimension = region.getSize();
 
         if (dimension.x <= 1 && dimension.y <= 1 && dimension.z <= 1) {
-            entities.put(new Integer(e.getID()), e);
+            entities.add(e);
             return;
         }
         Vector3f half = new Vector3f(dimension.x / 2.0f, dimension.y / 2.0f, dimension.z / 2.0f);
@@ -127,12 +129,11 @@ public class OctTree {
                 }
             }
             if (!foundChild) {
-                System.out.println("not found put1" + this.hashCode());
-                entities.put(new Integer(e.getID()), e);
+                entities.add(e);
             }
+        } else {
         }
         treeBuild = true;
-
     }
 
     private void buildTree() {
@@ -178,7 +179,7 @@ public class OctTree {
         }
 
         List<WorldEntity> remove = new LinkedList<>();
-        for (WorldEntity e : entities.values()) {
+        for (WorldEntity e : entities) {
             // only boxes for now.
             for (int i = 0; i < 8; i++) {
                 if (containsEntity(octant[i], e)) {
@@ -189,7 +190,7 @@ public class OctTree {
             }
         }
         for (WorldEntity e : remove) {
-            entities.remove(new Integer(e.getID()));
+            entities.remove(e);
         }
 
         for (int i = 0; i < 8; i++) {
@@ -204,12 +205,12 @@ public class OctTree {
     private boolean containsEntity(BoundingBox boundingBox, WorldEntity e) {
         Vector3f minBB = Vector3f.add(e.getPosition(), e.getBoundingBox().getMin(), null);
         Vector3f maxBB = Vector3f.add(e.getPosition(), e.getBoundingBox().getMax(), null);
-        if (minBB.x < boundingBox.getMax().x && minBB.x > boundingBox.getMin().x
-            && minBB.y < boundingBox.getMax().y && minBB.y > boundingBox.getMin().y
-            && minBB.z < boundingBox.getMax().z && minBB.z > boundingBox.getMin().z
-            && maxBB.x < boundingBox.getMax().x && maxBB.x > boundingBox.getMin().x
-            && maxBB.y < boundingBox.getMax().y && maxBB.y > boundingBox.getMin().y
-            && maxBB.z < boundingBox.getMax().z && maxBB.z > boundingBox.getMin().z) {
+        if (minBB.x <= boundingBox.getMax().x && minBB.x >= boundingBox.getMin().x
+            && minBB.y <= boundingBox.getMax().y && minBB.y >= boundingBox.getMin().y
+            && minBB.z <= boundingBox.getMax().z && minBB.z >= boundingBox.getMin().z
+            && maxBB.x <= boundingBox.getMax().x && maxBB.x >= boundingBox.getMin().x
+            && maxBB.y <= boundingBox.getMax().y && maxBB.y >= boundingBox.getMin().y
+            && maxBB.z <= boundingBox.getMax().z && maxBB.z >= boundingBox.getMin().z) {
             return true;
         }
         return false;
@@ -232,9 +233,9 @@ public class OctTree {
         if (list.isEmpty()) {
             return null;
         }
-        Map<Integer, WorldEntity> map = new HashMap<>();
+        PriorityQueue<WorldEntity> map = new PriorityQueue<>();
         for (WorldEntity e : list) {
-            map.put(e.getID(), e);
+            map.add(e);
         }
         OctTree returnTree = new OctTree(boundingBox, map);
         returnTree.parent = this;
@@ -243,11 +244,46 @@ public class OctTree {
         return returnTree;
     }
 
+    private boolean hasChildren() {
+        for (int i = 0; i < 8; i++) {
+            if (children[i] != null) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private int getAllEnties() {
+        int number = entities.size();
+        for (int i = 0; i < 8; i++) {
+            if (children[i] != null) {
+                number += children[i].getAllEnties();
+            }
+        }
+        return number;
+    }
+
     public void update() {
         if (treeBuild) {
+            if (entities.size() == 0) {
+                if (!hasChildren()) {
+                    if (m_curLife == -1) {
+                        m_curLife = m_maxLifespan;
+                    } else if (m_curLife > 0) {
+                        m_curLife--;
+                    }
+                }
+            } else {
+                if (m_curLife != -1) {
+                    if (m_maxLifespan <= 64) {
+                        m_maxLifespan *= 2;
+                    }
+                    m_curLife = -1;
+                }
+            }
 
             List<WorldEntity> movedObjects = new LinkedList<>();
-            for (WorldEntity e : entities.values()) {
+            for (WorldEntity e : entities) {
                 if (e.getType() == EntityType.MOVEABLE_OBJECT || e.getType() == EntityType.PLAYER) {
                     if (e.hasMoved()) {
                         movedObjects.add(e);
@@ -260,9 +296,10 @@ public class OctTree {
                     children[i].update();
                 }
             }
-            List<WorldEntity> toRemove = new LinkedList<>();
             for (WorldEntity e : movedObjects) {
                 OctTree current = this;
+                if (parent == null) {
+                }
                 while (!containsEntity(current.region, e)) {
                     if (current.parent != null) {
                         current = current.parent;
@@ -272,20 +309,81 @@ public class OctTree {
 
                 }
 
-                entities.remove(new Integer(e.getID()));
+                entities.remove(e);
                 current.insert(e);
+                if (parent == null) {
+                }
             }
+
+            for (int i = 0; i < 8; i++) {
+                if (children[i] != null && children[i].m_curLife == 0) {
+                    children[i] = null;
+                }
+            }
+
             // root node
-            if (parent != null) {
-                interSectionList = new LinkedList<Float[]>();
-                getAllIntersections(interSectionList);
+            if (parent == null) {
+                interSectionList = new LinkedList<Integer>();
+                interSectionList.addAll(getAllIntersections(new LinkedList<WorldEntity>()));
             }
 
         }
     }
 
-    public List<Float[]> getAllIntersections(LinkedList<Float[]> interSectionList2) {
-        return new LinkedList<Float[]>();
+    public List<Integer> getIntersectionList() {
+        return interSectionList;
+    }
+
+    public List<Integer> getAllIntersections(LinkedList<WorldEntity> parentEntities) {
+        List<Integer> intersectionIDs = new LinkedList<>();
+        for (WorldEntity parentEntity : parentEntities) {
+            for (WorldEntity entity : entities) {
+                if (parentEntity.getBoundingBox() != null
+                    && entity.getBoundingBox() != null && boundingBoxesColliding(parentEntity, entity)) {
+                    System.out.println("Collision!" + parentEntity.getID() + parentEntity.getModel() + "  " + entity.getID()
+                        + entity.getModel());
+                    if (parentEntity.getType() == EntityType.MOVEABLE_OBJECT || parentEntity.getType() == EntityType.PLAYER) {
+                        intersectionIDs.add(parentEntity.getID());
+                    }
+                    if (entity.getType() == EntityType.MOVEABLE_OBJECT || entity.getType() == EntityType.PLAYER) {
+                        intersectionIDs.add(entity.getID());
+                    }
+                }
+            }
+        }
+        if (entities.size() > 1) {
+
+            PriorityQueue<WorldEntity> tmp = new PriorityQueue<>(entities);
+            while (!tmp.isEmpty()) {
+                WorldEntity current = tmp.remove();
+                for (WorldEntity e : entities) {
+                    if (!e.getID().equals(current.getID())
+                        && (e.getType() == EntityType.MOVEABLE_OBJECT || e.getType() == EntityType.PLAYER
+                            || current.getType() == EntityType.MOVEABLE_OBJECT || e.getType() == EntityType.PLAYER)) {
+                        if (current.getBoundingBox() != null && (e.getBoundingBox() != null && boundingBoxesColliding(current, e))) {
+                            System.out.println("Collision2!" + e.getID() + e.getModel() + "   " + current.getID() + current.getModel());
+                            if (e.getType() == EntityType.MOVEABLE_OBJECT || e.getType() == EntityType.PLAYER) {
+                                intersectionIDs.add(e.getID());
+                            }
+                            if (current.getType() == EntityType.MOVEABLE_OBJECT || current.getType() == EntityType.PLAYER) {
+                                intersectionIDs.add(current.getID());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        for (WorldEntity e : entities) {
+            if (e.getType() == EntityType.MOVEABLE_OBJECT || e.getType() == EntityType.PLAYER) {
+                parentEntities.add(e);
+            }
+        }
+        for (int i = 0; i < 8; i++) {
+            if (children[i] != null) {
+                intersectionIDs.addAll(children[i].getAllIntersections(parentEntities));
+            }
+        }
+        return intersectionIDs;
     }
 
     @Override

@@ -26,6 +26,7 @@ import de.projectsc.core.TerrainLoader;
 import de.projectsc.core.WorldEntity;
 import de.projectsc.core.data.messages.MessageConstants;
 import de.projectsc.core.data.messages.NetworkMessageConstants;
+import de.projectsc.core.utils.OctTree;
 import de.projectsc.server.core.tasks.GameTimeUpdateTask;
 import de.projectsc.server.core.tasks.UpdateTask;
 
@@ -63,6 +64,8 @@ public class ServerCore implements Runnable {
     private Terrain terrain;
 
     private Map<Integer, WorldEntity> staticEntities;
+
+    private OctTree collisionTree;
 
     public ServerCore() {
         networkSendQueue = new LinkedBlockingQueue<>();
@@ -161,8 +164,16 @@ public class ServerCore implements Runnable {
 
     private void moveGoats(long elapsedTime) {
         for (WorldEntity e : entities.values()) {
-            if (e.getType() != EntityType.BACKGROUND_OBJECT && e.getType() != EntityType.SOLID_BACKGROUND_OBJECT) {
+            if (e.getType() == EntityType.PLAYER || e.getType() == EntityType.MOVEABLE_OBJECT) {
                 e.move(elapsedTime);
+
+            }
+        }
+        collisionTree.update();
+        for (WorldEntity e : entities.values()) {
+            if (collisionTree.getIntersectionList().contains(e.getID())) {
+                e.move(-elapsedTime);
+            } else {
                 networkSendQueue.offer(new ServerMessage(NetworkMessageConstants.NEW_LOCATION, new float[] { e.getID(),
                     e.getPosition().x, e.getPosition().z, e.getRotY() }));
             }
@@ -171,7 +182,7 @@ public class ServerCore implements Runnable {
 
     private void createWorldEntities() {
         terrain = TerrainLoader.loadTerrain("housingMap.psc");
-        // staticEntities = terrain.getStaticObjects();
+        staticEntities = terrain.getStaticObjects();
         // staticEntities.values();
         // List<Integer> remove = new LinkedList<>();
         // for (WorldEntity e : staticEntities.values()) {
@@ -198,7 +209,16 @@ public class ServerCore implements Runnable {
         // }
         // TerrainLoader.storeTerrain(terrain, "housingMap.psc");
         loadMovingEntities();
-
+        collisionTree = new OctTree(terrain.getMapBoundingBox());
+        for (WorldEntity entity : staticEntities.values()) {
+            if (entity.getType() == EntityType.SOLID_BACKGROUND_OBJECT) {
+                collisionTree.addEntity(entity);
+            }
+        }
+        for (WorldEntity entity : entities.values()) {
+            collisionTree.addEntity(entity);
+        }
+        collisionTree.recalculateTree();
     }
 
     private void loadMovingEntities() {

@@ -11,13 +11,15 @@ import org.apache.commons.logging.LogFactory;
 import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.client.gui.Timer;
+import de.projectsc.core.utils.BoundingBox;
+import de.projectsc.core.utils.BoundingBoxLoader;
 
 /**
  * An entity in the world.
  * 
  * @author Josch Bosch
  */
-public class WorldEntity {
+public class WorldEntity implements Comparable<WorldEntity> {
 
     // private static final float TURN_SPEED = 160f;
     //
@@ -101,7 +103,7 @@ public class WorldEntity {
         float dx = (float) (distance * Math.sin(Math.toRadians(getRotY())));
         float dz = (float) (distance * Math.cos(Math.toRadians(getRotY())));
         increasePostion(dx, 0, dz);
-        if (dx != 0 && dz != 0) {
+        if (dx != 0 || dz != 0) {
             moved = true;
         } else {
             moved = false;
@@ -174,7 +176,6 @@ public class WorldEntity {
     }
 
     public Vector3f getLocationBoundingBoxMinimum() {
-        System.out.println(boundingBox);
         return Vector3f.add(boundingBox.getMin(), position, null);
     }
 
@@ -279,5 +280,10 @@ public class WorldEntity {
 
     public void setMoved(boolean value) {
         moved = value;
+    }
+
+    @Override
+    public int compareTo(WorldEntity arg0) {
+        return getID().compareTo(arg0.getID());
     }
 }

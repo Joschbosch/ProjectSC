@@ -12,6 +12,7 @@ import java.util.Map;
 import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.client.gui.objects.Light;
+import de.projectsc.core.utils.BoundingBox;
 
 /**
  * Holds all information about the static terrain.
@@ -43,6 +44,8 @@ public class Terrain {
 
     private Map<Integer, WorldEntity> staticObjects;
 
+    private BoundingBox mapBox;
+
     public Terrain(int[][] tiles, float[][] heights, String bgTexture, String rTexture, String gTexture,
         String bTexture, List<Light> lights, Map<Integer, WorldEntity> staticObjects) {
         this.tiles = tiles;
@@ -54,6 +57,15 @@ public class Terrain {
         this.bTexture = bTexture;
         this.setStaticLights(lights);
         this.staticObjects = staticObjects;
+        this.setMapBox(calculateMapBox());
+    }
+
+    private BoundingBox calculateMapBox() {
+        Vector3f minimum = new Vector3f(0, 0, 0);
+        Vector3f maximum =
+            new Vector3f(mapSize * Terrain.TERRAIN_TILE_SIZE, mapSize * Terrain.TERRAIN_TILE_SIZE, mapSize * Terrain.TERRAIN_TILE_SIZE);
+
+        return new BoundingBox(minimum, maximum);
     }
 
     /**
@@ -137,5 +149,13 @@ public class Terrain {
 
     public void setStaticObjects(Map<Integer, WorldEntity> staticObjects) {
         this.staticObjects = staticObjects;
+    }
+
+    public BoundingBox getMapBoundingBox() {
+        return mapBox;
+    }
+
+    public void setMapBox(BoundingBox mapBox) {
+        this.mapBox = mapBox;
     }
 }

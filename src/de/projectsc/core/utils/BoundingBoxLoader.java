@@ -2,7 +2,7 @@
  * Copyright (C) 2015 
  */
 
-package de.projectsc.core;
+package de.projectsc.core.utils;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,6 +15,9 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.lwjgl.util.vector.Vector3f;
+
+import de.projectsc.core.EntityType;
+import de.projectsc.core.WorldEntity;
 
 public class BoundingBoxLoader {
 
@@ -57,6 +60,9 @@ public class BoundingBoxLoader {
                             }
                         }
                     }
+                    min.scale(entity.getScale());
+                    min.y = 0;
+                    max.scale(entity.getScale());
                     BoundingBox box = new BoundingBox(min, max);
                     // LOGGER.debug("Read bounding box for " + model + ": min=" + min + " max =" + max +
                     // " center=" + box.getCenter() +
