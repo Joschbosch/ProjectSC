@@ -56,8 +56,6 @@ public class Editor3DCore implements Runnable {
 
     private List<Light> lights;
 
-    private Object staticEntities;
-
     private final BlockingQueue<String> messageQueue;
 
     public Editor3DCore(Canvas displayParent, int width, int height, BlockingQueue<String> messageQueue) {

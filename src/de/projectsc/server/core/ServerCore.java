@@ -19,13 +19,14 @@ import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.client.core.ClientMessageConstants;
 import de.projectsc.client.gui.GUIMessageConstants;
-import de.projectsc.core.EntityType;
-import de.projectsc.core.Player;
 import de.projectsc.core.Terrain;
 import de.projectsc.core.TerrainLoader;
-import de.projectsc.core.WorldEntity;
 import de.projectsc.core.data.messages.MessageConstants;
 import de.projectsc.core.data.messages.NetworkMessageConstants;
+import de.projectsc.core.entities.EntityType;
+import de.projectsc.core.entities.MovingEntity;
+import de.projectsc.core.entities.Player;
+import de.projectsc.core.entities.WorldEntity;
 import de.projectsc.core.utils.OctTree;
 import de.projectsc.server.core.tasks.GameTimeUpdateTask;
 import de.projectsc.server.core.tasks.UpdateTask;
@@ -65,7 +66,7 @@ public class ServerCore implements Runnable {
 
     private Map<Integer, WorldEntity> staticEntities;
 
-    private OctTree collisionTree;
+    private OctTree<WorldEntity> collisionTree;
 
     public ServerCore() {
         networkSendQueue = new LinkedBlockingQueue<>();
@@ -99,7 +100,7 @@ public class ServerCore implements Runnable {
                 createWorldEntities();
                 List<WorldEntity> entitiesToSend = new LinkedList<WorldEntity>();
                 for (WorldEntity e : entities.values()) {
-                    if (e.getType() != EntityType.BACKGROUND_OBJECT && e.getType() != EntityType.SOLID_BACKGROUND_OBJECT) {
+                    if (e.getType() != EntityType.DECORATION && e.getType() != EntityType.SOLID_BACKGROUND_OBJECT) {
                         entitiesToSend.add(e);
                     }
 
@@ -151,7 +152,7 @@ public class ServerCore implements Runnable {
                         Vector3f position = e.getPosition();
                         float newX = (float) ((Math.random() * 2 * 2 * 10 * 10 - 2 * 10 * 10) + position.x);
                         float newZ = (float) ((Math.random() * 2 * 2 * 10 * 10 - 2 * 10 * 10) + position.z);
-                        e.setCurrentTarget(new Vector3f(newX, 0, newZ));
+                        ((MovingEntity) e).setCurrentTarget(new Vector3f(newX, 0, newZ));
                         networkSendQueue.offer(new ServerMessage(NetworkMessageConstants.NEW_LOCATION, new int[] { e.getID(),
                             (int) newX, (int) newZ }));
                     }
@@ -164,15 +165,15 @@ public class ServerCore implements Runnable {
 
     private void moveGoats(long elapsedTime) {
         for (WorldEntity e : entities.values()) {
-            if (e.getType() == EntityType.PLAYER || e.getType() == EntityType.MOVEABLE_OBJECT) {
-                e.move(elapsedTime);
+            if (e instanceof MovingEntity) {
+                ((MovingEntity) e).move(elapsedTime);
 
             }
         }
         collisionTree.update();
         for (WorldEntity e : entities.values()) {
             if (collisionTree.getIntersectionList().contains(e.getID())) {
-                e.move(-elapsedTime);
+                ((MovingEntity) e).move(-elapsedTime);
             } else {
                 networkSendQueue.offer(new ServerMessage(NetworkMessageConstants.NEW_LOCATION, new float[] { e.getID(),
                     e.getPosition().x, e.getPosition().z, e.getRotY() }));
@@ -209,7 +210,7 @@ public class ServerCore implements Runnable {
         // }
         // TerrainLoader.storeTerrain(terrain, "housingMap.psc");
         loadMovingEntities();
-        collisionTree = new OctTree(terrain.getMapBoundingBox());
+        collisionTree = new OctTree<WorldEntity>(terrain.getMapBoundingBox());
         for (WorldEntity entity : staticEntities.values()) {
             if (entity.getType() == EntityType.SOLID_BACKGROUND_OBJECT) {
                 collisionTree.addEntity(entity);
@@ -226,7 +227,7 @@ public class ServerCore implements Runnable {
         entities.put(worldPlayer.getID(), worldPlayer);
         for (int i = 0; i < 5; i++) {
             WorldEntity worldEntity =
-                new WorldEntity(EntityType.MOVEABLE_OBJECT, "goat", "white.png", new Vector3f(340 + i * 10, 0, 340), new Vector3f(0,
+                new MovingEntity("goat", "white.png", new Vector3f(340 + i * 10, 0, 340), new Vector3f(0,
                     1.0f, 0), 7f);
             entities.put(worldEntity.getID(), worldEntity);
         }

@@ -1,7 +1,8 @@
 /*
- * Copyright (C) 2015
+ * Copyright (C) 2015 Project SC
+ * 
+ * All rights reserved
  */
-
 package de.projectsc;
 
 import java.awt.BorderLayout;
@@ -44,7 +45,7 @@ public class Editor extends JFrame {
 
     private Editor3DCore editor3dCore;
 
-    BlockingQueue<String> messageQueue;
+    private BlockingQueue<String> messageQueue;
 
     public Editor() {}
 

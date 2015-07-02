@@ -22,7 +22,7 @@ import de.projectsc.client.gui.states.GUIState;
 import de.projectsc.client.gui.states.GameRunning;
 import de.projectsc.client.gui.states.Menue;
 import de.projectsc.client.gui.states.State;
-import de.projectsc.core.WorldEntity;
+import de.projectsc.core.entities.WorldEntity;
 
 /**
  * Core class for the GUI.

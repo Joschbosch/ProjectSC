@@ -20,9 +20,10 @@ import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.client.gui.GUIMessage;
 import de.projectsc.client.gui.GUIMessageConstants;
-import de.projectsc.core.EntityType;
-import de.projectsc.core.WorldEntity;
 import de.projectsc.core.data.messages.NetworkMessageConstants;
+import de.projectsc.core.entities.MovingEntity;
+import de.projectsc.core.entities.Player;
+import de.projectsc.core.entities.WorldEntity;
 
 /**
  * Core class for the client.
@@ -127,8 +128,8 @@ public class ClientCore implements Runnable {
             gameTime += delta;
             if (worldEntities != null) {
                 for (WorldEntity e : worldEntities.values()) {
-                    if (e.getType() == EntityType.MOVEABLE_OBJECT || e.getType() == EntityType.PLAYER) {
-                        e.move(delta);
+                    if (e instanceof MovingEntity) {
+                        ((MovingEntity) e).move(delta);
                     }
                 }
             }
@@ -157,10 +158,42 @@ public class ClientCore implements Runnable {
                 @SuppressWarnings("unchecked") List<WorldEntity> incomingEntities = (List<WorldEntity>) message.getData();
                 worldEntities = new TreeMap<>();
                 for (WorldEntity e : incomingEntities) {
-                    worldEntities.put(e.getID(),
-                        new WorldEntity(e.getID(), e.getType(), e.getModel(), e.getTexture(), new Vector3f(e.getPosition().x, e
+                    WorldEntity newEntity = null;
+                    switch (e.getType()) {
+                    case COLLECTABLE:
+
+                        break;
+                    case EFFECT:
+
+                        break;
+
+                    case MOVEABLE_OBJECT:
+                        newEntity = new MovingEntity(e.getID(), e.getModel(), e.getTexture(), new Vector3f(e.getPosition().x, e
                             .getPosition().y, e.getPosition().z), new Vector3f(e.getRotX(), e.getRotY(), e
-                            .getRotZ()), e.getScale()));
+                            .getRotZ()), e.getScale());
+                        break;
+
+                    case PLAYER:
+                        newEntity = new Player(e.getID(), e.getModel(), e.getTexture(), new Vector3f(e.getPosition().x, e
+                            .getPosition().y, e.getPosition().z), new Vector3f(e.getRotX(), e.getRotY(), e
+                            .getRotZ()), e.getScale());
+                        break;
+
+                    case DECORATION:
+
+                        break;
+                    case SOLID_BACKGROUND_OBJECT:
+
+                        break;
+
+                    case USABLE_OBJECT:
+
+                        break;
+
+                    default:
+                        break;
+                    }
+                    worldEntities.put(e.getID(), newEntity);
                 }
                 guiOutgoingQueue.offer(new GUIMessage(GUIMessageConstants.INIT_GAME, worldEntities));
             }
@@ -174,8 +207,10 @@ public class ClientCore implements Runnable {
                 worldEntity.getPosition().z = data[2];
             } else {
                 int[] data = (int[]) message.getData();
-                worldEntities.get(data[0]).setCurrentTarget(new Vector3f(data[1], 0, data[2]));
-                LOGGER.debug(String.format("Got new target information for entity %s: %s | %s", data[0], data[1], data[2]));
+                if (worldEntities.get(data[0]) instanceof MovingEntity) {
+                    ((MovingEntity) worldEntities.get(data[0])).setCurrentTarget(new Vector3f(data[1], 0, data[2]));
+                    LOGGER.debug(String.format("Got new target information for entity %s: %s | %s", data[0], data[1], data[2]));
+                }
             }
         } else if (message.getMessage().equals("pong")) {
             long[] data = (long[]) message.getData();

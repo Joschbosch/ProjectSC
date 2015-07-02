@@ -12,6 +12,7 @@ import java.util.Map;
 import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.client.gui.objects.Light;
+import de.projectsc.core.entities.WorldEntity;
 import de.projectsc.core.utils.BoundingBox;
 
 /**

@@ -8,7 +8,7 @@ package de.projectsc.client.gui.objects;
 import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.client.gui.models.TexturedModel;
-import de.projectsc.core.WorldEntity;
+import de.projectsc.core.entities.WorldEntity;
 
 /**
  * The instance of a model.

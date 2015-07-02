@@ -1,7 +1,8 @@
 /*
- * Copyright (C) 2015
+ * Copyright (C) 2015 Project SC
+ * 
+ * All rights reserved
  */
-
 package de.projectsc.core.utils;
 
 import java.util.LinkedList;
@@ -13,68 +14,85 @@ import java.util.TreeMap;
 
 import org.lwjgl.util.vector.Vector3f;
 
-import de.projectsc.core.EntityType;
-import de.projectsc.core.WorldEntity;
+import de.projectsc.core.entities.MovingEntity;
 
-public class OctTree {
+/**
+ * Data structure for finding collisions of {@link PhysicalObject}s.
+ * 
+ * @param <T> extends {@link PhysicalObject}
+ * @author Josch Bosch
+ */
+public class OctTree<T extends PhysicalObject> {
 
-    private final Queue<WorldEntity> pendingEntities = new LinkedList<WorldEntity>();
+    private static final int MAXIMUM_LIFESPAN = 64;
 
-    private PriorityQueue<WorldEntity> entities = new PriorityQueue<WorldEntity>();
+    private static final int LIFE_INIT_VALUE = -1;
+
+    private final Queue<T> pendingEntities = new LinkedList<>();
+
+    private PriorityQueue<T> entities = new PriorityQueue<>();
 
     private boolean treeBuild = false;
 
     private final BoundingBox region;
 
-    private OctTree parent;
+    private OctTree<T> parent;
 
-    private OctTree[] children;
+    private OctTree<T>[] children;
 
-    private byte activeChildren = 0;
+    private LinkedList<T> interSectionList;
 
-    private LinkedList<Integer> interSectionList;
+    private int maxLifespan = 8; //
 
-    private int m_maxLifespan = 8; //
-
-    private int m_curLife = -1;
+    private int curLife = 0 - 1;
 
     public OctTree() {
         region = new BoundingBox(new Vector3f(0, 0, 0), new Vector3f(0, 0, 0));
 
     }
 
+    @SuppressWarnings("unchecked")
     public OctTree(BoundingBox region) {
         this.region = region;
         children = new OctTree[8];
     }
 
-    private OctTree(BoundingBox region, PriorityQueue<WorldEntity> entities) {
+    @SuppressWarnings("unchecked")
+    private OctTree(BoundingBox region, PriorityQueue<T> entities) {
         this.region = region;
         this.entities = entities;
         children = new OctTree[8];
     }
 
-    public void addEntity(WorldEntity e) {
+    /**
+     * Add new entity to OcTree.
+     * 
+     * @param e to add
+     */
+    public void addEntity(T e) {
         pendingEntities.add(e);
     }
 
+    /**
+     * Recalculate the whole tree.
+     */
     public void recalculateTree() {
         if (!treeBuild) {
             while (!pendingEntities.isEmpty()) {
-                WorldEntity e = pendingEntities.remove();
+                T e = pendingEntities.remove();
                 entities.add(e);
             }
             buildTree();
         } else {
             while (!pendingEntities.isEmpty()) {
-                WorldEntity e = pendingEntities.remove();
+                T e = pendingEntities.remove();
                 insert(e);
             }
         }
         treeBuild = true;
     }
 
-    private void insert(WorldEntity e) {
+    private void insert(T e) {
         if (entities.size() <= 1 && !hasChildren()) {
             entities.add(e);
             return;
@@ -119,10 +137,9 @@ public class OctTree {
                     if (children[i] != null) {
                         children[i].insert(e);
                     } else {
-                        List<WorldEntity> list = new LinkedList<>();
+                        List<T> list = new LinkedList<>();
                         list.add(e);
                         children[i] = createNewNode(octant[i], list);
-                        activeChildren |= (byte) (1 << i);
                     }
 
                     foundChild = true;
@@ -131,7 +148,6 @@ public class OctTree {
             if (!foundChild) {
                 entities.add(e);
             }
-        } else {
         }
         treeBuild = true;
     }
@@ -142,9 +158,6 @@ public class OctTree {
         }
         Vector3f dimension = region.getSize();
 
-        if (dimension.lengthSquared() == 0.0) {
-
-        }
         if (dimension.x <= 1 && dimension.y <= 1 && dimension.z <= 1) {
             return;
         }
@@ -173,13 +186,13 @@ public class OctTree {
             new BoundingBox(new Vector3f(region.getMin().x, center.y, center.z), new Vector3f(center.x, region.getMax().y,
                 region.getMax().z));
 
-        Map<Integer, List<WorldEntity>> subEntities = new TreeMap<>();
+        Map<Integer, List<T>> subEntities = new TreeMap<>();
         for (int i = 0; i < 8; i++) {
             subEntities.put(i, new LinkedList<>());
         }
 
-        List<WorldEntity> remove = new LinkedList<>();
-        for (WorldEntity e : entities) {
+        List<T> remove = new LinkedList<>();
+        for (T e : entities) {
             // only boxes for now.
             for (int i = 0; i < 8; i++) {
                 if (containsEntity(octant[i], e)) {
@@ -189,20 +202,19 @@ public class OctTree {
                 }
             }
         }
-        for (WorldEntity e : remove) {
+        for (T e : remove) {
             entities.remove(e);
         }
 
         for (int i = 0; i < 8; i++) {
             if (!subEntities.get(i).isEmpty()) {
                 children[i] = createNewNode(octant[i], subEntities.get(new Integer(i)));
-                activeChildren |= (byte) (1 << i);
                 children[i].buildTree();
             }
         }
     }
 
-    private boolean containsEntity(BoundingBox boundingBox, WorldEntity e) {
+    private boolean containsEntity(BoundingBox boundingBox, T e) {
         Vector3f minBB = Vector3f.add(e.getPosition(), e.getBoundingBox().getMin(), null);
         Vector3f maxBB = Vector3f.add(e.getPosition(), e.getBoundingBox().getMax(), null);
         if (minBB.x <= boundingBox.getMax().x && minBB.x >= boundingBox.getMin().x
@@ -216,7 +228,7 @@ public class OctTree {
         return false;
     }
 
-    private boolean boundingBoxesColliding(WorldEntity a, WorldEntity b) {
+    private boolean boundingBoxesColliding(T a, T b) {
         Vector3f aMax = Vector3f.add(a.getPosition(), a.getBoundingBox().getMax(), null);
         Vector3f aMin = Vector3f.add(a.getPosition(), a.getBoundingBox().getMin(), null);
         Vector3f bMax = Vector3f.add(b.getPosition(), b.getBoundingBox().getMax(), null);
@@ -229,15 +241,15 @@ public class OctTree {
             && aMin.z < bMax.z);
     }
 
-    private OctTree createNewNode(BoundingBox boundingBox, List<WorldEntity> list) {
+    private OctTree<T> createNewNode(BoundingBox boundingBox, List<T> list) {
         if (list.isEmpty()) {
             return null;
         }
-        PriorityQueue<WorldEntity> map = new PriorityQueue<>();
-        for (WorldEntity e : list) {
+        PriorityQueue<T> map = new PriorityQueue<>();
+        for (T e : list) {
             map.add(e);
         }
-        OctTree returnTree = new OctTree(boundingBox, map);
+        OctTree<T> returnTree = new OctTree<T>(boundingBox, map);
         returnTree.parent = this;
         returnTree.treeBuild = true;
 
@@ -253,38 +265,31 @@ public class OctTree {
         return false;
     }
 
-    private int getAllEnties() {
-        int number = entities.size();
-        for (int i = 0; i < 8; i++) {
-            if (children[i] != null) {
-                number += children[i].getAllEnties();
-            }
-        }
-        return number;
-    }
-
+    /**
+     * Update tree after moving the objects.
+     */
     public void update() {
         if (treeBuild) {
             if (entities.size() == 0) {
                 if (!hasChildren()) {
-                    if (m_curLife == -1) {
-                        m_curLife = m_maxLifespan;
-                    } else if (m_curLife > 0) {
-                        m_curLife--;
+                    if (curLife == LIFE_INIT_VALUE) {
+                        curLife = maxLifespan;
+                    } else if (curLife > 0) {
+                        curLife--;
                     }
                 }
             } else {
-                if (m_curLife != -1) {
-                    if (m_maxLifespan <= 64) {
-                        m_maxLifespan *= 2;
+                if (curLife != LIFE_INIT_VALUE) {
+                    if (maxLifespan <= MAXIMUM_LIFESPAN) {
+                        maxLifespan *= 2;
                     }
-                    m_curLife = -1;
+                    curLife = LIFE_INIT_VALUE;
                 }
             }
 
-            List<WorldEntity> movedObjects = new LinkedList<>();
-            for (WorldEntity e : entities) {
-                if (e.getType() == EntityType.MOVEABLE_OBJECT || e.getType() == EntityType.PLAYER) {
+            List<T> movedObjects = new LinkedList<>();
+            for (T e : entities) {
+                if (e instanceof MovingEntity) {
                     if (e.hasMoved()) {
                         movedObjects.add(e);
                     }
@@ -296,10 +301,8 @@ public class OctTree {
                     children[i].update();
                 }
             }
-            for (WorldEntity e : movedObjects) {
-                OctTree current = this;
-                if (parent == null) {
-                }
+            for (T e : movedObjects) {
+                OctTree<T> current = this;
                 while (!containsEntity(current.region, e)) {
                     if (current.parent != null) {
                         current = current.parent;
@@ -311,76 +314,69 @@ public class OctTree {
 
                 entities.remove(e);
                 current.insert(e);
-                if (parent == null) {
-                }
             }
 
             for (int i = 0; i < 8; i++) {
-                if (children[i] != null && children[i].m_curLife == 0) {
+                if (children[i] != null && children[i].curLife == 0) {
                     children[i] = null;
                 }
             }
 
             // root node
             if (parent == null) {
-                interSectionList = new LinkedList<Integer>();
-                interSectionList.addAll(getAllIntersections(new LinkedList<WorldEntity>()));
+                interSectionList = new LinkedList<T>();
+                interSectionList.addAll(getAllIntersections(new LinkedList<T>()));
             }
 
         }
     }
 
-    public List<Integer> getIntersectionList() {
+    public List<T> getIntersectionList() {
         return interSectionList;
     }
 
-    public List<Integer> getAllIntersections(LinkedList<WorldEntity> parentEntities) {
-        List<Integer> intersectionIDs = new LinkedList<>();
-        for (WorldEntity parentEntity : parentEntities) {
-            for (WorldEntity entity : entities) {
+    private List<T> getAllIntersections(LinkedList<T> parentEntities) {
+        List<T> intersectionIDs = new LinkedList<>();
+        for (T parentEntity : parentEntities) {
+            for (T entity : entities) {
                 if (parentEntity.getBoundingBox() != null
                     && entity.getBoundingBox() != null && boundingBoxesColliding(parentEntity, entity)) {
-                    System.out.println("Collision!" + parentEntity.getID() + parentEntity.getModel() + "  " + entity.getID()
-                        + entity.getModel());
-                    if (parentEntity.getType() == EntityType.MOVEABLE_OBJECT || parentEntity.getType() == EntityType.PLAYER) {
-                        intersectionIDs.add(parentEntity.getID());
+                    if (parentEntity.isMovable()) {
+                        intersectionIDs.add(parentEntity);
                     }
-                    if (entity.getType() == EntityType.MOVEABLE_OBJECT || entity.getType() == EntityType.PLAYER) {
-                        intersectionIDs.add(entity.getID());
+                    if (entity.isMovable()) {
+                        intersectionIDs.add(entity);
                     }
                 }
             }
         }
         if (entities.size() > 1) {
 
-            PriorityQueue<WorldEntity> tmp = new PriorityQueue<>(entities);
+            PriorityQueue<T> tmp = new PriorityQueue<>(entities);
             while (!tmp.isEmpty()) {
-                WorldEntity current = tmp.remove();
-                for (WorldEntity e : entities) {
-                    if (!e.getID().equals(current.getID())
-                        && (e.getType() == EntityType.MOVEABLE_OBJECT || e.getType() == EntityType.PLAYER
-                            || current.getType() == EntityType.MOVEABLE_OBJECT || e.getType() == EntityType.PLAYER)) {
+                T current = tmp.remove();
+                for (T e : entities) {
+                    if (e.isMovable() || current.isMovable()) {
                         if (current.getBoundingBox() != null && (e.getBoundingBox() != null && boundingBoxesColliding(current, e))) {
-                            System.out.println("Collision2!" + e.getID() + e.getModel() + "   " + current.getID() + current.getModel());
-                            if (e.getType() == EntityType.MOVEABLE_OBJECT || e.getType() == EntityType.PLAYER) {
-                                intersectionIDs.add(e.getID());
+                            if (e.isMovable()) {
+                                intersectionIDs.add(e);
                             }
-                            if (current.getType() == EntityType.MOVEABLE_OBJECT || current.getType() == EntityType.PLAYER) {
-                                intersectionIDs.add(current.getID());
+                            if (current.isMovable()) {
+                                intersectionIDs.add(current);
                             }
                         }
                     }
                 }
             }
-        }
-        for (WorldEntity e : entities) {
-            if (e.getType() == EntityType.MOVEABLE_OBJECT || e.getType() == EntityType.PLAYER) {
-                parentEntities.add(e);
+            for (T e : entities) {
+                if (e.isMovable()) {
+                    parentEntities.add(e);
+                }
             }
-        }
-        for (int i = 0; i < 8; i++) {
-            if (children[i] != null) {
-                intersectionIDs.addAll(children[i].getAllIntersections(parentEntities));
+            for (int i = 0; i < 8; i++) {
+                if (children[i] != null) {
+                    intersectionIDs.addAll(children[i].getAllIntersections(parentEntities));
+                }
             }
         }
         return intersectionIDs;

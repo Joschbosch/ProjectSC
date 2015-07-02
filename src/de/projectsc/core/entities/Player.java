@@ -4,7 +4,7 @@
  * All rights reserved
  */
 
-package de.projectsc.core;
+package de.projectsc.core.entities;
 
 import org.lwjgl.util.vector.Vector3f;
 
@@ -15,10 +15,14 @@ import de.projectsc.client.gui.objects.GraphicalEntity;
  * 
  * @author Josch Bosch
  */
-public class Player extends WorldEntity {
+public class Player extends MovingEntity {
 
     public Player(Vector3f position, Vector3f rotation, float scale) {
-        super(EntityType.PLAYER, "person", "person.png", position, rotation, scale);
+        super("person", "person.png", position, rotation, scale);
+    }
+
+    public Player(Integer id, String model, String texture, Vector3f position, Vector3f rotation, float scale) {
+        super(id, "person", "person.png", position, rotation, scale);
     }
 
 }

@@ -24,6 +24,8 @@ import de.projectsc.core.data.messages.NetworkMessageConstants;
  */
 public class ClientNetworkCore implements Runnable {
 
+    private static final int TICK_LENGTH = 50;
+
     private static final Log LOGGER = LogFactory.getLog(ClientNetworkCore.class);
 
     private final BlockingQueue<ClientMessage> retreiveMessageQueue;
@@ -52,7 +54,7 @@ public class ClientNetworkCore implements Runnable {
             retreiveCoreMessages();
             retrieveServerMessages();
             try {
-                Thread.sleep(50);
+                Thread.sleep(TICK_LENGTH);
             } catch (InterruptedException e) {
                 LOGGER.error("Error in client network:", e);
             }

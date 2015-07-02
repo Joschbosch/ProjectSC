@@ -20,6 +20,8 @@ import de.projectsc.client.gui.Timer;
  */
 public class Camera {
 
+    private static final int CONSTANT_DISTANCE_FROM_ENTITY = 80;
+
     private static final int MINIMUM_Y_POSITION = 50;
 
     private static final int MAXIMUM_Y_POSITION = 80;
@@ -38,7 +40,7 @@ public class Camera {
 
     private static final int MAX_DISTANCE_TO_PLAYER = 100;
 
-    private static final float PLAYER_CENTER_Y_AXIS = 15.5f;
+    // private static final float PLAYER_CENTER_Y_AXIS = 15.5f;
 
     private static final int DEGREES_180 = 180;
 
@@ -68,7 +70,7 @@ public class Camera {
 
     private GraphicalEntity boundToEntity = null;
 
-    private Object entityLockObject = new Object();
+    private final Object entityLockObject = new Object();
 
     public Camera(GraphicalEntity player) {
         this.player = player;
@@ -157,7 +159,7 @@ public class Camera {
 
     private void calculateCameraPosition(float horizontalDistance, float verticalDistance) {
         position.x = boundToEntity.getPosition().x;
-        position.z = boundToEntity.getPosition().z + 80;
+        position.z = boundToEntity.getPosition().z + CONSTANT_DISTANCE_FROM_ENTITY;
     }
 
     /**

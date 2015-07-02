@@ -29,6 +29,10 @@ import org.codehaus.jackson.node.ObjectNode;
 import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.client.gui.objects.Light;
+import de.projectsc.core.entities.BackgroundEntity;
+import de.projectsc.core.entities.DecorationEntity;
+import de.projectsc.core.entities.EntityType;
+import de.projectsc.core.entities.WorldEntity;
 
 /**
  * Loader for a terrain map with its static lights and objects.
@@ -122,11 +126,8 @@ public final class TerrainLoader {
                     Float[] rotationValues = mapper.readValue(objectNode.get(ROTATION), new Float[3].getClass());
                     float yRot = rotationValues[1];
                     Vector3f rotation = new Vector3f(rotationValues[0], yRot, rotationValues[2]);
-                    WorldEntity e =
-                        new WorldEntity(objectNode.get(ID).asInt(), EntityType.valueOf(objectNode.get(TYPE).asText()), objectNode.get(
-                            MODEL).asText(), objectNode.get(TEXTURE).asText(), position, rotation, (float) objectNode.get(SCALE)
-                            .asDouble());
-                    staticObjects.put(objectNode.get(ID).asInt(), e);
+
+                    staticObjects.put(objectNode.get(ID).asInt(), newEntity(objectNode, position, rotation));
                 }
             }
             return new Terrain(map, heights, bgTexture, rTexture, gTexture, bTexture, staticLights, staticObjects);
@@ -134,6 +135,41 @@ public final class TerrainLoader {
             LOGGER.error("Error loading map: ", e);
         }
         return null;
+    }
+
+    private static WorldEntity newEntity(ObjectNode objectNode, Vector3f position, Vector3f rotation) {
+        WorldEntity e = null;
+        switch (EntityType.valueOf(objectNode.get(TYPE).asText())) {
+        case DECORATION:
+            e =
+                new DecorationEntity(objectNode.get(ID).asInt(), objectNode.get(
+                    MODEL).asText(), objectNode.get(TEXTURE).asText(), position, rotation, (float) objectNode.get(SCALE)
+                    .asDouble());
+            break;
+        case SOLID_BACKGROUND_OBJECT:
+            e =
+                new BackgroundEntity(objectNode.get(ID).asInt(), objectNode.get(
+                    MODEL).asText(), objectNode.get(TEXTURE).asText(), position, rotation, (float) objectNode.get(SCALE)
+                    .asDouble());
+            break;
+        case USABLE_OBJECT:
+            // e = new WorldEntity(objectNode.get(ID).asInt(), objectNode.get(
+            // MODEL).asText(), objectNode.get(TEXTURE).asText(), position, rotation, (float)
+            // objectNode.get(SCALE)
+            // .asDouble());
+            break;
+        case COLLECTABLE:
+            break;
+        case EFFECT:
+            break;
+        case MOVEABLE_OBJECT:
+            break;
+        case PLAYER:
+            break;
+        default:
+            break;
+        }
+        return e;
     }
 
     /**

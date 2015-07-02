@@ -43,10 +43,10 @@ import de.projectsc.client.gui.tools.ModelData;
 import de.projectsc.client.gui.tools.MousePicker;
 import de.projectsc.client.gui.tools.OBJFileLoader;
 import de.projectsc.client.gui.ui.UITexture;
-import de.projectsc.core.EntityType;
 import de.projectsc.core.Terrain;
 import de.projectsc.core.TerrainLoader;
-import de.projectsc.core.WorldEntity;
+import de.projectsc.core.entities.EntityType;
+import de.projectsc.core.entities.WorldEntity;
 
 /**
  * 
