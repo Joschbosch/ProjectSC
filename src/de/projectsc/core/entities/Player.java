@@ -19,10 +19,12 @@ public class Player extends MovingEntity {
 
     public Player(Vector3f position, Vector3f rotation, float scale) {
         super("person", "person.png", position, rotation, scale);
+        this.type = EntityType.PLAYER;
     }
 
     public Player(Integer id, String model, String texture, Vector3f position, Vector3f rotation, float scale) {
         super(id, "person", "person.png", position, rotation, scale);
+        this.type = EntityType.PLAYER;
     }
 
 }

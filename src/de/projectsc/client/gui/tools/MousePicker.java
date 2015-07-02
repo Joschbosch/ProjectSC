@@ -47,6 +47,10 @@ public class MousePicker {
     }
 
     public Vector3f getCurrentTerrainPoint() {
+        System.out.println(currentTerrainPoint);
+        if (currentTerrainPoint == null) {
+            System.exit(1);
+        }
         return currentTerrainPoint;
     }
 

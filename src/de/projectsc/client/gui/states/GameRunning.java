@@ -45,7 +45,7 @@ import de.projectsc.client.gui.tools.OBJFileLoader;
 import de.projectsc.client.gui.ui.UITexture;
 import de.projectsc.core.Terrain;
 import de.projectsc.core.TerrainLoader;
-import de.projectsc.core.entities.EntityType;
+import de.projectsc.core.entities.Player;
 import de.projectsc.core.entities.WorldEntity;
 
 /**
@@ -148,7 +148,7 @@ public class GameRunning implements State {
         ModelTexture modelTexture = new ModelTexture(texture);
         GraphicalEntity graphicalEntity = new GraphicalEntity(e, new TexturedModel(model, modelTexture));
         renderList.add(graphicalEntity);
-        if (e.getType() == EntityType.PLAYER) {
+        if (e instanceof Player) {
             player = graphicalEntity;
             camera.getPosition().x = player.getPosition().x;
             camera.getPosition().z = player.getPosition().z;
@@ -157,7 +157,7 @@ public class GameRunning implements State {
     }
 
     private void loadDemoObjects() {
-        loadTerrain("housingMap");
+        loadTerrain("newDataMap");
 
         ui = new ArrayList<>();
         uiRenderer = new UIRenderer(loader);

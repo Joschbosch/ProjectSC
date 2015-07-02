@@ -27,11 +27,11 @@ public class Terrain {
      */
     public static final float TERRAIN_TILE_SIZE = 4.0f;
 
+    public static final float HEIGHT_TILE_SIZE = 8.0f;
+
     private final int mapSize;
 
-    private final int[][] tiles;
-
-    private final float[][] heights;
+    private final Tile[][] tiles;
 
     private final String bgTexture;
 
@@ -47,11 +47,10 @@ public class Terrain {
 
     private BoundingBox mapBox;
 
-    public Terrain(int[][] tiles, float[][] heights, String bgTexture, String rTexture, String gTexture,
+    public Terrain(Tile[][] tiles, String bgTexture, String rTexture, String gTexture,
         String bTexture, List<Light> lights, Map<Integer, WorldEntity> staticObjects) {
         this.tiles = tiles;
         this.mapSize = tiles.length;
-        this.heights = heights;
         this.bgTexture = bgTexture;
         this.rTexture = rTexture;
         this.gTexture = gTexture;
@@ -93,9 +92,9 @@ public class Terrain {
      * @param z coordinate
      * @return height
      */
-    public float getHeight(int x, int z) {
-        if (x >= 0 && x < heights.length && z >= 0 && z < heights[0].length) {
-            return heights[x][z];
+    public byte getHeight(int x, int z) {
+        if (x >= 0 && x < tiles.length && z >= 0 && z < tiles[0].length && tiles[x][z] != null) {
+            return tiles[x][z].getHeight();
         }
         return 0;
         // if (x < 0 || x >= map.getHeight() || z < 0 || z >= map.getWidth()) {
@@ -108,15 +107,11 @@ public class Terrain {
         // return height;
     }
 
-    public float[][] getHeights() {
-        return heights;
-    }
-
     public int getMapSize() {
         return mapSize;
     }
 
-    public int[][] getTerrain() {
+    public Tile[][] getTerrain() {
         return tiles;
     }
 

@@ -14,8 +14,6 @@ import java.util.TreeMap;
 
 import org.lwjgl.util.vector.Vector3f;
 
-import de.projectsc.core.entities.MovingEntity;
-
 /**
  * Data structure for finding collisions of {@link PhysicalObject}s.
  * 
@@ -40,7 +38,7 @@ public class OctTree<T extends PhysicalObject> {
 
     private OctTree<T>[] children;
 
-    private LinkedList<T> interSectionList;
+    private List<T> interSectionList;
 
     private int maxLifespan = 8; //
 
@@ -289,13 +287,10 @@ public class OctTree<T extends PhysicalObject> {
 
             List<T> movedObjects = new LinkedList<>();
             for (T e : entities) {
-                if (e instanceof MovingEntity) {
-                    if (e.hasMoved()) {
-                        movedObjects.add(e);
-                    }
+                if (e.isMovable() && e.hasMoved()) {
+                    movedObjects.add(e);
                 }
             }
-
             for (int i = 0; i < 8; i++) {
                 if (children[i] != null) {
                     children[i].update();
@@ -324,8 +319,8 @@ public class OctTree<T extends PhysicalObject> {
 
             // root node
             if (parent == null) {
-                interSectionList = new LinkedList<T>();
-                interSectionList.addAll(getAllIntersections(new LinkedList<T>()));
+                interSectionList = getAllIntersections(new LinkedList<T>());
+
             }
 
         }

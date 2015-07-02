@@ -26,6 +26,7 @@ import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ArrayNode;
 import org.codehaus.jackson.node.ObjectNode;
+import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.client.gui.objects.Light;
@@ -71,7 +72,7 @@ public final class TerrainLoader {
 
     private static final String BG_TEXTURE = "bgTexture";
 
-    private static final String TERRAIN_HEIGHTS = "terrainHeights";
+    private static final String TERRAIN_HEIGHT = "terrainHeight";
 
     private static final String TERRAIN_DATA = "terrainData";
 
@@ -93,8 +94,24 @@ public final class TerrainLoader {
         try {
             JsonNode tree = mapper.readTree(new File(filename));
             int mapSize = tree.get(SIZE).asInt();
-            int[][] map = mapper.readValue(tree.get(TERRAIN_DATA), new int[mapSize][mapSize].getClass());
-            float[][] heights = mapper.readValue(tree.get(TERRAIN_HEIGHTS), new float[mapSize][mapSize].getClass());
+            Tile[][] map = new Tile[mapSize][mapSize];
+            for (int i = 0; i < mapSize; i++) {
+                for (int j = 0; j < mapSize; j++) {
+                    map[i][j] = null;
+                }
+            }
+
+            ArrayNode terrain = (ArrayNode) tree.get(TERRAIN_DATA);
+
+            for (JsonNode terrainFieldObject : terrain) {
+                ObjectNode terrainField = (ObjectNode) terrainFieldObject;
+                Integer[] position = mapper.readValue(terrainField.get(POSITION), new Integer[2].getClass());
+                map[position[0]][position[1]] =
+                    new Tile(new Vector2f(position[0], position[1]), mapper.readValue(terrainField.get(TERRAIN_HEIGHT), Byte.class),
+                        mapper.readValue(terrainField.get("walkable"), Byte.class), mapper.readValue(terrainField.get("type"),
+                            Byte.class));
+            }
+
             String bgTexture = mapper.readValue(tree.get(BG_TEXTURE), String.class);
             String rTexture = mapper.readValue(tree.get(R_TEXTURE), String.class);
             String gTexture = mapper.readValue(tree.get(G_TEXTURE), String.class);
@@ -130,7 +147,7 @@ public final class TerrainLoader {
                     staticObjects.put(objectNode.get(ID).asInt(), newEntity(objectNode, position, rotation));
                 }
             }
-            return new Terrain(map, heights, bgTexture, rTexture, gTexture, bTexture, staticLights, staticObjects);
+            return new Terrain(map, bgTexture, rTexture, gTexture, bTexture, staticLights, staticObjects);
         } catch (IOException e) {
             LOGGER.error("Error loading map: ", e);
         }
@@ -182,8 +199,22 @@ public final class TerrainLoader {
     public static void storeTerrain(Terrain terrain, String file) {
         File target = new File(file);
         Map<String, Object> map = new HashMap<>();
-        map.put(TERRAIN_DATA, terrain.getTerrain());
-        map.put(TERRAIN_HEIGHTS, terrain.getHeights());
+        List<Object> terrainList = new LinkedList<>();
+        for (int i = 0; i < terrain.getMapSize(); i++) {
+            for (int j = 0; j < terrain.getMapSize(); j++) {
+                if (terrain.getTerrain()[i][j] != null) {
+                    Map<String, Object> terrainData = new HashMap<>();
+                    Tile current = terrain.getTerrain()[i][j];
+                    terrainData.put(POSITION, new int[] { (int) current.getCoordinates().x, (int) current.getCoordinates().y });
+                    terrainData.put(TERRAIN_HEIGHT, current.getHeight());
+                    terrainData.put("walkable", current.getWalkAble());
+                    terrainData.put("type", current.getType());
+                    terrainList.add(terrainData);
+                }
+            }
+        }
+
+        map.put(TERRAIN_DATA, terrainList);
         map.put(SIZE, terrain.getMapSize());
         map.put(BG_TEXTURE, terrain.getBgTexture());
         map.put(R_TEXTURE, terrain.getRTexture());
@@ -234,8 +265,20 @@ public final class TerrainLoader {
         Graphics g = img.getGraphics();
         for (int i = 0; i < terrain.getMapSize(); i++) {
             for (int j = 0; j < terrain.getMapSize(); j++) {
-                if (i > terrain.getMapSize() / 2) {
-                    g.setColor(Color.RED);
+                if (terrain.getTerrain()[i][j] != null) {
+                    switch (terrain.getTerrain()[i][j].getType()) {
+                    case 0:
+                        g.setColor(Color.RED);
+                        break;
+                    case 1:
+                        g.setColor(Color.GREEN);
+                        break;
+                    case 2:
+                        g.setColor(Color.BLUE);
+                        break;
+                    default:
+                        break;
+                    }
                 } else {
                     g.setColor(Color.BLACK);
                 }

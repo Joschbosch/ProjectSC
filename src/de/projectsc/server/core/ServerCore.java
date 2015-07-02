@@ -148,7 +148,7 @@ public class ServerCore implements Runnable {
                 futureQueue.offer(new FutureEvent(event.getExecutionTime() + 10 * 10 * 10, new GameTimeUpdateTask()));
             } else if (event.getTask() instanceof UpdateTask) {
                 for (WorldEntity e : entities.values()) {
-                    if (e.getType() == EntityType.MOVEABLE_OBJECT) {
+                    if (e.getType() == EntityType.MOVEABLE_OBJECT && !(e instanceof Player)) {
                         Vector3f position = e.getPosition();
                         float newX = (float) ((Math.random() * 2 * 2 * 10 * 10 - 2 * 10 * 10) + position.x);
                         float newZ = (float) ((Math.random() * 2 * 2 * 10 * 10 - 2 * 10 * 10) + position.z);
@@ -172,7 +172,7 @@ public class ServerCore implements Runnable {
         }
         collisionTree.update();
         for (WorldEntity e : entities.values()) {
-            if (collisionTree.getIntersectionList().contains(e.getID())) {
+            if (collisionTree.getIntersectionList().contains(e)) {
                 ((MovingEntity) e).move(-elapsedTime);
             } else {
                 networkSendQueue.offer(new ServerMessage(NetworkMessageConstants.NEW_LOCATION, new float[] { e.getID(),
@@ -182,7 +182,7 @@ public class ServerCore implements Runnable {
     }
 
     private void createWorldEntities() {
-        terrain = TerrainLoader.loadTerrain("housingMap.psc");
+        terrain = TerrainLoader.loadTerrain("newDataMap.psc");
         staticEntities = terrain.getStaticObjects();
         // staticEntities.values();
         // List<Integer> remove = new LinkedList<>();

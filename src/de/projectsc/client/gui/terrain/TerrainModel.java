@@ -16,6 +16,7 @@ import de.projectsc.client.gui.textures.TerrainTexturePack;
 import de.projectsc.client.gui.tools.Loader;
 import de.projectsc.client.gui.tools.Maths;
 import de.projectsc.core.Terrain;
+import de.projectsc.core.Tile;
 
 /**
  * Representation of the terrain.
@@ -52,7 +53,7 @@ public class TerrainModel {
 
         LOGGER.debug("Start generating terrain.");
         int vertCount = terrain.getMapSize();
-        int[][] tiles = terrain.getTerrain();
+        Tile[][] tiles = terrain.getTerrain();
         int count = vertCount * vertCount;
         float[] vertices = new float[count * 3];
         float[] normals = new float[count * 3];
@@ -62,10 +63,10 @@ public class TerrainModel {
         for (int i = 0; i < vertCount; i++) {
             for (int j = 0; j < vertCount; j++) {
                 vertices[vertexPointer * 3] = j / ((float) vertCount - 1) * vertCount * Terrain.TERRAIN_TILE_SIZE;
-                float height = tiles[i][j];
+                float height = tiles[i][j] != null ? tiles[i][j].getHeight() : 0;
                 vertices[vertexPointer * 3 + 1] = height;
                 vertices[vertexPointer * 3 + 2] = i / ((float) vertCount - 1) * vertCount * Terrain.TERRAIN_TILE_SIZE;
-                Vector3f normal = calculateNormal(j, i, tiles);
+                Vector3f normal = calculateNormal(j, i);
                 normals[vertexPointer * 3] = normal.x;
                 normals[vertexPointer * 3 + 1] = normal.y;
                 normals[vertexPointer * 3 + 2] = normal.z;
@@ -102,10 +103,10 @@ public class TerrainModel {
     public float getHeightOfTerrain(float xWorld, float zWorld) {
         float terrainX = xWorld - this.xCoord;
         float terrainZ = zWorld - this.zCoord;
-        float gridSize = terrain.getMapSize() / ((float) terrain.getHeights().length - 1);
+        float gridSize = terrain.getMapSize() / ((float) terrain.getMapSize() - 1);
         int gridX = (int) Math.floor(terrainX / gridSize);
         int gridZ = (int) Math.floor(terrainZ / gridSize);
-        if (gridX >= terrain.getHeights().length - 1 || gridZ >= terrain.getHeights().length - 1 || gridX < 0 || gridZ < 0) {
+        if (gridX >= terrain.getMapSize() - 1 || gridZ >= terrain.getMapSize() - 1 || gridX < 0 || gridZ < 0) {
             return 0;
         }
         float xCoordPlayer = (terrainX % gridSize) / gridSize;
@@ -113,22 +114,22 @@ public class TerrainModel {
 
         float answer = 0.0f;
         if (xCoordPlayer <= (1 - zCoordPlayer)) {
-            answer = Maths.barryCentric(new Vector3f(0, terrain.getHeights()[gridX][gridZ], 0), new Vector3f(1,
-                terrain.getHeights()[gridX + 1][gridZ], 0), new Vector3f(0,
-                terrain.getHeights()[gridX][gridZ + 1], 1), new Vector2f(xCoordPlayer, zCoordPlayer));
+            answer = Maths.barryCentric(new Vector3f(0, terrain.getHeight(gridX, gridZ) * Terrain.HEIGHT_TILE_SIZE, 0), new Vector3f(1,
+                terrain.getHeight(gridX + 1, gridZ) * Terrain.HEIGHT_TILE_SIZE, 0), new Vector3f(0,
+                terrain.getHeight(gridX, gridZ + 1) * Terrain.HEIGHT_TILE_SIZE, 1), new Vector2f(xCoordPlayer, zCoordPlayer));
         } else {
-            answer = Maths.barryCentric(new Vector3f(1, terrain.getHeights()[gridX + 1][gridZ], 0), new Vector3f(1,
-                terrain.getHeights()[gridX + 1][gridZ + 1], 1), new Vector3f(0,
-                terrain.getHeights()[gridX][gridZ + 1], 1), new Vector2f(xCoordPlayer, zCoordPlayer));
+            answer = Maths.barryCentric(new Vector3f(1, terrain.getHeight(gridX + 1, gridZ) * Terrain.HEIGHT_TILE_SIZE, 0), new Vector3f(1,
+                terrain.getHeight(gridX + 1, gridZ + 1) * Terrain.HEIGHT_TILE_SIZE, 1), new Vector3f(0,
+                terrain.getHeight(gridX, gridZ + 1) * Terrain.HEIGHT_TILE_SIZE, 1), new Vector2f(xCoordPlayer, zCoordPlayer));
         }
         return answer;
     }
 
-    private Vector3f calculateNormal(int x, int z, int[][] map) {
-        float heightL = terrain.getHeight(x - 1, z);
-        float heightR = terrain.getHeight(x + 1, z);
-        float heightD = terrain.getHeight(x - 1, z - 1);
-        float heightU = terrain.getHeight(x, z + 1);
+    private Vector3f calculateNormal(int x, int z) {
+        float heightL = terrain.getHeight(x - 1, z) * Terrain.HEIGHT_TILE_SIZE;
+        float heightR = terrain.getHeight(x + 1, z) * Terrain.HEIGHT_TILE_SIZE;
+        float heightD = terrain.getHeight(x - 1, z - 1) * Terrain.HEIGHT_TILE_SIZE;
+        float heightU = terrain.getHeight(x, z + 1) * Terrain.HEIGHT_TILE_SIZE;
         Vector3f normal = new Vector3f(heightL - heightR, 2f, heightD - heightU);
         normal.normalise();
         return normal;
