@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 
+ * Copyright (C) 2015
  */
 
 package de.projectsc.core.utils;
@@ -17,43 +17,73 @@ public class AStar<T extends GraphNode> {
 
     private Set<T> closeList;
 
-    public Queue<T> calculatePath(T start, T target) {
+    public Queue<T> getPath(T start, T target) {
+        Queue<T> rawPath = calculatePath(start, target);
+        Queue<T> newPath = new LinkedList<>();
+        T checkPoint = rawPath.remove();
+        newPath.add(checkPoint);
+        T currentPoint = rawPath.remove();
+        while (rawPath.peek() != null) {
+            if (walkable(currentPoint, rawPath.peek())) {
+                T temp = currentPoint;
+                currentPoint = rawPath.remove();
+            } else {
+                checkPoint = currentPoint;
+                currentPoint = rawPath.remove();
+                newPath.add(checkPoint);
+
+            }
+        }
+        return newPath;
+    }
+
+    private boolean walkable(T currentPoint, T peek) {
+        return true;
+    }
+
+    private Queue<T> calculatePath(T start, T target) {
         openList = new LinkedList<>();
         closeList = new HashSet<>();
-        openList.add(new AStarNode<T>(start, 0.0f, 0.0f));
-
+        AStarNode<T> startAStar = new AStarNode<T>(start, 0.0f, Float.MAX_VALUE);
+        openList.add(startAStar);
+        AStarNode<T> leastPriority = startAStar;
         while (!openList.isEmpty()) {
             AStarNode<T> current = openList.remove(0);
             if (current.getNode().equals(target)) {
                 return getPath(current);
             }
+            if (leastPriority.getPriority() > current.getPriority()) {
+                leastPriority = current;
+            }
             closeList.add(current.getNode());
             expandNode(current, target);
         }
 
-        return null;
+        return getPath(leastPriority);
     }
 
     private void expandNode(AStarNode<T> current, T target) {
         for (GraphEdge e : ((GraphNode) current.getNode()).getAllNeighbors()) {
             if (!closeList.contains(e.getTarget())) {
-                Float newCosts = current.getCost() + e.getCost();
-                AStarNode<T> successor = new AStarNode(e.getTarget(), 0f, 0f);
-                if (openList.contains(successor)) {
-                    AStarNode<T> existingSuccessor = null;
-                    for (int i = 0; i < openList.size(); i++) {
-                        if (openList.get(i).equals(successor)) {
-                            existingSuccessor = openList.get(i);
+                if (e.getTarget().isWalkable()) {
+                    Float newCosts = current.getCost() + e.getCost();
+                    AStarNode<T> successor = new AStarNode(e.getTarget(), 0f, 0f);
+                    if (openList.contains(successor)) {
+                        AStarNode<T> existingSuccessor = null;
+                        for (int i = 0; i < openList.size(); i++) {
+                            if (openList.get(i).equals(successor)) {
+                                existingSuccessor = openList.get(i);
+                            }
                         }
+                        if (newCosts < existingSuccessor.getCost()) {
+                            existingSuccessor.setPrevious(current);
+                            existingSuccessor.setCost(newCosts);
+                        }
+                        existingSuccessor.setPriority(newCosts + existingSuccessor.getNode().getHeuristikCostsTo(target));
+                    } else {
+                        openList.add(new AStarNode<T>((T) e.getTarget(), newCosts, newCosts + e.getTarget().getHeuristikCostsTo(target),
+                            current));
                     }
-                    if (newCosts < existingSuccessor.getCost()) {
-                        existingSuccessor.setPrevious(current);
-                        existingSuccessor.setCost(newCosts);
-                    }
-                    existingSuccessor.setPriority(newCosts + existingSuccessor.getNode().getHeuristikCostsTo(target));
-                } else {
-                    openList.add(new AStarNode<T>((T) e.getTarget(), newCosts, newCosts + e.getTarget().getHeuristikCostsTo(target),
-                        current));
                 }
             }
         }
@@ -77,7 +107,7 @@ class AStarNode<T> implements Comparable<AStarNode<T>> {
 
     private Float cost;
 
-    private T node;
+    private final T node;
 
     private AStarNode<T> previous;
 
@@ -88,6 +118,10 @@ class AStarNode<T> implements Comparable<AStarNode<T>> {
         this.cost = cost;
         this.priority = priority;
         this.previous = null;
+    }
+
+    public Float getPriority() {
+        return priority;
     }
 
     public void setPriority(Float f) {

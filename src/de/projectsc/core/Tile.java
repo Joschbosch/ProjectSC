@@ -1,9 +1,10 @@
 /*
- * Copyright (C) 2015 
+ * Copyright (C) 2015
  */
 
 package de.projectsc.core;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import org.lwjgl.util.vector.Vector2f;
@@ -19,7 +20,7 @@ public class Tile extends GraphNode {
 
     public static byte WALKABLE = 0;
 
-    private Vector2f coordinates;
+    private final Vector2f coordinates;
 
     private List<GraphEdge> neighbors;
 
@@ -27,13 +28,14 @@ public class Tile extends GraphNode {
 
     private byte walkable;
 
-    private byte type;
+    private final byte type;
 
     public Tile(Vector2f coordinates, byte height, byte walkable, byte type) {
         this.height = height;
         this.walkable = walkable;
         this.coordinates = coordinates;
         this.type = type;
+        neighbors = new LinkedList<>();
     }
 
     @Override
@@ -74,6 +76,23 @@ public class Tile extends GraphNode {
 
     public byte getType() {
         return type;
+    }
+
+    @Override
+    public boolean isWalkable() {
+        return walkable == WALKABLE;
+    }
+
+    public void setWalkable(byte i) {
+        this.walkable = i;
+    }
+
+    @Override
+    public String toString() {
+        String result = "";
+        result += "coordinates: " + coordinates + ";";
+        result += "walkable: " + walkable + ";";
+        return result;
     }
 
 }

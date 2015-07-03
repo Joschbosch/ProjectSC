@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 
+ * Copyright (C) 2015
  */
 
 package de.projectsc.core.utils;
@@ -28,6 +28,13 @@ public class GraphEdge {
 
     public GraphNode getTarget() {
         return target;
+    }
+
+    @Override
+    public String toString() {
+        String result = "";
+        result += source + " -> " + target;
+        return result;
     }
 
     public void setTarget(GraphNode target) {

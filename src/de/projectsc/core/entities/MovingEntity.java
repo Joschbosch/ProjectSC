@@ -21,7 +21,7 @@ public class MovingEntity extends WorldEntity {
 
     private final float currentTurnSpeed = 0;
 
-    private Vector3f currentTarget;
+    private Vector3f nextTarget;
 
     private float currentSpeed = 0;
 
@@ -30,13 +30,13 @@ public class MovingEntity extends WorldEntity {
     public MovingEntity(String model, String texture, Vector3f position, Vector3f rotation, float scale) {
         super(EntityType.MOVEABLE_OBJECT, model, texture, position, rotation, scale);
         moved = false;
-        currentTarget = position;
+        nextTarget = position;
     }
 
     public MovingEntity(Integer id, String model, String texture, Vector3f position, Vector3f rotation, float scale) {
         super(id, EntityType.MOVEABLE_OBJECT, model, texture, position, rotation, scale);
         moved = false;
-        currentTarget = position;
+        nextTarget = position;
     }
 
     /**
@@ -116,7 +116,7 @@ public class MovingEntity extends WorldEntity {
      * @param currentTarget position
      */
     public void setCurrentTarget(Vector3f currentTarget) {
-        this.currentTarget = currentTarget;
+        this.nextTarget = currentTarget;
         Vector3f sub = Vector3f.sub(currentTarget, position, null);
         if (sub.length() != 0) {
             float angle = Vector3f.angle(sub, new Vector3f(0, 0, 1));
@@ -129,7 +129,7 @@ public class MovingEntity extends WorldEntity {
     }
 
     public Vector3f getCurrentTarget() {
-        return currentTarget;
+        return nextTarget;
     }
 
     /**

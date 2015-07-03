@@ -266,7 +266,7 @@ public final class TerrainLoader {
         for (int i = 0; i < terrain.getMapSize(); i++) {
             for (int j = 0; j < terrain.getMapSize(); j++) {
                 if (terrain.getTerrain()[i][j] != null) {
-                    switch (terrain.getTerrain()[i][j].getType()) {
+                    switch (terrain.getTerrain()[i][j].getWalkAble()) {
                     case 0:
                         g.setColor(Color.RED);
                         break;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 
+ * Copyright (C) 2015
  */
 
 package de.projectsc.core.utils;
@@ -13,4 +13,9 @@ public abstract class GraphNode {
     public abstract Float getHeuristikCostsTo(GraphNode target);
 
     public abstract boolean equals(GraphNode other);
+
+    public abstract boolean isWalkable();
+
+    @Override
+    public abstract String toString();
 }

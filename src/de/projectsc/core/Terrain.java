@@ -6,6 +6,7 @@
 
 package de.projectsc.core;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -14,6 +15,7 @@ import org.lwjgl.util.vector.Vector3f;
 import de.projectsc.client.gui.objects.Light;
 import de.projectsc.core.entities.WorldEntity;
 import de.projectsc.core.utils.BoundingBox;
+import de.projectsc.core.utils.GraphEdge;
 
 /**
  * Holds all information about the static terrain.
@@ -107,6 +109,73 @@ public class Terrain {
         // return height;
     }
 
+    /**
+     * Build up neighborhood for the loaded terrain.
+     */
+    public void buildNeighborhood() {
+        for (int i = 0; i < mapSize; i++) {
+            for (int j = 0; j < mapSize; j++) {
+                List<GraphEdge> neighbors = new LinkedList<>();
+                if (tiles[i][j] != null) {
+                    for (int k = 0 - 1; k < 2; k++) {
+                        for (int l = 0 - 1; l < 2; l++) {
+                            if (!(l == 0 && k == 0)) {
+                                GraphEdge neighbor = getNeightborAt(tiles[i][j], i + k, j + l);
+                                if (neighbor != null) {
+                                    neighbors.add(neighbor);
+                                }
+                            }
+                        }
+                    }
+                    tiles[i][j].setNeighbors(neighbors);
+                }
+            }
+        }
+    }
+
+    private GraphEdge getNeightborAt(Tile source, int i, int j) {
+        GraphEdge result = new GraphEdge(source, null, 0 - 1);
+        if (i >= 0 && j >= 0 && i < mapSize && j < mapSize) {
+            if (tiles[i][j] != null) {
+                result.setTarget(tiles[i][j]);
+                result.setCost(
+                    (float) Math.sqrt((Math.pow(i - source.getCoordinates().x, 2) + Math.pow(j - source.getCoordinates().y, 2))));
+                return result;
+            }
+        }
+        return null;
+    }
+
+    public void makeStaticObjectsNotWalkable() {
+        for (WorldEntity e : staticObjects.values()) {
+            markEntityPosition(e, Tile.NOT_WALKABLE);
+        }
+    }
+
+    public void markEntitiyObjects(byte mark, List<WorldEntity> list) {
+        for (WorldEntity e : list) {
+            markEntityPosition(e, mark);
+        }
+    }
+
+    public void markEntityPosition(WorldEntity e, byte mark) {
+        if (e.getBoundingBox() != null) {
+            Vector3f realMinPos = Vector3f.add(e.getBoundingBox().getMin(), e.getPosition(), null);
+            Vector3f realMaxPos = Vector3f.add(e.getBoundingBox().getMax(), e.getPosition(), null);
+            if (realMinPos.x > 0 && realMinPos.z > 0) {
+                realMinPos = (Vector3f) realMinPos.scale(1.0f / Terrain.TERRAIN_TILE_SIZE);
+                realMaxPos = (Vector3f) realMaxPos.scale(1.0f / Terrain.TERRAIN_TILE_SIZE);
+                for (int i = (int) realMinPos.x; i < (int) realMaxPos.x; i++) {
+                    for (int j = (int) realMinPos.z; j < (int) realMaxPos.z; j++) {
+                        if (tiles[i][j] != null) {
+                            tiles[i][j].setWalkable(mark);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     public int getMapSize() {
         return mapSize;
     }
@@ -154,4 +223,5 @@ public class Terrain {
     public void setMapBox(BoundingBox mapBox) {
         this.mapBox = mapBox;
     }
+
 }

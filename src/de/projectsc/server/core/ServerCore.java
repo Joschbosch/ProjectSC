@@ -21,6 +21,7 @@ import de.projectsc.client.core.ClientMessageConstants;
 import de.projectsc.client.gui.GUIMessageConstants;
 import de.projectsc.core.Terrain;
 import de.projectsc.core.TerrainLoader;
+import de.projectsc.core.Tile;
 import de.projectsc.core.data.messages.MessageConstants;
 import de.projectsc.core.data.messages.NetworkMessageConstants;
 import de.projectsc.core.entities.EntityType;
@@ -184,6 +185,8 @@ public class ServerCore implements Runnable {
     private void createWorldEntities() {
         terrain = TerrainLoader.loadTerrain("newDataMap.psc");
         staticEntities = terrain.getStaticObjects();
+        terrain.buildNeighborhood();
+        terrain.makeStaticObjectsNotWalkable();
         // staticEntities.values();
         // List<Integer> remove = new LinkedList<>();
         // for (WorldEntity e : staticEntities.values()) {
@@ -218,6 +221,7 @@ public class ServerCore implements Runnable {
         }
         for (WorldEntity entity : entities.values()) {
             collisionTree.addEntity(entity);
+            terrain.markEntityPosition(entity, Tile.NOT_WALKABLE);
         }
         collisionTree.recalculateTree();
     }
