@@ -6,9 +6,14 @@
 
 package de.projectsc.core.entities;
 
+import java.util.Queue;
+
+import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.client.gui.Timer;
+import de.projectsc.core.Terrain;
+import de.projectsc.core.Tile;
 
 /**
  * An entity that can move. Should be subclassed.
@@ -26,6 +31,8 @@ public class MovingEntity extends WorldEntity {
     private float currentSpeed = 0;
 
     private boolean moved;
+
+    private Queue<Tile> path;
 
     public MovingEntity(String model, String texture, Vector3f position, Vector3f rotation, float scale) {
         super(EntityType.MOVEABLE_OBJECT, model, texture, position, rotation, scale);
@@ -47,10 +54,15 @@ public class MovingEntity extends WorldEntity {
     public void move(float delta) {
         delta = (delta / Timer.SECONDS_CONSTANT);
         increaseRotation(0, currentTurnSpeed * delta, 0);
-        if (Vector3f.sub(getPosition(), getCurrentTarget(), null).lengthSquared() > 3) {
+        if (Vector3f.sub(getPosition(), getCurrentTarget(), null).lengthSquared() > 2) {
             currentSpeed = MOVEMENT_SPEED;
         } else {
-            currentSpeed = 0;
+            path.poll();
+            if (path.size() > 0) {
+                setCurrentTarget(path.peek().getCoordinates());
+            } else {
+                currentSpeed = 0;
+            }
         }
         float distance = currentSpeed * delta;
         float dx = (float) (distance * Math.sin(Math.toRadians(getRotY())));
@@ -126,6 +138,17 @@ public class MovingEntity extends WorldEntity {
             }
             setRotY(rotate);
         }
+    }
+
+    public void setNewPath(Queue<Tile> path) {
+        this.path = path;
+        this.setCurrentTarget(path.peek().getCoordinates());
+
+    }
+
+    private void setCurrentTarget(Vector2f coordinates) {
+        this.setCurrentTarget(new Vector3f(path.peek().getCoordinates().x * Terrain.TERRAIN_TILE_SIZE + Terrain.TERRAIN_TILE_SIZE / 2.0f,
+            0, path.peek().getCoordinates().y * Terrain.TERRAIN_TILE_SIZE + Terrain.TERRAIN_TILE_SIZE / 2.0f));
     }
 
     public Vector3f getCurrentTarget() {

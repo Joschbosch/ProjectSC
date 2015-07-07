@@ -8,6 +8,7 @@ package de.projectsc.server.core;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.TreeMap;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -28,6 +29,7 @@ import de.projectsc.core.entities.EntityType;
 import de.projectsc.core.entities.MovingEntity;
 import de.projectsc.core.entities.Player;
 import de.projectsc.core.entities.WorldEntity;
+import de.projectsc.core.utils.AStar;
 import de.projectsc.core.utils.OctTree;
 import de.projectsc.server.core.tasks.GameTimeUpdateTask;
 import de.projectsc.server.core.tasks.UpdateTask;
@@ -171,15 +173,15 @@ public class ServerCore implements Runnable {
 
             }
         }
-        collisionTree.update();
+        // collisionTree.update();
         for (WorldEntity e : entities.values()) {
-            if (collisionTree.getIntersectionList().contains(e)) {
-                ((MovingEntity) e).move(-elapsedTime);
-            } else {
-                networkSendQueue.offer(new ServerMessage(NetworkMessageConstants.NEW_LOCATION, new float[] { e.getID(),
-                    e.getPosition().x, e.getPosition().z, e.getRotY() }));
-            }
+            // if (collisionTree.getIntersectionList().contains(e)) {
+            // ((MovingEntity) e).move(-elapsedTime);
+            // } else {
+            networkSendQueue.offer(new ServerMessage(NetworkMessageConstants.NEW_LOCATION, new float[] { e.getID(),
+                e.getPosition().x, e.getPosition().z, e.getRotY() }));
         }
+        // }
     }
 
     private void createWorldEntities() {
@@ -251,7 +253,21 @@ public class ServerCore implements Runnable {
                     networkSendQueue.offer(new ServerMessage("pong", new long[] { (long) msg.getData(), gameTime }));
                 } else if (msg.getMessage().equals(GUIMessageConstants.POINT_ON_MAP_CLICKED)) {
                     if (startGame.get()) {
-                        worldPlayer.setCurrentTarget((Vector3f) msg.getData());
+                        Vector3f location = (Vector3f) msg.getData();
+                        if (location.x > 0 && location.z > 0) {
+                            AStar<Tile> aStar = new AStar<>();
+                            Vector3f position = worldPlayer.getPosition();
+                            Tile start =
+                                terrain.getTerrain()[(int) (position.x / Terrain.TERRAIN_TILE_SIZE)][(int) (position.z / Terrain.TERRAIN_TILE_SIZE)];
+                            Tile target =
+                                terrain.getTerrain()[(int) (location.x / Terrain.TERRAIN_TILE_SIZE)][(int) (location.z / Terrain.TERRAIN_TILE_SIZE)];
+                            Queue<Tile> path = aStar.getPath(start, target);
+                            if (path != null) {
+                                worldPlayer.setNewPath(path);
+                            }
+                            networkSendQueue.offer(new ServerMessage(NetworkMessageConstants.NEW_LOCATION, new int[] { worldPlayer.getID(),
+                                (int) worldPlayer.getCurrentTarget().x, (int) worldPlayer.getCurrentTarget().y }));
+                        }
                     }
                 } else if (msg.getMessage().equals(ClientMessageConstants.CLIENT_READY)) {
                     LOGGER.debug("Received client ready, starting game");

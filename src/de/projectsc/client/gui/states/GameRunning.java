@@ -177,6 +177,8 @@ public class GameRunning implements State {
     private void loadTerrain(String mapName) {
         LOGGER.debug("Loading terrain " + mapName);
         Terrain terrain = TerrainLoader.loadTerrain(mapName + ".psc");
+        terrain.buildNeighborhood();
+        terrain.makeStaticObjectsNotWalkable();
         TerrainTexture backgroundTex = new TerrainTexture(loader.loadTexture(terrain.getBgTexture()));
         TerrainTexture rTex = new TerrainTexture(loader.loadTexture(terrain.getRTexture()));
         TerrainTexture gTex = new TerrainTexture(loader.loadTexture(terrain.getGTexture()));
