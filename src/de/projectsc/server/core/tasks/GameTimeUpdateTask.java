@@ -5,7 +5,6 @@
  */
 package de.projectsc.server.core.tasks;
 
-import de.projectsc.server.core.Task;
 
 /**
  * Task for updating game time on all clients.

@@ -6,6 +6,8 @@
 
 package de.projectsc.server.core;
 
+import de.projectsc.server.core.tasks.Task;
+
 /**
  * 
  * Event that will be triggered in the future.

@@ -5,13 +5,12 @@
  */
 package de.projectsc.server.core.tasks;
 
-
 /**
- * Updating target.
+ * 
+ * Interface for future event tasks.
  * 
  * @author Josch Bosch
  */
-
-public class UpdateTask implements Task {
+public interface Task {
 
 }

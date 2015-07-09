@@ -3,7 +3,7 @@
  * 
  * All rights reserved
  */
-package de.projectsc;
+package testing;
 
 import java.util.LinkedList;
 import java.util.List;

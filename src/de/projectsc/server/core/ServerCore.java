@@ -109,7 +109,7 @@ public class ServerCore implements Runnable {
 
                 }
                 networkSendQueue.offer(new ServerMessage(NetworkMessageConstants.INITIALIZE_GAME, entitiesToSend));
-                while (!startGame.get()) {
+                while (!startGame.get() && !shutdown) {
                     try {
                         Thread.sleep(MS_PER_UPDATE);
                     } catch (InterruptedException e) {
@@ -137,7 +137,7 @@ public class ServerCore implements Runnable {
                     }
                 }
 
-                LOGGER.debug("Core initialized");
+                LOGGER.debug("Core shut down");
             }
 
         }).start();
