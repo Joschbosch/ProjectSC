@@ -5,9 +5,6 @@
  */
 package de.projectsc;
 
-import de.projectsc.client.core.ClientCore;
-import de.projectsc.client.gui.GUICore;
-import de.projectsc.client.network.ClientNetworkCore;
 import de.projectsc.server.core.ServerCore;
 import de.projectsc.server.network.ServerNetworkCore;
 
@@ -28,20 +25,19 @@ public class Main {
      * @param args command line parameters
      */
     public static void main(String[] args) {
-        ClientCore core = new ClientCore();
+        // ClientCore core = new ClientCore();
         ServerCore serverCore = new ServerCore();
-        ServerNetworkCore serverNetwork =
-            new ServerNetworkCore(serverCore.getNetworkSendQueue(), serverCore.getNetworkReceiveQueue());
+        ServerNetworkCore serverNetwork = new ServerNetworkCore(serverCore, serverCore.getReceiveQueue());
         new Thread(serverCore).start();
         new Thread(serverNetwork).start();
 
-        final GUICore gui = new GUICore(core.getGuiIncomingQueue(), core.getGuiOutgoingQueue());
-        final ClientNetworkCore network =
-            new ClientNetworkCore(core.getNetworkSendQueue(), core.getNetworkReceiveQueue(), serverNetwork.clientSendQueueFaking,
-                serverNetwork.clientReceiveQueueFaking);
-        new Thread(core).start();
-        new Thread(network).start();
-        new Thread(gui).start();
+        // final GUICore gui = new GUICore(core.getGuiIncomingQueue(), core.getGuiOutgoingQueue());
+        // final ClientNetworkCore network =
+        // new ClientNetworkCore(core.getNetworkSendQueue(), core.getNetworkReceiveQueue(), serverNetwork.clientSendQueueFaking,
+        // serverNetwork.clientReceiveQueueFaking);
+        // new Thread(core).start();
+        // new Thread(network).start();
+        // new Thread(gui).start();
 
         // while (true) {
         // try {

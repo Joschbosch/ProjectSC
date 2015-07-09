@@ -3,7 +3,7 @@
  * 
  * All rights reserved
  */
-package de.projectsc.server.core;
+package de.projectsc.server.core.serverMessages;
 
 import de.projectsc.core.data.messages.Message;
 
@@ -14,7 +14,7 @@ import de.projectsc.core.data.messages.Message;
  */
 public class ServerMessage extends Message {
 
-    public ServerMessage(String msg, Object data) {
+    public ServerMessage(String msg, Object... data) {
         super(msg, data);
     }
 

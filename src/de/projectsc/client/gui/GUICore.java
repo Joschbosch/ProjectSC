@@ -5,7 +5,7 @@
  */
 package de.projectsc.client.gui;
 
-import static de.projectsc.core.data.messages.MessageConstants.CLOSE_DOWN;
+import static de.projectsc.core.data.messages.MessageConstants.SHUTDOWN;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -89,7 +89,7 @@ public class GUICore implements Runnable {
         outgoingQueue.offer(new GUIMessage(GUIMessageConstants.GUI_INITIALIZED, null));
         while (running) {
             if (Display.isCloseRequested()) {
-                outgoingQueue.put(new GUIMessage(CLOSE_DOWN, null));
+                outgoingQueue.put(new GUIMessage(SHUTDOWN, null));
                 running = false;
                 LOGGER.debug("Send close request and close down");
             }
@@ -120,7 +120,7 @@ public class GUICore implements Runnable {
                 outgoingQueue.offer(new GUIMessage(GUIMessageConstants.GAME_GUI_INITIALIZED, null));
 
                 LOGGER.debug("Starting game!");
-            } else if (msg.getMessage().equals(CLOSE_DOWN)) {
+            } else if (msg.getMessage().equals(SHUTDOWN)) {
                 LOGGER.debug("Closing down");
                 running = false;
             }

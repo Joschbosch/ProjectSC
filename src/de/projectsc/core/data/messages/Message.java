@@ -14,14 +14,14 @@ public abstract class Message {
 
     private final String message;
 
-    private final Object data;
+    private final Object[] data;
 
-    public Message(String msg, Object data) {
+    public Message(String msg, Object... data) {
         this.message = msg;
         this.data = data;
     }
 
-    public Object getData() {
+    public Object[] getData() {
         return data;
     }
 
@@ -29,4 +29,16 @@ public abstract class Message {
         return message;
     }
 
+    @Override
+    public String toString() {
+        String result = "";
+        result += message + " ";
+        if (data != null) {
+            for (Object o : data) {
+                result += "Attribut : ";
+                result += o.toString() + ";   ";
+            }
+        }
+        return result;
+    }
 }

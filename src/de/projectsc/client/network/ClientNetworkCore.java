@@ -67,8 +67,8 @@ public class ClientNetworkCore implements Runnable {
             try {
                 msg = serverNetworkReceiveQueueFake.take();
 
-                if (msg.getMessage().equals(MessageConstants.CLOSE_DOWN)) {
-                    retreiveMessageQueue.offer(new ClientMessage(MessageConstants.CLOSE_DOWN, null));
+                if (msg.getMessage().equals(MessageConstants.SHUTDOWN)) {
+                    retreiveMessageQueue.offer(new ClientMessage(MessageConstants.SHUTDOWN, null));
                     shutdown();
                 } else if (msg.getMessage().equals(NetworkMessageConstants.INITIALIZE_GAME)) {
                     LOGGER.debug("Client receiving message: " + msg.getMessage());
@@ -90,7 +90,7 @@ public class ClientNetworkCore implements Runnable {
             ClientMessage msg;
             try {
                 msg = sendMessageQueue.take();
-                if (MessageConstants.CLOSE_DOWN.equals(msg.getMessage())) {
+                if (MessageConstants.SHUTDOWN.equals(msg.getMessage())) {
                     serverNetworkSendQueueFake.offer(new NetworkMessage(msg.getMessage(), msg.getData()));
                     shutdown();
                 } else {

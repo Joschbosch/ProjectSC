@@ -15,7 +15,7 @@ public final class MessageConstants {
     /**
      * Constant.
      */
-    public static final String CLOSE_DOWN = "Close Down";
+    public static final String SHUTDOWN = "shutdown";
 
     private MessageConstants() {};
 }

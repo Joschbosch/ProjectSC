@@ -13,7 +13,9 @@ import org.apache.commons.logging.LogFactory;
 
 import de.projectsc.core.data.messages.MessageConstants;
 import de.projectsc.core.data.messages.NetworkMessage;
-import de.projectsc.server.core.ServerMessage;
+import de.projectsc.server.core.ServerConstants;
+import de.projectsc.server.core.ServerCore;
+import de.projectsc.server.core.serverMessages.ServerMessage;
 
 /**
  * Core class for server network.
@@ -36,29 +38,24 @@ public class ServerNetworkCore implements Runnable {
 
     private boolean running = false;
 
-    private final BlockingQueue<ServerMessage> sendQueue;
+    private final BlockingQueue<ServerMessage> coreQueue;
 
-    private final BlockingQueue<ServerMessage> receiveQueue;
+    private ServerCore serverCore;
 
-    public ServerNetworkCore(BlockingQueue<ServerMessage> sendQueue, BlockingQueue<ServerMessage> receiveQueue) {
-        this.sendQueue = sendQueue;
-        this.receiveQueue = receiveQueue;
+    public ServerNetworkCore(ServerCore serverCore, BlockingQueue<ServerMessage> coreQueue) {
+        this.coreQueue = coreQueue;
         clientReceiveQueueFaking = new LinkedBlockingQueue<>();
-        clientSendQueueFaking = new LinkedBlockingQueue<>();
-    }
-
-    private void sendMessage(ServerMessage msg) {
-        clientSendQueueFaking.offer(new NetworkMessage(msg.getMessage(), msg.getData()));
+        this.serverCore = serverCore;
     }
 
     private void start() {
         LOGGER.debug("Starting network ...");
         running = true;
         while (running) {
-            retreiveCoreMessages();
             retreiveClientMessages();
+            running = serverCore.isAlive();
             try {
-                Thread.sleep(10);
+                Thread.sleep(ServerConstants.SLEEPTIME);
             } catch (InterruptedException e) {
                 LOGGER.error("Server network error: ", e);
             }
@@ -72,27 +69,15 @@ public class ServerNetworkCore implements Runnable {
                 msg = clientReceiveQueueFaking.take();
 
                 if (msg != null) {
-                    if (msg.getMessage().equals(MessageConstants.CLOSE_DOWN)) {
-                        receiveQueue.offer(new ServerMessage(msg.getMessage(), msg.getData()));
+                    if (msg.getMessage().equals(MessageConstants.SHUTDOWN)) {
+                        coreQueue.offer(new ServerMessage(msg.getMessage(), msg.getData()));
                         shutdown();
                     } else {
-                        receiveQueue.offer(new ServerMessage(msg.getMessage(), msg.getData()));
+                        coreQueue.offer(new ServerMessage(msg.getMessage(), msg.getData()));
                     }
                 }
             } catch (InterruptedException e) {
                 LOGGER.error("Error reading network messages: ", e);
-            }
-        }
-    }
-
-    private void retreiveCoreMessages() {
-        while (!sendQueue.isEmpty()) {
-            ServerMessage msg;
-            try {
-                msg = sendQueue.take();
-                sendMessage(msg);
-            } catch (InterruptedException e) {
-                LOGGER.error("Error reading core messages: ", e);
             }
         }
     }

@@ -3,7 +3,7 @@
  * 
  * All rights reserved
  */
-package de.projectsc.server.core;
+package de.projectsc.server.core.gameutils;
 
 import java.util.PriorityQueue;
 

@@ -5,7 +5,7 @@
  */
 package de.projectsc.client.core;
 
-import static de.projectsc.core.data.messages.MessageConstants.CLOSE_DOWN;
+import static de.projectsc.core.data.messages.MessageConstants.SHUTDOWN;
 
 import java.util.List;
 import java.util.Map;
@@ -236,9 +236,9 @@ public class ClientCore implements Runnable {
             while (!guiIncomingQueue.isEmpty()) {
                 GUIMessage msg = guiIncomingQueue.take();
                 LOGGER.debug("New Message: " + msg.getMessage());
-                if (msg.getMessage().contains(CLOSE_DOWN)) {
-                    guiOutgoingQueue.offer(new GUIMessage(CLOSE_DOWN, null));
-                    networkSendQueue.offer(new ClientMessage(CLOSE_DOWN, null));
+                if (msg.getMessage().contains(SHUTDOWN)) {
+                    guiOutgoingQueue.offer(new GUIMessage(SHUTDOWN, null));
+                    networkSendQueue.offer(new ClientMessage(SHUTDOWN, null));
                     shutdown = true;
                     LOGGER.debug("Shutting down");
                 } else if (msg.getMessage().equals(GUIMessageConstants.POINT_ON_MAP_CLICKED)) {
