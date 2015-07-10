@@ -22,7 +22,7 @@ import de.projectsc.client.gui.GUIMessage;
 import de.projectsc.client.gui.GUIMessageConstants;
 import de.projectsc.core.data.messages.NetworkMessageConstants;
 import de.projectsc.core.entities.MovingEntity;
-import de.projectsc.core.entities.Player;
+import de.projectsc.core.entities.PlayerEntity;
 import de.projectsc.core.entities.WorldEntity;
 
 /**
@@ -174,7 +174,7 @@ public class ClientCore implements Runnable {
                         break;
 
                     case PLAYER:
-                        newEntity = new Player(e.getID(), e.getModel(), e.getTexture(), new Vector3f(e.getPosition().x, e
+                        newEntity = new PlayerEntity(e.getID(), e.getModel(), e.getTexture(), new Vector3f(e.getPosition().x, e
                             .getPosition().y, e.getPosition().z), new Vector3f(e.getRotX(), e.getRotY(), e
                             .getRotZ()), e.getScale());
                         break;

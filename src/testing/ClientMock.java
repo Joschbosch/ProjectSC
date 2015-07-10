@@ -4,6 +4,8 @@
 
 package testing;
 
+import java.awt.Graphics;
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -12,6 +14,9 @@ import java.util.TreeMap;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -25,11 +30,15 @@ import de.projectsc.server.core.messages.ServerMessageConstants;
 
 public class ClientMock {
 
+    public static ClientMock mock;
+
     private static final Log LOGGER = LogFactory.getLog(ClientMock.class);
 
     private final AtomicBoolean shutdown = new AtomicBoolean(false);
 
     private final Map<Long, AuthendicatedClientMock> clients = new TreeMap<>();
+
+    public ShowPNG png;
 
     private void createNewClient(String[] information, BlockingQueue<ServerMessage> serverQueue) {
         AuthendicatedClientMock newClient = new AuthendicatedClientMock(information[1]);
@@ -110,7 +119,7 @@ public class ClientMock {
     }
 
     public static void main(String[] args) {
-        ClientMock mock = new ClientMock();
+        mock = new ClientMock();
         ServerCore serverCore = new ServerCore();
         new Thread(serverCore).start();
 
@@ -122,15 +131,86 @@ public class ClientMock {
             }
 
         }).start();
+        mock.png = new ShowPNG(null);
+        mock.png.setVisible(true);
         try {
             mock.handleCommand(serverCore.getReceiveQueue(), "create-client Josch");
             mock.handleCommand(serverCore.getReceiveQueue(), "create-client Ilka");
+            mock.handleCommand(serverCore.getReceiveQueue(), "create-client Client1");
+            mock.handleCommand(serverCore.getReceiveQueue(), "create-client Client2");
+            mock.handleCommand(serverCore.getReceiveQueue(), "create-client Client3");
+            mock.handleCommand(serverCore.getReceiveQueue(), "create-client Client4");
+            mock.handleCommand(serverCore.getReceiveQueue(), "create-client Client5");
+            mock.handleCommand(serverCore.getReceiveQueue(), "create-client Client6");
             mock.handleCommand(serverCore.getReceiveQueue(), "Josch request:create_new_game");
-
+            mock.handleCommand(serverCore.getReceiveQueue(), "Ilka request:join_game 1000");
+            mock.handleCommand(serverCore.getReceiveQueue(), "Client1 request:join_game 1000");
+            mock.handleCommand(serverCore.getReceiveQueue(), "Client2 request:join_game 1000");
+            mock.handleCommand(serverCore.getReceiveQueue(), "Client3 request:join_game 1000");
+            mock.handleCommand(serverCore.getReceiveQueue(), "Client4 request:join_game 1000");
+            mock.handleCommand(serverCore.getReceiveQueue(), "Client5 request:join_game 1000");
+            mock.handleCommand(serverCore.getReceiveQueue(), "Client6 request:join_game 1000");
+            Thread.sleep(100);
+            mock.handleCommand(serverCore.getReceiveQueue(), "Josch request:start_game");
+            Thread.sleep(2000);
+            mock.handleCommand(serverCore.getReceiveQueue(), "Josch update_loading_progress 100");
+            mock.handleCommand(serverCore.getReceiveQueue(), "Ilka update_loading_progress 100");
+            mock.handleCommand(serverCore.getReceiveQueue(), "Client1 update_loading_progress 100");
+            mock.handleCommand(serverCore.getReceiveQueue(), "Client2 update_loading_progress 100");
+            mock.handleCommand(serverCore.getReceiveQueue(), "Client3 update_loading_progress 100");
+            mock.handleCommand(serverCore.getReceiveQueue(), "Client4 update_loading_progress 100");
+            mock.handleCommand(serverCore.getReceiveQueue(), "Client5 update_loading_progress 100");
+            mock.handleCommand(serverCore.getReceiveQueue(), "Client6 update_loading_progress 100");
         } catch (InterruptedException e) {
         }
     }
 
+}
+
+class ShowPNG extends JFrame {
+
+    public BufferedImage img = null;
+
+    public BufferedImage img1 = null;
+
+    public void setImg(BufferedImage img) {
+        this.img = img;
+    }
+
+    public void setImg1(BufferedImage img1) {
+        this.img1 = img1;
+    }
+
+    ShowPNG(final String arg2) {
+        JPanel panel = new JPanel() {
+
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                if (img != null && img1 != null) {
+                    g.drawImage(img, 0, 0, null);
+                    g.drawImage(img1, img.getWidth(), 0, null);
+                }
+            }
+        };
+        panel.setSize(2048, 1024);
+
+        this.setSize(2048, 1024);
+        this.getContentPane().add(panel);
+        new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                while (true) {
+                    try {
+                        Thread.sleep(200);
+                    } catch (InterruptedException e) {
+                    }
+                    repaint();
+                }
+            }
+        }).start();
+    }
 }
 
 class AuthendicatedClientMock {
@@ -170,6 +250,10 @@ class AuthendicatedClientMock {
                     try {
                         ServerMessage msg = sendToClientQueue.take();
                         LOGGER.debug("Client " + authClient.getDisplayName() + ": Retreived message " + msg.toString());
+                        if (msg.getMessage().equals("newImage")) {
+                            ClientMock.mock.png.setImg((BufferedImage) msg.getData()[0]);
+                            ClientMock.mock.png.setImg1((BufferedImage) msg.getData()[1]);
+                        }
                     } catch (InterruptedException e) {
                     }
                 }

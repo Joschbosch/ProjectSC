@@ -183,10 +183,11 @@ public class Terrain {
             if (realMinPos.x > 0 && realMinPos.z > 0) {
                 realMinPos = (Vector3f) realMinPos.scale(1.0f / Terrain.TERRAIN_TILE_SIZE);
                 realMaxPos = (Vector3f) realMaxPos.scale(1.0f / Terrain.TERRAIN_TILE_SIZE);
-                for (int i = (int) realMinPos.x; i < (int) realMaxPos.x; i++) {
-                    for (int j = (int) realMinPos.z; j < (int) realMaxPos.z; j++) {
+                for (int i = (int) realMinPos.x; i <= (int) realMaxPos.x; i++) {
+                    for (int j = (int) realMinPos.z; j <= (int) realMaxPos.z; j++) {
                         if (tiles[i][j] != null) {
                             tiles[i][j].setWalkable(mark);
+
                         }
                     }
                 }

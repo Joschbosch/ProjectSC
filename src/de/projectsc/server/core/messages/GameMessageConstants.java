@@ -23,5 +23,9 @@ public final class GameMessageConstants {
 
     public static final String ERROR_STARTING_GAME = "response:error_starting_game";
 
+    public static final String UPDATE_LOADING_PROGRESS = "update_loading_progress";
+
+    public static final String BEGIN_GAME = "begin_game";
+
     private GameMessageConstants() {};
 }

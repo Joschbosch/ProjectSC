@@ -34,8 +34,7 @@ public final class BoundingBoxLoader {
     private BoundingBoxLoader() {}
 
     /**
-     * Reads the bounding box of the given enttity by reading its model file and checking out
-     * min/max vertices.
+     * Reads the bounding box of the given enttity by reading its model file and checking out min/max vertices.
      * 
      * @param entity to create the box of.
      * @return the box
@@ -75,7 +74,6 @@ public final class BoundingBoxLoader {
                     }
                 }
                 min.scale(entity.getScale());
-                min.y = 0;
                 max.scale(entity.getScale());
                 BoundingBox box = new BoundingBox(min, max);
                 // LOGGER.debug("Read bounding box for " + model + ": min=" + min + " max =" +

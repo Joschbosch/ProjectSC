@@ -10,6 +10,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.lwjgl.util.vector.Vector3f;
 
+import de.projectsc.core.game.GameAttributes;
 import de.projectsc.core.utils.BoundingBox;
 import de.projectsc.core.utils.BoundingBoxLoader;
 import de.projectsc.core.utils.PhysicalObject;
@@ -45,6 +46,8 @@ public abstract class WorldEntity implements Comparable<WorldEntity>, PhysicalOb
 
     protected String texture;
 
+    private GameAttributes attributes;
+
     protected BoundingBox boundingBox;
 
     public WorldEntity(EntityType type, String model, String texture, Vector3f position, Vector3f rotation, float scale) {
@@ -56,6 +59,7 @@ public abstract class WorldEntity implements Comparable<WorldEntity>, PhysicalOb
         this.setModel(model);
         this.setTexture(texture);
         boundingBox = BoundingBoxLoader.readBoundingBox(this);
+        attributes = new GameAttributes();
         LOGGER.debug("Created new Entity : " + this);
     }
 
@@ -85,6 +89,7 @@ public abstract class WorldEntity implements Comparable<WorldEntity>, PhysicalOb
         return Vector3f.add(boundingBox.getMax(), position, null);
     }
 
+    @Override
     public Vector3f getPosition() {
         return position;
     }
@@ -149,6 +154,7 @@ public abstract class WorldEntity implements Comparable<WorldEntity>, PhysicalOb
         return type;
     }
 
+    @Override
     public BoundingBox getBoundingBox() {
         return boundingBox;
     }

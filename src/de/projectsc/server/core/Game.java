@@ -20,7 +20,9 @@ import au.com.ds.ef.FlowBuilder;
 import au.com.ds.ef.StateEnum;
 import au.com.ds.ef.call.ContextHandler;
 import de.projectsc.core.data.messages.MessageConstants;
+import de.projectsc.core.game.GameAttributes;
 import de.projectsc.server.core.gamestates.Events;
+import de.projectsc.server.core.gamestates.GameRunningState;
 import de.projectsc.server.core.gamestates.GameState;
 import de.projectsc.server.core.gamestates.LoadingState;
 import de.projectsc.server.core.gamestates.LobbyState;
@@ -36,8 +38,6 @@ import de.projectsc.server.core.messages.ServerMessageConstants;
  * @author Josch Bosch
  */
 public class Game implements Runnable {
-
-    private static final long GAME_TICK = 15;
 
     private static final Log LOGGER = LogFactory.getLog(Game.class);
 
@@ -72,7 +72,7 @@ public class Game implements Runnable {
         LOGGER.debug(String.format("Game %d started", gameContext.getGameID()));
         while (lobbyAlive.get()) {
             try {
-                Thread.sleep(GAME_TICK);
+                Thread.sleep(GameRunningState.GAME_TICK);
             } catch (InterruptedException e) {
                 LOGGER.debug(e);
             }
@@ -97,6 +97,8 @@ public class Game implements Runnable {
                 ServerMessage msg = queue.poll();
                 if (msg.getMessage().equals(ServerMessageConstants.CHAT_MESSAGE)) {
                     sendMessageToAllPlayer(new ServerMessage(msg.getMessage(), msg.getData()[0], player.getDisplayName()));
+                } else if (msg.getMessage().equals(ServerCommands.LIST_PLAYER)) {
+                    createPlayerList();
                 } else if (msg.getMessage().equals(ServerMessageConstants.PLAYER_QUIT_LOBBY)) {
                     if (players.containsKey(player.getId())) {
                         toQuit.add(player);
@@ -134,6 +136,17 @@ public class Game implements Runnable {
         }
     }
 
+    private void createPlayerList() {
+        String gameList = "\nPlayer in game: \n";
+        Map<Long, ServerPlayer> players = gameContext.getPlayers();
+        for (Long id : players.keySet()) {
+            gameList +=
+                String.format("(%4d) %s Affiliation: %d - Character: %s\n", id, players.get(id).getDisplayName(), gameContext.getConfig()
+                    .getPlayerAffiliation(id), gameContext.getConfig().getPlayerCharacter(id));
+        }
+        LOGGER.debug(gameList);
+    }
+
     private void newHost(ServerPlayer remove) {
         Map<Long, ServerPlayer> players = gameContext.getPlayers();
         if (players.size() > 0 && remove.getId().equals(gameContext.getHost().getId())) {
@@ -167,6 +180,14 @@ public class Game implements Runnable {
         ServerPlayer player = new ServerPlayer(newPlayer);
         sendMessageToAllPlayer(new ServerMessage(ServerMessageConstants.PLAYER_JOINED_GAME, player.getId(), player.getDisplayName()));
         gameContext.getPlayers().put(player.getId(), player);
+        gameContext.getConfig().setPlayerCharacter(player.getId(), "person");
+        byte affiliation = 0;
+        if (gameContext.getConfig().getAffiliationCount(GameAttributes.AFFILIATION_LIGHT) < ServerConstants.MAXIMUM_PLAYER_PER_GAME / 2) {
+            affiliation = GameAttributes.AFFILIATION_LIGHT;
+        } else {
+            affiliation = GameAttributes.AFFILIATION_DARK;
+        }
+        gameContext.getConfig().setPlayerAffiliation(player.getId(), affiliation);
         LOGGER.debug(String.format("Player joined game %s: %s (Game %s)", gameContext.getDisplayName(), player.getDisplayName(),
             gameContext.getGameID()));
     }
@@ -218,13 +239,7 @@ public class Game implements Runnable {
 
         flow.whenEnter(States.LOBBY, new LobbyState());
         flow.whenEnter(States.LOADING, new LoadingState());
-        flow.whenEnter(States.FINISHED, new ContextHandler<GameContext>() {
-
-            @Override
-            public void call(GameContext context) throws Exception {
-                LOGGER.debug("Entered game state " + context.getState());
-            }
-        });
+        flow.whenEnter(States.RUNNING, new GameRunningState());
         flow.whenEnter(States.PAUSED, new ContextHandler<GameContext>() {
 
             @Override
@@ -232,7 +247,7 @@ public class Game implements Runnable {
                 LOGGER.debug("Entered game state " + context.getState());
             }
         });
-        flow.whenEnter(States.RUNNING, new ContextHandler<GameContext>() {
+        flow.whenEnter(States.FINISHED, new ContextHandler<GameContext>() {
 
             @Override
             public void call(GameContext context) throws Exception {
@@ -242,6 +257,7 @@ public class Game implements Runnable {
     }
 
     public void changeState(GameState newState) {
+        System.out.println("want to change " + gameContext.getState());
         synchronized (LOCK_OBJECT) {
             currenState = newState;
             LOGGER.debug("Set current game state to " + gameContext.getState());

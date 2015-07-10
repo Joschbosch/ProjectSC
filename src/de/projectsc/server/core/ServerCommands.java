@@ -22,5 +22,10 @@ public final class ServerCommands {
      */
     public static final String LIST_GAMES = "list-games";
 
+    /**
+     * Constants.
+     */
+    public static final String LIST_PLAYER = "list-player";
+
     private ServerCommands() {};
 }

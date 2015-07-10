@@ -17,5 +17,7 @@ public final class ServerConstants {
      */
     public static final long SLEEPTIME = 50;
 
+    public static final int MAXIMUM_PLAYER_PER_GAME = 10;
+
     private ServerConstants() {}
 }

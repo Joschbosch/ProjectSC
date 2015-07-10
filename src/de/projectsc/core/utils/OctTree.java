@@ -5,6 +5,8 @@
  */
 package de.projectsc.core.utils;
 
+import java.awt.Color;
+import java.awt.Graphics;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -28,9 +30,11 @@ public class OctTree<T extends PhysicalObject> {
 
     private final Queue<T> pendingEntities = new LinkedList<>();
 
-    private PriorityQueue<T> entities = new PriorityQueue<>();
+    private List<T> entities = new LinkedList<>();
 
     private boolean treeBuild = false;
+
+    private boolean treeReady = false;
 
     private final BoundingBox region;
 
@@ -44,10 +48,7 @@ public class OctTree<T extends PhysicalObject> {
 
     private int curLife = 0 - 1;
 
-    public OctTree() {
-        region = new BoundingBox(new Vector3f(0, 0, 0), new Vector3f(0, 0, 0));
-
-    }
+    private byte activeNodes = 0;
 
     @SuppressWarnings("unchecked")
     public OctTree(BoundingBox region) {
@@ -56,7 +57,7 @@ public class OctTree<T extends PhysicalObject> {
     }
 
     @SuppressWarnings("unchecked")
-    private OctTree(BoundingBox region, PriorityQueue<T> entities) {
+    private OctTree(BoundingBox region, List<T> entities) {
         this.region = region;
         this.entities = entities;
         children = new OctTree[8];
@@ -91,7 +92,7 @@ public class OctTree<T extends PhysicalObject> {
     }
 
     private void insert(T e) {
-        if (entities.size() <= 1 && !hasChildren()) {
+        if (entities.size() <= 1 && activeNodes == 0) {
             entities.add(e);
             return;
         }
@@ -138,6 +139,7 @@ public class OctTree<T extends PhysicalObject> {
                         List<T> list = new LinkedList<>();
                         list.add(e);
                         children[i] = createNewNode(octant[i], list);
+                        activeNodes |= (byte) (1 << i);
                     }
 
                     foundChild = true;
@@ -146,8 +148,9 @@ public class OctTree<T extends PhysicalObject> {
             if (!foundChild) {
                 entities.add(e);
             }
+        } else {
+            buildTree();
         }
-        treeBuild = true;
     }
 
     private void buildTree() {
@@ -206,10 +209,13 @@ public class OctTree<T extends PhysicalObject> {
 
         for (int i = 0; i < 8; i++) {
             if (!subEntities.get(i).isEmpty()) {
-                children[i] = createNewNode(octant[i], subEntities.get(new Integer(i)));
+                children[i] = createNewNode(octant[i], subEntities.get(i));
+                activeNodes |= (byte) (1 << i);
                 children[i].buildTree();
             }
         }
+        treeBuild = true;
+        treeReady = true;
     }
 
     private boolean containsEntity(BoundingBox boundingBox, T e) {
@@ -243,13 +249,8 @@ public class OctTree<T extends PhysicalObject> {
         if (list.isEmpty()) {
             return null;
         }
-        PriorityQueue<T> map = new PriorityQueue<>();
-        for (T e : list) {
-            map.add(e);
-        }
-        OctTree<T> returnTree = new OctTree<T>(boundingBox, map);
+        OctTree<T> returnTree = new OctTree<T>(boundingBox, list);
         returnTree.parent = this;
-        returnTree.treeBuild = true;
 
         return returnTree;
     }
@@ -267,63 +268,74 @@ public class OctTree<T extends PhysicalObject> {
      * Update tree after moving the objects.
      */
     public void update() {
-        if (treeBuild) {
-            if (entities.size() == 0) {
-                if (!hasChildren()) {
-                    if (curLife == LIFE_INIT_VALUE) {
-                        curLife = maxLifespan;
-                    } else if (curLife > 0) {
-                        curLife--;
-                    }
-                }
-            } else {
-                if (curLife != LIFE_INIT_VALUE) {
-                    if (maxLifespan <= MAXIMUM_LIFESPAN) {
-                        maxLifespan *= 2;
-                    }
-                    curLife = LIFE_INIT_VALUE;
+        // if (treeBuild) {
+        if (entities.size() == 0) {
+            if (!hasChildren()) {
+                if (curLife == LIFE_INIT_VALUE) {
+                    curLife = maxLifespan;
+                } else if (curLife > 0) {
+                    curLife--;
                 }
             }
-
-            List<T> movedObjects = new LinkedList<>();
-            for (T e : entities) {
-                if (e.isMovable() && e.hasMoved()) {
-                    movedObjects.add(e);
+        } else {
+            if (curLife != LIFE_INIT_VALUE) {
+                if (maxLifespan <= MAXIMUM_LIFESPAN) {
+                    maxLifespan *= 2;
                 }
+                curLife = LIFE_INIT_VALUE;
             }
-            for (int i = 0; i < 8; i++) {
-                if (children[i] != null) {
-                    children[i].update();
-                }
-            }
-            for (T e : movedObjects) {
-                OctTree<T> current = this;
-                while (!containsEntity(current.region, e)) {
-                    if (current.parent != null) {
-                        current = current.parent;
-                    } else {
-                        break;
-                    }
-
-                }
-
-                entities.remove(e);
-                current.insert(e);
-            }
-
-            for (int i = 0; i < 8; i++) {
-                if (children[i] != null && children[i].curLife == 0) {
-                    children[i] = null;
-                }
-            }
-
-            // root node
-            if (parent == null) {
-                interSectionList = getAllIntersections(new LinkedList<T>());
-
-            }
-
         }
+
+        List<T> movedObjects = new LinkedList<>();
+        for (T e : entities) {
+            if (e.isMovable() && e.hasMoved()) {
+                movedObjects.add(e);
+            }
+        }
+
+        int listSize = entities.size();
+        for (int i = 0; i < listSize; i++) {
+            if (entities.get(i) == null) {
+                if (movedObjects.contains(entities.get(i))) {
+                    movedObjects.remove(entities.get(i));
+                }
+                entities.remove(i--);
+                listSize--;
+            }
+        }
+        for (int i = 0; i < 8; i++) {
+            if (children[i] != null) {
+                children[i].update();
+            }
+        }
+        for (T e : movedObjects) {
+            OctTree<T> current = this;
+            while (!containsEntity(current.region, e)) {
+                if (current.parent != null) {
+                    current = current.parent;
+                } else {
+                    break;
+                }
+
+            }
+
+            entities.remove(e);
+            current.insert(e);
+        }
+
+        for (int flags = activeNodes, index = 0; flags > 0; flags >>= 1, index++) {
+            if ((flags & 1) == 1 && children[index].curLife == 0) {
+                children[index] = null;
+                activeNodes ^= (byte) (1 << index);
+            }
+        }
+
+        // root node
+        if (parent == null) {
+            interSectionList = getAllIntersections(new LinkedList<T>());
+        }
+
+        // }
     }
 
     public List<T> getIntersectionList() {
@@ -401,5 +413,44 @@ public class OctTree<T extends PhysicalObject> {
             }
         }
         return result;
+    }
+
+    private Color[] colorLevel = new Color[] { Color.RED, Color.GRAY, Color.GREEN, Color.YELLOW, Color.BLUE, Color.CYAN, Color.MAGENTA,
+        Color.PINK };
+
+    public void drawImage(Graphics treeG) {
+        int i = 0;
+        drawLevel(i, treeG, this);
+
+    }
+
+    private void drawLevel(int i, Graphics treeG, OctTree<T> octTree) {
+
+        Vector3f min = octTree.region.getMin();
+        Vector3f size = octTree.region.getSize();
+        treeG.setColor(colorLevel[i % colorLevel.length]);
+        if (i < 10) {
+            treeG.drawRect((int) min.x, (int) min.z, (int) size.x, (int) size.z);
+            for (T e : octTree.entities) {
+
+                Vector3f minBB = Vector3f.add(e.getPosition(), e.getBoundingBox().getMin(), null);
+                Vector3f centerBB = Vector3f.add(e.getPosition(), e.getBoundingBox().getCenter(), null);
+
+                Vector3f sizeBB = e.getBoundingBox().getSize();
+                treeG.setColor(colorLevel[i % colorLevel.length]);
+                treeG.fillRect((int) minBB.x, (int) minBB.z, (int) sizeBB.x, (int) sizeBB.z);
+                treeG.setColor(Color.WHITE);
+                treeG.drawOval((int) (centerBB.x - 2), (int) (centerBB.z - 2) - 3, 4, 4);
+                if (interSectionList.contains(e)) {
+                    treeG.drawRect((int) minBB.x, (int) minBB.z, (int) sizeBB.x, (int) sizeBB.z);
+                }
+
+            }
+        }
+        for (int g = 0; g < 8; g++) {
+            if (octTree.children[g] != null && octTree.children[g] != octTree) {
+                drawLevel(i + 1, treeG, octTree.children[g]);
+            }
+        }
     }
 }

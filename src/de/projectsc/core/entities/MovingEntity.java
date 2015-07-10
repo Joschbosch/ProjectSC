@@ -57,11 +57,15 @@ public class MovingEntity extends WorldEntity {
         if (Vector3f.sub(getPosition(), getCurrentTarget(), null).lengthSquared() > 2) {
             currentSpeed = MOVEMENT_SPEED;
         } else {
-            path.poll();
-            if (path.size() > 0) {
-                setCurrentTarget(path.peek().getCoordinates());
+            if (path != null) {
+                path.poll();
+                if (path.size() > 0) {
+                    setCurrentTarget(path.peek().getCoordinates());
+                } else {
+                    currentSpeed = 0;
+                }
             } else {
-                currentSpeed = 0;
+                setCurrentTarget(new Vector3f(0f, 0f, 0f));
             }
         }
         float distance = currentSpeed * delta;
