@@ -17,9 +17,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import de.projectsc.core.data.messages.MessageConstants;
-import de.projectsc.server.core.serverMessages.NewClientConnectedServerMessage;
-import de.projectsc.server.core.serverMessages.ServerMessage;
-import de.projectsc.server.core.serverMessages.ServerMessageConstants;
+import de.projectsc.server.core.messages.NewClientConnectedServerMessage;
+import de.projectsc.server.core.messages.ServerMessage;
+import de.projectsc.server.core.messages.ServerMessageConstants;
 
 /**
  * Core of server.
@@ -34,11 +34,11 @@ public class ServerCore implements Runnable {
 
     private static AtomicBoolean shutdown = new AtomicBoolean(false);
 
-    private BlockingQueue<ServerMessage> receiveQueue;
+    private final BlockingQueue<ServerMessage> receiveQueue;
 
-    private Map<Long, AuthenticatedClient> clientsInMainLobby;
+    private final Map<Long, AuthenticatedClient> clientsInMainLobby;
 
-    private Map<Long, Game> games;
+    private final Map<Long, Game> games;
 
     private ServerConsole console;
 
@@ -56,6 +56,7 @@ public class ServerCore implements Runnable {
     public void run() {
         LOGGER.debug("Starting core ... ");
         console = new ServerConsole(receiveQueue);
+        console.hashCode();
         while (!shutdown.get()) {
             try {
                 Thread.sleep(ServerConstants.SLEEPTIME);
@@ -63,8 +64,8 @@ public class ServerCore implements Runnable {
                 LOGGER.error(CORE_ERROR, e);
             }
             workMessages();
-
         }
+        LOGGER.debug("Server core shut down.");
     }
 
     private void workMessages() {
@@ -107,12 +108,13 @@ public class ServerCore implements Runnable {
             toRemove.add(client);
             sendMsgToAllClients(new ServerMessage(ServerMessageConstants.CLIENT_LEFT_LOBBY, client.getId(), client.getDisplayName()));
             client.sendMessage(new ServerMessage(ServerMessageConstants.NEW_GAME_CREATED));
-        } else if (msg.getMessage().equals(ServerMessageConstants.JOIN_GAME_REQUEST)) {
+        } else if (msg.getMessage().equals(ServerMessageConstants.JOIN_GAME_REQUEST) && msg.getData() != null && msg.getData().length > 0) {
             try {
                 Long game = Long.valueOf(((String) msg.getData()[0]).trim());
 
                 if (games.containsKey(game)) {
-                    if (!games.get(game).isFull()) {
+                    String joinable = games.get(game).isJoinable();
+                    if (joinable.isEmpty()) {
                         games.get(game).addPlayerToGameLobby(client);
                         client.sendMessage(new ServerMessage(ServerMessageConstants.JOIN_GAME_SUCCSESSFULL));
                         toRemove.add(client);
@@ -120,7 +122,7 @@ public class ServerCore implements Runnable {
                             client.getDisplayName()));
                     } else {
                         client.sendMessage(new ServerMessage(ServerMessageConstants.ERROR_JOINING_GAME, String.format(
-                            "Game is full")));
+                            joinable)));
                     }
                 } else {
                     client.sendMessage(new ServerMessage(ServerMessageConstants.ERROR_JOINING_GAME, String.format(
@@ -141,8 +143,11 @@ public class ServerCore implements Runnable {
 
     private void handleServerInternalMessages(ServerMessage msg) {
         if (msg.getMessage().equals(MessageConstants.SHUTDOWN)) {
-            shutdown.set(true);
+            for (Game g : games.values()) {
+                g.shutdown();
+            }
             sendMsgToAllClients(msg);
+            shutdown.set(true);
         } else if (msg.getMessage().equals(ServerMessageConstants.CHAT_MESSAGE)) {
             sendMsgToAllClients(msg);
         } else if (msg.getMessage().equals(ServerMessageConstants.NEW_CLIENT_CONNECTED)) {
@@ -189,7 +194,9 @@ public class ServerCore implements Runnable {
             gameList = "\nNo games";
         } else {
             for (Long id : games.keySet()) {
-                gameList += String.format("(%4d) %s (%d player)\n", id, games.get(id).getDisplayName(), games.get(id).getPlayerCount());
+                gameList +=
+                    String.format("(%4d) %s (%d player) %s\n", id, games.get(id).getDisplayName(), games.get(id).getPlayerCount(), games
+                        .get(id).getGameState());
             }
         }
         LOGGER.debug(gameList);

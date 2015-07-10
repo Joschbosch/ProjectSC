@@ -108,7 +108,7 @@ public final class TerrainLoader {
                 Integer[] position = mapper.readValue(terrainField.get(POSITION), new Integer[2].getClass());
                 map[position[0]][position[1]] =
                     new Tile(new Vector2f(position[0], position[1]), mapper.readValue(terrainField.get(TERRAIN_HEIGHT), Byte.class),
-                        mapper.readValue(terrainField.get("walkable"), Byte.class), mapper.readValue(terrainField.get("type"),
+                        mapper.readValue(terrainField.get("walkable"), Byte.class), mapper.readValue(terrainField.get(TYPE),
                             Byte.class));
             }
 
@@ -208,7 +208,7 @@ public final class TerrainLoader {
                     terrainData.put(POSITION, new int[] { (int) current.getCoordinates().x, (int) current.getCoordinates().y });
                     terrainData.put(TERRAIN_HEIGHT, current.getHeight());
                     terrainData.put("walkable", current.getWalkAble());
-                    terrainData.put("type", current.getType());
+                    terrainData.put(TYPE, current.getType());
                     terrainList.add(terrainData);
                 }
             }

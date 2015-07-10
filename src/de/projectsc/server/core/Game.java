@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2015 
+ * Copyright (C) 2015 Project SC
+ * 
+ * All rights reserved
  */
 
 package de.projectsc.server.core;
@@ -8,49 +10,66 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import de.projectsc.server.core.serverMessages.GameMessageConstants;
-import de.projectsc.server.core.serverMessages.ServerMessage;
-import de.projectsc.server.core.serverMessages.ServerMessageConstants;
+import au.com.ds.ef.EasyFlow;
+import au.com.ds.ef.FlowBuilder;
+import au.com.ds.ef.StateEnum;
+import au.com.ds.ef.call.ContextHandler;
+import de.projectsc.core.data.messages.MessageConstants;
+import de.projectsc.server.core.gamestates.Events;
+import de.projectsc.server.core.gamestates.GameState;
+import de.projectsc.server.core.gamestates.LoadingState;
+import de.projectsc.server.core.gamestates.LobbyState;
+import de.projectsc.server.core.gamestates.States;
+import de.projectsc.server.core.messages.GameMessageConstants;
+import de.projectsc.server.core.messages.ServerMessage;
+import de.projectsc.server.core.messages.ServerMessageConstants;
 
+/**
+ * 
+ * The actual game, first as lobby, than as the game.
+ * 
+ * @author Josch Bosch
+ */
 public class Game implements Runnable {
 
     private static final long GAME_TICK = 15;
 
     private static final Log LOGGER = LogFactory.getLog(Game.class);
 
-    private static int idCounter = 1000;
+    private static final int ID_START = 1000;
 
-    private ServerPlayer host;
+    private static final Object LOCK_OBJECT = new Object();
 
-    private Map<Long, ServerPlayer> players;
+    private static int idCounter = ID_START;
 
-    private AtomicBoolean lobbyAlive = new AtomicBoolean(true);
+    private final AtomicBoolean lobbyAlive = new AtomicBoolean(true);
 
-    private BlockingQueue<ServerMessage> coreQueue;
+    private final BlockingQueue<ServerMessage> coreQueue;
 
-    private final int gameID;
+    private GameState currenState;
 
-    private String displayName;
+    private final GameContext gameContext;
+
+    private EasyFlow<GameContext> flow;
 
     public Game(AuthenticatedClient host, BlockingQueue<ServerMessage> coreQueue) {
-        this.host = new ServerPlayer(host);
-        this.players = new ConcurrentHashMap<>();
-        players.put(this.host.getId(), this.host);
-        new Thread(this).start();
         this.coreQueue = coreQueue;
-        this.gameID = idCounter++;
-        displayName = host.getDisplayName() + "'s game";
-        LOGGER.debug(String.format("Created new game: %s (Host: %s, game id: %d)", displayName, host.getDisplayName(), gameID));
+        this.gameContext = new GameContext(idCounter++, host.getDisplayName() + "'s game", new ServerPlayer(host), this);
+        createAndBindFlow();
+        flow.start(gameContext);
+        LOGGER.debug(String.format("Created new game: %s (Host: %s, game id: %d)", gameContext.getDisplayName(), host.getDisplayName(),
+            gameContext.getGameID()));
+        new Thread(this).start();
     }
 
     @Override
     public void run() {
+        LOGGER.debug(String.format("Game %d started", gameContext.getGameID()));
         while (lobbyAlive.get()) {
             try {
                 Thread.sleep(GAME_TICK);
@@ -58,14 +77,20 @@ public class Game implements Runnable {
                 LOGGER.debug(e);
             }
             readMessages();
-
+            synchronized (LOCK_OBJECT) {
+                if (currenState != null) {
+                    currenState.loop();
+                }
+            }
         }
+        LOGGER.debug(String.format("Game %d terminated", gameContext.getGameID()));
     }
 
     private void readMessages() {
         List<ServerPlayer> toRemove = new LinkedList<>();
         List<ServerPlayer> toQuit = new LinkedList<>();
 
+        Map<Long, ServerPlayer> players = gameContext.getPlayers();
         for (ServerPlayer player : players.values()) {
             BlockingQueue<ServerMessage> queue = player.getClient().getReceiveFromClientQueue();
             while (!queue.isEmpty()) {
@@ -77,7 +102,8 @@ public class Game implements Runnable {
                         toQuit.add(player);
                         sendMessageToAllPlayer(new ServerMessage(ServerMessageConstants.PLAYER_QUIT_LOBBY, player.getId(),
                             player.getDisplayName()));
-                        LOGGER.debug(String.format("Player left game %s: %s (Game %s)", displayName, player.getDisplayName(), gameID));
+                        LOGGER.debug(String.format("Player left game %s: %s (Game %s)", gameContext.getDisplayName(),
+                            player.getDisplayName(), gameContext.getGameID()));
 
                     }
                 } else if (msg.getMessage().equals(ServerMessageConstants.CLIENT_DISCONNECTED)) {
@@ -86,10 +112,13 @@ public class Game implements Runnable {
 
                         sendMessageToAllPlayer(new ServerMessage(ServerMessageConstants.CLIENT_DISCONNECTED, player.getId(),
                             player.getDisplayName()));
-                        LOGGER.debug(String.format("Player disconnected from game %s: %s (Game %s)", displayName, player.getDisplayName(),
-                            gameID));
+                        LOGGER.debug(String.format("Player disconnected from game %s: %s (Game %s)", gameContext.getDisplayName(),
+                            player.getDisplayName(),
+                            gameContext.getGameID()));
 
                     }
+                } else if (currenState != null) {
+                    currenState.handleMessage(player, msg);
                 }
             }
         }
@@ -106,56 +135,124 @@ public class Game implements Runnable {
     }
 
     private void newHost(ServerPlayer remove) {
-        if (players.size() > 0 && remove.getId().equals(host.getId())) {
+        Map<Long, ServerPlayer> players = gameContext.getPlayers();
+        if (players.size() > 0 && remove.getId().equals(gameContext.getHost().getId())) {
             Long nextHost = players.keySet().iterator().next();
-            host = players.get(nextHost);
-            sendMessageToAllPlayer(new ServerMessage(GameMessageConstants.NEW_HOST, host.getId(), host.getDisplayName()));
+            gameContext.setHost(players.get(nextHost));
+            sendMessageToAllPlayer(new ServerMessage(GameMessageConstants.NEW_HOST, gameContext.getHost().getId(), gameContext.getHost()
+                .getDisplayName()));
         } else {
-            host = null;
+            gameContext.setHost(null);
             lobbyAlive.set(false);
         }
     }
 
+    /**
+     * Player quit or disconnected.
+     * 
+     * @param player to remove
+     */
     public void removePlayerFromLobby(ServerPlayer player) {
-        players.remove(player.getId());
+        gameContext.getPlayers().remove(player.getId());
         coreQueue.offer(new ServerMessage(ServerMessageConstants.PLAYER_QUIT_LOBBY, player.getClient()));
     }
 
+    /**
+     * 
+     * New player joins the lobby. Hooray!
+     * 
+     * @param newPlayer that joined.
+     */
     public void addPlayerToGameLobby(AuthenticatedClient newPlayer) {
         ServerPlayer player = new ServerPlayer(newPlayer);
         sendMessageToAllPlayer(new ServerMessage(ServerMessageConstants.PLAYER_JOINED_GAME, player.getId(), player.getDisplayName()));
-        players.put(player.getId(), player);
-        LOGGER.debug(String.format("Player joined game %s: %s (Game %s)", displayName, player.getDisplayName(),
-            gameID));
+        gameContext.getPlayers().put(player.getId(), player);
+        LOGGER.debug(String.format("Player joined game %s: %s (Game %s)", gameContext.getDisplayName(), player.getDisplayName(),
+            gameContext.getGameID()));
     }
 
     private void sendMessageToAllPlayer(ServerMessage msg) {
-        for (ServerPlayer player : players.values()) {
+        for (ServerPlayer player : gameContext.getPlayers().values()) {
             player.getClient().getSendToClientQueue().offer(msg);
         }
     }
 
     public int getPlayerCount() {
-        return players.size();
+        return gameContext.getPlayers().size();
     }
 
     public boolean isAlive() {
         return lobbyAlive.get();
     }
 
+    /**
+     * Shut down lobby.
+     */
     public void shutdown() {
+        sendMessageToAllPlayer(new ServerMessage(MessageConstants.SHUTDOWN));
+        gameContext.terminate();
         lobbyAlive.set(false);
     }
 
+    public StateEnum getGameState() {
+        return gameContext.getState();
+    }
+
     public long getGameID() {
-        return gameID;
+        return gameContext.getGameID();
     }
 
     public String getDisplayName() {
-        return displayName;
+        return gameContext.getDisplayName();
     }
 
     public boolean isFull() {
         return false;
+    }
+
+    private void createAndBindFlow() {
+        flow = FlowBuilder.from(States.LOBBY)
+            .transit(FlowBuilder.on(Events.START_GAME_COMMAND).to(States.LOADING)
+                .transit(FlowBuilder.on(Events.FINISHED_LOADING).to(States.RUNNING)
+                    .transit(FlowBuilder.on(Events.GAME_ENDS).finish(States.FINISHED))));
+
+        flow.whenEnter(States.LOBBY, new LobbyState());
+        flow.whenEnter(States.LOADING, new LoadingState());
+        flow.whenEnter(States.FINISHED, new ContextHandler<GameContext>() {
+
+            @Override
+            public void call(GameContext context) throws Exception {
+                LOGGER.debug("Entered game state " + context.getState());
+            }
+        });
+        flow.whenEnter(States.PAUSED, new ContextHandler<GameContext>() {
+
+            @Override
+            public void call(GameContext context) throws Exception {
+                LOGGER.debug("Entered game state " + context.getState());
+            }
+        });
+        flow.whenEnter(States.RUNNING, new ContextHandler<GameContext>() {
+
+            @Override
+            public void call(GameContext context) throws Exception {
+                LOGGER.debug("Entered game state " + context.getState());
+            }
+        });
+    }
+
+    public void changeState(GameState newState) {
+        synchronized (LOCK_OBJECT) {
+            currenState = newState;
+            LOGGER.debug("Set current game state to " + gameContext.getState());
+        }
+    }
+
+    public String isJoinable() {
+        String returnString = "";
+        if (!gameContext.getState().equals(States.LOBBY)) {
+            returnString = "Game already running";
+        }
+        return returnString;
     }
 }

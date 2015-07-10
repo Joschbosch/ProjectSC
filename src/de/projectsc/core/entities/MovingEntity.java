@@ -140,8 +140,13 @@ public class MovingEntity extends WorldEntity {
         }
     }
 
-    public void setNewPath(Queue<Tile> path) {
-        this.path = path;
+    /**
+     * Give entity a new path to follow.
+     * 
+     * @param newPath to follow
+     */
+    public void setNewPath(Queue<Tile> newPath) {
+        this.path = newPath;
         this.setCurrentTarget(path.peek().getCoordinates());
 
     }

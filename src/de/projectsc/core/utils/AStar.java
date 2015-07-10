@@ -1,7 +1,8 @@
 /*
- * Copyright (C) 2015
+ * Copyright (C) 2015 Project SC
+ * 
+ * All rights reserved
  */
-
 package de.projectsc.core.utils;
 
 import java.util.Collections;
@@ -11,12 +12,25 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 
+/**
+ * Algorithm to calculate the shortest distance between two nodes.
+ * 
+ * @param <T> for all kinds of graphs.
+ * @author Josch Bosch
+ */
 public class AStar<T extends GraphNode> {
 
     private List<AStarNode<T>> openList;
 
     private Set<T> closeList;
 
+    /**
+     * Calculate path to target.
+     * 
+     * @param start node
+     * @param target node
+     * @return path nodes
+     */
     public Queue<T> getPath(T start, T target) {
         Queue<T> rawPath = calculatePath(start, target);
         Queue<T> newPath = new LinkedList<>();
@@ -25,7 +39,6 @@ public class AStar<T extends GraphNode> {
         T currentPoint = rawPath.remove();
         while (rawPath.peek() != null) {
             if (walkable(currentPoint, rawPath.peek())) {
-                T temp = currentPoint;
                 currentPoint = rawPath.remove();
             } else {
                 checkPoint = currentPoint;
@@ -62,12 +75,13 @@ public class AStar<T extends GraphNode> {
         return getPath(leastPriority);
     }
 
+    @SuppressWarnings("unchecked")
     private void expandNode(AStarNode<T> current, T target) {
         for (GraphEdge e : ((GraphNode) current.getNode()).getAllNeighbors()) {
             if (!closeList.contains(e.getTarget())) {
                 if (e.getTarget().isWalkable()) {
                     Float newCosts = current.getCost() + e.getCost();
-                    AStarNode<T> successor = new AStarNode(e.getTarget(), 0f, 0f);
+                    AStarNode<T> successor = new AStarNode<T>((T) e.getTarget(), 0f, 0f);
                     if (openList.contains(successor)) {
                         AStarNode<T> existingSuccessor = null;
                         for (int i = 0; i < openList.size(); i++) {
@@ -103,6 +117,12 @@ public class AStar<T extends GraphNode> {
     }
 }
 
+/**
+ * Node in the A* algorithm.
+ * 
+ * @param <T>
+ * @author Josch Bosch
+ */
 class AStarNode<T> implements Comparable<AStarNode<T>> {
 
     private Float cost;
@@ -113,11 +133,18 @@ class AStarNode<T> implements Comparable<AStarNode<T>> {
 
     private Float priority;
 
-    public AStarNode(T node, Float cost, Float priority) {
-        this.node = node;
+    public AStarNode(T graphNode, Float cost, Float priority) {
+        this.node = graphNode;
         this.cost = cost;
         this.priority = priority;
         this.previous = null;
+    }
+
+    public AStarNode(T node, Float cost, Float priority, AStarNode<T> previous) {
+        this.node = node;
+        this.cost = cost;
+        this.priority = priority;
+        this.previous = previous;
     }
 
     public Float getPriority() {
@@ -130,13 +157,6 @@ class AStarNode<T> implements Comparable<AStarNode<T>> {
 
     public void setCost(Float newCosts) {
         cost = newCosts;
-    }
-
-    public AStarNode(T node, Float cost, Float priority, AStarNode<T> previous) {
-        this.node = node;
-        this.cost = cost;
-        this.priority = priority;
-        this.previous = previous;
     }
 
     public T getNode() {
@@ -160,11 +180,17 @@ class AStarNode<T> implements Comparable<AStarNode<T>> {
         return priority.compareTo(o.priority);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public boolean equals(Object other) {
         if (other instanceof AStarNode) {
             return node.equals(((AStarNode<T>) other).getNode());
         }
         return super.equals(other);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
     }
 }

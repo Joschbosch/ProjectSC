@@ -1,7 +1,8 @@
 /*
- * Copyright (C) 2015
+ * Copyright (C) 2015 Project SC
+ * 
+ * All rights reserved
  */
-
 package de.projectsc.core;
 
 import java.util.LinkedList;
@@ -12,13 +13,27 @@ import org.lwjgl.util.vector.Vector2f;
 import de.projectsc.core.utils.GraphEdge;
 import de.projectsc.core.utils.GraphNode;
 
+/**
+ * One tile of the map.
+ *
+ * @author Josch Bosch
+ */
 public class Tile extends GraphNode {
 
-    public static byte NOT_WALKABLE = 2;
+    /**
+     * Not walkable tile.
+     */
+    public static final byte NOT_WALKABLE = 2;
 
-    public static byte LATER_WALKABLE = 1;
+    /**
+     * Can become walkable later.
+     */
+    public static final byte LATER_WALKABLE = 1;
 
-    public static byte WALKABLE = 0;
+    /**
+     * Tile is walkable.
+     */
+    public static final byte WALKABLE = 0;
 
     private final Vector2f coordinates;
 
@@ -56,6 +71,11 @@ public class Tile extends GraphNode {
     @Override
     public boolean equals(GraphNode other) {
         return this.coordinates.equals(((Tile) other).getCoordinates());
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
     }
 
     public List<GraphEdge> getNeighbors() {

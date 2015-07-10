@@ -113,7 +113,7 @@ public class GUICore implements Runnable {
                 currentState = stateMap.get(GUIState.GAME);
                 if (currentState instanceof GameRunning) {
                     ((GameRunning) currentState).initialize();
-                    for (WorldEntity e : ((Map<Integer, WorldEntity>) msg.getData()).values()) {
+                    for (WorldEntity e : ((Map<Integer, WorldEntity>) msg.getData()[0]).values()) {
                         ((GameRunning) currentState).addWorldEntity(e);
                     }
                 }

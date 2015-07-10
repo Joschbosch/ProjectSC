@@ -1,7 +1,8 @@
 /*
- * Copyright (C) 2015 
+ * Copyright (C) 2015 Project SC
+ * 
+ * All rights reserved
  */
-
 package de.projectsc.server.core;
 
 import java.util.LinkedList;
@@ -62,7 +63,8 @@ public class GameTemp {
                     }
 
                 }
-                // networkSendQueue.offer(new ServerMessage(NetworkMessageConstants.INITIALIZE_GAME, entitiesToSend));
+                // networkSendQueue.offer(new ServerMessage(NetworkMessageConstants.INITIALIZE_GAME,
+                // entitiesToSend));
                 while (!startGame.get() && !shutdown) {
                     try {
                         Thread.sleep(MS_PER_UPDATE);
@@ -72,7 +74,8 @@ public class GameTemp {
                 }
                 gameTime = START_GAME_TIME;
                 // futureQueue = new FutureEventQueue();
-                // futureQueue.add(new FutureEvent(START_GAME_TIME + 10000, new GameTimeUpdateTask()));
+                // futureQueue.add(new FutureEvent(START_GAME_TIME + 10000, new
+                // GameTimeUpdateTask()));
                 // futureQueue.add(new FutureEvent(START_GAME_TIME + 10000, new UpdateTask()));
                 // networkSendQueue.offer(new ServerMessage("Start game", gameTime));
 
@@ -109,7 +112,8 @@ public class GameTemp {
             // if (collisionTree.getIntersectionList().contains(e)) {
             // ((MovingEntity) e).move(-elapsedTime);
             // } else {
-            // networkSendQueue.offer(new ServerMessage(NetworkMessageConstants.NEW_LOCATION, new float[] { e.getID(),
+            // networkSendQueue.offer(new ServerMessage(NetworkMessageConstants.NEW_LOCATION, new
+            // float[] { e.getID(),
             // e.getPosition().x, e.getPosition().z, e.getRotY() }));
         }
         // }
@@ -174,8 +178,10 @@ public class GameTemp {
         // while (futureQueue.peek().getExecutionTime() < gameTime) {
         // FutureEvent event = futureQueue.remove();
         // if (event.getTask() instanceof GameTimeUpdateTask) {
-        // networkSendQueue.offer(new ServerMessage(NetworkMessageConstants.GAME_TIME_UPDATE, gameTime));
-        // futureQueue.offer(new FutureEvent(event.getExecutionTime() + 10 * 10 * 10, new GameTimeUpdateTask()));
+        // networkSendQueue.offer(new ServerMessage(NetworkMessageConstants.GAME_TIME_UPDATE,
+        // gameTime));
+        // futureQueue.offer(new FutureEvent(event.getExecutionTime() + 10 * 10 * 10, new
+        // GameTimeUpdateTask()));
         // } else if (event.getTask() instanceof UpdateTask) {
         // for (WorldEntity e : entities.values()) {
         // if (e.getType() == EntityType.MOVEABLE_OBJECT && !(e instanceof Player)) {
@@ -183,11 +189,13 @@ public class GameTemp {
         // float newX = (float) ((Math.random() * 2 * 2 * 10 * 10 - 2 * 10 * 10) + position.x);
         // float newZ = (float) ((Math.random() * 2 * 2 * 10 * 10 - 2 * 10 * 10) + position.z);
         // ((MovingEntity) e).setCurrentTarget(new Vector3f(newX, 0, newZ));
-        // networkSendQueue.offer(new ServerMessage(NetworkMessageConstants.NEW_LOCATION, new int[] { e.getID(),
+        // networkSendQueue.offer(new ServerMessage(NetworkMessageConstants.NEW_LOCATION, new int[]
+        // { e.getID(),
         // (int) newX, (int) newZ }));
         // }
         // }
-        // futureQueue.offer(new FutureEvent((long) (event.getExecutionTime() + Math.random() * 2 * 10 * 10 * 10 + 3 * 10 * 10),
+        // futureQueue.offer(new FutureEvent((long) (event.getExecutionTime() + Math.random() * 2 *
+        // 10 * 10 * 10 + 3 * 10 * 10),
         // new UpdateTask()));
         // }
         // }

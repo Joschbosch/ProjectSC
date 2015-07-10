@@ -29,6 +29,9 @@ public class Terrain {
      */
     public static final float TERRAIN_TILE_SIZE = 4.0f;
 
+    /**
+     * Tile size height.
+     */
     public static final float HEIGHT_TILE_SIZE = 8.0f;
 
     private final int mapSize;
@@ -146,18 +149,33 @@ public class Terrain {
         return null;
     }
 
+    /**
+     * Set all static object to not walkable on map.
+     */
     public void makeStaticObjectsNotWalkable() {
         for (WorldEntity e : staticObjects.values()) {
             markEntityPosition(e, Tile.NOT_WALKABLE);
         }
     }
 
+    /**
+     * Set all entities to *mark* on walkable map.
+     * 
+     * @param mark to set to
+     * @param list of entities
+     */
     public void markEntitiyObjects(byte mark, List<WorldEntity> list) {
         for (WorldEntity e : list) {
             markEntityPosition(e, mark);
         }
     }
 
+    /**
+     * set entitiy to mark.
+     * 
+     * @param e entity
+     * @param mark to set to
+     */
     public void markEntityPosition(WorldEntity e, byte mark) {
         if (e.getBoundingBox() != null) {
             Vector3f realMinPos = Vector3f.add(e.getBoundingBox().getMin(), e.getPosition(), null);

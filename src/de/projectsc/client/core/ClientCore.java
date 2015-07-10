@@ -154,8 +154,8 @@ public class ClientCore implements Runnable {
     private void processMessage(ClientMessage message) {
         if (message.getMessage().equals(GUIMessageConstants.INIT_GAME)) {
             LOGGER.debug("Client core received message: " + message.getMessage());
-            if (message.getData() instanceof List<?>) {
-                @SuppressWarnings("unchecked") List<WorldEntity> incomingEntities = (List<WorldEntity>) message.getData();
+            if (message.getData()[0] instanceof List<?>) {
+                @SuppressWarnings("unchecked") List<WorldEntity> incomingEntities = (List<WorldEntity>) message.getData()[0];
                 worldEntities = new TreeMap<>();
                 for (WorldEntity e : incomingEntities) {
                     WorldEntity newEntity = null;
@@ -198,22 +198,22 @@ public class ClientCore implements Runnable {
                 guiOutgoingQueue.offer(new GUIMessage(GUIMessageConstants.INIT_GAME, worldEntities));
             }
         } else if (message.getMessage().equals(NetworkMessageConstants.NEW_LOCATION)) {
-            if (message.getData() instanceof float[]) {
-                float[] data = (float[]) message.getData();
+            if (message.getData()[0] instanceof float[]) {
+                float[] data = (float[]) message.getData()[0];
                 WorldEntity worldEntity = worldEntities.get((int) data[0]);
                 worldEntity.setRotY(data[3]);
                 worldEntity.getPosition().x = data[1];
                 worldEntity.getPosition().y = 0;
                 worldEntity.getPosition().z = data[2];
             } else {
-                int[] data = (int[]) message.getData();
+                int[] data = (int[]) message.getData()[0];
                 if (worldEntities.get(data[0]) instanceof MovingEntity) {
                     ((MovingEntity) worldEntities.get(data[0])).setCurrentTarget(new Vector3f(data[1], 0, data[2]));
                     LOGGER.debug(String.format("Got new target information for entity %s: %s | %s", data[0], data[1], data[2]));
                 }
             }
         } else if (message.getMessage().equals("pong")) {
-            long[] data = (long[]) message.getData();
+            long[] data = (long[]) message.getData()[0];
             LOGGER.debug(String.format("Got pong with times (%s, %s) and ping = %s", data[0], data[1],
                 System.currentTimeMillis()
                     - data[0]));
@@ -221,10 +221,10 @@ public class ClientCore implements Runnable {
             networkReady.set(true);
         } else if (message.getMessage().equals("Start game")) {
             gameStarted = true;
-            gameTime = (long) message.getData();
+            gameTime = (long) message.getData()[0];
         } else if (message.getMessage().equals(NetworkMessageConstants.GAME_TIME_UPDATE)) {
-            long delta = gameTime - (long) message.getData();
-            gameTime = (long) message.getData();
+            long delta = gameTime - (long) message.getData()[0];
+            gameTime = (long) message.getData()[0];
             LOGGER.debug("Received game time update! Delta was " + delta);
         } else {
             LOGGER.error("Message not recognized:" + message.getMessage());

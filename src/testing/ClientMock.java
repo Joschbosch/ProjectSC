@@ -19,9 +19,9 @@ import org.apache.commons.logging.LogFactory;
 import de.projectsc.core.data.messages.MessageConstants;
 import de.projectsc.server.core.AuthenticatedClient;
 import de.projectsc.server.core.ServerCore;
-import de.projectsc.server.core.serverMessages.NewClientConnectedServerMessage;
-import de.projectsc.server.core.serverMessages.ServerMessage;
-import de.projectsc.server.core.serverMessages.ServerMessageConstants;
+import de.projectsc.server.core.messages.NewClientConnectedServerMessage;
+import de.projectsc.server.core.messages.ServerMessage;
+import de.projectsc.server.core.messages.ServerMessageConstants;
 
 public class ClientMock {
 
@@ -29,7 +29,7 @@ public class ClientMock {
 
     private final AtomicBoolean shutdown = new AtomicBoolean(false);
 
-    private Map<Long, AuthendicatedClientMock> clients = new TreeMap<>();
+    private final Map<Long, AuthendicatedClientMock> clients = new TreeMap<>();
 
     private void createNewClient(String[] information, BlockingQueue<ServerMessage> serverQueue) {
         AuthendicatedClientMock newClient = new AuthendicatedClientMock(information[1]);
@@ -49,58 +49,64 @@ public class ClientMock {
                     BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
                     String s = bufferRead.readLine();
                     LOGGER.debug("Got mock command: " + s);
-                    String[] split = s.split("\\s");
-                    if (split[0].equals(MessageConstants.SHUTDOWN)) {
-                        shutdown.set(true);
-                        serverQueue.put(new ServerMessage(MessageConstants.SHUTDOWN, null));
-                        for (AuthendicatedClientMock client : clients.values()) {
-                            client.kill();
-                        }
-                    } else if (split[0].equals("create-client")) {
-                        if (split.length > 1) {
-                            createNewClient(split, serverQueue);
-                        } else {
-                            LOGGER.debug("Could not create mock client: arguments invalid");
-                        }
-
-                    } else if (Character.isDigit(split[0].charAt(0))) {
-                        Long id = null;
-                        id = Long.parseLong(split[0]);
-                        if (id != null) {
-                            AuthendicatedClientMock client = clients.get(id);
-                            if (client != null) {
-                                if (split.length > 2) {
-                                    client.sendMessage(new ServerMessage(split[1], s.substring(s.indexOf(split[2]))));
-                                } else {
-                                    client.sendMessage(new ServerMessage(split[1], null));
-                                }
-                            }
-                        }
-                    } else {
-                        AuthendicatedClientMock client = null;
-                        for (AuthendicatedClientMock c : clients.values()) {
-                            if (c.getAuthenticatedClient().getDisplayName().equals(split[0])) {
-                                client = c;
-                            }
-                        }
-                        if (client != null) {
-                            if (split.length > 2) {
-                                client.sendMessage(new ServerMessage(split[1], s.substring(s.indexOf(split[2]))));
-                            } else {
-                                client.sendMessage(new ServerMessage(split[1], null));
-                            }
-                        } else {
-                            serverQueue.put(new ServerMessage(split[0], null));
-                        }
-                    }
+                    handleCommand(serverQueue, s);
 
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             } catch (InterruptedException e) {
             }
-        }
 
+        }
+        LOGGER.debug(String.format("Mock console stopped"));
+
+    }
+
+    private void handleCommand(BlockingQueue<ServerMessage> serverQueue, String s) throws InterruptedException {
+        String[] split = s.split("\\s");
+        if (split[0].equals(MessageConstants.SHUTDOWN)) {
+            shutdown.set(true);
+            serverQueue.put(new ServerMessage(MessageConstants.SHUTDOWN));
+            for (AuthendicatedClientMock client : clients.values()) {
+                client.kill();
+            }
+        } else if (split[0].equals("create-client")) {
+            if (split.length > 1) {
+                createNewClient(split, serverQueue);
+            } else {
+                LOGGER.debug("Could not create mock client: arguments invalid");
+            }
+
+        } else if (Character.isDigit(split[0].charAt(0))) {
+            Long id = null;
+            id = Long.parseLong(split[0]);
+            if (id != null) {
+                AuthendicatedClientMock client = clients.get(id);
+                if (client != null) {
+                    if (split.length > 2) {
+                        client.sendMessage(new ServerMessage(split[1], s.substring(s.indexOf(split[2]))));
+                    } else {
+                        client.sendMessage(new ServerMessage(split[1]));
+                    }
+                }
+            }
+        } else {
+            AuthendicatedClientMock client = null;
+            for (AuthendicatedClientMock c : clients.values()) {
+                if (c.getAuthenticatedClient().getDisplayName().equals(split[0])) {
+                    client = c;
+                }
+            }
+            if (client != null) {
+                if (split.length > 2) {
+                    client.sendMessage(new ServerMessage(split[1], s.substring(s.indexOf(split[2]))));
+                } else {
+                    client.sendMessage(new ServerMessage(split[1]));
+                }
+            } else {
+                serverQueue.put(new ServerMessage(split[0]));
+            }
+        }
     }
 
     public static void main(String[] args) {
@@ -116,7 +122,13 @@ public class ClientMock {
             }
 
         }).start();
+        try {
+            mock.handleCommand(serverCore.getReceiveQueue(), "create-client Josch");
+            mock.handleCommand(serverCore.getReceiveQueue(), "create-client Ilka");
+            mock.handleCommand(serverCore.getReceiveQueue(), "Josch request:create_new_game");
 
+        } catch (InterruptedException e) {
+        }
     }
 
 }
@@ -127,15 +139,15 @@ class AuthendicatedClientMock {
 
     private static Log LOGGER = LogFactory.getLog(AuthendicatedClientMock.class);
 
-    private long id;
+    private final long id;
 
     private boolean alive = true;
 
-    private AuthenticatedClient authClient;
+    private final AuthenticatedClient authClient;
 
-    private LinkedBlockingQueue<ServerMessage> sendToClientQueue;
+    private final LinkedBlockingQueue<ServerMessage> sendToClientQueue;
 
-    private LinkedBlockingQueue<ServerMessage> receiveFromClientQueue;
+    private final LinkedBlockingQueue<ServerMessage> receiveFromClientQueue;
 
     public AuthendicatedClientMock(String name) {
         this.id = idCount++;
@@ -161,7 +173,7 @@ class AuthendicatedClientMock {
                     } catch (InterruptedException e) {
                     }
                 }
-
+                LOGGER.debug("Client closed: " + authClient.getDisplayName());
             }
         }).start();
     }

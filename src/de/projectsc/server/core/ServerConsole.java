@@ -1,7 +1,8 @@
 /*
- * Copyright (C) 2015 
+ * Copyright (C) 2015 Project SC
+ * 
+ * All rights reserved
  */
-
 package de.projectsc.server.core;
 
 import java.io.BufferedReader;
@@ -14,15 +15,20 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import de.projectsc.core.data.messages.MessageConstants;
-import de.projectsc.server.core.serverMessages.ServerMessage;
+import de.projectsc.server.core.messages.ServerMessage;
 
+/**
+ * Read commands for the server.
+ * 
+ * @author Josch Bosch
+ */
 public class ServerConsole implements Runnable {
 
     private static final Log LOGGER = LogFactory.getLog(ServerConsole.class);
 
-    private AtomicBoolean shutdown = new AtomicBoolean(false);
+    private final AtomicBoolean shutdown = new AtomicBoolean(false);
 
-    private BlockingQueue<ServerMessage> coreQueue;
+    private final BlockingQueue<ServerMessage> coreQueue;
 
     public ServerConsole(BlockingQueue<ServerMessage> coreQueue) {
         // new Thread(this).start();
@@ -32,6 +38,8 @@ public class ServerConsole implements Runnable {
 
     @Override
     public void run() {
+        LOGGER.debug(String.format("Server console started"));
+
         while (!shutdown.get()) {
             try {
                 Thread.sleep(ServerConstants.SLEEPTIME);
@@ -44,12 +52,14 @@ public class ServerConsole implements Runnable {
                     } else if (s.equals(ServerCommands.LISTCLIENTS)) {
                         shutdown.set(true);
                     }
-                    coreQueue.offer(new ServerMessage(s, null));
+                    coreQueue.offer(new ServerMessage(s));
                 } catch (IOException e) {
                 }
             } catch (InterruptedException e) {
             }
         }
+        LOGGER.debug(String.format("Server console stopped"));
+
     }
 
 }

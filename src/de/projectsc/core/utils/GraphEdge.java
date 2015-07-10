@@ -1,9 +1,15 @@
 /*
- * Copyright (C) 2015
+ * Copyright (C) 2015 Project SC
+ * 
+ * All rights reserved
  */
-
 package de.projectsc.core.utils;
 
+/**
+ * An Edge in the graph.
+ * 
+ * @author Josch Bosch
+ */
 public class GraphEdge {
 
     private GraphNode source;

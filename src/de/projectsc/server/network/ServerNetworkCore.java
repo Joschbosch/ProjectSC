@@ -15,7 +15,7 @@ import de.projectsc.core.data.messages.MessageConstants;
 import de.projectsc.core.data.messages.NetworkMessage;
 import de.projectsc.server.core.ServerConstants;
 import de.projectsc.server.core.ServerCore;
-import de.projectsc.server.core.serverMessages.ServerMessage;
+import de.projectsc.server.core.messages.ServerMessage;
 
 /**
  * Core class for server network.
@@ -40,7 +40,7 @@ public class ServerNetworkCore implements Runnable {
 
     private final BlockingQueue<ServerMessage> coreQueue;
 
-    private ServerCore serverCore;
+    private final ServerCore serverCore;
 
     public ServerNetworkCore(ServerCore serverCore, BlockingQueue<ServerMessage> coreQueue) {
         this.coreQueue = coreQueue;
@@ -49,7 +49,7 @@ public class ServerNetworkCore implements Runnable {
     }
 
     private void start() {
-        LOGGER.debug("Starting network ...");
+        LOGGER.debug("Starting server network ...");
         running = true;
         while (running) {
             retreiveClientMessages();
@@ -60,6 +60,8 @@ public class ServerNetworkCore implements Runnable {
                 LOGGER.error("Server network error: ", e);
             }
         }
+        LOGGER.debug(String.format("Server network stopped."));
+
     }
 
     private void retreiveClientMessages() {

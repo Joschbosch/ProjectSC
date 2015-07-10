@@ -1,11 +1,21 @@
 /*
- * Copyright (C) 2015 
+ * Copyright (C) 2015 Project SC
+ * 
+ * All rights reserved
  */
-
 package de.projectsc.server.core;
 
-public class ServerConstants {
+/**
+ * Constants for all over the server.
+ * 
+ * @author Josch Bosch
+ */
+public final class ServerConstants {
 
-    public static long SLEEPTIME = 50;
+    /**
+     * Constant.
+     */
+    public static final long SLEEPTIME = 50;
 
+    private ServerConstants() {}
 }
