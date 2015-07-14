@@ -36,6 +36,8 @@ public abstract class WorldEntity implements Comparable<WorldEntity>, PhysicalOb
 
     protected Vector3f position;
 
+    protected BoundingBox boundingBox;
+
     protected final Vector3f rotation;
 
     protected float scale;
@@ -48,8 +50,6 @@ public abstract class WorldEntity implements Comparable<WorldEntity>, PhysicalOb
 
     private GameAttributes attributes;
 
-    protected BoundingBox boundingBox;
-
     public WorldEntity(EntityType type, String model, String texture, Vector3f position, Vector3f rotation, float scale) {
         this.position = position;
         this.rotation = rotation;
@@ -59,7 +59,7 @@ public abstract class WorldEntity implements Comparable<WorldEntity>, PhysicalOb
         this.setModel(model);
         this.setTexture(texture);
         boundingBox = BoundingBoxLoader.readBoundingBox(this);
-        attributes = new GameAttributes();
+        setAttributes(new GameAttributes());
         LOGGER.debug("Created new Entity : " + this);
     }
 
@@ -181,5 +181,13 @@ public abstract class WorldEntity implements Comparable<WorldEntity>, PhysicalOb
     @Override
     public int compareTo(WorldEntity arg0) {
         return getID().compareTo(arg0.getID());
+    }
+
+    public GameAttributes getAttributes() {
+        return attributes;
+    }
+
+    public void setAttributes(GameAttributes attributes) {
+        this.attributes = attributes;
     }
 }

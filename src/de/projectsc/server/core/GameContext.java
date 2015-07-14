@@ -1,7 +1,8 @@
 /*
- * Copyright (C) 2015
+ * Copyright (C) 2015 Project SC
+ * 
+ * All rights reserved
  */
-
 package de.projectsc.server.core;
 
 import java.util.Map;
@@ -19,6 +20,11 @@ import de.projectsc.core.entities.WorldEntity;
 import de.projectsc.core.game.GameAttributes;
 import de.projectsc.core.utils.OctTree;
 
+/**
+ * Context for all game states.
+ * 
+ * @author Josch Bosch
+ */
 public class GameContext extends StatefulContext {
 
     private static final long serialVersionUID = 7971613418627835197L;
@@ -60,6 +66,9 @@ public class GameContext extends StatefulContext {
         this.config.setPlayerAffiliation(this.getHost().getId(), GameAttributes.AFFILIATION_LIGHT);
     }
 
+    /**
+     * Loads all neccesary data to the context.
+     */
     public void loadData() {
         loading = true;
         entities = new TreeMap<Integer, WorldEntity>();
@@ -93,12 +102,15 @@ public class GameContext extends StatefulContext {
     private void loadPlayerAndBots() {
         int affiliationLight = 0;
         int affiliationDark = 0;
+        // fake values;
         Vector3f[] lightStarters =
             new Vector3f[] { new Vector3f(330f, 0f, 330f), new Vector3f(330f, 0f, 340f), new Vector3f(330f, 0f, 350f),
-                new Vector3f(330f, 0f, 360f), new Vector3f(330f, 0f, 370f) }; // get positions from terrain
+                new Vector3f(330f, 0f, 360f), new Vector3f(330f, 0f, 370f) }; // get positions from
+        // fake values; // terrain
         Vector3f[] darkStarters =
             new Vector3f[] { new Vector3f(530f, 0f, 330f), new Vector3f(530f, 0f, 340f), new Vector3f(530f, 0f, 350f),
-                new Vector3f(530f, 0f, 360f), new Vector3f(530f, 0f, 370f) }; // get positions from terrain
+                new Vector3f(530f, 0f, 360f), new Vector3f(530f, 0f, 370f) }; // get positions from
+                                                                              // terrain
 
         for (ServerPlayer p : players.values()) {
             byte affiliation = config.getPlayerAffiliation(p.getId());
@@ -142,6 +154,9 @@ public class GameContext extends StatefulContext {
         return game;
     }
 
+    /**
+     * Terminate context.
+     */
     public void terminate() {
         setTerminated();
     }

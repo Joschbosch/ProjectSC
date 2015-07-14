@@ -41,7 +41,7 @@ public class ServerPlayer {
         return client.getDisplayName();
     }
 
-    public void setWorldEntity(PlayerEntity entity) {
-        this.entity = entity;
+    public void setWorldEntity(PlayerEntity newEntity) {
+        this.entity = newEntity;
     }
 }

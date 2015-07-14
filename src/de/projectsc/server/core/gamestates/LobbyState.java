@@ -1,7 +1,8 @@
 /*
- * Copyright (C) 2015
+ * Copyright (C) 2015 Project SC
+ * 
+ * All rights reserved
  */
-
 package de.projectsc.server.core.gamestates;
 
 import java.util.List;
@@ -14,6 +15,11 @@ import de.projectsc.server.core.ServerPlayer;
 import de.projectsc.server.core.messages.GameMessageConstants;
 import de.projectsc.server.core.messages.ServerMessage;
 
+/**
+ * State when the players are in a game lobby.
+ * 
+ * @author Josch Bosch
+ */
 public class LobbyState extends GameState {
 
     private static final Log LOGGER = LogFactory.getLog(LobbyState.class);

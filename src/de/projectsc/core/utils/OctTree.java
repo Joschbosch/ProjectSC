@@ -30,17 +30,19 @@ public class OctTree<T extends PhysicalObject> {
 
     private final Queue<T> pendingEntities = new LinkedList<>();
 
+    private final Color[] colorLevel =
+        new Color[] { Color.RED, Color.GRAY, Color.GREEN, Color.YELLOW, Color.BLUE, Color.CYAN, Color.MAGENTA,
+            Color.PINK };
+
     private List<T> entities = new LinkedList<>();
 
     private boolean treeBuild = false;
-
-    private boolean treeReady = false;
 
     private final BoundingBox region;
 
     private OctTree<T> parent;
 
-    private OctTree<T>[] children;
+    private final OctTree<T>[] children;
 
     private List<T> interSectionList;
 
@@ -215,7 +217,6 @@ public class OctTree<T extends PhysicalObject> {
             }
         }
         treeBuild = true;
-        treeReady = true;
     }
 
     private boolean containsEntity(BoundingBox boundingBox, T e) {
@@ -294,14 +295,17 @@ public class OctTree<T extends PhysicalObject> {
         }
 
         int listSize = entities.size();
+        List<T> remove = new LinkedList<>();
         for (int i = 0; i < listSize; i++) {
             if (entities.get(i) == null) {
                 if (movedObjects.contains(entities.get(i))) {
                     movedObjects.remove(entities.get(i));
                 }
-                entities.remove(i--);
-                listSize--;
+                remove.add(entities.get(i));
             }
+        }
+        for (T e : remove) {
+            movedObjects.remove(e);
         }
         for (int i = 0; i < 8; i++) {
             if (children[i] != null) {
@@ -415,9 +419,11 @@ public class OctTree<T extends PhysicalObject> {
         return result;
     }
 
-    private Color[] colorLevel = new Color[] { Color.RED, Color.GRAY, Color.GREEN, Color.YELLOW, Color.BLUE, Color.CYAN, Color.MAGENTA,
-        Color.PINK };
-
+    /**
+     * Draws an image of the current tree to the given graphics.
+     * 
+     * @param treeG to draw to.
+     */
     public void drawImage(Graphics treeG) {
         int i = 0;
         drawLevel(i, treeG, this);

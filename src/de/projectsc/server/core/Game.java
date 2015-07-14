@@ -256,14 +256,23 @@ public class Game implements Runnable {
         });
     }
 
+    /**
+     * Change current gamestate.
+     * 
+     * @param newState to change to
+     */
     public void changeState(GameState newState) {
-        System.out.println("want to change " + gameContext.getState());
         synchronized (LOCK_OBJECT) {
             currenState = newState;
             LOGGER.debug("Set current game state to " + gameContext.getState());
         }
     }
 
+    /**
+     * Is the current lobby joinable?
+     * 
+     * @return true if so.
+     */
     public String isJoinable() {
         String returnString = "";
         if (!gameContext.getState().equals(States.LOBBY)) {

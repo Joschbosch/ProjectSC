@@ -1,11 +1,32 @@
 /*
- * Copyright (C) 2015
+ * Copyright (C) 2015 Project SC
+ * 
+ * All rights reserved
  */
-
 package de.projectsc.server.core.gamestates;
 
 import au.com.ds.ef.EventEnum;
 
+/**
+ * Transitions of game states.
+ * 
+ * @author Josch Bosch
+ */
 public enum Events implements EventEnum {
-    START_GAME_COMMAND, FINISHED_LOADING, GAME_ENDS, GAME_PAUSED
+    /**
+     * Event type.
+     */
+    START_GAME_COMMAND,
+    /**
+     * Event type.
+     */
+    FINISHED_LOADING,
+    /**
+     * Event type.
+     */
+    GAME_ENDS,
+    /**
+     * Event type.
+     */
+    GAME_PAUSED
 }

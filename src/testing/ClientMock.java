@@ -150,7 +150,7 @@ public class ClientMock {
             mock.handleCommand(serverCore.getReceiveQueue(), "Client4 request:join_game 1000");
             mock.handleCommand(serverCore.getReceiveQueue(), "Client5 request:join_game 1000");
             mock.handleCommand(serverCore.getReceiveQueue(), "Client6 request:join_game 1000");
-            Thread.sleep(100);
+            Thread.sleep(2000);
             mock.handleCommand(serverCore.getReceiveQueue(), "Josch request:start_game");
             Thread.sleep(2000);
             mock.handleCommand(serverCore.getReceiveQueue(), "Josch update_loading_progress 100");

@@ -1,7 +1,8 @@
 /*
- * Copyright (C) 2015
+ * Copyright (C) 2015 Project SC
+ * 
+ * All rights reserved
  */
-
 package de.projectsc.server.core.gamestates;
 
 import java.util.List;
@@ -16,6 +17,11 @@ import de.projectsc.server.core.ServerPlayer;
 import de.projectsc.server.core.messages.GameMessageConstants;
 import de.projectsc.server.core.messages.ServerMessage;
 
+/**
+ * State when loading all data for a started game.
+ * 
+ * @author Josch Bosch
+ */
 public class LoadingState extends GameState {
 
     private static final Log LOGGER = LogFactory.getLog(LoadingState.class);
@@ -50,7 +56,8 @@ public class LoadingState extends GameState {
                 sumLoading += playerLoadingProgress.get(id);
             }
             int percentageLoaded = sumLoading / (playerLoadingProgress.size() + 1);
-            if (percentageLoaded >= 100) {
+            final int maximumpercentage = 100;
+            if (percentageLoaded >= maximumpercentage) {
                 LOGGER.debug("Loading done! Starting game!");
                 context.setLoading(false);
                 context.trigger(Events.FINISHED_LOADING);

@@ -1,11 +1,36 @@
 /*
- * Copyright (C) 2015
+ * Copyright (C) 2015 Project SC
+ * 
+ * All rights reserved
  */
-
 package de.projectsc.server.core.gamestates;
 
 import au.com.ds.ef.StateEnum;
 
+/**
+ * The states for a Game.
+ * 
+ * @author Josch Bosch
+ */
 public enum States implements StateEnum {
-    LOBBY, LOADING, RUNNING, FINISHED, PAUSED
+    /**
+     * State.
+     */
+    LOBBY,
+    /**
+     * State.
+     */
+    LOADING,
+    /**
+     * State.
+     */
+    RUNNING,
+    /**
+     * State.
+     */
+    FINISHED,
+    /**
+     * State.
+     */
+    PAUSED
 }

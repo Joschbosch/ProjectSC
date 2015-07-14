@@ -1,7 +1,8 @@
 /*
- * Copyright (C) 2015 
+ * Copyright (C) 2015 Project SC
+ * 
+ * All rights reserved
  */
-
 package de.projectsc.server.core.gamestates;
 
 import java.awt.Color;
@@ -24,11 +25,19 @@ import de.projectsc.server.core.ServerPlayer;
 import de.projectsc.server.core.messages.GameMessageConstants;
 import de.projectsc.server.core.messages.ServerMessage;
 
+/**
+ * State when the game is started and running. This is the main state for all the game logic.
+ * 
+ * @author Josch Bosch
+ */
 public class GameRunningState extends GameState {
 
-    private static final Log LOGGER = LogFactory.getLog(LoadingState.class);
-
+    /**
+     * Constant.
+     */
     public static final long GAME_TICK = 15;
+
+    private static final Log LOGGER = LogFactory.getLog(LoadingState.class);
 
     private OctTree<WorldEntity> collisionTree;
 
