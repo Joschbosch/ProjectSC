@@ -3,13 +3,13 @@
  * 
  * All rights reserved
  */
-package de.projectsc.server.core.gamestates;
+package de.projectsc.server.core.game.states;
 
 import java.util.List;
 
 import au.com.ds.ef.call.ContextHandler;
-import de.projectsc.server.core.GameContext;
 import de.projectsc.server.core.ServerPlayer;
+import de.projectsc.server.core.game.GameContext;
 import de.projectsc.server.core.messages.ServerMessage;
 
 /**

@@ -3,25 +3,26 @@
  * 
  * All rights reserved
  */
-package de.projectsc.server.core.gamestates;
+package de.projectsc.server.core.game.states;
 
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import com.rits.cloning.Cloner;
 
 import de.projectsc.core.Terrain;
 import de.projectsc.core.Tile;
 import de.projectsc.core.entities.PlayerEntity;
 import de.projectsc.core.entities.WorldEntity;
 import de.projectsc.core.utils.OctTree;
-import de.projectsc.server.core.GameContext;
 import de.projectsc.server.core.ServerPlayer;
+import de.projectsc.server.core.game.GameContext;
 import de.projectsc.server.core.messages.GameMessageConstants;
 import de.projectsc.server.core.messages.ServerMessage;
 
@@ -35,7 +36,7 @@ public class GameRunningState extends GameState {
     /**
      * Constant.
      */
-    public static final long GAME_TICK = 15;
+    public static final long GAME_TICK_TIME = 16;
 
     private static final Log LOGGER = LogFactory.getLog(LoadingState.class);
 
@@ -51,8 +52,6 @@ public class GameRunningState extends GameState {
 
     private long time = 0;
 
-    private Map<Long, Long[]> snapshotTimes;
-
     @Override
     public void call(GameContext context) throws Exception {
         LOGGER.debug("Entered game state " + context.getState());
@@ -63,37 +62,37 @@ public class GameRunningState extends GameState {
         this.staticEntities = context.getStaticEntities();
         sendMessageToAllPlayers(new ServerMessage(GameMessageConstants.BEGIN_GAME));
         time = System.currentTimeMillis();
-        snapshotTimes = new TreeMap<>();
-        snapshotTimes.put(gameTick, new Long[] { time, 0L });
         context.getGame().changeState(this);
     }
 
     @Override
     public void loop() {
         gameTick++;
-        long now = System.currentTimeMillis();
-        long delta = now - time;
-        time = now;
-        snapshotTimes.put(gameTick, new Long[] { time, delta });
-        LOGGER.debug("New loop, delta =  " + delta);
-
+        time = System.currentTimeMillis();
         PlayerEntity e = context.getPlayers().get(0L).getEntity();
         terrain.markEntityPosition(e, Tile.WALKABLE);
-        e.move(delta);
+        e.move(GAME_TICK_TIME);
         terrain.markEntityPosition(e, Tile.NOT_WALKABLE);
         collisionTree.update();
-        // if (gameTick % 20 == 0) {
-        new Thread(new Runnable() {
+        if (gameTick % 5 == 0) {
+            new Thread(new Runnable() {
 
-            @Override
-            public void run() {
-                BufferedImage path = createWalkablePathImage();
-                BufferedImage tree = createCollisionTreeImage();
-                sendMessageToPlayer(context.getPlayers().get(0L), new ServerMessage("newImage", tree, path));
-            }
+                @Override
+                public void run() {
+                    BufferedImage path = createWalkablePathImage();
+                    BufferedImage tree = createCollisionTreeImage();
+                    sendMessageToPlayer(context.getPlayers().get(0L), new ServerMessage("newImage", tree, path));
+                }
 
-        }).start();
-        // }
+            }).start();
+        }
+        createSnapshot();
+    }
+
+    private void createSnapshot() {
+        Cloner cloner = new Cloner();
+
+        // MyClass clone=cloner.deepClone(o);
     }
 
     private BufferedImage createWalkablePathImage() {

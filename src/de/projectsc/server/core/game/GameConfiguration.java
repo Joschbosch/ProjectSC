@@ -3,7 +3,7 @@
  * 
  * All rights reserved
  */
-package de.projectsc.server.core;
+package de.projectsc.server.core.game;
 
 import java.util.HashMap;
 import java.util.Map;

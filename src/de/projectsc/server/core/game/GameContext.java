@@ -3,7 +3,7 @@
  * 
  * All rights reserved
  */
-package de.projectsc.server.core;
+package de.projectsc.server.core.game;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -19,6 +19,7 @@ import de.projectsc.core.entities.PlayerEntity;
 import de.projectsc.core.entities.WorldEntity;
 import de.projectsc.core.game.GameAttributes;
 import de.projectsc.core.utils.OctTree;
+import de.projectsc.server.core.ServerPlayer;
 
 /**
  * Context for all game states.

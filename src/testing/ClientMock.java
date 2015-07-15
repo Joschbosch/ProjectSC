@@ -203,7 +203,7 @@ class ShowPNG extends JFrame {
             public void run() {
                 while (true) {
                     try {
-                        Thread.sleep(200);
+                        Thread.sleep(16);
                     } catch (InterruptedException e) {
                     }
                     repaint();

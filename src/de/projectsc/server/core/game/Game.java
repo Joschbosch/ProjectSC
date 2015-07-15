@@ -4,7 +4,7 @@
  * All rights reserved
  */
 
-package de.projectsc.server.core;
+package de.projectsc.server.core.game;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -21,12 +21,16 @@ import au.com.ds.ef.StateEnum;
 import au.com.ds.ef.call.ContextHandler;
 import de.projectsc.core.data.messages.MessageConstants;
 import de.projectsc.core.game.GameAttributes;
-import de.projectsc.server.core.gamestates.Events;
-import de.projectsc.server.core.gamestates.GameRunningState;
-import de.projectsc.server.core.gamestates.GameState;
-import de.projectsc.server.core.gamestates.LoadingState;
-import de.projectsc.server.core.gamestates.LobbyState;
-import de.projectsc.server.core.gamestates.States;
+import de.projectsc.server.core.AuthenticatedClient;
+import de.projectsc.server.core.ServerCommands;
+import de.projectsc.server.core.ServerConstants;
+import de.projectsc.server.core.ServerPlayer;
+import de.projectsc.server.core.game.states.Events;
+import de.projectsc.server.core.game.states.GameRunningState;
+import de.projectsc.server.core.game.states.GameState;
+import de.projectsc.server.core.game.states.LoadingState;
+import de.projectsc.server.core.game.states.LobbyState;
+import de.projectsc.server.core.game.states.States;
 import de.projectsc.server.core.messages.GameMessageConstants;
 import de.projectsc.server.core.messages.ServerMessage;
 import de.projectsc.server.core.messages.ServerMessageConstants;
@@ -69,18 +73,32 @@ public class Game implements Runnable {
 
     @Override
     public void run() {
+        long previous = System.currentTimeMillis();
+        long lag = 0;
         LOGGER.debug(String.format("Game %d started", gameContext.getGameID()));
         while (lobbyAlive.get()) {
+            long current = System.currentTimeMillis();
+            long elapsed = current - previous;
+            previous = current;
+            lag += elapsed;
+            readMessages();
+            while (lag >= GameRunningState.GAME_TICK_TIME) {
+                synchronized (LOCK_OBJECT) {
+                    if (currenState != null) {
+                        currenState.loop();
+                    }
+                }
+                lag -= GameRunningState.GAME_TICK_TIME;
+            }
+            long timeNeeded = System.currentTimeMillis() - current;
+            long sleepTime = Math.max((GameRunningState.GAME_TICK_TIME - timeNeeded), 0L);
+            // LOGGER.debug(
+            // String.format("Game %d needed %d ms for current tick, will sleep : %d",
+            // gameContext.getGameID(), timeNeeded, sleepTime));
             try {
-                Thread.sleep(GameRunningState.GAME_TICK);
+                Thread.sleep(sleepTime);
             } catch (InterruptedException e) {
                 LOGGER.debug(e);
-            }
-            readMessages();
-            synchronized (LOCK_OBJECT) {
-                if (currenState != null) {
-                    currenState.loop();
-                }
             }
         }
         LOGGER.debug(String.format("Game %d terminated", gameContext.getGameID()));

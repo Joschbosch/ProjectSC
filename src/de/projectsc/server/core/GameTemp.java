@@ -21,7 +21,7 @@ import de.projectsc.core.entities.EntityType;
 import de.projectsc.core.entities.MovingEntity;
 import de.projectsc.core.entities.WorldEntity;
 import de.projectsc.core.utils.OctTree;
-import de.projectsc.server.core.gameutils.FutureEventQueue;
+import de.projectsc.server.core.game.utils.FutureEventQueue;
 
 public class GameTemp {
 

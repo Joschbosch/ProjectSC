@@ -3,7 +3,7 @@
  * 
  * All rights reserved
  */
-package de.projectsc.server.core.gamestates;
+package de.projectsc.server.core.game.states;
 
 import au.com.ds.ef.StateEnum;
 
