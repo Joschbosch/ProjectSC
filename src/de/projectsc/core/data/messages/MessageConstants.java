@@ -20,6 +20,36 @@ public final class MessageConstants {
     /**
      * Constant.
      */
+    public static final String CONNECT = "request:client_connect"; // data for login: ip, port
+
+    /**
+     * Constant.
+     */
+    public static final String DISCONNECT = "request:client_disconnect"; //
+
+    /**
+     * Constant.
+     */
+    public static final String SERVER_WELCOME = "response:welcome"; //
+
+    /**
+     * Constant.
+     */
+    public static final String CLIENT_LOGIN_REQUEST = "request:login"; // Login data
+
+    /**
+     * Constant.
+     */
+    public static final String LOGIN_SUCCESSFUL = "response:login_successful"; // List of clients in lobby and games
+
+    /**
+     * Constant.
+     */
+    public static final String LOGIN_FAILED = "response:login_failed"; // Failure message
+
+    /**
+     * Constant.
+     */
     public static final String CHAT_MESSAGE = "client_chat_msg";
 
     /**

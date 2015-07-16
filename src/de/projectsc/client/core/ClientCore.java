@@ -22,6 +22,7 @@ import de.projectsc.client.core.states.ClientGameState;
 import de.projectsc.client.core.states.ClientLoadingState;
 import de.projectsc.client.core.states.ClientLobbyState;
 import de.projectsc.client.core.states.ClientStates;
+import de.projectsc.core.data.messages.MessageConstants;
 import de.projectsc.server.core.game.GameContext;
 import de.projectsc.server.core.game.states.GameRunningState;
 import de.projectsc.server.core.game.states.States;
@@ -55,9 +56,12 @@ public class ClientCore implements Runnable {
 
     private boolean clientRunning;
 
+    private LinkedBlockingQueue<ClientMessage> userInputQueue;
+
     public ClientCore() {
         networkSendQueue = new LinkedBlockingQueue<>();
         networkReceiveQueue = new LinkedBlockingQueue<>();
+        setUserInputQueue(new LinkedBlockingQueue<>());
     }
 
     @Override
@@ -76,7 +80,10 @@ public class ClientCore implements Runnable {
             long elapsed = current - previous;
             previous = current;
             lag += elapsed;
-            // readMessages();
+            readServerMessages();
+            // read keyboard and mouse
+            readGUIInput();
+
             while (lag >= GameRunningState.GAME_TICK_TIME) {
                 synchronized (LOCK_OBJECT) {
                     if (currenState != null) {
@@ -85,21 +92,43 @@ public class ClientCore implements Runnable {
                 }
                 lag -= GameRunningState.GAME_TICK_TIME;
             }
+            // render();
             long timeNeeded = System.currentTimeMillis() - current;
             long sleepTime = Math.max((GameRunningState.GAME_TICK_TIME - timeNeeded), 0L);
             // LOGGER.debug(
             // String.format("Game %d needed %d ms for current tick, will sleep : %d",
-            // gameContext.getGameID(), timeNeeded, sleepTime));
+            // 1, timeNeeded, sleepTime));
             try {
                 Thread.sleep(sleepTime);
             } catch (InterruptedException e) {
                 LOGGER.debug(e);
             }
 
-            // render();
         }
         LOGGER.debug(String.format("Client terminated"));
 
+    }
+
+    private void readServerMessages() {
+        while (!networkReceiveQueue.isEmpty()) {
+            ClientMessage msg = networkReceiveQueue.poll();
+            LOGGER.debug("Got message from server: " + msg);
+        }
+    }
+
+    private void readGUIInput() {
+        while (!userInputQueue.isEmpty()) {
+            ClientMessage msg = userInputQueue.poll();
+            if (msg.getMessage().equals(MessageConstants.JOIN_GAME_REQUEST)) {
+                sendMessageToServer(new ClientMessage(MessageConstants.JOIN_GAME_REQUEST, 1000));
+            } else {
+                networkSendQueue.offer(msg);
+            }
+        }
+    }
+
+    private void sendMessageToServer(ClientMessage clientMessage) {
+        networkSendQueue.offer(clientMessage);
     }
 
     private void createAndBindFlow() {
@@ -156,6 +185,14 @@ public class ClientCore implements Runnable {
 
     public void setNetworkReceiveQueue(BlockingQueue<ClientMessage> networkOutgoingQueue) {
         this.networkReceiveQueue = networkOutgoingQueue;
+    }
+
+    public LinkedBlockingQueue<ClientMessage> getUserInputQueue() {
+        return userInputQueue;
+    }
+
+    public void setUserInputQueue(LinkedBlockingQueue<ClientMessage> userInputQueue) {
+        this.userInputQueue = userInputQueue;
     }
 
 }

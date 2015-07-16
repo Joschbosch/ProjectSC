@@ -22,7 +22,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import de.projectsc.core.data.messages.MessageConstants;
-import de.projectsc.core.data.messages.MessageConstants;
 import de.projectsc.server.core.AuthenticatedClient;
 import de.projectsc.server.core.ServerCore;
 import de.projectsc.server.core.messages.NewClientConnectedServerMessage;
@@ -38,7 +37,7 @@ public class ClientMock {
 
     private final Map<Long, AuthendicatedClientMock> clients = new TreeMap<>();
 
-    public ShowClientPNG png;
+    public ShowPNG png;
 
     private void createNewClient(String[] information, BlockingQueue<ServerMessage> serverQueue) {
         AuthendicatedClientMock newClient = new AuthendicatedClientMock(information[1]);
@@ -131,7 +130,7 @@ public class ClientMock {
             }
 
         }).start();
-        mock.png = new ShowClientPNG(null);
+        mock.png = new ShowPNG(null);
         mock.png.setVisible(true);
         try {
             mock.handleCommand(serverCore.getReceiveQueue(), "create-client Josch");

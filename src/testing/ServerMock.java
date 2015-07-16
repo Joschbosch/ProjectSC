@@ -12,6 +12,7 @@ import java.io.InputStreamReader;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.JFrame;
@@ -22,9 +23,8 @@ import org.apache.commons.logging.LogFactory;
 
 import de.projectsc.client.core.ClientCore;
 import de.projectsc.client.core.messages.ClientMessage;
+import de.projectsc.client.network.ClientNetworkCore;
 import de.projectsc.core.data.messages.MessageConstants;
-import de.projectsc.core.data.messages.MessageConstants;
-import de.projectsc.server.core.messages.NewClientConnectedServerMessage;
 import de.projectsc.server.core.messages.ServerMessage;
 
 public class ServerMock {
@@ -39,17 +39,7 @@ public class ServerMock {
 
     public ShowPNG png;
 
-    private void createNewClient(String[] information, BlockingQueue<ServerMessage> serverQueue) {
-        AuthendicatedClientMock newClient = new AuthendicatedClientMock(information[1]);
-        clients.put(newClient.getId(), newClient);
-        newClient.start();
-        LOGGER.debug("Created new client mock" + newClient.getId());
-        serverQueue.add(new NewClientConnectedServerMessage(MessageConstants.NEW_CLIENT_CONNECTED,
-            newClient.getAuthenticatedClient(), null));
-
-    }
-
-    protected void createConsole(BlockingQueue<ClientMessage> serverQueue) {
+    protected void createConsole(BlockingQueue<ClientMessage> send, BlockingQueue<ClientMessage> guiSendMessage) {
         while (!shutdown.get()) {
             try {
                 Thread.sleep(50);
@@ -57,7 +47,7 @@ public class ServerMock {
                     BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
                     String s = bufferRead.readLine();
                     LOGGER.debug("Got mock command: " + s);
-                    handleCommand(serverQueue, s);
+                    handleCommand(send, guiSendMessage, s);
 
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -70,9 +60,17 @@ public class ServerMock {
 
     }
 
-    private void handleCommand(BlockingQueue<ClientMessage> clientQueue, String s) throws InterruptedException {
+    private void handleCommand(BlockingQueue<ClientMessage> clientQueue, BlockingQueue<ClientMessage> guiSendMessage, String s)
+        throws InterruptedException {
         String[] split = s.split("\\s");
-        if (split[0].equals(MessageConstants.SHUTDOWN)) {
+        if (split[0].startsWith("input:")) {
+            String[] split2 = split[0].split(":");
+            if (split.length > 1) {
+                guiSendMessage.put(new ClientMessage(split[0], split[1]));
+            } else {
+                guiSendMessage.put(new ClientMessage(split[0]));
+            }
+        } else if (split[0].equals(MessageConstants.SHUTDOWN)) {
             shutdown.set(true);
             clientQueue.put(new ClientMessage(MessageConstants.SHUTDOWN));
             for (AuthendicatedClientMock client : clients.values()) {
@@ -120,19 +118,23 @@ public class ServerMock {
     public static void main(String[] args) {
         mock = new ServerMock();
         ClientCore clientCore = new ClientCore();
+        BlockingQueue<ClientMessage> fakeInternetQueue = new LinkedBlockingQueue<ClientMessage>();
+        ClientNetworkCore network =
+            new ClientNetworkCore(clientCore.getNetworkSendQueue(), clientCore.getNetworkReceiveQueue(), fakeInternetQueue);
         new Thread(clientCore).start();
-
+        new Thread(network).start();
+        BlockingQueue<ClientMessage> guiSendMessage = clientCore.getUserInputQueue();
         new Thread(new Runnable() {
 
             @Override
             public void run() {
-                mock.createConsole(clientCore.getNetworkReceiveQueue());
+                mock.createConsole(fakeInternetQueue, guiSendMessage);
             }
 
         }).start();
         mock.png = new ShowPNG(null);
         mock.png.setVisible(true);
-        BlockingQueue<ClientMessage> queue = clientCore.getNetworkReceiveQueue();
+
         // mock.handleCommand(queue, "create-client Josch");
         // mock.handleCommand(queue, "create-client Ilka");
         // mock.handleCommand(queue, "create-client Client1");

@@ -12,7 +12,6 @@ import org.apache.commons.logging.LogFactory;
 
 import de.projectsc.client.core.messages.ClientMessage;
 import de.projectsc.core.data.messages.MessageConstants;
-import de.projectsc.core.data.messages.NetworkMessage;
 
 /**
  * Core class for client network communication.
@@ -31,16 +30,13 @@ public class ClientNetworkCore implements Runnable {
 
     private boolean running = false;
 
-    private final BlockingQueue<NetworkMessage> serverNetworkSendQueueFake;
-
-    private final BlockingQueue<NetworkMessage> serverNetworkReceiveQueueFake;
+    private BlockingQueue<ClientMessage> serverNetworkReceiveQueueFake;
 
     public ClientNetworkCore(BlockingQueue<ClientMessage> networkIncomingQueue, BlockingQueue<ClientMessage> networkOutgoingQueue,
-        BlockingQueue<NetworkMessage> blockingQueue, BlockingQueue<NetworkMessage> blockingQueue2) {
+        BlockingQueue<ClientMessage> serverNetworkReceiveQueueFake) {
         this.sendMessageQueue = networkIncomingQueue;
         this.retreiveMessageQueue = networkOutgoingQueue;
-        this.serverNetworkReceiveQueueFake = blockingQueue;
-        this.serverNetworkSendQueueFake = blockingQueue2;
+        this.serverNetworkReceiveQueueFake = serverNetworkReceiveQueueFake;
     }
 
     private void start() {
@@ -59,12 +55,12 @@ public class ClientNetworkCore implements Runnable {
 
     private void retrieveServerMessages() {
         while (!serverNetworkReceiveQueueFake.isEmpty()) {
-            NetworkMessage msg;
+            ClientMessage msg;
             try {
                 msg = serverNetworkReceiveQueueFake.take();
 
                 if (msg.getMessage().equals(MessageConstants.SHUTDOWN)) {
-                    retreiveMessageQueue.offer(new ClientMessage(MessageConstants.SHUTDOWN, null));
+                    retreiveMessageQueue.offer(new ClientMessage(MessageConstants.SHUTDOWN));
                     shutdown();
                 } else {
                     retreiveMessageQueue.offer(new ClientMessage(msg.getMessage(), msg.getData()));
@@ -81,12 +77,7 @@ public class ClientNetworkCore implements Runnable {
             ClientMessage msg;
             try {
                 msg = sendMessageQueue.take();
-                if (MessageConstants.SHUTDOWN.equals(msg.getMessage())) {
-                    serverNetworkSendQueueFake.offer(new NetworkMessage(msg.getMessage(), msg.getData()));
-                    shutdown();
-                } else {
-                    serverNetworkSendQueueFake.offer(new NetworkMessage(msg.getMessage(), msg.getData()));
-                }
+                LOGGER.debug("Got new message for Server: " + msg);
             } catch (InterruptedException e) {
                 LOGGER.error("Error reading core messages: ", e);
             }
