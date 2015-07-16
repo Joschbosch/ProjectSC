@@ -5,25 +5,26 @@
  */
 package de.projectsc.client.core;
 
-import static de.projectsc.core.data.messages.MessageConstants.SHUTDOWN;
-
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.lwjgl.util.vector.Vector3f;
 
-import de.projectsc.client.gui.GUIMessage;
-import de.projectsc.client.gui.GUIMessageConstants;
-import de.projectsc.core.data.messages.NetworkMessageConstants;
-import de.projectsc.core.entities.MovingEntity;
-import de.projectsc.core.entities.PlayerEntity;
-import de.projectsc.core.entities.WorldEntity;
+import au.com.ds.ef.EasyFlow;
+import au.com.ds.ef.FlowBuilder;
+import au.com.ds.ef.call.ContextHandler;
+import de.projectsc.client.core.messages.ClientMessage;
+import de.projectsc.client.core.states.ClientEvents;
+import de.projectsc.client.core.states.ClientGameLobbyState;
+import de.projectsc.client.core.states.ClientGameRunningState;
+import de.projectsc.client.core.states.ClientGameState;
+import de.projectsc.client.core.states.ClientLoadingState;
+import de.projectsc.client.core.states.ClientLobbyState;
+import de.projectsc.client.core.states.ClientStates;
+import de.projectsc.server.core.game.GameContext;
+import de.projectsc.server.core.game.states.GameRunningState;
+import de.projectsc.server.core.game.states.States;
 
 /**
  * Core class for the client.
@@ -40,31 +41,21 @@ public class ClientCore implements Runnable {
 
     private static final Log LOGGER = LogFactory.getLog(ClientCore.class);
 
-    private BlockingQueue<GUIMessage> guiIncomingQueue;
-
-    private BlockingQueue<GUIMessage> guiOutgoingQueue;
+    private static final Object LOCK_OBJECT = new Object();
 
     private BlockingQueue<ClientMessage> networkSendQueue;
 
     private BlockingQueue<ClientMessage> networkReceiveQueue;
 
-    private final AtomicBoolean guiReady = new AtomicBoolean(false);
+    private ClientGameState currenState;
 
-    private final AtomicBoolean networkReady = new AtomicBoolean(false);
+    private EasyFlow<ClientGameContext> flow;
 
-    private final AtomicBoolean gameGuiReady = new AtomicBoolean(false);
+    private ClientGameContext gameContext;
 
-    private long gameTime = 0;
-
-    private Map<Integer, WorldEntity> worldEntities;
-
-    private boolean shutdown;
-
-    private boolean gameStarted;
+    private boolean clientRunning;
 
     public ClientCore() {
-        guiIncomingQueue = new LinkedBlockingQueue<>();
-        guiOutgoingQueue = new LinkedBlockingQueue<>();
         networkSendQueue = new LinkedBlockingQueue<>();
         networkReceiveQueue = new LinkedBlockingQueue<>();
     }
@@ -72,203 +63,83 @@ public class ClientCore implements Runnable {
     @Override
     public void run() {
         LOGGER.debug("Starting core ... ");
+        createAndBindFlow();
+        clientRunning = true;
+        gameContext = new ClientGameContext(this);
+        flow.start(gameContext);
 
-        new Thread(new Runnable() {
+        long previous = System.currentTimeMillis();
+        long lag = 0;
+        LOGGER.debug(String.format("Client started"));
+        while (clientRunning) {
+            long current = System.currentTimeMillis();
+            long elapsed = current - previous;
+            previous = current;
+            lag += elapsed;
+            // readMessages();
+            while (lag >= GameRunningState.GAME_TICK_TIME) {
+                synchronized (LOCK_OBJECT) {
+                    if (currenState != null) {
+                        currenState.loop();
+                    }
+                }
+                lag -= GameRunningState.GAME_TICK_TIME;
+            }
+            long timeNeeded = System.currentTimeMillis() - current;
+            long sleepTime = Math.max((GameRunningState.GAME_TICK_TIME - timeNeeded), 0L);
+            // LOGGER.debug(
+            // String.format("Game %d needed %d ms for current tick, will sleep : %d",
+            // gameContext.getGameID(), timeNeeded, sleepTime));
+            try {
+                Thread.sleep(sleepTime);
+            } catch (InterruptedException e) {
+                LOGGER.debug(e);
+            }
+
+            // render();
+        }
+        LOGGER.debug(String.format("Client terminated"));
+
+    }
+
+    private void createAndBindFlow() {
+        flow = FlowBuilder.from(ClientStates.LOBBY)
+            .transit(FlowBuilder.on(ClientEvents.ENTER_OR_CREATE_GAME).to(ClientStates.GAME_LOBBY)
+                .transit(FlowBuilder.on(ClientEvents.START_GAME_COMMAND).to(ClientStates.LOADING)
+                    .transit(FlowBuilder.on(ClientEvents.FINISHED_LOADING).to(ClientStates.RUNNING)
+                        .transit(FlowBuilder.on(ClientEvents.GAME_ENDS).finish(ClientStates.FINISHED)))));
+
+        flow.whenEnter(ClientStates.LOBBY, new ClientLobbyState());
+        flow.whenEnter(ClientStates.GAME_LOBBY, new ClientGameLobbyState());
+
+        flow.whenEnter(ClientStates.LOADING, new ClientLoadingState());
+        flow.whenEnter(ClientStates.RUNNING, new ClientGameRunningState());
+        flow.whenEnter(ClientStates.PAUSED, new ContextHandler<GameContext>() {
 
             @Override
-            public void run() {
-                while (!shutdown) {
-                    try {
-                        Thread.sleep(SLEEP_TIME);
-                    } catch (InterruptedException e) {
-                        LOGGER.error(ERROR_IN_CORE, e);
-                    }
-
-                    workGUI();
-                }
+            public void call(GameContext context) throws Exception {
+                LOGGER.debug("Entered game state " + context.getState());
             }
-        }).start();
-
-        new Thread(new Runnable() {
+        });
+        flow.whenEnter(States.FINISHED, new ContextHandler<GameContext>() {
 
             @Override
-            public void run() {
-                while (!shutdown) {
-                    try {
-                        Thread.sleep(SLEEP_TIME);
-                    } catch (InterruptedException e) {
-                        LOGGER.error(ERROR_IN_CORE, e);
-                    }
-                    workNetwork();
-                }
+            public void call(GameContext context) throws Exception {
+                LOGGER.debug("Entered game state " + context.getState());
             }
-        }).start();
-        LOGGER.debug("Core initialized");
-        gameTime = System.currentTimeMillis();
-        while (!guiReady.get() || !networkReady.get()) {
-            try {
-                Thread.sleep(TICK_TIME);
-            } catch (InterruptedException e) {
-            }
+        });
+    }
+
+    /**
+     * Change current gamestate.
+     * 
+     * @param newState to change to
+     */
+    public void changeState(ClientGameState newState) {
+        synchronized (LOCK_OBJECT) {
+            currenState = newState;
+            LOGGER.debug("Set client state to " + gameContext.getState());
         }
-        networkSendQueue.offer(new ClientMessage(ClientMessageConstants.CLIENT_READY, null));
-
-        while (!gameStarted) {
-            try {
-                Thread.sleep(TICK_TIME);
-            } catch (InterruptedException e) {
-            }
-        }
-
-        long last = System.currentTimeMillis();
-        while (!shutdown) {
-            long now = System.currentTimeMillis();
-            long delta = now - last;
-            last = now;
-            gameTime += delta;
-            if (worldEntities != null) {
-                for (WorldEntity e : worldEntities.values()) {
-                    if (e instanceof MovingEntity) {
-                        ((MovingEntity) e).move(delta);
-                    }
-                }
-            }
-            try {
-                Thread.sleep(SLEEP_TIME);
-            } catch (InterruptedException e) {
-                LOGGER.error(ERROR_IN_CORE, e);
-            }
-        }
-    }
-
-    private void workNetwork() {
-        while (!networkReceiveQueue.isEmpty()) {
-            ClientMessage message;
-            message = networkReceiveQueue.poll();
-            if (message != null) {
-                processMessage(message);
-            }
-        }
-    }
-
-    private void processMessage(ClientMessage message) {
-        if (message.getMessage().equals(GUIMessageConstants.INIT_GAME)) {
-            LOGGER.debug("Client core received message: " + message.getMessage());
-            if (message.getData()[0] instanceof List<?>) {
-                @SuppressWarnings("unchecked") List<WorldEntity> incomingEntities = (List<WorldEntity>) message.getData()[0];
-                worldEntities = new TreeMap<>();
-                for (WorldEntity e : incomingEntities) {
-                    WorldEntity newEntity = null;
-                    switch (e.getType()) {
-                    case COLLECTABLE:
-
-                        break;
-                    case EFFECT:
-
-                        break;
-
-                    case MOVEABLE_OBJECT:
-                        newEntity = new MovingEntity(e.getID(), e.getModel(), e.getTexture(), new Vector3f(e.getPosition().x, e
-                            .getPosition().y, e.getPosition().z), new Vector3f(e.getRotX(), e.getRotY(), e
-                            .getRotZ()), e.getScale());
-                        break;
-
-                    case PLAYER:
-                        newEntity = new PlayerEntity(e.getID(), e.getModel(), e.getTexture(), new Vector3f(e.getPosition().x, e
-                            .getPosition().y, e.getPosition().z), new Vector3f(e.getRotX(), e.getRotY(), e
-                            .getRotZ()), e.getScale());
-                        break;
-
-                    case DECORATION:
-
-                        break;
-                    case SOLID_BACKGROUND_OBJECT:
-
-                        break;
-
-                    case USABLE_OBJECT:
-
-                        break;
-
-                    default:
-                        break;
-                    }
-                    worldEntities.put(e.getID(), newEntity);
-                }
-                guiOutgoingQueue.offer(new GUIMessage(GUIMessageConstants.INIT_GAME, worldEntities));
-            }
-        } else if (message.getMessage().equals(NetworkMessageConstants.NEW_LOCATION)) {
-            if (message.getData()[0] instanceof float[]) {
-                float[] data = (float[]) message.getData()[0];
-                WorldEntity worldEntity = worldEntities.get((int) data[0]);
-                worldEntity.setRotY(data[3]);
-                worldEntity.getPosition().x = data[1];
-                worldEntity.getPosition().y = 0;
-                worldEntity.getPosition().z = data[2];
-            } else {
-                int[] data = (int[]) message.getData()[0];
-                if (worldEntities.get(data[0]) instanceof MovingEntity) {
-                    ((MovingEntity) worldEntities.get(data[0])).setCurrentTarget(new Vector3f(data[1], 0, data[2]));
-                    LOGGER.debug(String.format("Got new target information for entity %s: %s | %s", data[0], data[1], data[2]));
-                }
-            }
-        } else if (message.getMessage().equals("pong")) {
-            long[] data = (long[]) message.getData()[0];
-            LOGGER.debug(String.format("Got pong with times (%s, %s) and ping = %s", data[0], data[1],
-                System.currentTimeMillis()
-                    - data[0]));
-        } else if (message.getMessage().equals(ClientMessageConstants.CLIENT_READY)) {
-            networkReady.set(true);
-        } else if (message.getMessage().equals("Start game")) {
-            gameStarted = true;
-            gameTime = (long) message.getData()[0];
-        } else if (message.getMessage().equals(NetworkMessageConstants.GAME_TIME_UPDATE)) {
-            long delta = gameTime - (long) message.getData()[0];
-            gameTime = (long) message.getData()[0];
-            LOGGER.debug("Received game time update! Delta was " + delta);
-        } else {
-            LOGGER.error("Message not recognized:" + message.getMessage());
-        }
-    }
-
-    private void workGUI() {
-        try {
-            while (!guiIncomingQueue.isEmpty()) {
-                GUIMessage msg = guiIncomingQueue.take();
-                LOGGER.debug("New Message: " + msg.getMessage());
-                if (msg.getMessage().contains(SHUTDOWN)) {
-                    guiOutgoingQueue.offer(new GUIMessage(SHUTDOWN, null));
-                    networkSendQueue.offer(new ClientMessage(SHUTDOWN, null));
-                    shutdown = true;
-                    LOGGER.debug("Shutting down");
-                } else if (msg.getMessage().equals(GUIMessageConstants.POINT_ON_MAP_CLICKED)) {
-                    LOGGER.debug("Sending new click info: " + msg.getData());
-                    networkSendQueue.offer(new ClientMessage(GUIMessageConstants.POINT_ON_MAP_CLICKED, msg.getData()));
-                } else if (msg.getMessage().equals(GUIMessageConstants.GUI_INITIALIZED)) {
-                    guiReady.set(true);
-                } else if (msg.getMessage().equals(GUIMessageConstants.GUI_INITIALIZED)) {
-                    gameGuiReady.set(true);
-                }
-            }
-        } catch (InterruptedException e) {
-            LOGGER.error(ERROR_IN_CORE, e);
-        }
-    }
-
-    public BlockingQueue<GUIMessage> getGuiIncomingQueue() {
-        return guiIncomingQueue;
-    }
-
-    public void setGuiIncomingQueue(BlockingQueue<GUIMessage> guiIncomingQueue) {
-        this.guiIncomingQueue = guiIncomingQueue;
-    }
-
-    public BlockingQueue<GUIMessage> getGuiOutgoingQueue() {
-        return guiOutgoingQueue;
-    }
-
-    public void setGuiOutgoingQueue(BlockingQueue<GUIMessage> guiOutgoingQueue) {
-        this.guiOutgoingQueue = guiOutgoingQueue;
     }
 
     public BlockingQueue<ClientMessage> getNetworkSendQueue() {

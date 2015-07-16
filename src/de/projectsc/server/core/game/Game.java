@@ -19,6 +19,8 @@ import au.com.ds.ef.EasyFlow;
 import au.com.ds.ef.FlowBuilder;
 import au.com.ds.ef.StateEnum;
 import au.com.ds.ef.call.ContextHandler;
+import de.projectsc.core.data.messages.GameMessageConstants;
+import de.projectsc.core.data.messages.MessageConstants;
 import de.projectsc.core.data.messages.MessageConstants;
 import de.projectsc.core.game.GameAttributes;
 import de.projectsc.server.core.AuthenticatedClient;
@@ -31,9 +33,7 @@ import de.projectsc.server.core.game.states.GameState;
 import de.projectsc.server.core.game.states.LoadingState;
 import de.projectsc.server.core.game.states.LobbyState;
 import de.projectsc.server.core.game.states.States;
-import de.projectsc.server.core.messages.GameMessageConstants;
 import de.projectsc.server.core.messages.ServerMessage;
-import de.projectsc.server.core.messages.ServerMessageConstants;
 
 /**
  * 
@@ -57,9 +57,9 @@ public class Game implements Runnable {
 
     private GameState currenState;
 
-    private final GameContext gameContext;
-
     private EasyFlow<GameContext> flow;
+
+    private final GameContext gameContext;
 
     public Game(AuthenticatedClient host, BlockingQueue<ServerMessage> coreQueue) {
         this.coreQueue = coreQueue;
@@ -113,24 +113,24 @@ public class Game implements Runnable {
             BlockingQueue<ServerMessage> queue = player.getClient().getReceiveFromClientQueue();
             while (!queue.isEmpty()) {
                 ServerMessage msg = queue.poll();
-                if (msg.getMessage().equals(ServerMessageConstants.CHAT_MESSAGE)) {
+                if (msg.getMessage().equals(MessageConstants.CHAT_MESSAGE)) {
                     sendMessageToAllPlayer(new ServerMessage(msg.getMessage(), msg.getData()[0], player.getDisplayName()));
                 } else if (msg.getMessage().equals(ServerCommands.LIST_PLAYER)) {
                     createPlayerList();
-                } else if (msg.getMessage().equals(ServerMessageConstants.PLAYER_QUIT_LOBBY)) {
+                } else if (msg.getMessage().equals(MessageConstants.PLAYER_QUIT_LOBBY_REQUEST)) {
                     if (players.containsKey(player.getId())) {
                         toQuit.add(player);
-                        sendMessageToAllPlayer(new ServerMessage(ServerMessageConstants.PLAYER_QUIT_LOBBY, player.getId(),
+                        sendMessageToAllPlayer(new ServerMessage(MessageConstants.PLAYER_QUIT_LOBBY_REQUEST, player.getId(),
                             player.getDisplayName()));
                         LOGGER.debug(String.format("Player left game %s: %s (Game %s)", gameContext.getDisplayName(),
                             player.getDisplayName(), gameContext.getGameID()));
 
                     }
-                } else if (msg.getMessage().equals(ServerMessageConstants.CLIENT_DISCONNECTED)) {
+                } else if (msg.getMessage().equals(MessageConstants.CLIENT_DISCONNECTED)) {
                     if (players.containsKey(player.getId())) {
                         toRemove.add(player);
 
-                        sendMessageToAllPlayer(new ServerMessage(ServerMessageConstants.CLIENT_DISCONNECTED, player.getId(),
+                        sendMessageToAllPlayer(new ServerMessage(MessageConstants.CLIENT_DISCONNECTED, player.getId(),
                             player.getDisplayName()));
                         LOGGER.debug(String.format("Player disconnected from game %s: %s (Game %s)", gameContext.getDisplayName(),
                             player.getDisplayName(),
@@ -185,7 +185,7 @@ public class Game implements Runnable {
      */
     public void removePlayerFromLobby(ServerPlayer player) {
         gameContext.getPlayers().remove(player.getId());
-        coreQueue.offer(new ServerMessage(ServerMessageConstants.PLAYER_QUIT_LOBBY, player.getClient()));
+        coreQueue.offer(new ServerMessage(MessageConstants.PLAYER_QUIT_LOBBY_REQUEST, player.getClient()));
     }
 
     /**
@@ -196,7 +196,7 @@ public class Game implements Runnable {
      */
     public void addPlayerToGameLobby(AuthenticatedClient newPlayer) {
         ServerPlayer player = new ServerPlayer(newPlayer);
-        sendMessageToAllPlayer(new ServerMessage(ServerMessageConstants.PLAYER_JOINED_GAME, player.getId(), player.getDisplayName()));
+        sendMessageToAllPlayer(new ServerMessage(MessageConstants.PLAYER_JOINED_GAME, player.getId(), player.getDisplayName()));
         gameContext.getPlayers().put(player.getId(), player);
         gameContext.getConfig().setPlayerCharacter(player.getId(), "person");
         byte affiliation = 0;

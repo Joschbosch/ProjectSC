@@ -22,11 +22,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import de.projectsc.core.data.messages.MessageConstants;
+import de.projectsc.core.data.messages.MessageConstants;
 import de.projectsc.server.core.AuthenticatedClient;
 import de.projectsc.server.core.ServerCore;
 import de.projectsc.server.core.messages.NewClientConnectedServerMessage;
 import de.projectsc.server.core.messages.ServerMessage;
-import de.projectsc.server.core.messages.ServerMessageConstants;
 
 public class ClientMock {
 
@@ -38,14 +38,14 @@ public class ClientMock {
 
     private final Map<Long, AuthendicatedClientMock> clients = new TreeMap<>();
 
-    public ShowPNG png;
+    public ShowClientPNG png;
 
     private void createNewClient(String[] information, BlockingQueue<ServerMessage> serverQueue) {
         AuthendicatedClientMock newClient = new AuthendicatedClientMock(information[1]);
         clients.put(newClient.getId(), newClient);
         newClient.start();
         LOGGER.debug("Created new client mock" + newClient.getId());
-        serverQueue.add(new NewClientConnectedServerMessage(ServerMessageConstants.NEW_CLIENT_CONNECTED,
+        serverQueue.add(new NewClientConnectedServerMessage(MessageConstants.NEW_CLIENT_CONNECTED,
             newClient.getAuthenticatedClient(), null));
 
     }
@@ -131,7 +131,7 @@ public class ClientMock {
             }
 
         }).start();
-        mock.png = new ShowPNG(null);
+        mock.png = new ShowClientPNG(null);
         mock.png.setVisible(true);
         try {
             mock.handleCommand(serverCore.getReceiveQueue(), "create-client Josch");

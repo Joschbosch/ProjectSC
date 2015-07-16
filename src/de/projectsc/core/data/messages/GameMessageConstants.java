@@ -3,7 +3,7 @@
  * 
  * All rights reserved
  */
-package de.projectsc.server.core.messages;
+package de.projectsc.core.data.messages;
 
 /**
  * Constants in a {@link Game} object.

@@ -17,10 +17,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import de.projectsc.core.data.messages.MessageConstants;
+import de.projectsc.core.data.messages.MessageConstants;
 import de.projectsc.server.core.game.Game;
 import de.projectsc.server.core.messages.NewClientConnectedServerMessage;
 import de.projectsc.server.core.messages.ServerMessage;
-import de.projectsc.server.core.messages.ServerMessageConstants;
 
 /**
  * Core of server.
@@ -100,16 +100,16 @@ public class ServerCore implements Runnable {
     }
 
     private void handleClientMessage(AuthenticatedClient client, ServerMessage msg, List<AuthenticatedClient> toRemove) {
-        if (msg.getMessage().equals(ServerMessageConstants.CHAT_MESSAGE)) {
+        if (msg.getMessage().equals(MessageConstants.CHAT_MESSAGE)) {
             receiveQueue.offer(new ServerMessage(msg.getMessage(), msg.getData()[0], clientsInMainLobby.get(client.getId())
                 .getDisplayName()));
-        } else if (msg.getMessage().equals(ServerMessageConstants.CREATE_NEW_GAME_REQUEST)) {
+        } else if (msg.getMessage().equals(MessageConstants.CREATE_NEW_GAME_REQUEST)) {
             Game newGame = new Game(client, receiveQueue);
             games.put(newGame.getGameID(), newGame);
             toRemove.add(client);
-            sendMsgToAllClients(new ServerMessage(ServerMessageConstants.CLIENT_LEFT_LOBBY, client.getId(), client.getDisplayName()));
-            client.sendMessage(new ServerMessage(ServerMessageConstants.NEW_GAME_CREATED));
-        } else if (msg.getMessage().equals(ServerMessageConstants.JOIN_GAME_REQUEST) && msg.getData() != null && msg.getData().length > 0) {
+            sendMsgToAllClients(new ServerMessage(MessageConstants.CLIENT_LEFT_LOBBY, client.getId(), client.getDisplayName()));
+            client.sendMessage(new ServerMessage(MessageConstants.NEW_GAME_CREATED));
+        } else if (msg.getMessage().equals(MessageConstants.JOIN_GAME_REQUEST) && msg.getData() != null && msg.getData().length > 0) {
             try {
                 Long game = Long.valueOf(((String) msg.getData()[0]).trim());
 
@@ -117,27 +117,27 @@ public class ServerCore implements Runnable {
                     String joinable = games.get(game).isJoinable();
                     if (joinable.isEmpty()) {
                         games.get(game).addPlayerToGameLobby(client);
-                        client.sendMessage(new ServerMessage(ServerMessageConstants.JOIN_GAME_SUCCSESSFULL));
+                        client.sendMessage(new ServerMessage(MessageConstants.JOIN_GAME_SUCCSESSFULL));
                         toRemove.add(client);
-                        sendMsgToAllClients(new ServerMessage(ServerMessageConstants.CLIENT_LEFT_LOBBY, client.getId(),
+                        sendMsgToAllClients(new ServerMessage(MessageConstants.CLIENT_LEFT_LOBBY, client.getId(),
                             client.getDisplayName()));
                     } else {
-                        client.sendMessage(new ServerMessage(ServerMessageConstants.ERROR_JOINING_GAME, String.format(
+                        client.sendMessage(new ServerMessage(MessageConstants.ERROR_JOINING_GAME, String.format(
                             joinable)));
                     }
                 } else {
-                    client.sendMessage(new ServerMessage(ServerMessageConstants.ERROR_JOINING_GAME, String.format(
+                    client.sendMessage(new ServerMessage(MessageConstants.ERROR_JOINING_GAME, String.format(
                         "Game with id %s does not exist", game)));
                 }
             } catch (NumberFormatException e) {
-                client.sendMessage(new ServerMessage(ServerMessageConstants.ERROR_JOINING_GAME, String.format(
+                client.sendMessage(new ServerMessage(MessageConstants.ERROR_JOINING_GAME, String.format(
                     "Id %s is not valid", msg.getData()[0])));
             }
-        } else if (msg.getMessage().equals(ServerMessageConstants.CLIENT_DISCONNECTED)) {
+        } else if (msg.getMessage().equals(MessageConstants.CLIENT_DISCONNECTED)) {
             // handle id not here
             if (clientsInMainLobby.containsKey(client.getId())) {
                 AuthenticatedClient c = clientsInMainLobby.remove(client.getId());
-                sendMsgToAllClients(new ServerMessage(ServerMessageConstants.CLIENT_DISCONNECTED, c.getId(), c.getDisplayName()));
+                sendMsgToAllClients(new ServerMessage(MessageConstants.CLIENT_DISCONNECTED, c.getId(), c.getDisplayName()));
             }
         }
     }
@@ -149,25 +149,25 @@ public class ServerCore implements Runnable {
             }
             sendMsgToAllClients(msg);
             shutdown.set(true);
-        } else if (msg.getMessage().equals(ServerMessageConstants.CHAT_MESSAGE)) {
+        } else if (msg.getMessage().equals(MessageConstants.CHAT_MESSAGE)) {
             sendMsgToAllClients(msg);
-        } else if (msg.getMessage().equals(ServerMessageConstants.NEW_CLIENT_CONNECTED)) {
+        } else if (msg.getMessage().equals(MessageConstants.NEW_CLIENT_CONNECTED)) {
             NewClientConnectedServerMessage newClient = (NewClientConnectedServerMessage) msg;
-            sendMsgToAllClients(new ServerMessage(ServerMessageConstants.CLIENT_JOINED_LOBBY, newClient.getClient().getId(), newClient
+            sendMsgToAllClients(new ServerMessage(MessageConstants.CLIENT_JOINED_LOBBY, newClient.getClient().getId(), newClient
                 .getClient().getDisplayName()));
             clientsInMainLobby.put(newClient.getClient().getId(), newClient.getClient());
-        } else if (msg.getMessage().equals(ServerMessageConstants.CLIENT_DISCONNECTED)) {
+        } else if (msg.getMessage().equals(MessageConstants.CLIENT_DISCONNECTED)) {
             Long id = Long.parseLong((String) msg.getData()[0]);
             // handle id not here
             if (clientsInMainLobby.containsKey(id)) {
                 AuthenticatedClient c = clientsInMainLobby.remove(id);
-                sendMsgToAllClients(new ServerMessage(ServerMessageConstants.CLIENT_DISCONNECTED, c.getId(), c.getDisplayName()));
+                sendMsgToAllClients(new ServerMessage(MessageConstants.CLIENT_DISCONNECTED, c.getId(), c.getDisplayName()));
             }
-        } else if (msg.getMessage().equals(ServerMessageConstants.PLAYER_QUIT_LOBBY)) {
+        } else if (msg.getMessage().equals(MessageConstants.PLAYER_QUIT_LOBBY_REQUEST)) {
             AuthenticatedClient client = (AuthenticatedClient) msg.getData()[0];
-            sendMsgToAllClients(new ServerMessage(ServerMessageConstants.CLIENT_JOINED_LOBBY, client.getId(), client.getDisplayName()));
+            sendMsgToAllClients(new ServerMessage(MessageConstants.CLIENT_JOINED_LOBBY, client.getId(), client.getDisplayName()));
             clientsInMainLobby.put(client.getId(), client);
-            client.sendMessage(new ServerMessage(ServerMessageConstants.JOIN_LOBBY));
+            client.sendMessage(new ServerMessage(MessageConstants.JOIN_LOBBY));
         } else if (msg.getMessage().equals(ServerCommands.LISTCLIENTS)) {
             createClientList();
         } else if (msg.getMessage().equals(ServerCommands.LIST_GAMES)) {

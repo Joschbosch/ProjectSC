@@ -18,12 +18,12 @@ import com.rits.cloning.Cloner;
 
 import de.projectsc.core.Terrain;
 import de.projectsc.core.Tile;
+import de.projectsc.core.data.messages.GameMessageConstants;
 import de.projectsc.core.entities.PlayerEntity;
 import de.projectsc.core.entities.WorldEntity;
 import de.projectsc.core.utils.OctTree;
 import de.projectsc.server.core.ServerPlayer;
 import de.projectsc.server.core.game.GameContext;
-import de.projectsc.server.core.messages.GameMessageConstants;
 import de.projectsc.server.core.messages.ServerMessage;
 
 /**

@@ -10,12 +10,9 @@ import java.util.concurrent.BlockingQueue;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import de.projectsc.client.core.ClientMessage;
-import de.projectsc.client.core.ClientMessageConstants;
-import de.projectsc.client.gui.GUIMessageConstants;
+import de.projectsc.client.core.messages.ClientMessage;
 import de.projectsc.core.data.messages.MessageConstants;
 import de.projectsc.core.data.messages.NetworkMessage;
-import de.projectsc.core.data.messages.NetworkMessageConstants;
 
 /**
  * Core class for client network communication.
@@ -34,9 +31,9 @@ public class ClientNetworkCore implements Runnable {
 
     private boolean running = false;
 
-    private BlockingQueue<NetworkMessage> serverNetworkSendQueueFake;
+    private final BlockingQueue<NetworkMessage> serverNetworkSendQueueFake;
 
-    private BlockingQueue<NetworkMessage> serverNetworkReceiveQueueFake;
+    private final BlockingQueue<NetworkMessage> serverNetworkReceiveQueueFake;
 
     public ClientNetworkCore(BlockingQueue<ClientMessage> networkIncomingQueue, BlockingQueue<ClientMessage> networkOutgoingQueue,
         BlockingQueue<NetworkMessage> blockingQueue, BlockingQueue<NetworkMessage> blockingQueue2) {
@@ -49,7 +46,6 @@ public class ClientNetworkCore implements Runnable {
     private void start() {
         LOGGER.debug("Starting network ...");
         running = true;
-        retreiveMessageQueue.offer(new ClientMessage(ClientMessageConstants.CLIENT_READY, null));
         while (running) {
             retreiveCoreMessages();
             retrieveServerMessages();
@@ -70,11 +66,6 @@ public class ClientNetworkCore implements Runnable {
                 if (msg.getMessage().equals(MessageConstants.SHUTDOWN)) {
                     retreiveMessageQueue.offer(new ClientMessage(MessageConstants.SHUTDOWN, null));
                     shutdown();
-                } else if (msg.getMessage().equals(NetworkMessageConstants.INITIALIZE_GAME)) {
-                    LOGGER.debug("Client receiving message: " + msg.getMessage());
-                    retreiveMessageQueue.offer(new ClientMessage(GUIMessageConstants.INIT_GAME, msg.getData()));
-                } else if (msg.getMessage().equals(NetworkMessageConstants.NEW_LOCATION)) {
-                    retreiveMessageQueue.offer(new ClientMessage(NetworkMessageConstants.NEW_LOCATION, msg.getData()));
                 } else {
                     retreiveMessageQueue.offer(new ClientMessage(msg.getMessage(), msg.getData()));
                 }
