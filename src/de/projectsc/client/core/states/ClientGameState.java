@@ -36,7 +36,21 @@ public abstract class ClientGameState implements ContextHandler<ClientGameContex
 
     /**
      * Main loop for the state.
+     * 
+     * @param tickTime
      */
-    public abstract void loop();
+    public abstract void loop(long tickTime);
+
+    public abstract void readInput();
+
+    protected void sendMessageToServer(ClientMessage msg) {
+        context.getCore().sendMessageToServer(msg);
+    }
+
+    public void changeGUI() {
+        context.getGUI().changeState((ClientStates) context.getState());
+    }
+
+    public abstract void render(long elapsed, long lag);
 
 }

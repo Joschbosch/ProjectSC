@@ -18,6 +18,7 @@ import de.projectsc.core.entities.EntityType;
 import de.projectsc.core.entities.PlayerEntity;
 import de.projectsc.core.entities.WorldEntity;
 import de.projectsc.core.game.GameAttributes;
+import de.projectsc.core.game.GameConfiguration;
 import de.projectsc.core.utils.OctTree;
 import de.projectsc.server.core.ServerPlayer;
 

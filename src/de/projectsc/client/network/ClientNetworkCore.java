@@ -5,13 +5,24 @@
  */
 package de.projectsc.client.network;
 
+import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.codehaus.jackson.map.ObjectMapper;
+
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryonet.Client;
+import com.esotericsoftware.kryonet.Connection;
+import com.esotericsoftware.kryonet.FrameworkMessage;
+import com.esotericsoftware.kryonet.Listener;
+import com.sun.corba.se.impl.protocol.giopmsgheaders.Message;
 
 import de.projectsc.client.core.messages.ClientMessage;
 import de.projectsc.core.data.messages.MessageConstants;
+import de.projectsc.core.data.messages.NetworkMessage;
+import de.projectsc.server.core.messages.ServerMessage;
 
 /**
  * Core class for client network communication.
@@ -30,13 +41,16 @@ public class ClientNetworkCore implements Runnable {
 
     private boolean running = false;
 
-    private BlockingQueue<ClientMessage> serverNetworkReceiveQueueFake;
+    private final boolean connected = false;
+
+    private final Client client;
 
     public ClientNetworkCore(BlockingQueue<ClientMessage> networkIncomingQueue, BlockingQueue<ClientMessage> networkOutgoingQueue,
         BlockingQueue<ClientMessage> serverNetworkReceiveQueueFake) {
         this.sendMessageQueue = networkIncomingQueue;
         this.retreiveMessageQueue = networkOutgoingQueue;
-        this.serverNetworkReceiveQueueFake = serverNetworkReceiveQueueFake;
+        client = new Client();
+        new Thread(client).start();
     }
 
     private void start() {
@@ -44,30 +58,10 @@ public class ClientNetworkCore implements Runnable {
         running = true;
         while (running) {
             retreiveCoreMessages();
-            retrieveServerMessages();
             try {
                 Thread.sleep(TICK_LENGTH);
             } catch (InterruptedException e) {
                 LOGGER.error("Error in client network:", e);
-            }
-        }
-    }
-
-    private void retrieveServerMessages() {
-        while (!serverNetworkReceiveQueueFake.isEmpty()) {
-            ClientMessage msg;
-            try {
-                msg = serverNetworkReceiveQueueFake.take();
-
-                if (msg.getMessage().equals(MessageConstants.SHUTDOWN)) {
-                    retreiveMessageQueue.offer(new ClientMessage(MessageConstants.SHUTDOWN));
-                    shutdown();
-                } else {
-                    retreiveMessageQueue.offer(new ClientMessage(msg.getMessage(), msg.getData()));
-                }
-
-            } catch (InterruptedException e) {
-                LOGGER.error("Error reading server messages: ", e);
             }
         }
     }
@@ -78,14 +72,55 @@ public class ClientNetworkCore implements Runnable {
             try {
                 msg = sendMessageQueue.take();
                 LOGGER.debug("Got new message for Server: " + msg);
-            } catch (InterruptedException e) {
+                if (msg.getMessage().equals(MessageConstants.CONNECT)) {
+                    connectToServer();
+                } else {
+                    NetworkMessage sendMessage = new NetworkMessage();
+                    sendMessage.setMsg(msg.getMessage());
+                    sendMessage.setData(msg.getData());
+                    ObjectMapper mapper = new ObjectMapper();
+                    client.sendUDP(mapper.writeValueAsString(sendMessage));
+                }
+            } catch (InterruptedException | IOException e) {
                 LOGGER.error("Error reading core messages: ", e);
             }
         }
+
     }
 
-    private void shutdown() {
-        running = false;
+    private void connectToServer() {
+        LOGGER.debug("Connecting to server ...");
+        try {
+            client.connect(5000, "localhost", 54555, 54777);
+            Kryo kryo = client.getKryo();
+            kryo.register(ClientMessage.class);
+            kryo.register(ServerMessage.class);
+            kryo.register(Message.class);
+            kryo.register(String.class);
+            kryo.register(Object[].class);
+            kryo.register(Object.class);
+            client.addListener(new Listener() {
+
+                @Override
+                public void received(Connection connection, Object object) {
+                    if (!(object instanceof FrameworkMessage)) {
+                        ObjectMapper mapper = new ObjectMapper();
+                        try {
+                            NetworkMessage msg = mapper.readValue((String) object, NetworkMessage.class);
+                            retreiveMessageQueue.offer(new ClientMessage(msg.getMsg(), msg.getData()));
+                        } catch (IOException e) {
+                            LOGGER.error(e.getStackTrace());
+                        }
+                    }
+                }
+
+            });
+            LOGGER.debug("Client connection established");
+        } catch (IOException e) {
+            LOGGER.error(e.getStackTrace());
+        }
+        LOGGER.debug("connected.");
+
     }
 
     @Override

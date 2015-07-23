@@ -40,7 +40,8 @@ public final class MessageConstants {
     /**
      * Constant.
      */
-    public static final String LOGIN_SUCCESSFUL = "response:login_successful"; // List of clients in lobby and games
+    public static final String LOGIN_SUCCESSFUL = "response:login_successful"; // List of clients in
+                                                                               // lobby and games
 
     /**
      * Constant.

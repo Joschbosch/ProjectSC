@@ -7,7 +7,6 @@
 	<classpathentry exported="true" kind="lib" path="project_resources/commons-logging-1.2/commons-logging-1.2-javadoc.jar"/>
 	<classpathentry exported="true" kind="lib" path="project_resources/commons-logging-1.2/commons-logging-1.2.jar"/>
 	<classpathentry kind="lib" path="lib/lwjgl/jar/AppleJavaExtensions.jar"/>
-	<classpathentry kind="lib" path="lib/lwjgl/jar/asm-debug-all.jar"/>
 	<classpathentry kind="lib" path="lib/lwjgl/jar/jinput.jar"/>
 	<classpathentry kind="lib" path="lib/lwjgl/jar/laf-plugin-7.2.1.jar"/>
 	<classpathentry kind="lib" path="lib/lwjgl/jar/laf-widget-7.2.1.jar"/>
@@ -37,5 +36,8 @@
 	<classpathentry kind="lib" path="lib/guava-18.0.jar"/>
 	<classpathentry kind="lib" path="lib/cloning-1.9.2.jar"/>
 	<classpathentry kind="lib" path="lib/objenesis-tck-2.1.jar"/>
+	<classpathentry kind="lib" path="lib/kryonet-2.21/jars/production/onejar/kryonet-2.21-all.jar"/>
+	<classpathentry kind="lib" path="lib/kryonet-2.21/kryo-3.0.2.jar"/>
+	<classpathentry kind="lib" path="lib/kryonet-2.21/asm-all-5.0.4.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

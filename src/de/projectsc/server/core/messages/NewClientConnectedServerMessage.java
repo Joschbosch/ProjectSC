@@ -16,7 +16,7 @@ public class NewClientConnectedServerMessage extends ServerMessage {
 
     private final AuthenticatedClient client;
 
-    public NewClientConnectedServerMessage(String msg, AuthenticatedClient client, Object[] data) {
+    public NewClientConnectedServerMessage(String msg, AuthenticatedClient client, Object... data) {
         super(msg, data);
         this.client = client;
     }

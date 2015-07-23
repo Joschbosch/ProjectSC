@@ -57,4 +57,9 @@ public class AuthenticatedClient {
     public String getDisplayName() {
         return displayName;
     }
+
+    public void received(ServerMessage arg1) {
+        System.out.println("Received message from client: " + arg1);
+        receiveFromClientQueue.add(arg1);
+    }
 }

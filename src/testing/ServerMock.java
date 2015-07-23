@@ -10,6 +10,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Map;
+import java.util.Queue;
 import java.util.TreeMap;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -23,11 +24,15 @@ import org.apache.commons.logging.LogFactory;
 
 import de.projectsc.client.core.ClientCore;
 import de.projectsc.client.core.messages.ClientMessage;
+import de.projectsc.client.guiFake.FakeGUI;
 import de.projectsc.client.network.ClientNetworkCore;
 import de.projectsc.core.data.messages.MessageConstants;
+import de.projectsc.core.game.GameConfiguration;
 import de.projectsc.server.core.messages.ServerMessage;
 
 public class ServerMock {
+
+    private static final String INPUT_PREFIX = "input:";
 
     public static ServerMock mock;
 
@@ -39,7 +44,7 @@ public class ServerMock {
 
     public ShowPNG png;
 
-    protected void createConsole(BlockingQueue<ClientMessage> send, BlockingQueue<ClientMessage> guiSendMessage) {
+    protected void createConsole(BlockingQueue<ClientMessage> send, Queue<ClientMessage> input) {
         while (!shutdown.get()) {
             try {
                 Thread.sleep(50);
@@ -47,7 +52,7 @@ public class ServerMock {
                     BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
                     String s = bufferRead.readLine();
                     LOGGER.debug("Got mock command: " + s);
-                    handleCommand(send, guiSendMessage, s);
+                    handleCommand(send, input, s);
 
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -60,59 +65,55 @@ public class ServerMock {
 
     }
 
-    private void handleCommand(BlockingQueue<ClientMessage> clientQueue, BlockingQueue<ClientMessage> guiSendMessage, String s)
+    private void handleCommand(BlockingQueue<ClientMessage> clientQueue, Queue<ClientMessage> input, String s)
         throws InterruptedException {
-        String[] split = s.split("\\s");
-        if (split[0].startsWith("input:")) {
-            String[] split2 = split[0].split(":");
-            if (split.length > 1) {
-                guiSendMessage.put(new ClientMessage(split[0], split[1]));
-            } else {
-                guiSendMessage.put(new ClientMessage(split[0]));
-            }
-        } else if (split[0].equals(MessageConstants.SHUTDOWN)) {
-            shutdown.set(true);
-            clientQueue.put(new ClientMessage(MessageConstants.SHUTDOWN));
-            for (AuthendicatedClientMock client : clients.values()) {
-                client.kill();
-            }
-        } else if (split[0].equals("create-client")) {
-            if (split.length > 1) {
-                // createNewClient(split, clientQueue);
-            } else {
-                LOGGER.debug("Could not create mock client: arguments invalid");
-            }
+        if (s != null && !s.isEmpty()) {
+            String[] split = s.split("\\s");
+            if (split[0].startsWith(INPUT_PREFIX)) {
+                if (split.length > 1) {
+                    input.add(new ClientMessage(split[0].replace(INPUT_PREFIX, ""), split[1]));
+                } else {
+                    input.add(new ClientMessage(split[0].replace(INPUT_PREFIX, "")));
+                }
+            } else if (split[0].equals(MessageConstants.SHUTDOWN)) {
+                shutdown.set(true);
+                clientQueue.put(new ClientMessage(MessageConstants.SHUTDOWN));
+                for (AuthendicatedClientMock client : clients.values()) {
+                    client.kill();
+                }
+            } else if (split[0].equals("create-client")) {
+                if (split.length > 1) {
+                    // createNewClient(split, clientQueue);
+                } else {
+                    LOGGER.debug("Could not create mock client: arguments invalid");
+                }
 
-        } else if (Character.isDigit(split[0].charAt(0))) {
-            Long id = null;
-            id = Long.parseLong(split[0]);
-            if (id != null) {
-                AuthendicatedClientMock client = clients.get(id);
-                if (client != null) {
-                    if (split.length > 2) {
-                        client.sendMessage(new ServerMessage(split[1], s.substring(s.indexOf(split[2]))));
-                    } else {
-                        client.sendMessage(new ServerMessage(split[1]));
+            } else if (Character.isDigit(split[0].charAt(0))) {
+                Long id = null;
+                id = Long.parseLong(split[0]);
+                if (id != null) {
+                    AuthendicatedClientMock client = clients.get(id);
+                    if (client != null) {
+                        if (split.length > 2) {
+                            client.sendMessage(new ServerMessage(split[1], s.substring(s.indexOf(split[2]))));
+                        } else {
+                            client.sendMessage(new ServerMessage(split[1]));
+                        }
                     }
                 }
-            }
-        } else {
-            AuthendicatedClientMock client = null;
-            for (AuthendicatedClientMock c : clients.values()) {
-                if (c.getAuthenticatedClient().getDisplayName().equals(split[0])) {
-                    client = c;
-                }
-            }
-            if (client != null) {
-                if (split.length > 2) {
-                    client.sendMessage(new ServerMessage(split[1], s.substring(s.indexOf(split[2]))));
-                } else {
-                    client.sendMessage(new ServerMessage(split[1]));
-                }
             } else {
-                clientQueue.put(new ClientMessage(split[0]));
+                if (split.length == 1) {
+                    clientQueue.offer(new ClientMessage(split[0]));
+                }
+                if (split.length == 2) {
+                    clientQueue.offer(new ClientMessage(split[0], split[1]));
+                }
+                if (split.length == 3) {
+                    clientQueue.offer(new ClientMessage(split[0], split[1], split[2]));
+                }
             }
         }
+
     }
 
     public static void main(String[] args) {
@@ -123,45 +124,58 @@ public class ServerMock {
             new ClientNetworkCore(clientCore.getNetworkSendQueue(), clientCore.getNetworkReceiveQueue(), fakeInternetQueue);
         new Thread(clientCore).start();
         new Thread(network).start();
-        BlockingQueue<ClientMessage> guiSendMessage = clientCore.getUserInputQueue();
         new Thread(new Runnable() {
 
             @Override
             public void run() {
-                mock.createConsole(fakeInternetQueue, guiSendMessage);
+                mock.createConsole(fakeInternetQueue, FakeGUI.input);
+            }
+
+        }).start();
+        new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                while (true) {
+                    try {
+                        ClientMessage msg = clientCore.getNetworkSendQueue().take();
+                        LOGGER.debug("Got message for server: " + msg);
+                        if (msg.getMessage().equals(MessageConstants.CONNECT)) {
+                            fakeInternetQueue.offer(new ClientMessage(MessageConstants.SERVER_WELCOME));
+                        }
+                        if (msg.getMessage().equals(MessageConstants.CLIENT_LOGIN_REQUEST)) {
+                            if (msg.getData().length < 2) {
+                                fakeInternetQueue.offer(new ClientMessage(MessageConstants.LOGIN_FAILED, "No credentials"));
+                            } else if (msg.getData()[0].equals("josch") && msg.getData()[1].equals("josch")) {
+                                fakeInternetQueue.offer(new ClientMessage(MessageConstants.LOGIN_SUCCESSFUL));
+                            } else {
+                                fakeInternetQueue.offer(new ClientMessage(MessageConstants.LOGIN_FAILED, "Invalid credentials"));
+                            }
+                        }
+                        if (msg.getMessage().equals(MessageConstants.CREATE_NEW_GAME_REQUEST)) {
+                            GameConfiguration gameConfig = new GameConfiguration();
+                            gameConfig.setMapName("newDataMap");
+                            gameConfig.setPlayerAffiliation(0L, (byte) 0);
+                            gameConfig.setPlayerCharacter(0L, "person");
+
+                            fakeInternetQueue.offer(new ClientMessage(MessageConstants.NEW_GAME_CREATED, gameConfig));
+
+                        }
+                    } catch (InterruptedException e) {
+                        LOGGER.error(e.getStackTrace());
+                    }
+                }
             }
 
         }).start();
         mock.png = new ShowPNG(null);
         mock.png.setVisible(true);
 
-        // mock.handleCommand(queue, "create-client Josch");
-        // mock.handleCommand(queue, "create-client Ilka");
-        // mock.handleCommand(queue, "create-client Client1");
-        // mock.handleCommand(queue, "create-client Client2");
-        // mock.handleCommand(queue, "create-client Client3");
-        // mock.handleCommand(queue, "create-client Client4");
-        // mock.handleCommand(queue, "create-client Client5");
-        // mock.handleCommand(queue, "create-client Client6");
-        // mock.handleCommand(queue, "Josch request:create_new_game");
-        // mock.handleCommand(queue, "Ilka request:join_game 1000");
-        // mock.handleCommand(queue, "Client1 request:join_game 1000");
-        // mock.handleCommand(queue, "Client2 request:join_game 1000");
-        // mock.handleCommand(queue, "Client3 request:join_game 1000");
-        // mock.handleCommand(queue, "Client4 request:join_game 1000");
-        // mock.handleCommand(queue, "Client5 request:join_game 1000");
-        // mock.handleCommand(queue, "Client6 request:join_game 1000");
-        // Thread.sleep(2000);
-        // mock.handleCommand(queue, "Josch request:start_game");
-        // Thread.sleep(2000);
-        // mock.handleCommand(queue, "Josch update_loading_progress 100");
-        // mock.handleCommand(queue, "Ilka update_loading_progress 100");
-        // mock.handleCommand(queue, "Client1 update_loading_progress 100");
-        // mock.handleCommand(queue, "Client2 update_loading_progress 100");
-        // mock.handleCommand(queue, "Client3 update_loading_progress 100");
-        // mock.handleCommand(queue, "Client4 update_loading_progress 100");
-        // mock.handleCommand(queue, "Client5 update_loading_progress 100");
-        // mock.handleCommand(queue, "Client6 update_loading_progress 100");
+        try {
+            mock.handleCommand(fakeInternetQueue, FakeGUI.input, "input:request:client_connect");
+        } catch (InterruptedException e) {
+        }
+
     }
 
 }
