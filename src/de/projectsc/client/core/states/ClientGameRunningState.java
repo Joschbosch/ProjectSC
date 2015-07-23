@@ -54,7 +54,7 @@ public class ClientGameRunningState extends ClientGameState {
     }
 
     @Override
-    public void loop() {}
+    public void loop(long tickTime) {}
 
     @Override
     public void handleMessage(ClientMessage msg) {
@@ -64,6 +64,24 @@ public class ClientGameRunningState extends ClientGameState {
 
     @Override
     public void handleMessages(List<ClientMessage> msg) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void readInput() {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void changeGUI() {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void render(long elapsed, long lag) {
         // TODO Auto-generated method stub
 
     }

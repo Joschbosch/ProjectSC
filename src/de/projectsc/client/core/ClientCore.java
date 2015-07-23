@@ -22,7 +22,7 @@ import de.projectsc.client.core.states.ClientGameState;
 import de.projectsc.client.core.states.ClientLoadingState;
 import de.projectsc.client.core.states.ClientLobbyState;
 import de.projectsc.client.core.states.ClientStates;
-import de.projectsc.core.data.messages.MessageConstants;
+import de.projectsc.client.guiFake.FakeGUI;
 import de.projectsc.server.core.game.GameContext;
 import de.projectsc.server.core.game.states.GameRunningState;
 import de.projectsc.server.core.game.states.States;
@@ -34,11 +34,7 @@ import de.projectsc.server.core.game.states.States;
  */
 public class ClientCore implements Runnable {
 
-    private static final int TICK_TIME = 50;
-
-    private static final int SLEEP_TIME = 10;
-
-    private static final String ERROR_IN_CORE = "Error in Core: ";
+    private static final int TICK_TIME = (int) GameRunningState.GAME_TICK_TIME;
 
     private static final Log LOGGER = LogFactory.getLog(ClientCore.class);
 
@@ -58,20 +54,27 @@ public class ClientCore implements Runnable {
 
     private LinkedBlockingQueue<ClientMessage> userInputQueue;
 
+    private GUI gui;
+
+    private boolean stateChanged;
+
     public ClientCore() {
         networkSendQueue = new LinkedBlockingQueue<>();
         networkReceiveQueue = new LinkedBlockingQueue<>();
-        setUserInputQueue(new LinkedBlockingQueue<>());
+        userInputQueue = new LinkedBlockingQueue<>();
     }
 
     @Override
     public void run() {
         LOGGER.debug("Starting core ... ");
+        gui = new FakeGUI();
+        gui.init();
         createAndBindFlow();
         clientRunning = true;
         gameContext = new ClientGameContext(this);
+        gameContext.setGUI(gui);
         flow.start(gameContext);
-
+        stateChanged = true;
         long previous = System.currentTimeMillis();
         long lag = 0;
         LOGGER.debug(String.format("Client started"));
@@ -81,16 +84,22 @@ public class ClientCore implements Runnable {
             previous = current;
             lag += elapsed;
             readServerMessages();
-            // read keyboard and mouse
-            readGUIInput();
-
-            while (lag >= GameRunningState.GAME_TICK_TIME) {
+            if (currenState != null) {
                 synchronized (LOCK_OBJECT) {
-                    if (currenState != null) {
-                        currenState.loop();
+                    if (stateChanged) {
+                        currenState.changeGUI();
+                        stateChanged = false;
                     }
+                    currenState.readInput();
+                    while (lag >= TICK_TIME) {
+                        currenState.loop(TICK_TIME);
+                        lag -= TICK_TIME;
+                    }
+                    if (currenState != null) {
+                        currenState.loop(lag);
+                    }
+                    currenState.render(elapsed, lag);
                 }
-                lag -= GameRunningState.GAME_TICK_TIME;
             }
             // render();
             long timeNeeded = System.currentTimeMillis() - current;
@@ -110,24 +119,16 @@ public class ClientCore implements Runnable {
     }
 
     private void readServerMessages() {
-        while (!networkReceiveQueue.isEmpty()) {
-            ClientMessage msg = networkReceiveQueue.poll();
-            LOGGER.debug("Got message from server: " + msg);
-        }
-    }
-
-    private void readGUIInput() {
-        while (!userInputQueue.isEmpty()) {
-            ClientMessage msg = userInputQueue.poll();
-            if (msg.getMessage().equals(MessageConstants.JOIN_GAME_REQUEST)) {
-                sendMessageToServer(new ClientMessage(MessageConstants.JOIN_GAME_REQUEST, 1000));
-            } else {
-                networkSendQueue.offer(msg);
+        if (currenState != null) {
+            while (!networkReceiveQueue.isEmpty()) {
+                ClientMessage msg = networkReceiveQueue.poll();
+                LOGGER.debug("Got message from server: " + msg);
+                currenState.handleMessage(msg);
             }
         }
     }
 
-    private void sendMessageToServer(ClientMessage clientMessage) {
+    public void sendMessageToServer(ClientMessage clientMessage) {
         networkSendQueue.offer(clientMessage);
     }
 
@@ -167,6 +168,7 @@ public class ClientCore implements Runnable {
     public void changeState(ClientGameState newState) {
         synchronized (LOCK_OBJECT) {
             currenState = newState;
+            stateChanged = true;
             LOGGER.debug("Set client state to " + gameContext.getState());
         }
     }

@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -23,7 +22,6 @@ import org.lwjgl.util.vector.Vector4f;
 import de.projectsc.client.gui.GUIMessage;
 import de.projectsc.client.gui.GUIMessageConstants;
 import de.projectsc.client.gui.GameFont;
-import de.projectsc.client.gui.content.GUICommand;
 import de.projectsc.client.gui.models.RawModel;
 import de.projectsc.client.gui.models.TexturedModel;
 import de.projectsc.client.gui.objects.Camera;
@@ -63,8 +61,6 @@ public class GameRunning implements State {
     private static final GUIState STATE = GUIState.GAME;
 
     private final BlockingQueue<GUIMessage> outgoingQueue;
-
-    private final BlockingQueue<GUICommand> drawableQueue = new LinkedBlockingQueue<>();
 
     private Loader loader;
 
@@ -285,16 +281,7 @@ public class GameRunning implements State {
     }
 
     @Override
-    public void handleInput(long elapsedTime) {
-        GUICommand command = drawableQueue.poll();
-        while (command != null) {
-            if (command.getMessage().equals(GUICommand.CHANGE_LOCATION)) {
-                LOGGER.debug("Changing location");
-            }
-            command = drawableQueue.poll();
-
-        }
-    }
+    public void handleInput(long elapsedTime) {}
 
     /**
      * Add new entitiy to gui rednering.

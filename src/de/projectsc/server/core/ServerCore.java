@@ -108,7 +108,7 @@ public class ServerCore implements Runnable {
             games.put(newGame.getGameID(), newGame);
             toRemove.add(client);
             sendMsgToAllClients(new ServerMessage(MessageConstants.CLIENT_LEFT_LOBBY, client.getId(), client.getDisplayName()));
-            client.sendMessage(new ServerMessage(MessageConstants.NEW_GAME_CREATED));
+            client.sendMessage(new ServerMessage(MessageConstants.NEW_GAME_CREATED, newGame.getConfiguration()));
         } else if (msg.getMessage().equals(MessageConstants.JOIN_GAME_REQUEST) && msg.getData() != null && msg.getData().length > 0) {
             try {
                 Long game = Long.valueOf(((String) msg.getData()[0]).trim());
@@ -152,6 +152,7 @@ public class ServerCore implements Runnable {
         } else if (msg.getMessage().equals(MessageConstants.CHAT_MESSAGE)) {
             sendMsgToAllClients(msg);
         } else if (msg.getMessage().equals(MessageConstants.NEW_CLIENT_CONNECTED)) {
+            LOGGER.debug("New Client connected to server!");
             NewClientConnectedServerMessage newClient = (NewClientConnectedServerMessage) msg;
             sendMsgToAllClients(new ServerMessage(MessageConstants.CLIENT_JOINED_LOBBY, newClient.getClient().getId(), newClient
                 .getClient().getDisplayName()));

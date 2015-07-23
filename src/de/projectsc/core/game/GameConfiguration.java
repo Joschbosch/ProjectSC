@@ -3,7 +3,7 @@
  * 
  * All rights reserved
  */
-package de.projectsc.server.core.game;
+package de.projectsc.core.game;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,13 +17,18 @@ public class GameConfiguration {
 
     private String mapName;
 
-    private final Map<Long, String> playerCharacters;
+    private Map<Long, String> playerCharacters;
 
-    private final Map<Long, Byte> playerAffiliation;
+    private Map<Long, Byte> playerAffiliation;
 
     public GameConfiguration() {
         playerCharacters = new HashMap<>();
         playerAffiliation = new HashMap<>();
+    }
+
+    public GameConfiguration(Map<Long, String> playerCharacters, Map<Long, Byte> playerAffiliation) {
+        this.playerCharacters = playerCharacters;
+        this.playerAffiliation = playerAffiliation;
     }
 
     /**
@@ -70,6 +75,10 @@ public class GameConfiguration {
         this.mapName = mapName;
     }
 
+    public void setPlayerAffiliation(Map<Long, Byte> playerAffiliation) {
+        this.playerAffiliation = playerAffiliation;
+    }
+
     /**
      * @param affiliation to count
      * @return number of players with that affiliation
@@ -84,4 +93,7 @@ public class GameConfiguration {
         return count;
     }
 
+    public void setPlayerCharacters(Map<Long, String> playerCharacters) {
+        this.playerCharacters = playerCharacters;
+    }
 }

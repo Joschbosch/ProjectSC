@@ -55,7 +55,25 @@ public class ClientLoadingState extends ClientGameState {
     }
 
     @Override
-    public void loop() {
+    public void loop(long tickTime) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void readInput() {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void changeGUI() {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void render(long elapsed, long lag) {
         // TODO Auto-generated method stub
 
     }

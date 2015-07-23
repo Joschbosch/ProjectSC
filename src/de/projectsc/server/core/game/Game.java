@@ -23,6 +23,7 @@ import de.projectsc.core.data.messages.GameMessageConstants;
 import de.projectsc.core.data.messages.MessageConstants;
 import de.projectsc.core.data.messages.MessageConstants;
 import de.projectsc.core.game.GameAttributes;
+import de.projectsc.core.game.GameConfiguration;
 import de.projectsc.server.core.AuthenticatedClient;
 import de.projectsc.server.core.ServerCommands;
 import de.projectsc.server.core.ServerConstants;
@@ -297,5 +298,9 @@ public class Game implements Runnable {
             returnString = "Game already running";
         }
         return returnString;
+    }
+
+    public GameConfiguration getConfiguration() {
+        return gameContext.getConfig();
     }
 }

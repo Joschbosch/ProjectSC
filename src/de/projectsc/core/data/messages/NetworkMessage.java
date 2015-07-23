@@ -10,10 +10,30 @@ package de.projectsc.core.data.messages;
  * 
  * @author Josch Bosch
  */
-public class NetworkMessage extends Message {
+public class NetworkMessage {
 
-    public NetworkMessage(String msg, Object data) {
-        super(msg, data);
+    private String msg;
+
+    private Object[] data;
+
+    public NetworkMessage() {
+
+    }
+
+    public String getMsg() {
+        return msg;
+    }
+
+    public void setMsg(String msg) {
+        this.msg = msg;
+    }
+
+    public Object[] getData() {
+        return data;
+    }
+
+    public void setData(Object... data) {
+        this.data = data;
     }
 
 }
