@@ -29,7 +29,7 @@ public final class ServerNetworkUtils {
     
     private static final int TCP_PORT = 54555;
     
-    private static final int UDP_PORT = 54556;
+    private static final int UDP_PORT =  54777;
   
     private ServerNetworkUtils() {}
     
@@ -44,7 +44,7 @@ public final class ServerNetworkUtils {
             try {
                 ((Server) endpoint).bind(TCP_PORT, UDP_PORT);
             } catch (IOException e) {
-                LOGGER.error("Failed to bind tcp and udp ports...", e);
+                LOGGER.error("Failed to bind ports...", e);
             }
         }
         

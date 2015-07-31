@@ -4,8 +4,6 @@
  
 package de.projectsc.server.core.client;
 
-import java.util.concurrent.BlockingQueue;
-
 import de.projectsc.server.core.messages.ServerMessage;
 
 /**
@@ -18,16 +16,10 @@ public abstract class Client {
     private final String displayName;
 
     private final long id;
-
-    private final BlockingQueue<ServerMessage> sendToClientQueue;
-
-    private final BlockingQueue<ServerMessage> receiveFromClientQueue;
     
-    public Client(String displayName, long id, BlockingQueue<ServerMessage> sendToClientQueue, BlockingQueue<ServerMessage> receiveFormClientQueue) {
+    public Client(String displayName, long id) {
         this.displayName = displayName;
         this.id = id;
-        this.sendToClientQueue = sendToClientQueue;
-        this.receiveFromClientQueue = receiveFormClientQueue;
     }
 
     public String getDisplayName() {
@@ -36,14 +28,6 @@ public abstract class Client {
     
     public long getId() {
         return id;
-    }
-    
-    public BlockingQueue<ServerMessage> getSendToClientQueue() {
-        return sendToClientQueue;
-    }
-    
-    public BlockingQueue<ServerMessage> getReceiveFromClientQueue() {
-        return receiveFromClientQueue;
     }
     
     public abstract void sendMessage(ServerMessage msg);

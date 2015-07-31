@@ -23,8 +23,18 @@ public class AuthenticatedClient extends Client {
 
     private  BlockingQueue<ServerMessage> receiveFromClientQueue;
     
-    public AuthenticatedClient(String displayName, long id, BlockingQueue<ServerMessage> sendToClientQueue, BlockingQueue<ServerMessage> receiveFromClientQueue) {
-        super(displayName, id,  sendToClientQueue, receiveFromClientQueue);
+    public AuthenticatedClient(String displayName, long id, BlockingQueue<ServerMessage> sendToClientQueue, BlockingQueue<ServerMessage> receiveFromClienQueue) {
+        super(displayName, id);
+        this.sendToClientQueue = sendToClientQueue;
+        this.receiveFromClientQueue = receiveFromClienQueue;
+    }
+    
+    public BlockingQueue<ServerMessage> getSendToClientQueue() {
+        return sendToClientQueue;
+    }
+    
+    public BlockingQueue<ServerMessage> getReceiveFromClientQueue() {
+        return receiveFromClientQueue;
     }
 
     @Override

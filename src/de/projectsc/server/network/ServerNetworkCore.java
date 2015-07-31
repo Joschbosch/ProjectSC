@@ -4,17 +4,25 @@
  
 package de.projectsc.server.network;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.esotericsoftware.kryonet.Connection;
-import com.esotericsoftware.kryonet.FrameworkMessage;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
 
 import de.projectsc.server.core.ServerCore;
+import de.projectsc.server.core.client.AuthenticatedClient;
+import de.projectsc.server.core.client.Client;
+import de.projectsc.server.core.messages.AuthentificationRequestServerMessage;
+import de.projectsc.server.core.messages.AuthentificationResponseServerMessage;
+import de.projectsc.server.core.messages.ClientDisconnectedServerMessage;
+import de.projectsc.server.core.messages.NewClientConnectedServerMessage;
 import de.projectsc.server.core.messages.ServerMessage;
 import de.projectsc.server.network.utils.ServerNetworkUtils;
 
@@ -35,6 +43,7 @@ public class ServerNetworkCore {
 			this.serverCore = serverCore;
 			this.coreQueue = coreQueue;
 			Server server = new Server();
+			new Thread(server).start();
 			server.addListener(new ClientListener(coreQueue));
 			ServerNetworkUtils.register(server);
 	}
@@ -52,6 +61,10 @@ class ClientListener extends Listener {
     
     private final BlockingQueue<ServerMessage> coreQueue;
     
+    private Map<Client, Thread> clientToSendThreadMap = new HashMap<>();
+    
+    private Client newClient;
+    
     public ClientListener(BlockingQueue<ServerMessage> coreQueue) {
         this.coreQueue = coreQueue;
     }
@@ -59,21 +72,32 @@ class ClientListener extends Listener {
     @Override
     public void connected(Connection client) {
         super.connected(client);
-        
+        coreQueue.add(new AuthentificationRequestServerMessage(client));
     }
     
     @Override
     public void disconnected(Connection client) {
         super.disconnected(client);
-        
+        coreQueue.add(new ClientDisconnectedServerMessage());
     }
     
     @Override
     public void received(Connection client, Object object) {
         super.received(client, object);
-        // this is necessary since kryonet sends heartbeats.
-        if (!(object instanceof FrameworkMessage)) {
-            
+        
+        if (object instanceof AuthentificationResponseServerMessage) {
+            if (((AuthentificationResponseServerMessage) object).isValid()) {
+                BlockingQueue<ServerMessage> sendQueue = new LinkedBlockingQueue<>();
+                BlockingQueue<ServerMessage> receiveQueue = new LinkedBlockingQueue<>();
+                client.setName("Josch");
+                newClient = new AuthenticatedClient("Josch", client.getID(), sendQueue, receiveQueue);
+                SendThread runnable = new SendThread();
+                Thread thread = new Thread(runnable);
+                clientToSendThreadMap.put(newClient, thread);
+                thread.start();
+                coreQueue.add(new NewClientConnectedServerMessage());
+                LOGGER.debug(String.format("New connection accepted: User %s ID %d", newClient.getDisplayName(), newClient.getId()));
+            }            
         }
         
     }

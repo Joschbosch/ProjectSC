@@ -24,7 +24,9 @@ public class AdminClient extends Client {
     private  BlockingQueue<ServerMessage> receiveFromClientQueue;
     
     public AdminClient(String displayName, long id, BlockingQueue<ServerMessage> sendToClientQueue, BlockingQueue<ServerMessage> receiveFromClientQueue) {
-        super(displayName, id,  sendToClientQueue, receiveFromClientQueue);
+        super(displayName, id);
+        this.sendToClientQueue = sendToClientQueue;
+        this.receiveFromClientQueue = receiveFromClientQueue;
     }
 
     @Override
