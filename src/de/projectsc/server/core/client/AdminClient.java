@@ -17,16 +17,14 @@ public class AdminClient extends Client {
     
     private String displayName;
 
-    private  long id;
+    private long id;
 
     private  BlockingQueue<ServerMessage> sendToClientQueue;
 
     private  BlockingQueue<ServerMessage> receiveFromClientQueue;
     
     public AdminClient(String displayName, long id, BlockingQueue<ServerMessage> sendToClientQueue, BlockingQueue<ServerMessage> receiveFromClientQueue) {
-        super(displayName, id);
-        this.sendToClientQueue = sendToClientQueue;
-        this.receiveFromClientQueue = receiveFromClientQueue;
+        super(displayName, id, sendToClientQueue, receiveFromClientQueue);
     }
 
     @Override

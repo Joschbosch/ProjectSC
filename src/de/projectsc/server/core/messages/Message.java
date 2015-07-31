@@ -5,10 +5,8 @@
 package de.projectsc.server.core.messages;
 
 /**
- * Message interface.
+ * Marker interface for messages.
  *
  * @author David Scholz
  */
-public interface Message {
-
-}
+public interface Message {}

@@ -35,17 +35,26 @@ public class ServerNetworkCore {
 	
     private static final Log LOGGER = LogFactory.getLog(ServerNetworkCore.class);
     
-	private ServerCore serverCore;
+	private final ServerCore serverCore;
 	
-	private BlockingQueue<ServerMessage> coreQueue;
+	private final BlockingQueue<ServerMessage> coreQueue;
 	
 	public ServerNetworkCore(ServerCore serverCore, BlockingQueue<ServerMessage> coreQueue) {
 			this.serverCore = serverCore;
 			this.coreQueue = coreQueue;
 			Server server = new Server();
+			LOGGER.debug("Server started...");
 			new Thread(server).start();
 			server.addListener(new ClientListener(coreQueue));
 			ServerNetworkUtils.register(server);
+	}
+	
+	public ServerCore getServerCore() {
+	    return serverCore;
+	}
+	
+	public BlockingQueue<ServerMessage> getCoreQueue() {
+	    return coreQueue;
 	}
 
 }
@@ -79,6 +88,7 @@ class ClientListener extends Listener {
     public void disconnected(Connection client) {
         super.disconnected(client);
         coreQueue.add(new ClientDisconnectedServerMessage());
+        clientToSendThreadMap.get(client).interrupt();
     }
     
     @Override
@@ -91,7 +101,7 @@ class ClientListener extends Listener {
                 BlockingQueue<ServerMessage> receiveQueue = new LinkedBlockingQueue<>();
                 client.setName("Josch");
                 newClient = new AuthenticatedClient("Josch", client.getID(), sendQueue, receiveQueue);
-                SendThread runnable = new SendThread();
+                SendThread runnable = new SendThread(newClient, client);
                 Thread thread = new Thread(runnable);
                 clientToSendThreadMap.put(newClient, thread);
                 thread.start();

@@ -24,4 +24,9 @@ public class AuthentificationRequestServerMessage extends ServerMessage {
         return client;
     }
 
+    @Override
+    public Connection getConnection() {
+        return client;
+    }
+
 }

@@ -26,8 +26,9 @@ public class AuthentificationResponseServerMessage extends ServerMessage {
     public boolean isValid() {
         return accepted;
     }
-    
-    public Connection getClient() {
+
+    @Override
+    public Connection getConnection() {
         return client;
     }
 
