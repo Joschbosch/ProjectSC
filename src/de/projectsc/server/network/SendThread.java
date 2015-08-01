@@ -25,7 +25,7 @@ public class SendThread implements Runnable {
         this.client = client;
         this.connection = connection;
     }
-
+    
     @Override
     public void run() {
         while(!Thread.currentThread().isInterrupted()) {

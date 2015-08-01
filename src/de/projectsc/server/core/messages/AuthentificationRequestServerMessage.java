@@ -29,4 +29,10 @@ public class AuthentificationRequestServerMessage extends ServerMessage {
         return client;
     }
 
+    @Override
+    public String getMessage() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
 }

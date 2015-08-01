@@ -9,4 +9,6 @@ package de.projectsc.server.core.messages;
  *
  * @author David Scholz
  */
-public interface Message {}
+public interface Message {
+    String getMessage();
+}
