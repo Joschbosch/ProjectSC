@@ -47,7 +47,7 @@ public class GUICore implements GUI {
 
     @Override
     public void load() {
-        game = new GameRunning(null);
+        game = new GameRunning();
         game.initialize();
     }
 

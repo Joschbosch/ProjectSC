@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.concurrent.BlockingQueue;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -19,9 +18,6 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Vector4f;
 
-import de.projectsc.client.gui.GUIMessage;
-import de.projectsc.client.gui.GUIMessageConstants;
-import de.projectsc.client.gui.GameFont;
 import de.projectsc.client.gui.models.RawModel;
 import de.projectsc.client.gui.models.TexturedModel;
 import de.projectsc.client.gui.objects.Camera;
@@ -59,8 +55,6 @@ public class GameRunning implements State {
     private static final Log LOGGER = LogFactory.getLog(GameRunning.class);
 
     private static final GUIState STATE = GUIState.GAME;
-
-    private final BlockingQueue<GUIMessage> outgoingQueue;
 
     private Loader loader;
 
@@ -100,15 +94,13 @@ public class GameRunning implements State {
 
     private Map<String, Integer> textureMap;
 
-    public GameRunning(BlockingQueue<GUIMessage> outgoingQueue) {
-        this.outgoingQueue = outgoingQueue;
+    public GameRunning() {
         movingEntities = new TreeMap<>();
     }
 
     @Override
     public void initialize() {
         LOGGER.debug("Loading models and light ... ");
-        GameFont.loadFonts();
         loader = new Loader();
         masterRenderer = new MasterRenderer(loader);
         waterfbo = new WaterFrameBuffers();
@@ -259,7 +251,7 @@ public class GameRunning implements State {
             }
         }
         if (Mouse.isButtonDown(0)) {
-            outgoingQueue.offer(new GUIMessage(GUIMessageConstants.POINT_ON_MAP_CLICKED, mousePicker.getCurrentTerrainPoint()));
+            // outgoingQueue.offer(new GUIMessage(GUIMessageConstants.POINT_ON_MAP_CLICKED, mousePicker.getCurrentTerrainPoint()));
         }
 
     }

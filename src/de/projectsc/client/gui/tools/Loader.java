@@ -16,6 +16,8 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -45,6 +47,8 @@ public class Loader {
     private static final float MIPMAP_BIAS = 0.5f;
 
     private static final Log LOGGER = LogFactory.getLog(Loader.class);
+
+    private static Map<String, Integer> textureMap = new TreeMap<>();
 
     private final List<Integer> vaos = new ArrayList<>();
 
@@ -100,7 +104,13 @@ public class Loader {
      * @return location of texture
      */
     public int loadTexture(String filename) {
-        return loadTexture(Loader.class.getResourceAsStream("/graphics/" + filename), "PNG");
+        if (textureMap.containsKey(filename)) {
+            return textureMap.get(filename);
+        } else {
+            int textureID = loadTexture(Loader.class.getResourceAsStream("/graphics/" + filename), "PNG");
+            textureMap.put(filename, textureID);
+            return textureID;
+        }
     }
 
     /**

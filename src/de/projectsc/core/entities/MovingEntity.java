@@ -11,7 +11,6 @@ import java.util.Queue;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
-import de.projectsc.client.gui.Timer;
 import de.projectsc.core.Terrain;
 import de.projectsc.core.Tile;
 
@@ -52,7 +51,7 @@ public class MovingEntity extends WorldEntity {
      * @param delta elapsed time
      */
     public void move(float delta) {
-        delta = (delta / Timer.SECONDS_CONSTANT);
+        delta = (delta / 1000.0f);
         increaseRotation(0, currentTurnSpeed * delta, 0);
         if (Vector3f.sub(getPosition(), getCurrentTarget(), null).lengthSquared() > 2) {
             currentSpeed = MOVEMENT_SPEED;
@@ -86,7 +85,7 @@ public class MovingEntity extends WorldEntity {
      * @return new position.
      */
     public Vector3f getNextPosition(float delta) {
-        delta = (delta / Timer.SECONDS_CONSTANT);
+        delta = (delta / 1000.0f);
         increaseRotation(0, currentTurnSpeed * delta, 0);
         if (Vector3f.sub(getPosition(), getCurrentTarget(), null).lengthSquared() > 3) {
             currentSpeed = MOVEMENT_SPEED;

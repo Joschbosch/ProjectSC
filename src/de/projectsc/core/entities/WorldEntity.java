@@ -34,9 +34,9 @@ public abstract class WorldEntity implements Comparable<WorldEntity>, PhysicalOb
 
     protected EntityType type;
 
-    protected Vector3f position;
-
     protected BoundingBox boundingBox;
+
+    protected Vector3f position;
 
     protected final Vector3f rotation;
 

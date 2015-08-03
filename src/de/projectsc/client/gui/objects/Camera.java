@@ -11,8 +11,6 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
 
-import de.projectsc.client.gui.Timer;
-
 /**
  * Class for moving around in the world.
  * 
@@ -153,8 +151,8 @@ public class Camera {
     }
 
     private void calculateCameraPosition(float delta) {
-        position.x = position.x + delta / Timer.SECONDS_CONSTANT * currentSpeedX;
-        position.z = position.z + delta / Timer.SECONDS_CONSTANT * currentSpeedZ;
+        position.x = position.x + delta / 1000.0f * currentSpeedX;
+        position.z = position.z + delta / 1000.0f * currentSpeedZ;
     }
 
     private void calculateCameraPosition(float horizontalDistance, float verticalDistance) {

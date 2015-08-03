@@ -6,6 +6,7 @@
 package de.projectsc.editor;
 
 import java.awt.Canvas;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
@@ -15,6 +16,7 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
 import de.projectsc.client.gui.objects.Camera;
@@ -28,6 +30,8 @@ import de.projectsc.client.gui.tools.Loader;
 import de.projectsc.client.gui.tools.MousePicker;
 import de.projectsc.core.Terrain;
 import de.projectsc.core.TerrainLoader;
+import de.projectsc.core.Tile;
+import de.projectsc.core.entities.WorldEntity;
 
 /**
  * Core class for the GUI.
@@ -71,7 +75,7 @@ public class Editor3DCore implements Runnable {
         running = true;
         try {
             Display.setDisplayMode(new DisplayMode(width, height));
-            Display.setTitle("Project SC Editor");
+            Display.setTitle("Project SC Entity Editor");
             Display.setVSyncEnabled(true);
             Display.setParent(displayParent);
             Display.create();
@@ -79,8 +83,26 @@ public class Editor3DCore implements Runnable {
         } catch (LWJGLException e) {
         }
         loader = new Loader();
+
         masterRenderer = new MasterRenderer(loader);
         camera = new Camera(null);
+
+        Tile[][] tiles = new Tile[1000][1000];
+        lights = new LinkedList<>();
+        lights.add(new Light(new Vector3f(0.0f, 100.0f, 0.0f), new Vector3f(1.0f, 1.0f, 1.0f), "sun"));
+        Terrain t =
+            new Terrain(tiles, "terrain/mud.png", "terrain/mud.png", "terrain/mud.png", "terrain/mud.png", lights,
+                new HashMap<Integer, WorldEntity>());
+
+        TerrainTexture backgroundTex = new TerrainTexture(loader.loadTexture("terrain/mud.png"));
+        TerrainTexture rTex = new TerrainTexture(loader.loadTexture("terrain/mud.png"));
+        TerrainTexture gTex = new TerrainTexture(loader.loadTexture("terrain/mud.png"));
+        TerrainTexture bTex = new TerrainTexture(loader.loadTexture("terrain/mud.png"));
+        TerrainTexturePack texturePack = new TerrainTexturePack(backgroundTex, rTex, gTex, bTex);
+        TerrainTexture blendMap = new TerrainTexture(loader.loadTexture(TerrainLoader.createBlendMap(t)));
+
+        terrainModel = new TerrainModel(t, -0.5f, -0.5f, texturePack, blendMap, loader);
+
         mousePicker = new MousePicker(camera, masterRenderer.getProjectionMatrix(), terrainModel);
         gameLoop();
     }
