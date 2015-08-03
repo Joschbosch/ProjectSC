@@ -40,8 +40,10 @@ public class Entity {
     }
 
     public void update(ComponentType type) {
-        for (Component c : typeMap.get(type)) {
-            c.update(this);
+        if (typeMap.get(type) != null) {
+            for (Component c : typeMap.get(type)) {
+                c.update(this);
+            }
         }
     }
 

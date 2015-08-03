@@ -68,16 +68,16 @@ public class MovingComponent extends Component {
     @Override
     public void update(Entity owner) {
         long delta = 15;
-        if (!(Math.abs((targetRotation - owner.getRotY())) < 1)) {
-            if (targetRotation > owner.getRotY()) {
-                increaseRotation(owner, 0f, TURN_SPEED * delta, 0f);
-            } else {
-                increaseRotation(owner, 0f, -TURN_SPEED * delta, 0f);
-            }
-        } else {
-            owner.setRotY(targetRotation);
-        }
-        if (Vector3f.sub(owner.getPosition(), nextTarget, null).lengthSquared() > 2) {
+        // if (!(Math.abs((targetRotation - owner.getRotY())) < 1)) {
+        // if (targetRotation > owner.getRotY()) {
+        // increaseRotation(owner, 0f, TURN_SPEED * delta, 0f);
+        // } else {
+        // increaseRotation(owner, 0f, -TURN_SPEED * delta, 0f);
+        // }
+        // } else {
+        owner.setRotY(0);
+        // }
+        if (nextTarget != null && Vector3f.sub(owner.getPosition(), nextTarget, null).lengthSquared() > 2) {
             currentSpeed = MOVEMENT_SPEED;
         } else {
             if (path != null) {

@@ -48,6 +48,8 @@ public class Camera {
 
     private static final int SCROLL_MARGIN = 15;
 
+    private static final boolean NO_CAMERA_MOVING = false;
+
     private final Vector3f position = new Vector3f(0, 80f, 0);
 
     private float pitch = 5 * 10;
@@ -84,6 +86,9 @@ public class Camera {
      * @param delta elapsed time.
      */
     public void move(float delta) {
+        if (NO_CAMERA_MOVING) {
+            return;
+        }
         if (!MOBA_MODE) {
             calculateZoom();
             calculatePitch();

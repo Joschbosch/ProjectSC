@@ -70,6 +70,8 @@ public class Editor3DCore implements Runnable {
 
     private final List<Entity> entities = new LinkedList<>();
 
+    private Entity firstEntity;
+
     public Editor3DCore(Canvas displayParent, int width, int height, BlockingQueue<String> messageQueue) {
 
         this.displayParent = displayParent;
@@ -116,18 +118,17 @@ public class Editor3DCore implements Runnable {
 
         mousePicker = new MousePicker(camera, masterRenderer.getProjectionMatrix(), terrainModel);
 
-        Entity firstEntity = new Entity(10000);
+        firstEntity = new Entity(10000);
         firstEntity.setPosition(new Vector3f(0, 0, 0));
         firstEntity.setRotation(new Vector3f(0, 0, 0));
         firstEntity.setScale(1.0f);
         ModelAndTextureComponent modelComponent = new ModelAndTextureComponent();
+        modelComponent.loadModel(loader, firstEntity);
         firstEntity.addComponent(modelComponent);
-        EmittingLightComponent lightComponent = new EmittingLightComponent();
-        lightComponent.createAndAddLight(firstEntity, new Vector3f(1.0f, 1.0f, 1.0f), "oneLight");
-        firstEntity.addComponent(lightComponent);
+        firstEntity.setScale(1.0f);
 
         MovingComponent moving = new MovingComponent();
-        moving.setCurrentSpeed(10);
+        // moving.setCurrentSpeed(0.01f);
         firstEntity.addComponent(moving);
         entities.add(firstEntity);
         gameLoop();
@@ -136,6 +137,7 @@ public class Editor3DCore implements Runnable {
     protected void initGL() {}
 
     protected void gameLoop() {
+
         long time = System.currentTimeMillis();
         while (running) {
             long now = System.currentTimeMillis();
@@ -177,7 +179,11 @@ public class Editor3DCore implements Runnable {
     }
 
     public void loadMap() {
-        loadTerrain("map");
+        EmittingLightComponent lightComponent = new EmittingLightComponent();
+        Light l = new Light(new Vector3f(0f, 100f, 0f), new Vector3f(1.0f, 1.0f, 1.0f), "oneLight");
+        lightComponent.addLight(firstEntity, l);
+        firstEntity.addComponent(lightComponent);
+        // loadTerrain("map");
     }
 
     private void loadTerrain(String mapName) {

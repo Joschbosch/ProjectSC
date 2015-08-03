@@ -70,12 +70,13 @@ public class ModelAndTextureComponent extends Component {
     }
 
     public void loadModel(Loader loader, Entity owner) {
-        ModelData data = NewOBJFileLoader.loadOBJ("M" + owner.getEntityTypeId() + "/model.obj");
+        ModelData data = NewOBJFileLoader.loadOBJ("M" + owner.getEntityTypeId());
         model = loader.loadToVAO(data.getVertices(), data.getTextureCoords(), data.getNormals(), data.getIndices());
         int texture = 0 - 1;
         try {
-            File textureFile = new File(this.getClass().getResource("model/M" + owner.getEntityTypeId() + "/texture.obj").toURI());
-            loader.loadTexture(textureFile);
+            File textureFile =
+                new File(this.getClass().getResource("/model/M" + owner.getEntityTypeId() + "/texture.png").toURI());
+            texture = loader.loadTexture(textureFile);
         } catch (URISyntaxException e) {
             LOGGER.error("Could not load texture for " + owner.getEntityTypeId());
         }

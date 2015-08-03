@@ -67,4 +67,9 @@ public class EmittingLightComponent extends Component {
         lights.add(l);
         offsets.put(l, offset);
     }
+
+    public void removeLight(Light l) {
+        lights.remove(l);
+        offsets.remove(l);
+    }
 }

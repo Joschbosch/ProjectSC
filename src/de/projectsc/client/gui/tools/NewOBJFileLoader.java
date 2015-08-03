@@ -54,7 +54,10 @@ public final class NewOBJFileLoader {
         BufferedReader reader = null;
         try {
             FileReader isr = null;
-            File objFile = new File(NewOBJFileLoader.class.getResource(RES_LOC + objFileName + ".obj").toURI());
+            System.out.println(RES_LOC + objFileName + "/model.obj");
+            System.out.println(NewOBJFileLoader.class.getResource(RES_LOC + objFileName + "/model.obj"));
+            File objFile = new File(NewOBJFileLoader.class.getResource(RES_LOC + objFileName + "/model.obj").toURI());
+            System.out.println(objFile.getAbsolutePath());
             isr = new FileReader(objFile);
             reader = new BufferedReader(isr);
         } catch (FileNotFoundException | URISyntaxException e) {
@@ -69,8 +72,10 @@ public final class NewOBJFileLoader {
             try {
                 while (true) {
                     line = reader.readLine();
+                    System.out.println(line);
                     if (line.startsWith("v ")) {
-                        String[] currentLine = line.split(" ");
+                        String[] currentLine = line.split("\\s");
+                        System.out.println(currentLine[1]);
                         Vector3f vertex = new Vector3f(Float.valueOf(currentLine[1]),
                             Float.valueOf(currentLine[2]),
                             Float.valueOf(currentLine[3]));
