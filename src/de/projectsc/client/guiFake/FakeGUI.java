@@ -25,7 +25,7 @@ import de.projectsc.core.data.messages.MessageConstants;
 
 public class FakeGUI implements GUI {
 
-    private static Log LOGGER = LogFactory.getLog(FakeGUI.class);
+    private static final Log LOGGER = LogFactory.getLog(FakeGUI.class);
 
     public static Queue<ClientMessage> input = new LinkedList<>();
 

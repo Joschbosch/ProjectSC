@@ -8,6 +8,7 @@ package de.projectsc.client.gui.render;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -24,7 +25,8 @@ import de.projectsc.client.gui.shaders.EntityShader;
 import de.projectsc.client.gui.shaders.TerrainShader;
 import de.projectsc.client.gui.terrain.TerrainModel;
 import de.projectsc.client.gui.tools.Loader;
-import de.projectsc.core.components.ModelAndTextureComponent;
+import de.projectsc.core.components.impl.EmittingLightComponent;
+import de.projectsc.core.components.impl.ModelAndTextureComponent;
 import de.projectsc.core.entities.Entity;
 
 /**
@@ -94,12 +96,16 @@ public class NewMasterRenderer {
      * @param clipPlane to clip the world
      */
     public void renderScene(TerrainModel terrain, List<Entity> entities,
-        List<Light> lights,
         Camera camera, long elapsedTime, Vector4f clipPlane) {
+        List<Light> lights = new LinkedList<>();
         processTerrain(terrain);
         for (Entity e : entities) {
             if (e.getComponent(ModelAndTextureComponent.class) != null) {
                 processEntity(e, e.getComponent(ModelAndTextureComponent.class));
+            }
+            if (e.getComponent(EmittingLightComponent.class) != null) {
+                EmittingLightComponent lightComp = e.getComponent(EmittingLightComponent.class);
+                lights.addAll(lightComp.getLights());
             }
         }
         render(lights, camera, elapsedTime, clipPlane);

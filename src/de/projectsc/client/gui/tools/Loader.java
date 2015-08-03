@@ -120,10 +120,17 @@ public class Loader {
      * @return location of texture
      */
     public int loadTexture(File file) {
-        try {
-            return loadTexture(new FileInputStream(file), "PNG");
-        } catch (FileNotFoundException e) {
-            LOGGER.error(e);
+        if (textureMap.containsKey(file.getAbsolutePath())) {
+            return textureMap.get(file.getAbsolutePath());
+        } else {
+            try {
+                int texId = loadTexture(new FileInputStream(file), "PNG");
+                textureMap.put(file.getAbsolutePath(), texId);
+
+                return texId;
+            } catch (FileNotFoundException e) {
+                LOGGER.error(e);
+            }
         }
         return 0 - 1;
     }

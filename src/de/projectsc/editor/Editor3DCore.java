@@ -20,9 +20,10 @@ import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
 import de.projectsc.client.gui.objects.Camera;
-import de.projectsc.client.gui.objects.GraphicalEntity;
 import de.projectsc.client.gui.objects.Light;
-import de.projectsc.client.gui.render.MasterRenderer;
+import de.projectsc.client.gui.render.NewEntityRenderer;
+import de.projectsc.client.gui.render.NewMasterRenderer;
+import de.projectsc.client.gui.shaders.EntityShader;
 import de.projectsc.client.gui.terrain.TerrainModel;
 import de.projectsc.client.gui.textures.TerrainTexture;
 import de.projectsc.client.gui.textures.TerrainTexturePack;
@@ -31,6 +32,11 @@ import de.projectsc.client.gui.tools.MousePicker;
 import de.projectsc.core.Terrain;
 import de.projectsc.core.TerrainLoader;
 import de.projectsc.core.Tile;
+import de.projectsc.core.components.ComponentType;
+import de.projectsc.core.components.impl.EmittingLightComponent;
+import de.projectsc.core.components.impl.ModelAndTextureComponent;
+import de.projectsc.core.components.impl.MovingComponent;
+import de.projectsc.core.entities.Entity;
 import de.projectsc.core.entities.WorldEntity;
 
 /**
@@ -50,7 +56,7 @@ public class Editor3DCore implements Runnable {
 
     private Loader loader;
 
-    private MasterRenderer masterRenderer;
+    private NewEntityRenderer entityRenderer;
 
     private Camera camera;
 
@@ -58,9 +64,11 @@ public class Editor3DCore implements Runnable {
 
     private TerrainModel terrainModel;
 
-    private List<Light> lights;
-
     private final BlockingQueue<String> messageQueue;
+
+    private NewMasterRenderer masterRenderer;
+
+    private final List<Entity> entities = new LinkedList<>();
 
     public Editor3DCore(Canvas displayParent, int width, int height, BlockingQueue<String> messageQueue) {
 
@@ -84,11 +92,14 @@ public class Editor3DCore implements Runnable {
         }
         loader = new Loader();
 
-        masterRenderer = new MasterRenderer(loader);
         camera = new Camera(null);
+        EntityShader shader = new EntityShader();
+        masterRenderer = new NewMasterRenderer(loader);
+
+        entityRenderer = new NewEntityRenderer(shader, masterRenderer.getProjectionMatrix());
 
         Tile[][] tiles = new Tile[1000][1000];
-        lights = new LinkedList<>();
+        List<Light> lights = new LinkedList<>();
         lights.add(new Light(new Vector3f(0.0f, 100.0f, 0.0f), new Vector3f(1.0f, 1.0f, 1.0f), "sun"));
         Terrain t =
             new Terrain(tiles, "terrain/mud.png", "terrain/mud.png", "terrain/mud.png", "terrain/mud.png", lights,
@@ -104,6 +115,21 @@ public class Editor3DCore implements Runnable {
         terrainModel = new TerrainModel(t, -0.5f, -0.5f, texturePack, blendMap, loader);
 
         mousePicker = new MousePicker(camera, masterRenderer.getProjectionMatrix(), terrainModel);
+
+        Entity firstEntity = new Entity(10000);
+        firstEntity.setPosition(new Vector3f(0, 0, 0));
+        firstEntity.setRotation(new Vector3f(0, 0, 0));
+        firstEntity.setScale(1.0f);
+        ModelAndTextureComponent modelComponent = new ModelAndTextureComponent();
+        firstEntity.addComponent(modelComponent);
+        EmittingLightComponent lightComponent = new EmittingLightComponent();
+        lightComponent.createAndAddLight(firstEntity, new Vector3f(1.0f, 1.0f, 1.0f), "oneLight");
+        firstEntity.addComponent(lightComponent);
+
+        MovingComponent moving = new MovingComponent();
+        moving.setCurrentSpeed(10);
+        firstEntity.addComponent(moving);
+        entities.add(firstEntity);
         gameLoop();
     }
 
@@ -116,11 +142,15 @@ public class Editor3DCore implements Runnable {
             long delta = now - time;
             time = now;
             Display.update();
-
+            for (ComponentType type : ComponentType.values()) {
+                for (Entity e : entities) {
+                    e.update(type);
+                }
+            }
             if (terrainModel != null) {
                 camera.move(delta);
                 mousePicker.update();
-                masterRenderer.renderScene(terrainModel, new LinkedList<GraphicalEntity>(), new LinkedList<GraphicalEntity>(), lights,
+                masterRenderer.renderScene(terrainModel, entities,
                     camera, delta, new Vector4f(0, 1, 0, 100000));
             } else {
                 if (Keyboard.isKeyDown(Keyboard.KEY_SPACE)) {
@@ -160,7 +190,7 @@ public class Editor3DCore implements Runnable {
         TerrainTexture blendMap = new TerrainTexture(loader.loadTexture(TerrainLoader.createBlendMap(terrain)));
 
         terrainModel = new TerrainModel(terrain, 0, 0, texturePack, blendMap, loader);
-        lights = terrain.getStaticLights();
+        // lights = terrain.getStaticLights();
         // if (staticEntities == null) {
         // staticEntities = new TreeMap<>();
         // }

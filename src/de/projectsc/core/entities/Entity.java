@@ -1,23 +1,22 @@
 /*
- * Copyright (C) 2015 
+ * Copyright (C) 2015
  */
 
 package de.projectsc.core.entities;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.core.components.Component;
+import de.projectsc.core.components.ComponentType;
 
 public class Entity {
 
     private static int idCount = 1000;
-
-    private final long ENTITY_TYPE_ID;
-
-    private final long ENTITY_UNIQUE_ID;
 
     protected Vector3f position;
 
@@ -27,23 +26,41 @@ public class Entity {
 
     protected Map<Class<? extends Component>, Component> components;
 
+    protected Map<ComponentType, List<Component>> typeMap = new HashMap<>();
+
+    private final long entityTypeID;
+
+    private final long entityUID;
+
     public Entity(long entityTypeId) {
         super();
-        ENTITY_TYPE_ID = entityTypeId;
-        ENTITY_UNIQUE_ID = idCount++;
+        entityTypeID = entityTypeId;
+        entityUID = idCount++;
         components = new HashMap<>();
     }
 
+    public void update(ComponentType type) {
+        for (Component c : typeMap.get(type)) {
+            c.update(this);
+        }
+    }
+
     public long getEntityTypeId() {
-        return ENTITY_TYPE_ID;
+        return entityTypeID;
     }
 
     public long getID() {
-        return ENTITY_UNIQUE_ID;
+        return entityUID;
     }
 
     public void addComponent(Component c) {
         components.put(c.getClass(), c);
+        List<Component> type = typeMap.get(c.getType());
+        if (type == null) {
+            type = new LinkedList<>();
+            typeMap.put(c.getType(), type);
+        }
+        type.add(c);
     }
 
     public <T> T getComponent(Class<T> clazz) {
@@ -52,5 +69,56 @@ public class Entity {
 
     public Map<Class<? extends Component>, Component> getComponents() {
         return components;
+    }
+
+    public Vector3f getPosition() {
+        return position;
+    }
+
+    public Vector3f getRotation() {
+        return rotation;
+    }
+
+    public float getScale() {
+        return scale;
+    }
+
+    public float getRotX() {
+        if (rotation != null) {
+            return rotation.x;
+        }
+        return 0;
+    }
+
+    public float getRotY() {
+        if (rotation != null) {
+            return rotation.y;
+        }
+        return 0;
+    }
+
+    public float getRotZ() {
+        if (rotation != null) {
+            return rotation.z;
+        }
+        return 0;
+    }
+
+    public void setPosition(Vector3f position) {
+        this.position = position;
+    }
+
+    public void setRotation(Vector3f rotation) {
+        this.rotation = rotation;
+    }
+
+    public void setScale(float scale) {
+        this.scale = scale;
+    }
+
+    public void setRotY(float targetRotation) {
+        if (this.rotation != null) {
+            this.rotation.y = targetRotation;
+        }
     }
 }

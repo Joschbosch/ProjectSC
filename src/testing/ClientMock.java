@@ -216,7 +216,7 @@ class AuthendicatedClientMock {
 
     private static long idCount = 0;
 
-    private static Log LOGGER = LogFactory.getLog(AuthendicatedClientMock.class);
+    private static final Log LOGGER = LogFactory.getLog(AuthendicatedClientMock.class);
 
     private final long id;
 

@@ -1,7 +1,8 @@
 /*
- * Copyright (C) 2015 
+ * Copyright (C) 2015 Project SC
+ * 
+ * All rights reserved
  */
-
 package de.projectsc.core.components;
 
 import de.projectsc.core.entities.Entity;
@@ -17,6 +18,10 @@ public abstract class Component {
     }
 
     public abstract void update(Entity owner);
+
+    public void receiveMessage(ComponentMessage message) {
+
+    }
 
     public ComponentType getType() {
         return type;
