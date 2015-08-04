@@ -54,6 +54,7 @@ import de.projectsc.core.components.impl.EmittingLightComponent;
 import de.projectsc.core.components.impl.MovingComponent;
 import de.projectsc.editor.Editor3DCore;
 import de.projectsc.editor.EditorData;
+import de.projectsc.editor.componentViews.EmittingLightComponentView;
 
 /**
  * Entity editor.
@@ -279,6 +280,21 @@ public class EntityEditor extends JFrame {
 
         JButton editComponentButton = new JButton("Edit");
         editComponentButton.setBounds(115, 65, 95, 23);
+        editComponentButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (componentList.getSelectedValue() != null && !componentList.getSelectedValue().isEmpty()) {
+                    if (componentList.getSelectedValue().equals(EmittingLightComponent.name)) {
+                        EmittingLightComponent component = (EmittingLightComponent) editor3dCore.getComponent(EmittingLightComponent.name);
+                        EmittingLightComponentView dialog =
+                            new EmittingLightComponentView(component, editor3dCore.getCurrentEntity());
+                        dialog.setSize(800, 600);
+                        dialog.show();
+                    }
+                }
+            }
+        });
         componentPanel.add(editComponentButton);
 
         JButton removeComponentButton = new JButton("Remove");
@@ -575,6 +591,23 @@ public class EntityEditor extends JFrame {
         menueFile.add(menueItemNew);
 
         JMenuItem menueItemSave = new JMenuItem("Save");
+        menueItemSave.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (verifyID()) {
+                    File folder;
+                    try {
+                        folder = new File(EntityEditor.class.getResource("/model/").toURI());
+                        File targetFolder = new File(folder, "M" + Integer.parseInt(idTextfield.getText()));
+
+                    } catch (URISyntaxException e1) {
+                        LOGGER.error("Could not write EntitySchema: ", e1);
+                    }
+                }
+            }
+
+        });
         menueFile.add(menueItemSave);
 
         JMenuItem menueItemLoad = new JMenuItem("Load");
@@ -662,6 +695,34 @@ public class EntityEditor extends JFrame {
         }
     }
 
+    private boolean verifyID() {
+        boolean isvalid = true;
+        String text = idTextfield.getText();
+        int id = Integer.parseInt(text);
+        try {
+            File folder = new File(EntityEditor.class.getResource("/model/").toURI());
+            File folder2 = new File(folder, "M" + id);
+            if (folder2.exists()) {
+                isvalid = false;
+            }
+        } catch (URISyntaxException e) {
+            LOGGER.error("Could not load folder with id " + id);
+        }
+        if (id < EntityEditor.MINIMUM_ID) {
+            isvalid = false;
+        }
+
+        if (isvalid) {
+            idTextfield.setBackground(Color.WHITE);
+        } else {
+            idTextfield.setBackground(Color.RED);
+        }
+        if (isvalid) {
+            data.setId(id);
+        }
+        return isvalid;
+    }
+
     /**
      * Listener for id textfield.
      * 
@@ -689,31 +750,5 @@ public class EntityEditor extends JFrame {
             }
         }
 
-        private void verifyID() {
-            boolean isvalid = true;
-            String text = idTextfield.getText();
-            int id = Integer.parseInt(text);
-            try {
-                File folder = new File(EntityEditor.class.getResource("/model/").toURI());
-                File folder2 = new File(folder, "M" + id);
-                if (folder2.exists()) {
-                    isvalid = false;
-                }
-            } catch (URISyntaxException e) {
-                LOGGER.error("Could not load folder with id " + id);
-            }
-            if (id < EntityEditor.MINIMUM_ID) {
-                isvalid = false;
-            }
-
-            if (isvalid) {
-                idTextfield.setBackground(Color.WHITE);
-            } else {
-                idTextfield.setBackground(Color.RED);
-            }
-            if (isvalid) {
-                data.setId(id);
-            }
-        }
     }
 }

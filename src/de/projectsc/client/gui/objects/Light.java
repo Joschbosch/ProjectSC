@@ -12,7 +12,7 @@ import org.lwjgl.util.vector.Vector3f;
  * 
  * @author Josch Bosch
  */
-public class Light {
+public class Light implements Comparable<Light> {
 
     private Vector3f position;
 
@@ -69,6 +69,11 @@ public class Light {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    @Override
+    public int compareTo(Light o) {
+        return getName().compareTo(o.getName());
     }
 
 }

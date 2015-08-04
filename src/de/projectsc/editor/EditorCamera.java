@@ -10,21 +10,28 @@ import org.lwjgl.util.vector.Vector3f;
 import de.projectsc.client.gui.objects.Camera;
 import de.projectsc.client.gui.objects.GraphicalEntity;
 
+/**
+ * A camera object especially for the editor.
+ * 
+ * @author Josch Bosch
+ */
 public class EditorCamera extends Camera {
 
     private boolean rotateCamera;
 
     public EditorCamera(GraphicalEntity player) {
         super(player);
-        distanceFromPlayer = 12;
+        distanceFromPlayer = 20;
         pitch = 40;
+        setPosition(0f, 20f, 10f);
+
     }
 
     @Override
     public void move(float delta) {
         // super.move(delta);
         if (rotateCamera) {
-            angleAroundPlayer += delta * 0.03f;
+            angleAroundPlayer += delta * 0.003f;
         }
         this.yaw = (0.0f - angleAroundPlayer);
         calculateCameraPosition(new Vector3f(0, 0, 0), distanceFromPlayer, angleAroundPlayer);

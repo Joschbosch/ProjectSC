@@ -5,17 +5,25 @@
  */
 package de.projectsc.core.components.impl;
 
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.codehaus.jackson.JsonGenerationException;
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.JsonProcessingException;
+import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.node.ObjectNode;
 import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.client.gui.objects.Light;
 import de.projectsc.core.components.Component;
 import de.projectsc.core.components.ComponentType;
 import de.projectsc.core.entities.Entity;
+import de.projectsc.core.utils.Serialization;
 
 /**
  * Entity component to allow entities having lights.
@@ -111,5 +119,35 @@ public class EmittingLightComponent extends Component {
     public void removeLight(Light l) {
         lights.remove(l);
         offsets.remove(l);
+    }
+
+    @Override
+    public String serialize() throws JsonGenerationException, JsonMappingException, IOException {
+        Map<String, Map<String, Float[]>> serializedLights = Serialization.serializeLights(lights);
+        for (Light l : offsets.keySet()) {
+            Map<String, Float[]> values = serializedLights.get(l.getName());
+            values.put("offset", new Float[] { offsets.get(l).x, offsets.get(l).y, offsets.get(l).z });
+        }
+        return mapper.writeValueAsString(serializedLights);
+    }
+
+    @Override
+    public void deserialize(JsonNode input) throws JsonProcessingException, IOException {
+        Iterator<String> it = input.getFieldNames();
+        Map<String, Vector3f> tmpOffsets = new HashMap<>();
+        while (it.hasNext()) {
+            String lightName = it.next();
+            JsonNode light = input.get(lightName);
+            JsonNode offsets = light.get("offset");
+            Vector3f offset = Serialization.readVector(mapper, offsets);
+            tmpOffsets.put(lightName, offset);
+        }
+        List<Light> tmplights = Serialization.deserializeLights(mapper, (ObjectNode) input);
+        offsets.clear();
+        lights.clear();
+        for (Light l : tmplights) {
+            lights.add(l);
+            offsets.put(l, tmpOffsets.get(l.getName()));
+        }
     }
 }

@@ -10,6 +10,7 @@ import java.net.URISyntaxException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.codehaus.jackson.JsonNode;
 
 import de.projectsc.client.gui.models.RawModel;
 import de.projectsc.client.gui.models.TexturedModel;
@@ -182,5 +183,15 @@ public class ModelAndTextureComponent extends Component {
 
     public void setTextureIndex(int textureIndex) {
         this.textureIndex = textureIndex;
+    }
+
+    @Override
+    public String serialize() {
+        return null;
+    }
+
+    @Override
+    public void deserialize(JsonNode input) {
+
     }
 }

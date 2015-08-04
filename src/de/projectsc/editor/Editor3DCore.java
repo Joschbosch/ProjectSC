@@ -34,6 +34,7 @@ import de.projectsc.client.gui.tools.MousePicker;
 import de.projectsc.core.Terrain;
 import de.projectsc.core.TerrainLoader;
 import de.projectsc.core.Tile;
+import de.projectsc.core.components.Component;
 import de.projectsc.core.components.ComponentType;
 import de.projectsc.core.components.impl.EmittingLightComponent;
 import de.projectsc.core.components.impl.ModelAndTextureComponent;
@@ -106,8 +107,6 @@ public class Editor3DCore implements Runnable {
         loader = new Loader();
 
         camera = new EditorCamera(null);
-        camera.setPosition(0f, 15f, 10f);
-        camera.setYaw(0);
         masterRenderer = new NewMasterRenderer(loader);
 
         Tile[][] tiles = new Tile[100][100];
@@ -304,7 +303,6 @@ public class Editor3DCore implements Runnable {
     public void addComponent(String component) {
         if (EmittingLightComponent.name.equals(component)) {
             EmittingLightComponent lightComponent = new EmittingLightComponent();
-            lightComponent.createAndAddLight(entity, new Vector3f(0.0f, 15f, 0.0f), new Vector3f(1.0f, 0.0f, 0.0f), "blood");
             entity.addComponent(lightComponent);
         }
         if (MovingComponent.name.equals(component)) {
@@ -314,5 +312,18 @@ public class Editor3DCore implements Runnable {
 
     public void removeComponent(String component) {
         entity.removeComponent(component);
+    }
+
+    public Component getComponent(String name) {
+        for (Component c : entity.getComponents().values()) {
+            if (c.getComponentName().equals(name)) {
+                return c;
+            }
+        }
+        return null;
+    }
+
+    public Entity getCurrentEntity() {
+        return entity;
     }
 }

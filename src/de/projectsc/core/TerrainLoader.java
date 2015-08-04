@@ -10,9 +10,7 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +32,7 @@ import de.projectsc.core.entities.BackgroundEntity;
 import de.projectsc.core.entities.DecorationEntity;
 import de.projectsc.core.entities.EntityType;
 import de.projectsc.core.entities.WorldEntity;
+import de.projectsc.core.utils.Serialization;
 
 /**
  * Loader for a terrain map with its static lights and objects.
@@ -41,6 +40,12 @@ import de.projectsc.core.entities.WorldEntity;
  * @author Josch Bosch
  */
 public final class TerrainLoader {
+
+    private static final String ATTENUATION = "attenuation";
+
+    private static final String COLOR = "color";
+
+    private static final String POSITION = "position";
 
     private static final String SCALE = "scale";
 
@@ -55,12 +60,6 @@ public final class TerrainLoader {
     private static final String ROTATION = "rotation";
 
     private static final String STATIC_OBJECTS = "staticObjects";
-
-    private static final String ATTENUATION = "attenuation";
-
-    private static final String COLOR = "color";
-
-    private static final String POSITION = "position";
 
     private static final String STATIC_LIGHTS = "staticLights";
 
@@ -118,20 +117,8 @@ public final class TerrainLoader {
             String bTexture = mapper.readValue(tree.get(B_TEXTURE), String.class);
 
             ObjectNode lightsNode = (ObjectNode) tree.get(STATIC_LIGHTS);
-            Iterator<String> lightsIterator = lightsNode.getFieldNames();
-            List<Light> staticLights = new ArrayList<Light>();
-            while (lightsIterator.hasNext()) {
-                String light = lightsIterator.next();
-                Vector3f[] attributes = new Vector3f[3];
-                int i = 0;
-                for (String attributeName : new String[] { POSITION, COLOR, ATTENUATION }) {
-                    Float[] attribute = mapper.readValue(lightsNode.get(light).get(attributeName), new Float[3].getClass());
-                    attributes[i++] = new Vector3f(attribute[0], attribute[1], attribute[2]);
 
-                }
-                Light l = new Light(attributes[0], attributes[1], attributes[2], light);
-                staticLights.add(l);
-            }
+            List<Light> staticLights = Serialization.deserializeLights(mapper, lightsNode);
 
             ArrayNode staticObjectsNode = (ArrayNode) tree.get(STATIC_OBJECTS);
             Map<Integer, WorldEntity> staticObjects = new TreeMap<Integer, WorldEntity>();
@@ -220,15 +207,7 @@ public final class TerrainLoader {
         map.put(R_TEXTURE, terrain.getRTexture());
         map.put(G_TEXTURE, terrain.getGTexture());
         map.put(B_TEXTURE, terrain.getBTexture());
-        List<Light> staticLights = terrain.getStaticLights();
-        Map<String, Map<String, Float[]>> lights = new HashMap<>();
-        for (Light l : staticLights) {
-            Map<String, Float[]> light = new HashMap<>();
-            light.put(ATTENUATION, new Float[] { l.getAttenuation().x, l.getAttenuation().y, l.getAttenuation().z });
-            light.put(COLOR, new Float[] { l.getColor().x, l.getColor().y, l.getColor().z });
-            light.put(POSITION, new Float[] { l.getPosition().x, l.getPosition().y, l.getPosition().z });
-            lights.put(l.getName(), light);
-        }
+        Map<String, Map<String, Float[]>> lights = Serialization.serializeLights(terrain.getStaticLights());
         map.put(STATIC_LIGHTS, lights);
 
         Map<Integer, WorldEntity> staticObjects = terrain.getStaticObjects();

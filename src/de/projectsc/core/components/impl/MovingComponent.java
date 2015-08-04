@@ -7,6 +7,7 @@ package de.projectsc.core.components.impl;
 
 import java.util.Queue;
 
+import org.codehaus.jackson.JsonNode;
 import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.core.Tile;
@@ -145,6 +146,18 @@ public class MovingComponent extends Component {
 
     public void setCurrentSpeed(float currentSpeed) {
         this.currentSpeed = currentSpeed;
+    }
+
+    @Override
+    public String serialize() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public void deserialize(JsonNode input) {
+        // TODO Auto-generated method stub
+
     }
 
 }
