@@ -21,6 +21,12 @@ import de.projectsc.core.components.Component;
 import de.projectsc.core.components.ComponentType;
 import de.projectsc.core.entities.Entity;
 
+/**
+ * Entity component to add a model and a texture to the entity.
+ * 
+ * @author Josch Bosch
+ * 
+ */
 public class ModelAndTextureComponent extends Component {
 
     private static final Log LOGGER = LogFactory.getLog(ModelAndTextureComponent.class);
@@ -69,41 +75,89 @@ public class ModelAndTextureComponent extends Component {
         return (row / (float) modelTexture.getNumberOfRows());
     }
 
+    /**
+     * Load model and texture from given files.
+     * 
+     * @param loader to load
+     * @param modelFile model file
+     * @param textureFile texture image
+     */
+    public void loadModel(Loader loader, File modelFile, File textureFile) {
+        ModelData data = NewOBJFileLoader.loadOBJ(modelFile);
+        model = loader.loadToVAO(data.getVertices(), data.getTextureCoords(), data.getNormals(), data.getIndices());
+        loadAndApplyTexture(loader, textureFile);
+    }
+
+    /**
+     * Load model and texture using the owners id for the path.
+     * 
+     * @param loader to load
+     * @param owner with the id.
+     */
     public void loadModel(Loader loader, Entity owner) {
         ModelData data = NewOBJFileLoader.loadOBJ("M" + owner.getEntityTypeId());
         model = loader.loadToVAO(data.getVertices(), data.getTextureCoords(), data.getNormals(), data.getIndices());
-        int texture = 0 - 1;
         try {
             File textureFile =
                 new File(this.getClass().getResource("/model/M" + owner.getEntityTypeId() + "/texture.png").toURI());
-            texture = loader.loadTexture(textureFile);
+            if (textureFile.exists()) {
+                loadAndApplyTexture(loader, textureFile);
+            }
         } catch (URISyntaxException e) {
             LOGGER.error("Could not load texture for " + owner.getEntityTypeId());
         }
-        modelTexture = new ModelTexture(texture);
         // load texture settings for this model
     }
 
+    /**
+     * loads and applys the given texture file.
+     * 
+     * @param loader to load
+     * @param textureFile to load
+     */
+    public void loadAndApplyTexture(Loader loader, File textureFile) {
+        int texture = 0 - 1;
+        texture = loader.loadTexture(textureFile);
+        if (modelTexture == null) {
+            modelTexture = new ModelTexture(texture);
+        } else {
+            modelTexture.setTextureID(texture);
+        }
+    }
+
+    /**
+     * 
+     * @param value if the texture is transparent.
+     */
     public void setIsTransparent(boolean value) {
         modelTexture.setTransparent(value);
     }
 
+    /**
+     * @param value if the model uses fake lighting
+     */
     public void setFakeLighting(boolean value) {
         modelTexture.setFakeLighting(value);
     }
 
-    public void setIsTransparent(float value) {
-        modelTexture.setReflectivity(value);
-    }
-
+    /**
+     * @param value for the shine damper
+     */
     public void setShineDamper(float value) {
         modelTexture.setShineDamper(value);
     }
 
+    /**
+     * @param value for the reflectivity
+     */
     public void setReflectivity(float value) {
         modelTexture.setReflectivity(value);
     }
 
+    /**
+     * 
+     * @param value number of rows in the texture file
+     */
     public void setNumberOfRows(int value) {
         modelTexture.setNumberOfRows(value);
     }

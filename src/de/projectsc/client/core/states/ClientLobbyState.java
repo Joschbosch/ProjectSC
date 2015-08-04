@@ -83,7 +83,6 @@ public class ClientLobbyState extends ClientGameState {
         } else if (msg.getMessage().equals(MessageConstants.CHAT_MESSAGE)) {
             chat.addLine((String) msg.getData()[0]);
         } else if (msg.getMessage().equals(MessageConstants.NEW_GAME_CREATED)) {
-            System.out.println(msg.getData()[0]);
             context.setGameConfiguration((GameConfiguration) msg.getData()[0]);
             context.trigger(ClientEvents.ENTER_OR_CREATE_GAME);
         } else {

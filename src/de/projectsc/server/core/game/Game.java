@@ -21,7 +21,6 @@ import au.com.ds.ef.StateEnum;
 import au.com.ds.ef.call.ContextHandler;
 import de.projectsc.core.data.messages.GameMessageConstants;
 import de.projectsc.core.data.messages.MessageConstants;
-import de.projectsc.core.data.messages.MessageConstants;
 import de.projectsc.core.game.GameAttributes;
 import de.projectsc.core.game.GameConfiguration;
 import de.projectsc.server.core.AuthenticatedClient;

@@ -29,8 +29,8 @@ public class ClientGameContext extends StatefulContext {
         return core;
     }
 
-    public void setGUI(GUI gui) {
-        this.gui = gui;
+    public void setGUI(GUI sgui) {
+        this.gui = sgui;
     }
 
     public GUI getGUI() {

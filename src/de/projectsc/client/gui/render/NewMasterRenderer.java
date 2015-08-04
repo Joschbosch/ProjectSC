@@ -88,18 +88,16 @@ public class NewMasterRenderer {
      * Render the whole scene with all objects.
      * 
      * @param terrain to render
-     * @param staticWorldEntities all static entities to render
-     * @param dynamicRenderEntities all dynamic entities to render
-     * @param lights to render
+     * @param allEntities all entities
      * @param camera for view
      * @param elapsedTime since last frame
      * @param clipPlane to clip the world
      */
-    public void renderScene(TerrainModel terrain, List<Entity> entities,
+    public void renderScene(TerrainModel terrain, List<Entity> allEntities,
         Camera camera, long elapsedTime, Vector4f clipPlane) {
         List<Light> lights = new LinkedList<>();
         processTerrain(terrain);
-        for (Entity e : entities) {
+        for (Entity e : allEntities) {
             if (e.getComponent(ModelAndTextureComponent.class) != null) {
                 processEntity(e, e.getComponent(ModelAndTextureComponent.class));
             }
@@ -152,6 +150,7 @@ public class NewMasterRenderer {
     /**
      * Add entity for rendering.
      * 
+     * @param e entity
      * @param component to render.
      */
     public void processEntity(Entity e, ModelAndTextureComponent component) {

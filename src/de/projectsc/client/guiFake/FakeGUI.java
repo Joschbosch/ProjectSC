@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2015
+ * Copyright (C) 2015 Project SC
+ * 
+ * All rights reserved
  */
 
 package de.projectsc.client.guiFake;
@@ -100,12 +102,12 @@ public class FakeGUI implements GUI {
         throws InterruptedException {
         if (s != null && !s.isEmpty()) {
             String[] split = s.split("\\s");
-            String INPUT_PREFIX = "input:";
-            if (split[0].startsWith(INPUT_PREFIX)) {
+            String inputPrefix = "input:";
+            if (split[0].startsWith(inputPrefix)) {
                 if (split.length > 1) {
-                    input.add(new ClientMessage(split[0].replace(INPUT_PREFIX, ""), split[1]));
+                    input.add(new ClientMessage(split[0].replace(inputPrefix, ""), split[1]));
                 } else {
-                    input.add(new ClientMessage(split[0].replace(INPUT_PREFIX, "")));
+                    input.add(new ClientMessage(split[0].replace(inputPrefix, "")));
                 }
             } else if (split[0].equals(MessageConstants.SHUTDOWN)) {
             } else if (split[0].equals("create-client")) {

@@ -35,10 +35,20 @@ public final class NewOBJFileLoader {
 
     private static final String RES_LOC = "/model/";
 
-    private static Map<String, ModelData> loadedModels = new TreeMap<>();
+    private static Map<File, ModelData> loadedModels = new TreeMap<>();
 
     private NewOBJFileLoader() {
 
+    }
+
+    public static ModelData loadOBJ(String filePath) {
+        try {
+            File objFile = new File(NewOBJFileLoader.class.getResource(RES_LOC + filePath + "/model.obj").toURI());
+            return loadOBJ(objFile);
+        } catch (URISyntaxException e) {
+            LOGGER.error(e);
+        }
+        return null;
     }
 
     /**
@@ -47,20 +57,16 @@ public final class NewOBJFileLoader {
      * @param objFileName just the name without suffix.
      * @return {@link ModelData} with all information
      */
-    public static ModelData loadOBJ(String objFileName) {
-        if (loadedModels.containsKey(objFileName)) {
-            return loadedModels.get(objFileName);
+    public static ModelData loadOBJ(File objFile) {
+        if (loadedModels.containsKey(objFile)) {
+            return loadedModels.get(objFile);
         }
         BufferedReader reader = null;
         try {
             FileReader isr = null;
-            System.out.println(RES_LOC + objFileName + "/model.obj");
-            System.out.println(NewOBJFileLoader.class.getResource(RES_LOC + objFileName + "/model.obj"));
-            File objFile = new File(NewOBJFileLoader.class.getResource(RES_LOC + objFileName + "/model.obj").toURI());
-            System.out.println(objFile.getAbsolutePath());
             isr = new FileReader(objFile);
             reader = new BufferedReader(isr);
-        } catch (FileNotFoundException | URISyntaxException e) {
+        } catch (FileNotFoundException e) {
             System.err.println("File not found in res; don't use any extention");
         }
         if (reader != null) {
@@ -72,10 +78,8 @@ public final class NewOBJFileLoader {
             try {
                 while (true) {
                     line = reader.readLine();
-                    System.out.println(line);
                     if (line.startsWith("v ")) {
                         String[] currentLine = line.split("\\s");
-                        System.out.println(currentLine[1]);
                         Vector3f vertex = new Vector3f(Float.valueOf(currentLine[1]),
                             Float.valueOf(currentLine[2]),
                             Float.valueOf(currentLine[3]));
@@ -121,10 +125,10 @@ public final class NewOBJFileLoader {
             int[] indicesArray = convertIndicesListToArray(indices);
             ModelData data = new ModelData(verticesArray, texturesArray, normalsArray, indicesArray,
                 furthest);
-            loadedModels.put(objFileName, data);
+            loadedModels.put(objFile, data);
             return data;
         } else {
-            LOGGER.error("Could not load model " + objFileName);
+            LOGGER.error("Could not load model " + objFile.getAbsolutePath());
             return null;
         }
     }

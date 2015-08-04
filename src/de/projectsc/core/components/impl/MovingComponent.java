@@ -14,6 +14,11 @@ import de.projectsc.core.components.Component;
 import de.projectsc.core.components.ComponentType;
 import de.projectsc.core.entities.Entity;
 
+/**
+ * Entity component to allow movement.
+ * 
+ * @author Josch Bosch
+ */
 public class MovingComponent extends Component {
 
     private static final int MOVEMENT_SPEED = 30;
@@ -50,6 +55,7 @@ public class MovingComponent extends Component {
     /**
      * Sets a target position for the entity.
      * 
+     * @param e owner Entity
      * @param currentTarget position
      */
     public void setCurrentTarget(Entity e, Vector3f currentTarget) {

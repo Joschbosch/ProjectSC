@@ -1,7 +1,8 @@
 /*
- * Copyright (C) 2015
+ * Copyright (C) 2015 Project SC
+ * 
+ * All rights reserved
  */
-
 package testing;
 
 import java.awt.Graphics;
@@ -29,15 +30,21 @@ import de.projectsc.server.core.messages.ServerMessage;
 
 public class ClientMock {
 
+    /**
+     * mock.
+     */
     public static ClientMock mock;
 
     private static final Log LOGGER = LogFactory.getLog(ClientMock.class);
 
+    /**
+     * test.
+     */
+    public ShowPNG png;
+
     private final AtomicBoolean shutdown = new AtomicBoolean(false);
 
     private final Map<Long, AuthendicatedClientMock> clients = new TreeMap<>();
-
-    public ShowPNG png;
 
     private void createNewClient(String[] information, BlockingQueue<ServerMessage> serverQueue) {
         AuthendicatedClientMock newClient = new AuthendicatedClientMock(information[1]);
@@ -45,7 +52,7 @@ public class ClientMock {
         newClient.start();
         LOGGER.debug("Created new client mock" + newClient.getId());
         serverQueue.add(new NewClientConnectedServerMessage(MessageConstants.NEW_CLIENT_CONNECTED,
-            newClient.getAuthenticatedClient(), null));
+            newClient.getAuthenticatedClient()));
 
     }
 

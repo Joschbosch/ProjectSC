@@ -59,7 +59,6 @@ public class AuthenticatedClient {
     }
 
     public void received(ServerMessage arg1) {
-        System.out.println("Received message from client: " + arg1);
         receiveFromClientQueue.add(arg1);
     }
 }

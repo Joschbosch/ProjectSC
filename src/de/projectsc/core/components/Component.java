@@ -7,6 +7,12 @@ package de.projectsc.core.components;
 
 import de.projectsc.core.entities.Entity;
 
+/**
+ * 
+ * Abstract class for entity components.
+ * 
+ * @author Josch Bosch
+ */
 public abstract class Component {
 
     protected String componentName;

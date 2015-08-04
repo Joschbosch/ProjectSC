@@ -6,11 +6,15 @@
 package de.projectsc.editor;
 
 import java.awt.Canvas;
+import java.io.File;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
@@ -19,11 +23,9 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
-import de.projectsc.client.gui.objects.Camera;
 import de.projectsc.client.gui.objects.Light;
 import de.projectsc.client.gui.render.NewEntityRenderer;
 import de.projectsc.client.gui.render.NewMasterRenderer;
-import de.projectsc.client.gui.shaders.EntityShader;
 import de.projectsc.client.gui.terrain.TerrainModel;
 import de.projectsc.client.gui.textures.TerrainTexture;
 import de.projectsc.client.gui.textures.TerrainTexturePack;
@@ -46,6 +48,8 @@ import de.projectsc.core.entities.WorldEntity;
  */
 public class Editor3DCore implements Runnable {
 
+    private static final Log LOGGER = LogFactory.getLog(Editor3DCore.class);
+
     private boolean running;
 
     private final Canvas displayParent;
@@ -58,7 +62,7 @@ public class Editor3DCore implements Runnable {
 
     private NewEntityRenderer entityRenderer;
 
-    private Camera camera;
+    private EditorCamera camera;
 
     private MousePicker mousePicker;
 
@@ -70,7 +74,11 @@ public class Editor3DCore implements Runnable {
 
     private final List<Entity> entities = new LinkedList<>();
 
-    private Entity firstEntity;
+    private Entity entity;
+
+    private EditorData editorData;
+
+    private ModelAndTextureComponent modelComponent;
 
     public Editor3DCore(Canvas displayParent, int width, int height, BlockingQueue<String> messageQueue) {
 
@@ -94,17 +102,18 @@ public class Editor3DCore implements Runnable {
         }
         loader = new Loader();
 
-        camera = new Camera(null);
-        EntityShader shader = new EntityShader();
+        camera = new EditorCamera(null);
         masterRenderer = new NewMasterRenderer(loader);
 
-        entityRenderer = new NewEntityRenderer(shader, masterRenderer.getProjectionMatrix());
-
         Tile[][] tiles = new Tile[1000][1000];
-        List<Light> lights = new LinkedList<>();
-        lights.add(new Light(new Vector3f(0.0f, 100.0f, 0.0f), new Vector3f(1.0f, 1.0f, 1.0f), "sun"));
+
+        Entity lightEntity = new Entity(-2);
+        EmittingLightComponent lightComponent = new EmittingLightComponent();
+        lightComponent.addLight(lightEntity, new Light(new Vector3f(0.0f, 200.0f, 0.0f), new Vector3f(1.0f, 1.0f, 1.0f), "sun"));
+        lightEntity.addComponent(lightComponent);
+        entities.add(lightEntity);
         Terrain t =
-            new Terrain(tiles, "terrain/mud.png", "terrain/mud.png", "terrain/mud.png", "terrain/mud.png", lights,
+            new Terrain(tiles, "terrain/mud.png", "terrain/mud.png", "terrain/mud.png", "terrain/mud.png", new LinkedList<>(),
                 new HashMap<Integer, WorldEntity>());
 
         TerrainTexture backgroundTex = new TerrainTexture(loader.loadTexture("terrain/mud.png"));
@@ -118,23 +127,58 @@ public class Editor3DCore implements Runnable {
 
         mousePicker = new MousePicker(camera, masterRenderer.getProjectionMatrix(), terrainModel);
 
-        firstEntity = new Entity(10000);
-        firstEntity.setPosition(new Vector3f(0, 0, 0));
-        firstEntity.setRotation(new Vector3f(0, 0, 0));
-        firstEntity.setScale(1.0f);
-        ModelAndTextureComponent modelComponent = new ModelAndTextureComponent();
-        modelComponent.loadModel(loader, firstEntity);
-        firstEntity.addComponent(modelComponent);
-        firstEntity.setScale(1.0f);
-
-        MovingComponent moving = new MovingComponent();
-        // moving.setCurrentSpeed(0.01f);
-        firstEntity.addComponent(moving);
-        entities.add(firstEntity);
         gameLoop();
     }
 
     protected void initGL() {}
+
+    public void updateData(EditorData data) {
+        if (entity != null) {
+            entity.setScale(editorData.getScale());
+        }
+        if (modelComponent != null) {
+            modelComponent.setFakeLighting(editorData.isFakeLighting());
+            modelComponent.setIsTransparent(editorData.isTransparent());
+            modelComponent.setReflectivity(editorData.getReflectivity());
+            modelComponent.setShineDamper(editorData.getShineDamper());
+            modelComponent.setNumberOfRows(editorData.getNumColums());
+        }
+    }
+
+    public void loadEntity() {
+        if (editorData != null) {
+            entity = new Entity(editorData.getId());
+            entity.setPosition(new Vector3f(0, 0, 0));
+            entity.setRotation(new Vector3f(0, 0, 0));
+            entities.add(entity);
+            if (editorData.getModelFile() != null) {
+            }
+        } else {
+            if (entity != null) {
+                entities.remove(entity);
+            }
+            entity = null;
+        }
+    }
+
+    public void loadModel() {
+        modelComponent = new ModelAndTextureComponent();
+        try {
+            modelComponent.loadModel(loader, editorData.getModelFile(), new File(Editor3DCore.class.getResource("white.png").toURI()));
+        } catch (URISyntaxException e) {
+            LOGGER.error(e);
+        }
+
+        entity.addComponent(modelComponent);
+        MovingComponent moving = new MovingComponent();
+        // moving.setCurrentSpeed(0.01f);
+        entity.addComponent(moving);
+    }
+
+    public void updateTexture() {
+        modelComponent.loadAndApplyTexture(loader, editorData.getTextureFile());
+        updateData(editorData);
+    }
 
     protected void gameLoop() {
 
@@ -179,10 +223,7 @@ public class Editor3DCore implements Runnable {
     }
 
     public void loadMap() {
-        EmittingLightComponent lightComponent = new EmittingLightComponent();
-        Light l = new Light(new Vector3f(0f, 100f, 0f), new Vector3f(1.0f, 1.0f, 1.0f), "oneLight");
-        lightComponent.addLight(firstEntity, l);
-        firstEntity.addComponent(lightComponent);
+
         // loadTerrain("map");
     }
 
@@ -203,4 +244,14 @@ public class Editor3DCore implements Runnable {
         // staticEntities.putAll(terrain.getStaticObjects());
     }
 
+    public void setEditorData(EditorData data) {
+        this.editorData = data;
+    }
+
+    public void updateData() {
+        if (editorData != null) {
+            camera.setRotateCamera(editorData.isRotateCamera());
+            updateData(editorData);
+        }
+    }
 }
