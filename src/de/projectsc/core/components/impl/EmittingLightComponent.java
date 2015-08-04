@@ -24,12 +24,14 @@ import de.projectsc.core.entities.Entity;
  */
 public class EmittingLightComponent extends Component {
 
+    public static final String name = "Emitting light component";
+
     private final List<Light> lights = new LinkedList<>();
 
     private final Map<Light, Vector3f> offsets = new HashMap<>();
 
     public EmittingLightComponent() {
-        super("Emitting light component");
+        super(name);
         type = ComponentType.GRAPHICS;
     }
 
@@ -60,8 +62,7 @@ public class EmittingLightComponent extends Component {
     }
 
     /**
-     * Add light to entity. Note that the lights postion will be the offset of the entities
-     * position.
+     * Add light to entity. Note that the lights postion will be the offset of the entities position.
      * 
      * @param e owner entity
      * @param light to add

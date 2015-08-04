@@ -19,8 +19,8 @@ public abstract class Component {
 
     protected ComponentType type;
 
-    public Component(String name) {
-        this.componentName = name;
+    public Component(String newName) {
+        this.componentName = newName;
     }
 
     public abstract void update(Entity owner);

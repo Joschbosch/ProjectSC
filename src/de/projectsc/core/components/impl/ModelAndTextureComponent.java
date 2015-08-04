@@ -29,6 +29,8 @@ import de.projectsc.core.entities.Entity;
  */
 public class ModelAndTextureComponent extends Component {
 
+    public static final String name = "Model and Texture Component";
+
     private static final Log LOGGER = LogFactory.getLog(ModelAndTextureComponent.class);
 
     private RawModel model;
@@ -38,13 +40,13 @@ public class ModelAndTextureComponent extends Component {
     private int textureIndex = 0;
 
     public ModelAndTextureComponent() {
-        super("Model and Texture Component");
+        super(name);
         textureIndex = 0;
         type = ComponentType.GRAPHICS;
     }
 
     public ModelAndTextureComponent(int textureIndex) {
-        super("Model and Texture Component");
+        super(name);
         this.textureIndex = textureIndex;
         type = ComponentType.GRAPHICS;
 

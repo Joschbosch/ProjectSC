@@ -18,6 +18,8 @@ import org.lwjgl.util.vector.Vector3f;
  */
 public class Camera {
 
+    protected static final int DEGREES_180 = 180;
+
     private static final int CONSTANT_DISTANCE_FROM_ENTITY = 80;
 
     private static final int MINIMUM_Y_POSITION = 50;
@@ -40,8 +42,6 @@ public class Camera {
 
     // private static final float PLAYER_CENTER_Y_AXIS = 15.5f;
 
-    private static final int DEGREES_180 = 180;
-
     private static final int FAST_MOVEMENT_SPEED_FACTOR = 5;
 
     private static final float MOVEMENT_SPEED = 60f;
@@ -50,19 +50,19 @@ public class Camera {
 
     private static final boolean NO_CAMERA_MOVING = false;
 
-    private final Vector3f position = new Vector3f(0, 80f, 0);
+    protected float distanceFromPlayer = 3 * 10f;
 
-    private float pitch = 5 * 10;
+    protected float yaw = 0;
 
-    private float yaw = 0;
+    protected float angleAroundPlayer = 0;
+
+    protected final Vector3f position = new Vector3f(0, 80f, 0);
+
+    protected float pitch = 5 * 10;
 
     private float roll = 0;
 
     private final GraphicalEntity player;
-
-    private float distanceFromPlayer = 3 * 10f;
-
-    private float angleAroundPlayer = 0;
 
     private float currentSpeedX;
 
@@ -95,7 +95,7 @@ public class Camera {
             calculateAngleAroundPlayer();
             float horizontalDistance = calculateHorizontalDistance();
             float verticalDistance = calculateVerticalDistance();
-            calculateCameraPosition(horizontalDistance, verticalDistance);
+            calculateCameraPosition(boundToEntity.getPosition(), horizontalDistance, verticalDistance);
             this.yaw = DEGREES_180 - (player.getRotY() + angleAroundPlayer);
         } else {
             synchronized (entityLockObject) {
@@ -106,7 +106,7 @@ public class Camera {
                 } else {
                     float horizontalDistance = calculateHorizontalDistance();
                     float verticalDistance = calculateVerticalDistance();
-                    calculateCameraPosition(horizontalDistance, verticalDistance);
+                    calculateCameraPosition(boundToEntity.getPosition(), horizontalDistance, verticalDistance);
                 }
             }
         }
@@ -160,9 +160,9 @@ public class Camera {
         position.z = position.z + delta / 1000.0f * currentSpeedZ;
     }
 
-    private void calculateCameraPosition(float horizontalDistance, float verticalDistance) {
-        position.x = boundToEntity.getPosition().x;
-        position.z = boundToEntity.getPosition().z + CONSTANT_DISTANCE_FROM_ENTITY;
+    protected void calculateCameraPosition(Vector3f lookAtPoint, float horizontalDistance, float verticalDistance) {
+        position.x = lookAtPoint.x;
+        position.z = lookAtPoint.z + CONSTANT_DISTANCE_FROM_ENTITY;
     }
 
     /**
@@ -246,11 +246,11 @@ public class Camera {
         }
     }
 
-    private float calculateHorizontalDistance() {
+    protected float calculateHorizontalDistance() {
         return (float) (distanceFromPlayer * Math.cos(Math.toRadians(pitch)));
     }
 
-    private float calculateVerticalDistance() {
+    protected float calculateVerticalDistance() {
         return (float) (distanceFromPlayer * Math.sin(Math.toRadians(pitch)));
     }
 

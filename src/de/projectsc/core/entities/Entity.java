@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.lwjgl.util.vector.Vector3f;
 
@@ -64,6 +65,29 @@ public class Entity {
             typeMap.put(c.getType(), type);
         }
         type.add(c);
+    }
+
+    public void removeComponent(String component) {
+        Entry<Class<? extends Component>, Component> toRemove = null;
+        for (Entry<Class<? extends Component>, Component> c : components.entrySet()) {
+            if (c.getValue().getComponentName().equals(component)) {
+                toRemove = c;
+                break;
+            }
+        }
+        if (toRemove != null) {
+            components.remove(toRemove.getKey());
+            List<Component> type = typeMap.get(toRemove.getValue().getType());
+            Component removetype = null;
+            for (Component c : type) {
+                if (c.getComponentName().equals(component)) {
+                    removetype = c;
+                }
+            }
+            if (removetype != null) {
+                type.remove(removetype);
+            }
+        }
     }
 
     public <T> T getComponent(Class<T> clazz) {
@@ -124,4 +148,5 @@ public class Entity {
             this.rotation.y = targetRotation;
         }
     }
+
 }

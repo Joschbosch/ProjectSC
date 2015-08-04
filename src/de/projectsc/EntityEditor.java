@@ -5,6 +5,7 @@
  */
 package de.projectsc;
 
+import java.awt.BorderLayout;
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.EventQueue;
@@ -49,6 +50,8 @@ import javax.swing.text.PlainDocument;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import de.projectsc.core.components.impl.EmittingLightComponent;
+import de.projectsc.core.components.impl.MovingComponent;
 import de.projectsc.editor.Editor3DCore;
 import de.projectsc.editor.EditorData;
 
@@ -114,12 +117,20 @@ public class EntityEditor extends JFrame {
 
     private JCheckBox cycleCheckbox;
 
+    private JCheckBox lightPositionCheckBox;
+
+    private JComboBox<String> componentCombo;
+
+    private String[] componentNames = { EmittingLightComponent.name, MovingComponent.name };
+
+    private JList<String> componentList;
+
     /**
      * Create the frame.
      */
     public EntityEditor() {
-        createContent();
         data = new EditorData();
+        createContent();
         try {
             File folder = new File(EntityEditor.class.getResource("/model/").toURI());
             for (int i = 0; i < 10000; i++) {
@@ -131,9 +142,6 @@ public class EntityEditor extends JFrame {
             }
         } catch (URISyntaxException e) {
             LOGGER.error("Could not read model data.");
-        }
-        if (editor3dCore != null) {
-            editor3dCore.loadEntity();
         }
         updateEditor(data);
     }
@@ -161,9 +169,8 @@ public class EntityEditor extends JFrame {
         cycleCheckbox.setSelected(d.isCycleTextures());
         fakelightCheckbox.setSelected(d.isFakeLighting());
         rotateCheckbox.setSelected(d.isRotateCamera());
-        if (editor3dCore != null) {
-            editor3dCore.updateData();
-        }
+        lightPositionCheckBox.setSelected(d.isLightAtCameraPostion());
+
     }
 
     /**
@@ -208,6 +215,7 @@ public class EntityEditor extends JFrame {
         createComponentPanel();
 
         JPanel previewPanel = new JPanel();
+        previewPanel.setLayout(new BorderLayout(0, 0));
         previewPanel.setBorder(new TitledBorder(null, "Preview", TitledBorder.LEADING, TitledBorder.TOP, null, null));
         previewPanel.setBounds(371, 214, 627, 484);
         contentPane.add(previewPanel);
@@ -244,7 +252,7 @@ public class EntityEditor extends JFrame {
         contentPane.add(componentPanel);
         componentPanel.setLayout(null);
 
-        JList<String> componentList = new JList<>();
+        componentList = new JList<String>();
         componentList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         componentList.setValueIsAdjusting(true);
         componentList.setBorder(new LineBorder(new Color(0, 0, 0)));
@@ -255,7 +263,16 @@ public class EntityEditor extends JFrame {
         addComponentButton.addActionListener(new ActionListener() {
 
             @Override
-            public void actionPerformed(ActionEvent e) {}
+            public void actionPerformed(ActionEvent e) {
+                if (componentCombo.getSelectedItem() != null) {
+                    String component = (String) componentCombo.getSelectedItem();
+                    if (!component.isEmpty()) {
+                        data.getComponentsAdded().add(component);
+                    }
+                    fillComponentComboAndList();
+                    editor3dCore.addComponent(component);
+                }
+            }
         });
         addComponentButton.setBounds(10, 65, 95, 23);
         componentPanel.add(addComponentButton);
@@ -266,11 +283,37 @@ public class EntityEditor extends JFrame {
 
         JButton removeComponentButton = new JButton("Remove");
         removeComponentButton.setBounds(220, 65, 95, 23);
+        removeComponentButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (componentList.getSelectedValue() != null) {
+                    String component = componentList.getSelectedValue();
+                    data.getComponentsAdded().remove(component);
+                    editor3dCore.removeComponent(component);
+                }
+                fillComponentComboAndList();
+            }
+        });
         componentPanel.add(removeComponentButton);
 
-        JComboBox<String> componentCombo = new JComboBox<>();
+        componentCombo = new JComboBox<String>();
         componentCombo.setBounds(10, 34, 305, 20);
+        fillComponentComboAndList();
         componentPanel.add(componentCombo);
+    }
+
+    private void fillComponentComboAndList() {
+        componentCombo.removeAllItems();
+        componentList.removeAll();
+        for (String componentName : componentNames) {
+            if (data != null && !data.getComponentsAdded().contains(componentName)) {
+                componentCombo.addItem(componentName);
+            }
+        }
+        if (data != null && data.getComponentsAdded() != null) {
+            componentList.setListData(data.getComponentsAdded().toArray(new String[data.getComponentsAdded().size()]));
+        }
     }
 
     private void createPreviewOptions() {
@@ -299,11 +342,26 @@ public class EntityEditor extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 data.setCycleTextures(cycleCheckbox.isSelected());
-                updateEditor(data);
-
+                if (editor3dCore != null) {
+                    editor3dCore.updateData();
+                }
             }
         });
         previewOptionsPanel.add(cycleCheckbox);
+
+        lightPositionCheckBox = new JCheckBox("Light at camera position");
+        lightPositionCheckBox.setBounds(6, 70, 142, 23);
+        lightPositionCheckBox.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                data.setLightAtCameraPostion(lightPositionCheckBox.isSelected());
+                if (editor3dCore != null) {
+                    editor3dCore.updateData();
+                }
+            }
+        });
+        previewOptionsPanel.add(lightPositionCheckBox);
     }
 
     private void createMainSettings() {
@@ -353,8 +411,9 @@ public class EntityEditor extends JFrame {
                     iconPreviewLabel.setIcon(imageIcon);
                     data.setTextureFile(chosen);
                     if (data.getModelFile() != null) {
-                        editor3dCore.updateTexture();
+                        editor3dCore.triggerUpdateTexture();
                     }
+                    editor3dCore.updateData();
                 }
             }
         });
@@ -376,6 +435,9 @@ public class EntityEditor extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 data.setTransparent(transparentCheckbox.isSelected());
+                if (editor3dCore != null) {
+                    editor3dCore.updateData();
+                }
             }
         });
         texturePanel.add(transparentCheckbox);
@@ -412,6 +474,9 @@ public class EntityEditor extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 data.setFakeLighting(fakelightCheckbox.isSelected());
+                if (editor3dCore != null) {
+                    editor3dCore.updateData();
+                }
             }
         });
         texturePanel.add(fakelightCheckbox);
@@ -424,6 +489,9 @@ public class EntityEditor extends JFrame {
             @Override
             public void stateChanged(ChangeEvent e) {
                 data.setNumColums((int) numColumSpinner.getValue());
+                if (editor3dCore != null) {
+                    editor3dCore.updateData();
+                }
             }
         });
         texturePanel.add(numColumSpinner);
@@ -443,6 +511,7 @@ public class EntityEditor extends JFrame {
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 JFileChooser chooser = new JFileChooser();
+                chooser.setCurrentDirectory(new File("E:/Horreum/"));
                 FileNameExtensionFilter filter = new FileNameExtensionFilter("Model Files", "obj");
                 chooser.setFileFilter(filter);
                 chooser.showOpenDialog(null);
@@ -450,7 +519,7 @@ public class EntityEditor extends JFrame {
                 if (chosen != null && chosen.exists()) {
                     modelNameLabel.setText(chosen.getName().substring(0, chosen.getName().lastIndexOf(DOT)));
                     data.setModelFile(chosen);
-                    editor3dCore.loadEntity();
+                    editor3dCore.triggerLoadModel();
                     if (data.getTextureFile() != null) {
                         editor3dCore.updateTexture();
                     }
@@ -476,7 +545,11 @@ public class EntityEditor extends JFrame {
             @Override
             public void stateChanged(ChangeEvent e) {
                 data.setScale(scaleSlider.getValue() / 10.0f);
+                if (editor3dCore != null) {
+                    editor3dCore.updateData();
+                }
                 updateEditor(data);
+
             }
         });
         modelPanel.add(scaleSlider);
@@ -509,8 +582,7 @@ public class EntityEditor extends JFrame {
     }
 
     /**
-     * Once the Canvas is created its add notify method will call this method to start the LWJGL
-     * Display and game loop in another thread.
+     * Once the Canvas is created its add notify method will call this method to start the LWJGL Display and game loop in another thread.
      */
     public void startLWJGL() {
         messageQueue = new LinkedBlockingQueue<String>();
@@ -521,8 +593,8 @@ public class EntityEditor extends JFrame {
     }
 
     /**
-     * Tell game loop to stop running, after which the LWJGL Display will be destoryed. The main
-     * thread will wait for the Display.destroy() to complete
+     * Tell game loop to stop running, after which the LWJGL Display will be destoryed. The main thread will wait for the Display.destroy()
+     * to complete
      */
     private void stopLWJGL() {
         try {
@@ -560,6 +632,9 @@ public class EntityEditor extends JFrame {
             }
             super.insertString(off, str, as);
             verifyFloat();
+            if (editor3dCore != null) {
+                editor3dCore.updateData();
+            }
         }
 
         private void verifyFloat() {
@@ -602,15 +677,16 @@ public class EntityEditor extends JFrame {
                 return;
             }
 
-            // Prüfen, ob die einzufügenden Zeichen Zahlen sind
             for (int i = 0; i < str.length(); i++) {
                 if (!Character.isDigit(str.charAt(i))) {
                     return;
                 }
             }
-            // Zahl(en) einfügen
             super.insertString(off, str, as);
             verifyID();
+            if (editor3dCore != null) {
+                editor3dCore.updateData();
+            }
         }
 
         private void verifyID() {

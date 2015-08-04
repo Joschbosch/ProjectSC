@@ -21,6 +21,8 @@ import de.projectsc.core.entities.Entity;
  */
 public class MovingComponent extends Component {
 
+    public static final String name = "Moving Component";
+
     private static final int MOVEMENT_SPEED = 30;
 
     private static final int TURN_SPEED = 60;
@@ -36,7 +38,7 @@ public class MovingComponent extends Component {
     private float targetRotation;
 
     public MovingComponent() {
-        super("Moving Component");
+        super(name);
         type = ComponentType.PREPHYSICS;
     }
 

@@ -21,11 +21,11 @@ public class EditorData {
 
     private boolean transparent = true;
 
-    private boolean fakeLighting = true;
+    private boolean fakeLighting = false;
 
     private float shineDamper = 1.0f;
 
-    private float reflectivity = 1.0f;
+    private float reflectivity = 0.0f;
 
     private int numColums = 1;
 
@@ -34,6 +34,8 @@ public class EditorData {
     private boolean rotateCamera = false;
 
     private boolean cycleTextures = false;
+
+    private boolean lightAtCamera = true;
 
     public EditorData() {
         modelFile = null;
@@ -134,5 +136,13 @@ public class EditorData {
 
     public void setCycleTextures(boolean cycleTextures) {
         this.cycleTextures = cycleTextures;
+    }
+
+    public boolean isLightAtCameraPostion() {
+        return lightAtCamera;
+    }
+
+    public void setLightAtCameraPostion(boolean value) {
+        lightAtCamera = value;
     }
 }

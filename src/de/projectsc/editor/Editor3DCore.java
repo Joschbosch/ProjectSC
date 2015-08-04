@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -24,7 +25,6 @@ import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
 import de.projectsc.client.gui.objects.Light;
-import de.projectsc.client.gui.render.NewEntityRenderer;
 import de.projectsc.client.gui.render.NewMasterRenderer;
 import de.projectsc.client.gui.terrain.TerrainModel;
 import de.projectsc.client.gui.textures.TerrainTexture;
@@ -60,8 +60,6 @@ public class Editor3DCore implements Runnable {
 
     private Loader loader;
 
-    private NewEntityRenderer entityRenderer;
-
     private EditorCamera camera;
 
     private MousePicker mousePicker;
@@ -80,8 +78,12 @@ public class Editor3DCore implements Runnable {
 
     private ModelAndTextureComponent modelComponent;
 
-    public Editor3DCore(Canvas displayParent, int width, int height, BlockingQueue<String> messageQueue) {
+    private BlockingQueue<String> incomingQueue;
 
+    private Light sun;
+
+    public Editor3DCore(Canvas displayParent, int width, int height, BlockingQueue<String> messageQueue) {
+        incomingQueue = new LinkedBlockingQueue<>();
         this.displayParent = displayParent;
         this.width = width;
         this.height = height;
@@ -91,6 +93,7 @@ public class Editor3DCore implements Runnable {
     @Override
     public void run() {
         running = true;
+        loadEntity();
         try {
             Display.setDisplayMode(new DisplayMode(width, height));
             Display.setTitle("Project SC Entity Editor");
@@ -103,23 +106,27 @@ public class Editor3DCore implements Runnable {
         loader = new Loader();
 
         camera = new EditorCamera(null);
+        camera.setPosition(0f, 15f, 10f);
+        camera.setYaw(0);
         masterRenderer = new NewMasterRenderer(loader);
 
-        Tile[][] tiles = new Tile[1000][1000];
+        Tile[][] tiles = new Tile[100][100];
 
         Entity lightEntity = new Entity(-2);
+        lightEntity.setPosition(new Vector3f(0, 0, 0));
         EmittingLightComponent lightComponent = new EmittingLightComponent();
-        lightComponent.addLight(lightEntity, new Light(new Vector3f(0.0f, 200.0f, 0.0f), new Vector3f(1.0f, 1.0f, 1.0f), "sun"));
+        sun = new Light(new Vector3f(0.0f, 100.0f, 100.0f), new Vector3f(1.0f, 1.0f, 1.0f), "sun");
+        lightComponent.addLight(lightEntity, sun);
         lightEntity.addComponent(lightComponent);
         entities.add(lightEntity);
         Terrain t =
-            new Terrain(tiles, "terrain/mud.png", "terrain/mud.png", "terrain/mud.png", "terrain/mud.png", new LinkedList<>(),
+            new Terrain(tiles, "terrain/grass.png", "terrain/grass.png", "terrain/grass.png", "terrain/grass.png", new LinkedList<>(),
                 new HashMap<Integer, WorldEntity>());
 
-        TerrainTexture backgroundTex = new TerrainTexture(loader.loadTexture("terrain/mud.png"));
-        TerrainTexture rTex = new TerrainTexture(loader.loadTexture("terrain/mud.png"));
-        TerrainTexture gTex = new TerrainTexture(loader.loadTexture("terrain/mud.png"));
-        TerrainTexture bTex = new TerrainTexture(loader.loadTexture("terrain/mud.png"));
+        TerrainTexture backgroundTex = new TerrainTexture(loader.loadTexture("terrain/grass.png"));
+        TerrainTexture rTex = new TerrainTexture(loader.loadTexture("terrain/grass.png"));
+        TerrainTexture gTex = new TerrainTexture(loader.loadTexture("terrain/grass.png"));
+        TerrainTexture bTex = new TerrainTexture(loader.loadTexture("terrain/grass.png"));
         TerrainTexturePack texturePack = new TerrainTexturePack(backgroundTex, rTex, gTex, bTex);
         TerrainTexture blendMap = new TerrainTexture(loader.loadTexture(TerrainLoader.createBlendMap(t)));
 
@@ -161,10 +168,14 @@ public class Editor3DCore implements Runnable {
         }
     }
 
-    public void loadModel() {
+    public void triggerLoadModel() {
+        incomingQueue.offer("loadModel");
+    }
+
+    private void loadModel() {
         modelComponent = new ModelAndTextureComponent();
         try {
-            modelComponent.loadModel(loader, editorData.getModelFile(), new File(Editor3DCore.class.getResource("white.png").toURI()));
+            modelComponent.loadModel(loader, editorData.getModelFile(), new File(Editor3DCore.class.getResource("/white.png").toURI()));
         } catch (URISyntaxException e) {
             LOGGER.error(e);
         }
@@ -176,18 +187,36 @@ public class Editor3DCore implements Runnable {
     }
 
     public void updateTexture() {
-        modelComponent.loadAndApplyTexture(loader, editorData.getTextureFile());
-        updateData(editorData);
+        if (modelComponent != null) {
+            modelComponent.loadAndApplyTexture(loader, editorData.getTextureFile());
+            updateData(editorData);
+        }
     }
 
     protected void gameLoop() {
 
         long time = System.currentTimeMillis();
+        int timer = 1500;
         while (running) {
             long now = System.currentTimeMillis();
             long delta = now - time;
             time = now;
-            Display.update();
+            readMessages();
+            camera.move(delta);
+            if (editorData.isLightAtCameraPostion()) {
+                sun.setPosition(camera.getPosition());
+            }
+            if (editorData.isCycleTextures()) {
+                timer -= delta;
+                if (timer <= 0) {
+                    timer = 1500;
+                    ModelAndTextureComponent component = entity.getComponent(ModelAndTextureComponent.class);
+                    if (entity != null && component != null) {
+                        component.setTextureIndex((component.getTextureIndex() + 1)
+                            % (editorData.getNumColums() * editorData.getNumColums()));
+                    }
+                }
+            }
             for (ComponentType type : ComponentType.values()) {
                 for (Entity e : entities) {
                     e.update(type);
@@ -211,8 +240,21 @@ public class Editor3DCore implements Runnable {
                 loadMap();
             }
             Display.sync(60);
+            Display.update();
         }
         Display.destroy();
+    }
+
+    private void readMessages() {
+        while (!incomingQueue.isEmpty()) {
+            String msg = incomingQueue.poll();
+            if (msg.equals("loadModel")) {
+                loadModel();
+            }
+            if (msg.equals("updateTexture")) {
+                updateTexture();
+            }
+        }
     }
 
     /**
@@ -253,5 +295,24 @@ public class Editor3DCore implements Runnable {
             camera.setRotateCamera(editorData.isRotateCamera());
             updateData(editorData);
         }
+    }
+
+    public void triggerUpdateTexture() {
+        incomingQueue.offer("updateTexture");
+    }
+
+    public void addComponent(String component) {
+        if (EmittingLightComponent.name.equals(component)) {
+            EmittingLightComponent lightComponent = new EmittingLightComponent();
+            lightComponent.createAndAddLight(entity, new Vector3f(0.0f, 15f, 0.0f), new Vector3f(1.0f, 0.0f, 0.0f), "blood");
+            entity.addComponent(lightComponent);
+        }
+        if (MovingComponent.name.equals(component)) {
+            entity.addComponent(new MovingComponent());
+        }
+    }
+
+    public void removeComponent(String component) {
+        entity.removeComponent(component);
     }
 }

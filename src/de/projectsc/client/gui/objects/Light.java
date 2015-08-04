@@ -42,7 +42,9 @@ public class Light {
     }
 
     public void setPosition(Vector3f position) {
-        this.position = position;
+        this.position.x = position.x;
+        this.position.y = position.y;
+        this.position.z = position.z;
     }
 
     public Vector3f getColor() {
