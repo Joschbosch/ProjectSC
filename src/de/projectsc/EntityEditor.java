@@ -16,6 +16,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -47,6 +48,8 @@ import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -55,6 +58,7 @@ import de.projectsc.core.components.impl.MovingComponent;
 import de.projectsc.editor.Editor3DCore;
 import de.projectsc.editor.EditorData;
 import de.projectsc.editor.componentViews.EmittingLightComponentView;
+import de.projectsc.editor.componentViews.MovingComponentView;
 
 /**
  * Entity editor.
@@ -122,7 +126,7 @@ public class EntityEditor extends JFrame {
 
     private JComboBox<String> componentCombo;
 
-    private String[] componentNames = { EmittingLightComponent.name, MovingComponent.name };
+    private final String[] componentNames = { EmittingLightComponent.name, MovingComponent.name };
 
     private JList<String> componentList;
 
@@ -150,12 +154,12 @@ public class EntityEditor extends JFrame {
     private void updateEditor(EditorData d) {
         String modelName = "";
         if (d.getModelFile() != null) {
-            modelName = d.getModelFile().getName().substring(0, d.getModelFile().getName().lastIndexOf(DOT));
+            modelName = FilenameUtils.removeExtension(d.getModelFile().getName());
         }
         modelNameLabel.setText(modelName);
         String textureName = "";
         if (d.getTextureFile() != null) {
-            textureName = d.getTextureFile().getName().substring(0, d.getTextureFile().getName().lastIndexOf(DOT));
+            textureName = FilenameUtils.removeExtension(d.getTextureFile().getName());
         }
         textureNameLabel.setText(textureName);
 
@@ -291,6 +295,12 @@ public class EntityEditor extends JFrame {
                             new EmittingLightComponentView(component, editor3dCore.getCurrentEntity());
                         dialog.setSize(800, 600);
                         dialog.show();
+                    } else if (componentList.getSelectedValue().equals(MovingComponent.name)) {
+                        MovingComponent component = (MovingComponent) editor3dCore.getComponent(MovingComponent.name);
+                        MovingComponentView dialog =
+                            new MovingComponentView(component, editor3dCore.getCurrentEntity());
+                        dialog.setSize(450, 130);
+                        dialog.show();
                     }
                 }
             }
@@ -310,6 +320,7 @@ public class EntityEditor extends JFrame {
                 }
                 fillComponentComboAndList();
             }
+
         });
         componentPanel.add(removeComponentButton);
 
@@ -415,6 +426,13 @@ public class EntityEditor extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 JFileChooser chooser = new JFileChooser();
+                try {
+                    File folder = new File(EntityEditor.class.getResource("/model/").toURI());
+                    chooser.setCurrentDirectory(folder);
+                } catch (URISyntaxException e1) {
+                    LOGGER.info("Could not set current directory.");
+                }
+
                 FileNameExtensionFilter filter = new FileNameExtensionFilter("PNG Files", "png");
                 chooser.setFileFilter(filter);
                 chooser.showOpenDialog(null);
@@ -527,8 +545,13 @@ public class EntityEditor extends JFrame {
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 JFileChooser chooser = new JFileChooser();
-                chooser.setCurrentDirectory(new File("E:/Horreum/"));
                 FileNameExtensionFilter filter = new FileNameExtensionFilter("Model Files", "obj");
+                try {
+                    File folder = new File(EntityEditor.class.getResource("/model/").toURI());
+                    chooser.setCurrentDirectory(folder);
+                } catch (URISyntaxException e1) {
+                    LOGGER.info("Could not set current directory.");
+                }
                 chooser.setFileFilter(filter);
                 chooser.showOpenDialog(null);
                 File chosen = chooser.getSelectedFile();
@@ -600,8 +623,16 @@ public class EntityEditor extends JFrame {
                     try {
                         folder = new File(EntityEditor.class.getResource("/model/").toURI());
                         File targetFolder = new File(folder, "M" + Integer.parseInt(idTextfield.getText()));
-
-                    } catch (URISyntaxException e1) {
+                        targetFolder.mkdirs();
+                        if (data.getModelFile() != null) {
+                            FileUtils.copyFile(data.getModelFile(), new File(targetFolder, "model.obj"));
+                        }
+                        if (data.getTextureFile() != null) {
+                            FileUtils.copyFile(data.getTextureFile(), new File(targetFolder, "texture.png"));
+                        }
+                        File nameFile = new File(targetFolder, FilenameUtils.removeExtension(data.getModelFile().getName()));
+                        nameFile.createNewFile();
+                    } catch (URISyntaxException | IOException e1) {
                         LOGGER.error("Could not write EntitySchema: ", e1);
                     }
                 }
@@ -615,7 +646,8 @@ public class EntityEditor extends JFrame {
     }
 
     /**
-     * Once the Canvas is created its add notify method will call this method to start the LWJGL Display and game loop in another thread.
+     * Once the Canvas is created its add notify method will call this method to start the LWJGL
+     * Display and game loop in another thread.
      */
     public void startLWJGL() {
         messageQueue = new LinkedBlockingQueue<String>();
@@ -626,8 +658,8 @@ public class EntityEditor extends JFrame {
     }
 
     /**
-     * Tell game loop to stop running, after which the LWJGL Display will be destoryed. The main thread will wait for the Display.destroy()
-     * to complete
+     * Tell game loop to stop running, after which the LWJGL Display will be destoryed. The main
+     * thread will wait for the Display.destroy() to complete
      */
     private void stopLWJGL() {
         try {

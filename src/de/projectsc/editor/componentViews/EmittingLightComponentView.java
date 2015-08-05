@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 
+ * Copyright (C) 2015
  */
 
 package de.projectsc.editor.componentViews;
@@ -28,35 +28,34 @@ import de.projectsc.core.entities.Entity;
 
 public class EmittingLightComponentView extends JDialog {
 
-    private JTable lightsTable;
+    private static final long serialVersionUID = -3903795685651739513L;
 
-    private JTextField nameText;
+    private final JTable lightsTable;
 
-    private JTextField positionXText;
+    private final JTextField nameText;
 
-    private JTextField positionYText;
+    private final JTextField positionXText;
 
-    private JTextField positionZText;
+    private final JTextField positionYText;
 
-    private JTextField colorRText;
+    private final JTextField positionZText;
 
-    private JTextField colorGText;
+    private final JTextField colorRText;
 
-    private JTextField colorBText;
+    private final JTextField colorGText;
 
-    private JTextField attenuation1Text;
+    private final JTextField colorBText;
 
-    private JTextField attenuation2Text;
+    private final JTextField attenuation1Text;
 
-    private JTextField attenuation3Text;
+    private final JTextField attenuation2Text;
 
-    private EmittingLightComponent component;
+    private final JTextField attenuation3Text;
 
-    private Entity entity;
+    private final EmittingLightComponent component;
 
     public EmittingLightComponentView(EmittingLightComponent component, Entity entity) {
         this.component = component;
-        this.entity = entity;
         setTitle("Emitting Light Component");
         getContentPane().setLayout(null);
 
@@ -71,8 +70,7 @@ public class EmittingLightComponentView extends JDialog {
             },
             new String[] {
                 "Name", "Position", "Color", "Attenation"
-            }
-            ));
+            }));
         lightsTable.setBorder(new TitledBorder(null, "Lights", TitledBorder.LEADING, TitledBorder.TOP, null, null));
         lightsTable.setBounds(0, 103, 668, 347);
         panel.add(lightsTable);

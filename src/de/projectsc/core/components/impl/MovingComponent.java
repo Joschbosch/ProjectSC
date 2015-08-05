@@ -24,9 +24,9 @@ public class MovingComponent extends Component {
 
     public static final String name = "Moving Component";
 
-    private static final int MOVEMENT_SPEED = 30;
+    private int turnSpeed = 60;
 
-    private static final int TURN_SPEED = 60;
+    private int movementSpeed = 30;
 
     private Vector3f nextTarget;
 
@@ -87,7 +87,7 @@ public class MovingComponent extends Component {
         owner.setRotY(0);
         // }
         if (nextTarget != null && Vector3f.sub(owner.getPosition(), nextTarget, null).lengthSquared() > 2) {
-            currentSpeed = MOVEMENT_SPEED;
+            currentSpeed = movementSpeed;
         } else {
             if (path != null) {
                 path.poll();
@@ -124,6 +124,16 @@ public class MovingComponent extends Component {
         e.getPosition().z += dz;
     }
 
+    @Override
+    public String serialize() {
+        return "" + movementSpeed;
+    }
+
+    @Override
+    public void deserialize(JsonNode input) {
+        movementSpeed = Integer.valueOf(input.getTextValue());
+    }
+
     public boolean isMoved() {
         return moved;
     }
@@ -148,16 +158,19 @@ public class MovingComponent extends Component {
         this.currentSpeed = currentSpeed;
     }
 
-    @Override
-    public String serialize() {
-        // TODO Auto-generated method stub
-        return null;
+    public int getTurnSpeed() {
+        return turnSpeed;
     }
 
-    @Override
-    public void deserialize(JsonNode input) {
-        // TODO Auto-generated method stub
-
+    public void setTurnSpeed(int turnSpeed) {
+        this.turnSpeed = turnSpeed;
     }
 
+    public void setMovementSpeed(int movementSpeed) {
+        this.movementSpeed = movementSpeed;
+    }
+
+    public int getMovementSpeed() {
+        return movementSpeed;
+    }
 }
