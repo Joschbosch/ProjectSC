@@ -86,9 +86,12 @@ public class ModelAndTextureComponent extends Component {
      * @param textureFile texture image
      */
     public void loadModel(Loader loader, File modelFile, File textureFile) {
-        ModelData data = NewOBJFileLoader.loadOBJ(modelFile);
-        model = loader.loadToVAO(data.getVertices(), data.getTextureCoords(), data.getNormals(), data.getIndices());
-        loadAndApplyTexture(loader, textureFile);
+        if (modelFile != null) {
+            ModelData data = NewOBJFileLoader.loadOBJ(modelFile);
+            model = loader.loadToVAO(data.getVertices(), data.getTextureCoords(), data.getNormals(), data.getIndices());
+            loadAndApplyTexture(loader, textureFile);
+        } else {
+        }
     }
 
     /**
@@ -119,12 +122,14 @@ public class ModelAndTextureComponent extends Component {
      * @param textureFile to load
      */
     public void loadAndApplyTexture(Loader loader, File textureFile) {
-        int texture = 0 - 1;
-        texture = loader.loadTexture(textureFile);
-        if (modelTexture == null) {
-            modelTexture = new ModelTexture(texture);
-        } else {
-            modelTexture.setTextureID(texture);
+        if (textureFile != null) {
+            int texture = 0 - 1;
+            texture = loader.loadTexture(textureFile);
+            if (modelTexture == null) {
+                modelTexture = new ModelTexture(texture);
+            } else {
+                modelTexture.setTextureID(texture);
+            }
         }
     }
 
@@ -133,28 +138,36 @@ public class ModelAndTextureComponent extends Component {
      * @param value if the texture is transparent.
      */
     public void setIsTransparent(boolean value) {
-        modelTexture.setTransparent(value);
+        if (modelTexture != null) {
+            modelTexture.setTransparent(value);
+        }
     }
 
     /**
      * @param value if the model uses fake lighting
      */
     public void setFakeLighting(boolean value) {
-        modelTexture.setFakeLighting(value);
+        if (modelTexture != null) {
+            modelTexture.setFakeLighting(value);
+        }
     }
 
     /**
      * @param value for the shine damper
      */
     public void setShineDamper(float value) {
-        modelTexture.setShineDamper(value);
+        if (modelTexture != null) {
+            modelTexture.setShineDamper(value);
+        }
     }
 
     /**
      * @param value for the reflectivity
      */
     public void setReflectivity(float value) {
-        modelTexture.setReflectivity(value);
+        if (modelTexture != null) {
+            modelTexture.setReflectivity(value);
+        }
     }
 
     /**
@@ -162,7 +175,9 @@ public class ModelAndTextureComponent extends Component {
      * @param value number of rows in the texture file
      */
     public void setNumberOfRows(int value) {
-        modelTexture.setNumberOfRows(value);
+        if (modelTexture != null) {
+            modelTexture.setNumberOfRows(value);
+        }
     }
 
     public TexturedModel getTexturedModel() {

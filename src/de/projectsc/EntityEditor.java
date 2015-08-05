@@ -18,6 +18,9 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -52,7 +55,10 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
 
+import de.projectsc.core.components.Component;
 import de.projectsc.core.components.impl.EmittingLightComponent;
 import de.projectsc.core.components.impl.MovingComponent;
 import de.projectsc.editor.Editor3DCore;
@@ -66,6 +72,14 @@ import de.projectsc.editor.componentViews.MovingComponentView;
  * @author Josch Bosch
  */
 public class EntityEditor extends JFrame {
+
+    private static final String ENTITY_ENT = "entity.ent";
+
+    private static final String TEXTURE_PNG = "texture.png";
+
+    private static final String MODEL_OBJ = "model.obj";
+
+    private static final String COMPONENTS = "components";
 
     /**
      * Smallest id for models.
@@ -98,7 +112,7 @@ public class EntityEditor extends JFrame {
 
     private JLabel modelNameLabel;
 
-    private final EditorData data;
+    private EditorData data;
 
     private JButton loadModelButton;
 
@@ -438,18 +452,15 @@ public class EntityEditor extends JFrame {
                 chooser.showOpenDialog(null);
                 File chosen = chooser.getSelectedFile();
                 if (chosen != null && chosen.exists()) {
-                    ImageIcon imageIcon = new ImageIcon(chosen.getAbsolutePath());
-                    Image image = imageIcon.getImage(); // transform it
-                    Image newimg = image.getScaledInstance(120, 120, java.awt.Image.SCALE_SMOOTH);
-                    imageIcon = new ImageIcon(newimg);
-                    iconPreviewLabel.setIcon(imageIcon);
                     data.setTextureFile(chosen);
+                    updateTexturePreview(chosen);
                     if (data.getModelFile() != null) {
                         editor3dCore.triggerUpdateTexture();
                     }
                     editor3dCore.updateData();
                 }
             }
+
         });
         texturePanel.add(loadTextureButton);
 
@@ -529,6 +540,14 @@ public class EntityEditor extends JFrame {
             }
         });
         texturePanel.add(numColumSpinner);
+    }
+
+    private void updateTexturePreview(File chosen) {
+        ImageIcon imageIcon = new ImageIcon(chosen.getAbsolutePath());
+        Image image = imageIcon.getImage(); // transform it
+        Image newimg = image.getScaledInstance(120, 120, java.awt.Image.SCALE_SMOOTH);
+        imageIcon = new ImageIcon(newimg);
+        iconPreviewLabel.setIcon(imageIcon);
     }
 
     private void modelPanel(JPanel mainSettingsPanel) {
@@ -618,23 +637,35 @@ public class EntityEditor extends JFrame {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (verifyID()) {
-                    File folder;
-                    try {
-                        folder = new File(EntityEditor.class.getResource("/model/").toURI());
-                        File targetFolder = new File(folder, "M" + Integer.parseInt(idTextfield.getText()));
-                        targetFolder.mkdirs();
-                        if (data.getModelFile() != null) {
-                            FileUtils.copyFile(data.getModelFile(), new File(targetFolder, "model.obj"));
-                        }
-                        if (data.getTextureFile() != null) {
-                            FileUtils.copyFile(data.getTextureFile(), new File(targetFolder, "texture.png"));
-                        }
-                        File nameFile = new File(targetFolder, FilenameUtils.removeExtension(data.getModelFile().getName()));
-                        nameFile.createNewFile();
-                    } catch (URISyntaxException | IOException e1) {
-                        LOGGER.error("Could not write EntitySchema: ", e1);
+                File folder;
+                try {
+                    folder = new File(EntityEditor.class.getResource("/model/").toURI());
+                    File targetFolder = new File(folder, "M" + Integer.parseInt(idTextfield.getText()));
+                    targetFolder.mkdirs();
+                    if (data.getModelFile() != null && !data.getModelFile().equals(new File(targetFolder, MODEL_OBJ))) {
+                        FileUtils.copyFile(data.getModelFile(), new File(targetFolder, MODEL_OBJ));
                     }
+                    if (data.getTextureFile() != null && !data.getTextureFile().equals(new File(targetFolder, TEXTURE_PNG))) {
+                        FileUtils.copyFile(data.getTextureFile(), new File(targetFolder, TEXTURE_PNG));
+                    }
+                    File nameFile = new File(targetFolder, FilenameUtils.removeExtension(data.getModelFile().getName()));
+                    nameFile.createNewFile();
+                    Map<String, Object> serialization = new HashMap<>();
+                    serialization.put("numColumns", data.getNumColums());
+                    serialization.put("reflectivity", data.getReflectivity());
+                    serialization.put("shineDamper", data.getShineDamper());
+                    serialization.put("scale", data.getScale());
+                    Map<String, String> components = new HashMap<>();
+                    for (String component : data.getComponentsAdded()) {
+                        Component c = editor3dCore.getComponent(component);
+                        components.put(component, c.serialize());
+                        System.out.println(component);
+                    }
+                    serialization.put(COMPONENTS, components);
+                    ObjectMapper mapper = new ObjectMapper();
+                    mapper.writeValue(new File(targetFolder, ENTITY_ENT), serialization);
+                } catch (URISyntaxException | IOException e1) {
+                    LOGGER.error("Could not write EntitySchema: ", e1);
                 }
             }
 
@@ -642,12 +673,67 @@ public class EntityEditor extends JFrame {
         menueFile.add(menueItemSave);
 
         JMenuItem menueItemLoad = new JMenuItem("Load");
+        menueItemLoad.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFileChooser chooser = new JFileChooser();
+                chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                try {
+                    File folder = new File(EntityEditor.class.getResource("/model/").toURI());
+                    chooser.setCurrentDirectory(folder);
+                } catch (URISyntaxException e1) {
+                    LOGGER.info("Could not set current directory.");
+                }
+                chooser.showOpenDialog(null);
+                File chosen = chooser.getSelectedFile();
+                if (chosen != null && chosen.getName().matches("M\\d{5}") && new File(chosen, ENTITY_ENT).exists()) {
+                    editor3dCore.doRender(false);
+                    data = new EditorData();
+                    editor3dCore.setEditorData(data);
+                    ObjectMapper mapper = new ObjectMapper();
+                    try {
+                        JsonNode tree = mapper.readTree(new File(chosen, ENTITY_ENT));
+                        data.setId(Integer.parseInt(chosen.getName().substring(1)));
+                        data.setNumColums(tree.get("numColumns").getIntValue());
+                        data.setReflectivity((float) tree.get("reflectivity").getDoubleValue());
+                        data.setShineDamper((float) tree.get("shineDamper").getDoubleValue());
+                        data.setScale((float) tree.get("scale").getDoubleValue());
+                        if (new File(chosen, MODEL_OBJ).exists()) {
+                            data.setModelFile(new File(chosen, MODEL_OBJ));
+                            editor3dCore.loadEntity();
+                            editor3dCore.triggerLoadModel();
+                        }
+                        if (new File(chosen, TEXTURE_PNG).exists()) {
+                            data.setTextureFile(new File(chosen, TEXTURE_PNG));
+                            editor3dCore.triggerUpdateTexture();
+                            updateTexturePreview(data.getTextureFile());
+                        }
+                        Iterator<String> componentNames = tree.get(COMPONENTS).getFieldNames();
+                        while (componentNames.hasNext()) {
+                            String name = componentNames.next();
+                            editor3dCore.addComponent(name);
+                            Component c = editor3dCore.getComponent(name);
+                            c.deserialize(tree.get(COMPONENTS).get(name));
+                            data.getComponentsAdded().add(name);
+                        }
+                    } catch (IOException e1) {
+                        LOGGER.error("Could not read entity file in path " + chosen);
+
+                    }
+                    updateEditor(data);
+                    fillComponentComboAndList();
+                    editor3dCore.updateData();
+                    editor3dCore.doRender(true);
+
+                }
+            }
+        });
         menueFile.add(menueItemLoad);
     }
 
     /**
-     * Once the Canvas is created its add notify method will call this method to start the LWJGL
-     * Display and game loop in another thread.
+     * Once the Canvas is created its add notify method will call this method to start the LWJGL Display and game loop in another thread.
      */
     public void startLWJGL() {
         messageQueue = new LinkedBlockingQueue<String>();
@@ -658,8 +744,8 @@ public class EntityEditor extends JFrame {
     }
 
     /**
-     * Tell game loop to stop running, after which the LWJGL Display will be destoryed. The main
-     * thread will wait for the Display.destroy() to complete
+     * Tell game loop to stop running, after which the LWJGL Display will be destoryed. The main thread will wait for the Display.destroy()
+     * to complete
      */
     private void stopLWJGL() {
         try {

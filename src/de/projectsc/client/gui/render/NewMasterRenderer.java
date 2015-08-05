@@ -98,7 +98,8 @@ public class NewMasterRenderer {
         List<Light> lights = new LinkedList<>();
         processTerrain(terrain);
         for (Entity e : allEntities) {
-            if (e.getComponent(ModelAndTextureComponent.class) != null) {
+            if (e.getComponent(ModelAndTextureComponent.class) != null
+                && e.getComponent(ModelAndTextureComponent.class).getTexturedModel() != null) {
                 processEntity(e, e.getComponent(ModelAndTextureComponent.class));
             }
             if (e.getComponent(EmittingLightComponent.class) != null) {

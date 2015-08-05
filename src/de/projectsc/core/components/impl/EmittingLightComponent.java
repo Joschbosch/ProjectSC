@@ -7,7 +7,6 @@ package de.projectsc.core.components.impl;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -16,7 +15,6 @@ import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.map.JsonMappingException;
-import org.codehaus.jackson.node.ObjectNode;
 import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.client.gui.objects.Light;
@@ -133,21 +131,24 @@ public class EmittingLightComponent extends Component {
 
     @Override
     public void deserialize(JsonNode input) throws JsonProcessingException, IOException {
-        Iterator<String> it = input.getFieldNames();
-        Map<String, Vector3f> tmpOffsets = new HashMap<>();
-        while (it.hasNext()) {
-            String lightName = it.next();
-            JsonNode light = input.get(lightName);
-            JsonNode offsets = light.get("offset");
-            Vector3f offset = Serialization.readVector(mapper, offsets);
-            tmpOffsets.put(lightName, offset);
-        }
-        List<Light> tmplights = Serialization.deserializeLights(mapper, (ObjectNode) input);
-        offsets.clear();
-        lights.clear();
-        for (Light l : tmplights) {
+        Map<String, Map<String, List<Double>>> deserializedLights =
+            mapper.readValue(input.getTextValue(), new HashMap<String, Map<String, List<Double>>>().getClass());
+        for (String lightName : deserializedLights.keySet()) {
+            Vector3f position = readVector(deserializedLights.get(lightName), "position");
+            Vector3f color = readVector(deserializedLights.get(lightName), "color");
+            Vector3f attenuation = readVector(deserializedLights.get(lightName), "attenuation");
+            Light l = new Light(position, color, attenuation, lightName);
             lights.add(l);
-            offsets.put(l, tmpOffsets.get(l.getName()));
+            offsets.put(l, readVector(deserializedLights.get(lightName), "offset"));
         }
     }
+
+    private Vector3f readVector(Map<String, List<Double>> map, String name) {
+        List<Double> list = map.get(name);
+        double v1 = list.get(0);
+        double v2 = list.get(1);
+        double v3 = list.get(2);
+        return new Vector3f((float) v1, (float) v2, (float) v3);
+    }
+
 }

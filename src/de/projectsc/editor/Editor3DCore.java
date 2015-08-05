@@ -13,6 +13,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -83,6 +84,8 @@ public class Editor3DCore implements Runnable {
 
     private Light sun;
 
+    private AtomicBoolean doRender = new AtomicBoolean(true);
+
     public Editor3DCore(Canvas displayParent, int width, int height, BlockingQueue<String> messageQueue) {
         incomingQueue = new LinkedBlockingQueue<>();
         this.displayParent = displayParent;
@@ -152,17 +155,15 @@ public class Editor3DCore implements Runnable {
     }
 
     public void loadEntity() {
+        if (entity != null) {
+            entities.remove(entity);
+        }
         if (editorData != null) {
-            entity = new Entity(editorData.getId());
+            entity = new Entity(0);
             entity.setPosition(new Vector3f(0, 0, 0));
             entity.setRotation(new Vector3f(0, 0, 0));
             entities.add(entity);
-            if (editorData.getModelFile() != null) {
-            }
         } else {
-            if (entity != null) {
-                entities.remove(entity);
-            }
             entity = null;
         }
     }
@@ -172,6 +173,7 @@ public class Editor3DCore implements Runnable {
     }
 
     private void loadModel() {
+
         modelComponent = new ModelAndTextureComponent();
         try {
             modelComponent.loadModel(loader, editorData.getModelFile(), new File(Editor3DCore.class.getResource("/white.png").toURI()));
@@ -224,8 +226,10 @@ public class Editor3DCore implements Runnable {
             if (terrainModel != null) {
                 camera.move(delta);
                 mousePicker.update();
-                masterRenderer.renderScene(terrainModel, entities,
-                    camera, delta, new Vector4f(0, 1, 0, 100000));
+                if (doRender.get()) {
+                    masterRenderer.renderScene(terrainModel, entities,
+                        camera, delta, new Vector4f(0, 1, 0, 100000));
+                }
             } else {
                 if (Keyboard.isKeyDown(Keyboard.KEY_SPACE)) {
                     GL11.glClearColor(1f, 0, 0, 0);
@@ -325,5 +329,10 @@ public class Editor3DCore implements Runnable {
 
     public Entity getCurrentEntity() {
         return entity;
+    }
+
+    public void doRender(boolean value) {
+        doRender.set(value);
+
     }
 }
