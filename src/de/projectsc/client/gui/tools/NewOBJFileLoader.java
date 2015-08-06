@@ -138,14 +138,29 @@ public final class NewOBJFileLoader {
     }
 
     private static void processVertex(String[] vertex, List<Vertex> vertices, List<Integer> indices) {
-        int index = Integer.parseInt(vertex[0]) - 1;
+        int index = -1;
+        if (!vertex[0].isEmpty()) {
+            index = Integer.parseInt(vertex[0]) - 1;
+        }
         Vertex currentVertex = vertices.get(index);
-        int textureIndex = Integer.parseInt(vertex[1]) - 1;
-        int normalIndex = Integer.parseInt(vertex[2]) - 1;
+        int textureIndex = -1;
+        if (!vertex[1].isEmpty()) {
+            textureIndex = Integer.parseInt(vertex[1]) - 1;
+        }
+        int normalIndex = -1;
+        if (!vertex[2].isEmpty()) {
+            normalIndex = Integer.parseInt(vertex[2]) - 1;
+        }
         if (!currentVertex.isSet()) {
-            currentVertex.setTextureIndex(textureIndex);
-            currentVertex.setNormalIndex(normalIndex);
-            indices.add(index);
+            if (textureIndex != -1) {
+                currentVertex.setTextureIndex(textureIndex);
+            }
+            if (normalIndex != -1) {
+                currentVertex.setNormalIndex(normalIndex);
+            }
+            if (index != -1) {
+                indices.add(index);
+            }
         } else {
             dealWithAlreadyProcessedVertex(currentVertex, textureIndex, normalIndex, indices,
                 vertices);
