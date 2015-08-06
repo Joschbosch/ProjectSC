@@ -22,6 +22,8 @@ import org.apache.commons.logging.LogFactory;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
+import de.projectsc.core.CoreConstants;
+
 /**
  * Load an *.obj model file.
  * 
@@ -33,17 +35,19 @@ public final class NewOBJFileLoader {
 
     private static final String FACE_SEPERATION_CHAR = "/";
 
-    private static final String RES_LOC = "/model/";
-
     private static Map<File, ModelData> loadedModels = new TreeMap<>();
 
     private NewOBJFileLoader() {
 
     }
 
+    /**
+     * @param filePath to load obj file from
+     * @return data
+     */
     public static ModelData loadOBJ(String filePath) {
         try {
-            File objFile = new File(NewOBJFileLoader.class.getResource(RES_LOC + filePath + "/model.obj").toURI());
+            File objFile = new File(NewOBJFileLoader.class.getResource(filePath + CoreConstants.MODEL_FILENAME).toURI());
             return loadOBJ(objFile);
         } catch (URISyntaxException e) {
             LOGGER.error(e);
@@ -54,7 +58,7 @@ public final class NewOBJFileLoader {
     /**
      * Load given file.
      * 
-     * @param objFileName just the name without suffix.
+     * @param objFile file from obj
      * @return {@link ModelData} with all information
      */
     public static ModelData loadOBJ(File objFile) {

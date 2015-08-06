@@ -16,6 +16,12 @@ import org.lwjgl.util.vector.Vector3f;
 import de.projectsc.core.components.Component;
 import de.projectsc.core.components.ComponentType;
 
+/**
+ * All game objects in the game are entities. All entities have components, that define their role
+ * and behavior.
+ * 
+ * @author Josch Bosch
+ */
 public class Entity {
 
     private static int idCount = 1000;
@@ -41,6 +47,11 @@ public class Entity {
         components = new HashMap<>();
     }
 
+    /**
+     * Update all components with the given type.
+     * 
+     * @param type to update
+     */
     public void update(ComponentType type) {
         if (typeMap.get(type) != null) {
             for (Component c : typeMap.get(type)) {
@@ -57,6 +68,11 @@ public class Entity {
         return entityUID;
     }
 
+    /**
+     * Add component to entity.
+     * 
+     * @param c component to add.
+     */
     public void addComponent(Component c) {
         components.put(c.getClass(), c);
         List<Component> type = typeMap.get(c.getType());
@@ -67,6 +83,11 @@ public class Entity {
         type.add(c);
     }
 
+    /**
+     * Remove component from entity.
+     * 
+     * @param component to remove
+     */
     public void removeComponent(String component) {
         Entry<Class<? extends Component>, Component> toRemove = null;
         for (Entry<Class<? extends Component>, Component> c : components.entrySet()) {
@@ -90,8 +111,57 @@ public class Entity {
         }
     }
 
+    /**
+     * Get component from entity, null if there is no component of this class.
+     * 
+     * @param <T> class
+     * @param clazz of component to get.
+     * @return component or null
+     */
     public <T> T getComponent(Class<T> clazz) {
         return clazz.cast(components.get(clazz));
+    }
+
+    /**
+     * 
+     * Get component from entity, null if there is no component of this name.
+     * 
+     * @param name of component
+     * @return component or null
+     */
+    public Component getComponentByName(String name) {
+        for (Entry<Class<? extends Component>, Component> c : components.entrySet()) {
+            if (c.getValue().getComponentName().equals(name)) {
+                return (c.getKey().cast(c.getValue()));
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Checks if the entity has the given component.
+     * 
+     * @param <T> clazz type
+     * @param clazz to look up
+     * @return true if component is there.
+     */
+    public <T> boolean hasComponent(Class<T> clazz) {
+        return components.containsKey(clazz);
+    }
+
+    /**
+     * Checks if the entity has the given component.
+     * 
+     * @param name to look up
+     * @return true if component is there.
+     */
+    public boolean hasComponent(String name) {
+        for (Entry<Class<? extends Component>, Component> c : components.entrySet()) {
+            if (c.getValue().getComponentName().equals(name)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public Map<Class<? extends Component>, Component> getComponents() {
@@ -110,6 +180,11 @@ public class Entity {
         return scale;
     }
 
+    /**
+     * Get x rotation of entity.
+     * 
+     * @return rotation
+     */
     public float getRotX() {
         if (rotation != null) {
             return rotation.x;
@@ -117,6 +192,11 @@ public class Entity {
         return 0;
     }
 
+    /**
+     * Get y rotation of entity.
+     * 
+     * @return rotation
+     */
     public float getRotY() {
         if (rotation != null) {
             return rotation.y;
@@ -124,6 +204,11 @@ public class Entity {
         return 0;
     }
 
+    /**
+     * Get z rotation of entity.
+     * 
+     * @return rotation
+     */
     public float getRotZ() {
         if (rotation != null) {
             return rotation.z;
@@ -143,6 +228,11 @@ public class Entity {
         this.scale = scale;
     }
 
+    /**
+     * Set y rotation of entity.
+     * 
+     * @param targetRotation to set
+     */
     public void setRotY(float targetRotation) {
         if (this.rotation != null) {
             this.rotation.y = targetRotation;

@@ -6,11 +6,13 @@
 package de.projectsc.core.components.impl;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URISyntaxException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
 
 import de.projectsc.client.gui.models.RawModel;
 import de.projectsc.client.gui.models.TexturedModel;
@@ -18,6 +20,7 @@ import de.projectsc.client.gui.textures.ModelTexture;
 import de.projectsc.client.gui.tools.Loader;
 import de.projectsc.client.gui.tools.ModelData;
 import de.projectsc.client.gui.tools.NewOBJFileLoader;
+import de.projectsc.core.CoreConstants;
 import de.projectsc.core.components.Component;
 import de.projectsc.core.components.ComponentType;
 import de.projectsc.core.entities.Entity;
@@ -30,7 +33,10 @@ import de.projectsc.core.entities.Entity;
  */
 public class ModelAndTextureComponent extends Component {
 
-    public static final String name = "Model and Texture Component";
+    /**
+     * Name.
+     */
+    public static final String NAME = "Model and Texture Component";
 
     private static final Log LOGGER = LogFactory.getLog(ModelAndTextureComponent.class);
 
@@ -41,13 +47,13 @@ public class ModelAndTextureComponent extends Component {
     private int textureIndex = 0;
 
     public ModelAndTextureComponent() {
-        super(name);
+        super(NAME);
         textureIndex = 0;
         type = ComponentType.GRAPHICS;
     }
 
     public ModelAndTextureComponent(int textureIndex) {
-        super(name);
+        super(NAME);
         this.textureIndex = textureIndex;
         type = ComponentType.GRAPHICS;
 
@@ -90,7 +96,6 @@ public class ModelAndTextureComponent extends Component {
             ModelData data = NewOBJFileLoader.loadOBJ(modelFile);
             model = loader.loadToVAO(data.getVertices(), data.getTextureCoords(), data.getNormals(), data.getIndices());
             loadAndApplyTexture(loader, textureFile);
-        } else {
         }
     }
 
@@ -101,18 +106,29 @@ public class ModelAndTextureComponent extends Component {
      * @param owner with the id.
      */
     public void loadModel(Loader loader, Entity owner) {
-        ModelData data = NewOBJFileLoader.loadOBJ("M" + owner.getEntityTypeId());
-        model = loader.loadToVAO(data.getVertices(), data.getTextureCoords(), data.getNormals(), data.getIndices());
         try {
-            File textureFile =
-                new File(this.getClass().getResource("/model/M" + owner.getEntityTypeId() + "/texture.png").toURI());
+            String filePath =
+                String.format("/%s/%s/%d", CoreConstants.MODEL_DIRECTORY_NAME, CoreConstants.MODEL_DIRECTORY_PREFIX,
+                    owner.getEntityTypeId());
+            File pathToSchema;
+            pathToSchema = new File(this.getClass().getResource(filePath).toURI());
+
+            ModelData data = NewOBJFileLoader.loadOBJ(filePath);
+            model = loader.loadToVAO(data.getVertices(), data.getTextureCoords(), data.getNormals(), data.getIndices());
+            File textureFile = new File(pathToSchema, CoreConstants.TEXTURE_FILENAME);
             if (textureFile.exists()) {
                 loadAndApplyTexture(loader, textureFile);
             }
-        } catch (URISyntaxException e) {
-            LOGGER.error("Could not load texture for " + owner.getEntityTypeId());
+            // load texture settings for this model
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode tree = mapper.readTree(new File(filePath, CoreConstants.ENTITY_FILENAME));
+            setNumberOfRows(tree.get("numColumns").getIntValue());
+            setReflectivity((float) tree.get("reflectivity").getDoubleValue());
+            setShineDamper((float) tree.get("shineDamper").getDoubleValue());
+            owner.setScale((float) tree.get("scale").getDoubleValue());
+        } catch (URISyntaxException | IOException e) {
+            LOGGER.error("Could not load schema for id " + owner.getEntityTypeId(), e);
         }
-        // load texture settings for this model
     }
 
     /**

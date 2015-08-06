@@ -14,7 +14,6 @@ import java.util.TreeMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Vector4f;
 
@@ -110,7 +109,8 @@ public class GameRunning implements State {
         loadEntityModels(staticRenderEntities, staticEntities);
         dynamicRenderEntities = new ArrayList<>();
         loadEntityModels(dynamicRenderEntities, movingEntities);
-        camera = new Camera(player);
+        camera = new Camera();
+        camera.setPosition(player.getPosition().x, player.getPosition().y, player.getPosition().z);
         mousePicker = new MousePicker(camera, masterRenderer.getProjectionMatrix(), terrainModel);
         LOGGER.debug("Terrain, models and lights loaded");
     }
@@ -246,12 +246,6 @@ public class GameRunning implements State {
                     renderBoundingBoxes = true;
                 }
             }
-            if (Keyboard.getEventKey() == Keyboard.KEY_P && Keyboard.getEventKeyState()) {
-                camera.bindToEntity(player);
-            }
-        }
-        if (Mouse.isButtonDown(0)) {
-            // outgoingQueue.offer(new GUIMessage(GUIMessageConstants.POINT_ON_MAP_CLICKED, mousePicker.getCurrentTerrainPoint()));
         }
 
     }

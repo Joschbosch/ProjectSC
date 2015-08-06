@@ -58,6 +58,7 @@ import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 
+import de.projectsc.core.CoreConstants;
 import de.projectsc.core.components.Component;
 import de.projectsc.core.components.impl.EmittingLightComponent;
 import de.projectsc.core.components.impl.MovingComponent;
@@ -73,18 +74,20 @@ import de.projectsc.editor.componentViews.MovingComponentView;
  */
 public class EntityEditor extends JFrame {
 
-    private static final String ENTITY_ENT = "entity.ent";
-
-    private static final String TEXTURE_PNG = "texture.png";
-
-    private static final String MODEL_OBJ = "model.obj";
-
-    private static final String COMPONENTS = "components";
-
     /**
      * Smallest id for models.
      */
     public static final int MINIMUM_ID = 10000;
+
+    private static final String COULD_NOT_SET_CURRENT_DIRECTORY = "Could not set current directory.";
+
+    private static final String ENTITY_ENT = CoreConstants.ENTITY_FILENAME;
+
+    private static final String TEXTURE_PNG = CoreConstants.TEXTURE_FILENAME;
+
+    private static final String MODEL_OBJ = CoreConstants.MODEL_FILENAME;
+
+    private static final String COMPONENTS = "components";
 
     private static final String DOT = ".";
 
@@ -93,6 +96,8 @@ public class EntityEditor extends JFrame {
     private static final Log LOGGER = LogFactory.getLog(EntityEditor.class);
 
     private static final long serialVersionUID = 3313139728699706144L;
+
+    private static final String SLASHED_MODEL_DIR = "/" + CoreConstants.MODEL_DIRECTORY_NAME + "/";
 
     private JPanel contentPane;
 
@@ -136,11 +141,13 @@ public class EntityEditor extends JFrame {
 
     private JCheckBox cycleCheckbox;
 
+    private JCheckBox moveEntityCheckBox;
+
     private JCheckBox lightPositionCheckBox;
 
     private JComboBox<String> componentCombo;
 
-    private final String[] componentNames = { EmittingLightComponent.name, MovingComponent.name };
+    private final String[] componentNames = { EmittingLightComponent.NAME, MovingComponent.NAME };
 
     private JList<String> componentList;
 
@@ -151,9 +158,9 @@ public class EntityEditor extends JFrame {
         data = new EditorData();
         createContent();
         try {
-            File folder = new File(EntityEditor.class.getResource("/model/").toURI());
+            File folder = new File(EntityEditor.class.getResource(SLASHED_MODEL_DIR).toURI());
             for (int i = 0; i < 10000; i++) {
-                File f = new File(folder, "M" + (MINIMUM_ID + i));
+                File f = new File(folder, CoreConstants.MODEL_DIRECTORY_PREFIX + (MINIMUM_ID + i));
                 if (!f.exists()) {
                     data.setId(MINIMUM_ID + i);
                     break;
@@ -186,6 +193,7 @@ public class EntityEditor extends JFrame {
         shineDamperTextfield.setText("" + d.getShineDamper());
         transparentCheckbox.setSelected(d.isTransparent());
         cycleCheckbox.setSelected(d.isCycleTextures());
+        moveEntityCheckBox.setSelected(d.isMoveEntity());
         fakelightCheckbox.setSelected(d.isFakeLighting());
         rotateCheckbox.setSelected(d.isRotateCamera());
         lightPositionCheckBox.setSelected(d.isLightAtCameraPostion());
@@ -195,7 +203,7 @@ public class EntityEditor extends JFrame {
     /**
      * Launch the application.
      * 
-     * @param args programm arguments
+     * @param args program arguments
      */
     public static void main(String[] args) {
         EventQueue.invokeLater(new Runnable() {
@@ -303,18 +311,18 @@ public class EntityEditor extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (componentList.getSelectedValue() != null && !componentList.getSelectedValue().isEmpty()) {
-                    if (componentList.getSelectedValue().equals(EmittingLightComponent.name)) {
-                        EmittingLightComponent component = (EmittingLightComponent) editor3dCore.getComponent(EmittingLightComponent.name);
+                    if (componentList.getSelectedValue().equals(EmittingLightComponent.NAME)) {
+                        EmittingLightComponent component = (EmittingLightComponent) editor3dCore.getComponent(EmittingLightComponent.NAME);
                         EmittingLightComponentView dialog =
                             new EmittingLightComponentView(component, editor3dCore.getCurrentEntity());
                         dialog.setSize(800, 600);
-                        dialog.show();
-                    } else if (componentList.getSelectedValue().equals(MovingComponent.name)) {
-                        MovingComponent component = (MovingComponent) editor3dCore.getComponent(MovingComponent.name);
+                        dialog.setVisible(true);
+                    } else if (componentList.getSelectedValue().equals(MovingComponent.NAME)) {
+                        MovingComponent component = (MovingComponent) editor3dCore.getComponent(MovingComponent.NAME);
                         MovingComponentView dialog =
                             new MovingComponentView(component, editor3dCore.getCurrentEntity());
                         dialog.setSize(450, 130);
-                        dialog.show();
+                        dialog.setVisible(true);
                     }
                 }
             }
@@ -391,7 +399,7 @@ public class EntityEditor extends JFrame {
         previewOptionsPanel.add(cycleCheckbox);
 
         lightPositionCheckBox = new JCheckBox("Light at camera position");
-        lightPositionCheckBox.setBounds(6, 70, 142, 23);
+        lightPositionCheckBox.setBounds(6, 72, 142, 23);
         lightPositionCheckBox.addActionListener(new ActionListener() {
 
             @Override
@@ -403,6 +411,20 @@ public class EntityEditor extends JFrame {
             }
         });
         previewOptionsPanel.add(lightPositionCheckBox);
+
+        moveEntityCheckBox = new JCheckBox("Move entity");
+        moveEntityCheckBox.setBounds(6, 98, 142, 23);
+        moveEntityCheckBox.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                data.setEntityMoving(moveEntityCheckBox.isSelected());
+                if (editor3dCore != null) {
+                    editor3dCore.moveEntity(moveEntityCheckBox.isSelected());
+                }
+            }
+        });
+        previewOptionsPanel.add(moveEntityCheckBox);
     }
 
     private void createMainSettings() {
@@ -441,10 +463,10 @@ public class EntityEditor extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 JFileChooser chooser = new JFileChooser();
                 try {
-                    File folder = new File(EntityEditor.class.getResource("/model/").toURI());
+                    File folder = new File(EntityEditor.class.getResource(SLASHED_MODEL_DIR).toURI());
                     chooser.setCurrentDirectory(folder);
                 } catch (URISyntaxException e1) {
-                    LOGGER.info("Could not set current directory.");
+                    LOGGER.info(COULD_NOT_SET_CURRENT_DIRECTORY);
                 }
 
                 FileNameExtensionFilter filter = new FileNameExtensionFilter("PNG Files", "png");
@@ -566,10 +588,10 @@ public class EntityEditor extends JFrame {
                 JFileChooser chooser = new JFileChooser();
                 FileNameExtensionFilter filter = new FileNameExtensionFilter("Model Files", "obj");
                 try {
-                    File folder = new File(EntityEditor.class.getResource("/model/").toURI());
+                    File folder = new File(EntityEditor.class.getResource(SLASHED_MODEL_DIR).toURI());
                     chooser.setCurrentDirectory(folder);
                 } catch (URISyntaxException e1) {
-                    LOGGER.info("Could not set current directory.");
+                    LOGGER.info(COULD_NOT_SET_CURRENT_DIRECTORY);
                 }
                 chooser.setFileFilter(filter);
                 chooser.showOpenDialog(null);
@@ -639,7 +661,7 @@ public class EntityEditor extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 File folder;
                 try {
-                    folder = new File(EntityEditor.class.getResource("/model/").toURI());
+                    folder = new File(EntityEditor.class.getResource(SLASHED_MODEL_DIR).toURI());
                     File targetFolder = new File(folder, "M" + Integer.parseInt(idTextfield.getText()));
                     targetFolder.mkdirs();
                     if (data.getModelFile() != null && !data.getModelFile().equals(new File(targetFolder, MODEL_OBJ))) {
@@ -659,7 +681,6 @@ public class EntityEditor extends JFrame {
                     for (String component : data.getComponentsAdded()) {
                         Component c = editor3dCore.getComponent(component);
                         components.put(component, c.serialize());
-                        System.out.println(component);
                     }
                     serialization.put(COMPONENTS, components);
                     ObjectMapper mapper = new ObjectMapper();
@@ -680,10 +701,10 @@ public class EntityEditor extends JFrame {
                 JFileChooser chooser = new JFileChooser();
                 chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                 try {
-                    File folder = new File(EntityEditor.class.getResource("/model/").toURI());
+                    File folder = new File(EntityEditor.class.getResource(SLASHED_MODEL_DIR).toURI());
                     chooser.setCurrentDirectory(folder);
                 } catch (URISyntaxException e1) {
-                    LOGGER.info("Could not set current directory.");
+                    LOGGER.info(COULD_NOT_SET_CURRENT_DIRECTORY);
                 }
                 chooser.showOpenDialog(null);
                 File chosen = chooser.getSelectedFile();
@@ -701,7 +722,7 @@ public class EntityEditor extends JFrame {
                         data.setScale((float) tree.get("scale").getDoubleValue());
                         if (new File(chosen, MODEL_OBJ).exists()) {
                             data.setModelFile(new File(chosen, MODEL_OBJ));
-                            editor3dCore.loadEntity();
+                            editor3dCore.createNewEntity();
                             editor3dCore.triggerLoadModel();
                         }
                         if (new File(chosen, TEXTURE_PNG).exists()) {
@@ -709,9 +730,9 @@ public class EntityEditor extends JFrame {
                             editor3dCore.triggerUpdateTexture();
                             updateTexturePreview(data.getTextureFile());
                         }
-                        Iterator<String> componentNames = tree.get(COMPONENTS).getFieldNames();
-                        while (componentNames.hasNext()) {
-                            String name = componentNames.next();
+                        Iterator<String> componentNamesIterator = tree.get(COMPONENTS).getFieldNames();
+                        while (componentNamesIterator.hasNext()) {
+                            String name = componentNamesIterator.next();
                             editor3dCore.addComponent(name);
                             Component c = editor3dCore.getComponent(name);
                             c.deserialize(tree.get(COMPONENTS).get(name));
@@ -733,7 +754,8 @@ public class EntityEditor extends JFrame {
     }
 
     /**
-     * Once the Canvas is created its add notify method will call this method to start the LWJGL Display and game loop in another thread.
+     * Once the Canvas is created its add notify method will call this method to start the LWJGL
+     * Display and game loop in another thread.
      */
     public void startLWJGL() {
         messageQueue = new LinkedBlockingQueue<String>();
@@ -744,8 +766,8 @@ public class EntityEditor extends JFrame {
     }
 
     /**
-     * Tell game loop to stop running, after which the LWJGL Display will be destoryed. The main thread will wait for the Display.destroy()
-     * to complete
+     * Tell game loop to stop running, after which the LWJGL Display will be destoryed. The main
+     * thread will wait for the Display.destroy() to complete
      */
     private void stopLWJGL() {
         try {
@@ -818,7 +840,7 @@ public class EntityEditor extends JFrame {
         String text = idTextfield.getText();
         int id = Integer.parseInt(text);
         try {
-            File folder = new File(EntityEditor.class.getResource("/model/").toURI());
+            File folder = new File(EntityEditor.class.getResource(SLASHED_MODEL_DIR).toURI());
             File folder2 = new File(folder, "M" + id);
             if (folder2.exists()) {
                 isvalid = false;

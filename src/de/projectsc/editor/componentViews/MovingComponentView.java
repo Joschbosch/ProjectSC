@@ -1,7 +1,8 @@
 /*
- * Copyright (C) 2015
+ * Copyright (C) 2015 Project SC
+ * 
+ * All rights reserved
  */
-
 package de.projectsc.editor.componentViews;
 
 import javax.swing.JDialog;
@@ -14,7 +15,14 @@ import javax.swing.event.ChangeListener;
 import de.projectsc.core.components.impl.MovingComponent;
 import de.projectsc.core.entities.Entity;
 
+/**
+ * Editor view for the {@link MovingComponent}.
+ * 
+ * @author Josch Bosch
+ */
 public class MovingComponentView extends JDialog {
+
+    private static final long serialVersionUID = -504709352705363482L;
 
     public MovingComponentView(MovingComponent component, Entity entity) {
         setTitle("Moving Component");

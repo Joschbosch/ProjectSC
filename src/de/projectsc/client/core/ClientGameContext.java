@@ -15,6 +15,8 @@ import de.projectsc.core.game.GameConfiguration;
  */
 public class ClientGameContext extends StatefulContext {
 
+    private static final long serialVersionUID = -1363044117352387082L;
+
     private final ClientCore core;
 
     private GUI gui;

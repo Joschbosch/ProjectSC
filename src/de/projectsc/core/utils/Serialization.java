@@ -1,7 +1,8 @@
 /*
- * Copyright (C) 2015 
+ * Copyright (C) 2015 Project SC
+ * 
+ * All rights reserved
  */
-
 package de.projectsc.core.utils;
 
 import java.io.IOException;
@@ -20,7 +21,12 @@ import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.client.gui.objects.Light;
 
-public class Serialization {
+/**
+ * Utils for Serialization.
+ * 
+ * @author Josch Bosch
+ */
+public final class Serialization {
 
     private static final String ATTENUATION = "attenuation";
 
@@ -28,7 +34,13 @@ public class Serialization {
 
     private static final String POSITION = "position";
 
-    public static Map<String, Map<String, Float[]>> serializeLights(List<Light> lightsToSerialize) {
+    private Serialization() {};
+
+    /**
+     * @param lightsToSerialize list
+     * @return map ready to serialize
+     */
+    public static Map<String, Map<String, Float[]>> createSerializableMap(List<Light> lightsToSerialize) {
 
         Map<String, Map<String, Float[]>> lights = new HashMap<>();
         for (Light l : lightsToSerialize) {
@@ -41,6 +53,14 @@ public class Serialization {
         return lights;
     }
 
+    /**
+     * @param mapper to read json
+     * @param lightsNode of tree
+     * @return list of all lights
+     * @throws IOException e
+     * @throws JsonParseException e
+     * @throws JsonMappingException e
+     */
     public static List<Light> deserializeLights(ObjectMapper mapper, ObjectNode lightsNode)
         throws IOException, JsonParseException, JsonMappingException {
         Iterator<String> lightsIterator = lightsNode.getFieldNames();
@@ -59,10 +79,19 @@ public class Serialization {
         return staticLights;
     }
 
+    /**
+     * @param mapper to read json
+     * @param node of vector
+     * @return read vector
+     * @throws JsonParseException e
+     * @throws JsonMappingException e
+     * @throws IOException e
+     */
     public static Vector3f readVector(ObjectMapper mapper, JsonNode node) throws JsonParseException, JsonMappingException, IOException {
         Float[] values = mapper.readValue(node, new Float[3].getClass());
         Vector3f vector = new Vector3f(values[0], values[1], values[2]);
         return vector;
 
     }
+
 }

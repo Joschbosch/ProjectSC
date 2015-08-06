@@ -17,7 +17,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import de.projectsc.core.data.messages.MessageConstants;
-import de.projectsc.core.data.messages.MessageConstants;
 import de.projectsc.server.core.game.Game;
 import de.projectsc.server.core.messages.NewClientConnectedServerMessage;
 import de.projectsc.server.core.messages.ServerMessage;

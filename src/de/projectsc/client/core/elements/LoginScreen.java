@@ -6,6 +6,11 @@
 
 package de.projectsc.client.core.elements;
 
+/**
+ * Screen if client wants to login.
+ * 
+ * @author Josch Bosch
+ */
 public class LoginScreen implements UIElement {
 
     private String loginMessage = "";

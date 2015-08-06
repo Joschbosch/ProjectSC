@@ -9,12 +9,9 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import com.rits.cloning.Cloner;
 
 import de.projectsc.core.Terrain;
 import de.projectsc.core.Tile;
@@ -44,13 +41,7 @@ public class GameRunningState extends GameState {
 
     private Terrain terrain;
 
-    private Map<Integer, WorldEntity> staticEntities;
-
-    private Map<Integer, WorldEntity> entities;
-
     private long gameTick = 0;
-
-    private long time = 0;
 
     @Override
     public void call(GameContext context) throws Exception {
@@ -58,17 +49,13 @@ public class GameRunningState extends GameState {
         this.context = context;
         this.collisionTree = context.getCollisionTree();
         this.terrain = context.getTerrain();
-        this.entities = context.getEntities();
-        this.staticEntities = context.getStaticEntities();
         sendMessageToAllPlayers(new ServerMessage(GameMessageConstants.BEGIN_GAME));
-        time = System.currentTimeMillis();
         context.getGame().changeState(this);
     }
 
     @Override
     public void loop() {
         gameTick++;
-        time = System.currentTimeMillis();
         PlayerEntity e = context.getPlayers().get(0L).getEntity();
         terrain.markEntityPosition(e, Tile.WALKABLE);
         e.move(GAME_TICK_TIME);
@@ -90,7 +77,7 @@ public class GameRunningState extends GameState {
     }
 
     private void createSnapshot() {
-        Cloner cloner = new Cloner();
+        // Cloner cloner = new Cloner();
 
         // MyClass clone=cloner.deepClone(o);
     }

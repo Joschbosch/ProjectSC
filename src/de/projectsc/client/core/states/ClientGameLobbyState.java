@@ -43,6 +43,7 @@ public class ClientGameLobbyState extends ClientGameState {
         this.gui = context.getGUI();
         chat = new Chat();
         config = new GameConfigurationView(gameContext.getGameConfiguration());
+        config.getGameConfiguration();
         context.getCore().changeState(this);
     }
 

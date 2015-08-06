@@ -6,16 +6,12 @@
 package de.projectsc.client.core.states;
 
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import de.projectsc.client.core.ClientGameContext;
 import de.projectsc.client.core.messages.ClientMessage;
-import de.projectsc.core.Terrain;
-import de.projectsc.core.entities.WorldEntity;
-import de.projectsc.core.utils.OctTree;
 
 /**
  * State when the game is started and running. This is the main state for all the game logic.
@@ -31,24 +27,11 @@ public class ClientGameRunningState extends ClientGameState {
 
     private static final Log LOGGER = LogFactory.getLog(ClientLoadingState.class);
 
-    private OctTree<WorldEntity> collisionTree;
-
-    private Terrain terrain;
-
-    private Map<Integer, WorldEntity> staticEntities;
-
-    private Map<Integer, WorldEntity> entities;
-
-    private final long gameTick = 0;
-
-    private long time = 0;
-
     @Override
     public void call(ClientGameContext context) throws Exception {
         LOGGER.debug("Entered game state " + context.getState());
 
         this.context = context;
-        time = System.currentTimeMillis();
         context.getCore().changeState(this);
 
     }

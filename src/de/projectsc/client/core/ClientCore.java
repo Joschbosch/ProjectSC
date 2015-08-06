@@ -128,6 +128,9 @@ public class ClientCore implements Runnable {
         }
     }
 
+    /**
+     * @param clientMessage to send to server
+     */
     public void sendMessageToServer(ClientMessage clientMessage) {
         networkSendQueue.offer(clientMessage);
     }

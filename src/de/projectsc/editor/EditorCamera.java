@@ -8,7 +8,6 @@ package de.projectsc.editor;
 import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.client.gui.objects.Camera;
-import de.projectsc.client.gui.objects.GraphicalEntity;
 
 /**
  * A camera object especially for the editor.
@@ -19,22 +18,21 @@ public class EditorCamera extends Camera {
 
     private boolean rotateCamera;
 
-    public EditorCamera(GraphicalEntity player) {
-        super(player);
-        distanceFromPlayer = 20;
+    public EditorCamera() {
+        distanceFromCenterPoint = 20;
         pitch = 40;
         setPosition(0f, 20f, 10f);
-
     }
 
     @Override
     public void move(float delta) {
-        // super.move(delta);
+        calculatePitch();
+        calculateAngleAroundPlayer();
         if (rotateCamera) {
-            angleAroundPlayer += delta * 0.003f;
+            angleAroundPlayer += delta * ANGLE_AROUND_PLAYER_FACTOR / 100f;
         }
         this.yaw = (0.0f - angleAroundPlayer);
-        calculateCameraPosition(new Vector3f(0, 0, 0), distanceFromPlayer, angleAroundPlayer);
+        calculateCameraPosition(centeringPoint, distanceFromCenterPoint, angleAroundPlayer);
     }
 
     @Override
@@ -51,9 +49,4 @@ public class EditorCamera extends Camera {
         this.rotateCamera = rotateCamera;
     }
 
-    public void setPosition(float x, float y, float z) {
-        position.x = x;
-        position.y = y;
-        position.z = z;
-    }
 }

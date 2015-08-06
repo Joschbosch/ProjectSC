@@ -30,7 +30,7 @@ public class Main {
         // ClientCore core = new ClientCore();
         if (args.length > 0 && args[0] != null && args[0].equals("server")) {
             ServerCore serverCore = new ServerCore();
-            ServerNetworkCore serverNetwork = new ServerNetworkCore(serverCore, serverCore.getReceiveQueue());
+            new ServerNetworkCore(serverCore, serverCore.getReceiveQueue());
             new Thread(serverCore).start();
 
         } else {

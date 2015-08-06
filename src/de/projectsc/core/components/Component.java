@@ -33,15 +33,29 @@ public abstract class Component {
         this.componentName = newName;
     }
 
+    /**
+     * Update method for the component.
+     * 
+     * @param owner entity that has this component.
+     */
     public abstract void update(Entity owner);
 
+    /**
+     * 
+     * @return serialized string
+     * @throws JsonGenerationException e
+     * @throws JsonMappingException e
+     * @throws IOException e
+     */
     public abstract String serialize() throws JsonGenerationException, JsonMappingException, IOException;
 
+    /**
+     * 
+     * @param input to deserialize
+     * @throws JsonProcessingException e
+     * @throws IOException e
+     */
     public abstract void deserialize(JsonNode input) throws JsonProcessingException, IOException;
-
-    public void receiveMessage(ComponentMessage message) {
-
-    }
 
     public ComponentType getType() {
         return type;

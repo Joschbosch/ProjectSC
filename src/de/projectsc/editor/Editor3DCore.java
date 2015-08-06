@@ -68,8 +68,6 @@ public class Editor3DCore implements Runnable {
 
     private TerrainModel terrainModel;
 
-    private final BlockingQueue<String> messageQueue;
-
     private NewMasterRenderer masterRenderer;
 
     private final List<Entity> entities = new LinkedList<>();
@@ -80,24 +78,25 @@ public class Editor3DCore implements Runnable {
 
     private ModelAndTextureComponent modelComponent;
 
-    private BlockingQueue<String> incomingQueue;
+    private final BlockingQueue<String> incomingQueue;
 
     private Light sun;
 
-    private AtomicBoolean doRender = new AtomicBoolean(true);
+    private final AtomicBoolean doRender = new AtomicBoolean(true);
+
+    private final AtomicBoolean moveEntity = new AtomicBoolean(false);
 
     public Editor3DCore(Canvas displayParent, int width, int height, BlockingQueue<String> messageQueue) {
         incomingQueue = new LinkedBlockingQueue<>();
         this.displayParent = displayParent;
         this.width = width;
         this.height = height;
-        this.messageQueue = messageQueue;
     }
 
     @Override
     public void run() {
         running = true;
-        loadEntity();
+
         try {
             Display.setDisplayMode(new DisplayMode(width, height));
             Display.setTitle("Project SC Entity Editor");
@@ -107,95 +106,18 @@ public class Editor3DCore implements Runnable {
             initGL();
         } catch (LWJGLException e) {
         }
+
+        camera = new EditorCamera();
         loader = new Loader();
-
-        camera = new EditorCamera(null);
+        createNewEntity();
         masterRenderer = new NewMasterRenderer(loader);
-
-        Tile[][] tiles = new Tile[100][100];
-
-        Entity lightEntity = new Entity(-2);
-        lightEntity.setPosition(new Vector3f(0, 0, 0));
-        EmittingLightComponent lightComponent = new EmittingLightComponent();
-        sun = new Light(new Vector3f(0.0f, 100.0f, 100.0f), new Vector3f(1.0f, 1.0f, 1.0f), "sun");
-        lightComponent.addLight(lightEntity, sun);
-        lightEntity.addComponent(lightComponent);
-        entities.add(lightEntity);
-        Terrain t =
-            new Terrain(tiles, "terrain/grass.png", "terrain/grass.png", "terrain/grass.png", "terrain/grass.png", new LinkedList<>(),
-                new HashMap<Integer, WorldEntity>());
-
-        TerrainTexture backgroundTex = new TerrainTexture(loader.loadTexture("terrain/grass.png"));
-        TerrainTexture rTex = new TerrainTexture(loader.loadTexture("terrain/grass.png"));
-        TerrainTexture gTex = new TerrainTexture(loader.loadTexture("terrain/grass.png"));
-        TerrainTexture bTex = new TerrainTexture(loader.loadTexture("terrain/grass.png"));
-        TerrainTexturePack texturePack = new TerrainTexturePack(backgroundTex, rTex, gTex, bTex);
-        TerrainTexture blendMap = new TerrainTexture(loader.loadTexture(TerrainLoader.createBlendMap(t)));
-
-        terrainModel = new TerrainModel(t, -0.5f, -0.5f, texturePack, blendMap, loader);
-
-        mousePicker = new MousePicker(camera, masterRenderer.getProjectionMatrix(), terrainModel);
-
+        createPlayerEntity();
+        createSun();
+        createTerrain();
         gameLoop();
     }
 
-    protected void initGL() {}
-
-    public void updateData(EditorData data) {
-        if (entity != null) {
-            entity.setScale(editorData.getScale());
-        }
-        if (modelComponent != null) {
-            modelComponent.setFakeLighting(editorData.isFakeLighting());
-            modelComponent.setIsTransparent(editorData.isTransparent());
-            modelComponent.setReflectivity(editorData.getReflectivity());
-            modelComponent.setShineDamper(editorData.getShineDamper());
-            modelComponent.setNumberOfRows(editorData.getNumColums());
-        }
-    }
-
-    public void loadEntity() {
-        if (entity != null) {
-            entities.remove(entity);
-        }
-        if (editorData != null) {
-            entity = new Entity(0);
-            entity.setPosition(new Vector3f(0, 0, 0));
-            entity.setRotation(new Vector3f(0, 0, 0));
-            entities.add(entity);
-        } else {
-            entity = null;
-        }
-    }
-
-    public void triggerLoadModel() {
-        incomingQueue.offer("loadModel");
-    }
-
-    private void loadModel() {
-
-        modelComponent = new ModelAndTextureComponent();
-        try {
-            modelComponent.loadModel(loader, editorData.getModelFile(), new File(Editor3DCore.class.getResource("/white.png").toURI()));
-        } catch (URISyntaxException e) {
-            LOGGER.error(e);
-        }
-
-        entity.addComponent(modelComponent);
-        MovingComponent moving = new MovingComponent();
-        // moving.setCurrentSpeed(0.01f);
-        entity.addComponent(moving);
-    }
-
-    public void updateTexture() {
-        if (modelComponent != null) {
-            modelComponent.loadAndApplyTexture(loader, editorData.getTextureFile());
-            updateData(editorData);
-        }
-    }
-
     protected void gameLoop() {
-
         long time = System.currentTimeMillis();
         int timer = 1500;
         while (running) {
@@ -207,17 +129,8 @@ public class Editor3DCore implements Runnable {
             if (editorData.isLightAtCameraPostion()) {
                 sun.setPosition(camera.getPosition());
             }
-            if (editorData.isCycleTextures()) {
-                timer -= delta;
-                if (timer <= 0) {
-                    timer = 1500;
-                    ModelAndTextureComponent component = entity.getComponent(ModelAndTextureComponent.class);
-                    if (entity != null && component != null) {
-                        component.setTextureIndex((component.getTextureIndex() + 1)
-                            % (editorData.getNumColums() * editorData.getNumColums()));
-                    }
-                }
-            }
+            timer = cycleTextures(timer, delta);
+            moveEntity();
             for (ComponentType type : ComponentType.values()) {
                 for (Entity e : entities) {
                     e.update(type);
@@ -238,14 +151,144 @@ public class Editor3DCore implements Runnable {
                 }
                 GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
             }
-            String message = messageQueue.poll();
-            if (message != null) {
-                loadMap();
-            }
             Display.sync(60);
             Display.update();
         }
         Display.destroy();
+    }
+
+    private void createPlayerEntity() {
+        Entity player = new Entity(10000);
+        ModelAndTextureComponent modelAndTexture = new ModelAndTextureComponent();
+        player.addComponent(modelAndTexture);
+        modelAndTexture.loadModel(loader, player);
+        Vector3f position = entity.getPosition();
+        position.x += 40;
+        player.setPosition(position);
+    }
+
+    private void createSun() {
+        Entity lightEntity = new Entity(-2);
+        lightEntity.setPosition(new Vector3f(0, 0, 0));
+        EmittingLightComponent lightComponent = new EmittingLightComponent();
+        sun = new Light(new Vector3f(0.0f, 100.0f, 100.0f), new Vector3f(1.0f, 1.0f, 1.0f), "sun");
+        lightComponent.addLight(lightEntity, sun);
+        lightEntity.addComponent(lightComponent);
+        entities.add(lightEntity);
+    }
+
+    private void createTerrain() {
+        Tile[][] tiles = new Tile[100][100];
+        String texture = "terrain/grass.png";
+        Terrain t =
+            new Terrain(tiles, texture, texture, texture, texture, new LinkedList<>(),
+                new HashMap<Integer, WorldEntity>());
+        TerrainTexture backgroundTex = new TerrainTexture(loader.loadTexture(texture));
+        TerrainTexture rTex = new TerrainTexture(loader.loadTexture(texture));
+        TerrainTexture gTex = new TerrainTexture(loader.loadTexture(texture));
+        TerrainTexture bTex = new TerrainTexture(loader.loadTexture(texture));
+        TerrainTexturePack texturePack = new TerrainTexturePack(backgroundTex, rTex, gTex, bTex);
+        TerrainTexture blendMap = new TerrainTexture(loader.loadTexture(TerrainLoader.createBlendMap(t)));
+
+        terrainModel = new TerrainModel(t, -0.5f, -0.5f, texturePack, blendMap, loader);
+
+        mousePicker = new MousePicker(camera, masterRenderer.getProjectionMatrix(), terrainModel);
+    }
+
+    private void moveEntity() {
+        MovingComponent c = entity.getComponent(MovingComponent.class);
+        if (moveEntity.get() && c != null) {
+            c.setCurrentSpeed(c.getMovementSpeed());
+        } else if (c != null) {
+            c.setCurrentSpeed(0);
+        }
+    }
+
+    private int cycleTextures(int timer, long delta) {
+        if (editorData.isCycleTextures()) {
+            timer -= delta;
+            if (timer <= 0) {
+                timer = 1500;
+                ModelAndTextureComponent component = entity.getComponent(ModelAndTextureComponent.class);
+                if (entity != null && component != null) {
+                    component.setTextureIndex((component.getTextureIndex() + 1)
+                        % (editorData.getNumColums() * editorData.getNumColums()));
+                }
+            }
+        }
+        return timer;
+    }
+
+    protected void initGL() {}
+
+    /**
+     * Update data from current editor data.
+     */
+    public void updateData() {
+        if (editorData != null) {
+            camera.setRotateCamera(editorData.isRotateCamera());
+            updateData(editorData);
+        }
+    }
+
+    /**
+     * Update data from new data.
+     * 
+     * @param data to update
+     */
+    public void updateData(EditorData data) {
+        if (entity != null) {
+            entity.setScale(editorData.getScale());
+        }
+        if (modelComponent != null) {
+            modelComponent.setFakeLighting(editorData.isFakeLighting());
+            modelComponent.setIsTransparent(editorData.isTransparent());
+            modelComponent.setReflectivity(editorData.getReflectivity());
+            modelComponent.setShineDamper(editorData.getShineDamper());
+            modelComponent.setNumberOfRows(editorData.getNumColums());
+        }
+    }
+
+    /**
+     * Creates a new entity.
+     */
+    public void createNewEntity() {
+        if (entity != null) {
+            entities.remove(entity);
+        }
+        if (editorData != null) {
+            entity = new Entity(0);
+            entity.setPosition(new Vector3f(0, 0, 0));
+            entity.setRotation(new Vector3f(0, 0, 0));
+            entities.add(entity);
+            camera.bindToEntity(entity);
+        } else {
+            entity = null;
+            camera.setLookAtPoint(0, 0, 0);
+        }
+    }
+
+    private void loadModel() {
+        modelComponent = new ModelAndTextureComponent();
+        try {
+            modelComponent.loadModel(loader, editorData.getModelFile(), new File(Editor3DCore.class.getResource("/white.png").toURI()));
+        } catch (URISyntaxException e) {
+            LOGGER.error(e);
+        }
+        entity.addComponent(modelComponent);
+        if (editorData.getTextureFile() != null) {
+            updateTexture();
+        }
+    }
+
+    /**
+     * load new texture.
+     */
+    public void updateTexture() {
+        if (modelComponent != null) {
+            modelComponent.loadAndApplyTexture(loader, editorData.getTextureFile());
+            updateData(editorData);
+        }
     }
 
     private void readMessages() {
@@ -267,57 +310,38 @@ public class Editor3DCore implements Runnable {
         running = false;
     }
 
-    public void loadMap() {
-
-        // loadTerrain("map");
-    }
-
-    private void loadTerrain(String mapName) {
-        Terrain terrain = TerrainLoader.loadTerrain(mapName + ".psc");
-        TerrainTexture backgroundTex = new TerrainTexture(loader.loadTexture(terrain.getBgTexture()));
-        TerrainTexture rTex = new TerrainTexture(loader.loadTexture(terrain.getRTexture()));
-        TerrainTexture gTex = new TerrainTexture(loader.loadTexture(terrain.getGTexture()));
-        TerrainTexture bTex = new TerrainTexture(loader.loadTexture(terrain.getBgTexture()));
-        TerrainTexturePack texturePack = new TerrainTexturePack(backgroundTex, rTex, gTex, bTex);
-        TerrainTexture blendMap = new TerrainTexture(loader.loadTexture(TerrainLoader.createBlendMap(terrain)));
-
-        terrainModel = new TerrainModel(terrain, 0, 0, texturePack, blendMap, loader);
-        // lights = terrain.getStaticLights();
-        // if (staticEntities == null) {
-        // staticEntities = new TreeMap<>();
-        // }
-        // staticEntities.putAll(terrain.getStaticObjects());
-    }
-
     public void setEditorData(EditorData data) {
         this.editorData = data;
     }
 
-    public void updateData() {
-        if (editorData != null) {
-            camera.setRotateCamera(editorData.isRotateCamera());
-            updateData(editorData);
-        }
-    }
-
-    public void triggerUpdateTexture() {
-        incomingQueue.offer("updateTexture");
-    }
-
+    /**
+     * Add new component to entity.
+     * 
+     * @param component to add
+     */
     public void addComponent(String component) {
-        if (EmittingLightComponent.name.equals(component)) {
+        if (EmittingLightComponent.NAME.equals(component)) {
             EmittingLightComponent lightComponent = new EmittingLightComponent();
             entity.addComponent(lightComponent);
         }
-        if (MovingComponent.name.equals(component)) {
+        if (MovingComponent.NAME.equals(component)) {
             entity.addComponent(new MovingComponent());
         }
     }
 
+    /**
+     * Remove component from entity.
+     * 
+     * @param component to remove
+     */
     public void removeComponent(String component) {
         entity.removeComponent(component);
     }
 
+    /**
+     * @param name to get
+     * @return component
+     */
     public Component getComponent(String name) {
         for (Component c : entity.getComponents().values()) {
             if (c.getComponentName().equals(name)) {
@@ -331,8 +355,31 @@ public class Editor3DCore implements Runnable {
         return entity;
     }
 
+    /**
+     * @param value true, if rendering is enabled.
+     */
     public void doRender(boolean value) {
         doRender.set(value);
+    }
 
+    /**
+     * @param value true, if entity should be moved
+     */
+    public void moveEntity(boolean value) {
+        moveEntity.set(value);
+    }
+
+    /**
+     * triggers to load model in gui thread.
+     */
+    public void triggerLoadModel() {
+        incomingQueue.offer("loadModel");
+    }
+
+    /**
+     * triggers to load texture in gui thread.
+     */
+    public void triggerUpdateTexture() {
+        incomingQueue.offer("updateTexture");
     }
 }

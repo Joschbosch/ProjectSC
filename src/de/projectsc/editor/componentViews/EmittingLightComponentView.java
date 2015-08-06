@@ -1,7 +1,8 @@
 /*
- * Copyright (C) 2015
+ * Copyright (C) 2015 Project SC
+ * 
+ * All rights reserved
  */
-
 package de.projectsc.editor.componentViews;
 
 import java.awt.event.ActionEvent;
@@ -15,7 +16,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.border.TitledBorder;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
@@ -26,6 +26,11 @@ import de.projectsc.client.gui.objects.Light;
 import de.projectsc.core.components.impl.EmittingLightComponent;
 import de.projectsc.core.entities.Entity;
 
+/**
+ * Editor view for the {@link EmittingLightComponent}.
+ * 
+ * @author Josch Bosch
+ */
 public class EmittingLightComponentView extends JDialog {
 
     private static final long serialVersionUID = -3903795685651739513L;
@@ -71,7 +76,6 @@ public class EmittingLightComponentView extends JDialog {
             new String[] {
                 "Name", "Position", "Color", "Attenation"
             }));
-        lightsTable.setBorder(new TitledBorder(null, "Lights", TitledBorder.LEADING, TitledBorder.TOP, null, null));
         lightsTable.setBounds(0, 103, 668, 347);
         panel.add(lightsTable);
 
@@ -94,37 +98,31 @@ public class EmittingLightComponentView extends JDialog {
         panel.add(lblNewLabel);
 
         positionXText = new JTextField();
-        positionXText.setText("0");
         positionXText.setBounds(95, 47, 41, 20);
         panel.add(positionXText);
         positionXText.setColumns(10);
 
         positionYText = new JTextField();
-        positionYText.setText("0");
         positionYText.setColumns(10);
         positionYText.setBounds(143, 47, 41, 20);
         panel.add(positionYText);
 
         positionZText = new JTextField();
-        positionZText.setText("0");
         positionZText.setColumns(10);
         positionZText.setBounds(191, 47, 41, 20);
         panel.add(positionZText);
 
         colorRText = new JTextField();
-        colorRText.setText("255");
         colorRText.setColumns(10);
         colorRText.setBounds(95, 72, 41, 20);
         panel.add(colorRText);
 
         colorGText = new JTextField();
-        colorGText.setText("255");
         colorGText.setColumns(10);
         colorGText.setBounds(143, 72, 41, 20);
         panel.add(colorGText);
 
         colorBText = new JTextField();
-        colorBText.setText("255");
         colorBText.setColumns(10);
         colorBText.setBounds(191, 72, 41, 20);
         panel.add(colorBText);
@@ -134,19 +132,16 @@ public class EmittingLightComponentView extends JDialog {
         panel.add(lblAttenuation);
 
         attenuation1Text = new JTextField();
-        attenuation1Text.setText("1");
         attenuation1Text.setColumns(10);
         attenuation1Text.setBounds(364, 22, 41, 20);
         panel.add(attenuation1Text);
 
         attenuation2Text = new JTextField();
-        attenuation2Text.setText("0");
         attenuation2Text.setColumns(10);
         attenuation2Text.setBounds(415, 22, 41, 20);
         panel.add(attenuation2Text);
 
         attenuation3Text = new JTextField();
-        attenuation3Text.setText("0");
         attenuation3Text.setColumns(10);
         attenuation3Text.setBounds(466, 22, 41, 20);
         panel.add(attenuation3Text);
@@ -203,16 +198,16 @@ public class EmittingLightComponentView extends JDialog {
         fillTable();
     }
 
-    private void removeSelectedLight(EmittingLightComponent component) {
+    private void removeSelectedLight(EmittingLightComponent lightComponent) {
         if (lightsTable.getSelectedRow() > -1) {
             String lightsName = (String) lightsTable.getModel().getValueAt(lightsTable.getSelectedRow(), 0);
             Light remove = null;
-            for (Light l : component.getLights()) {
+            for (Light l : lightComponent.getLights()) {
                 if (l.getName().equals(lightsName)) {
                     remove = l;
                 }
             }
-            component.getLights().remove(remove);
+            lightComponent.getLights().remove(remove);
             fillTable();
         }
     }
@@ -244,6 +239,8 @@ public class EmittingLightComponentView extends JDialog {
             List<Light> lights = component.getLights();
             Collections.sort(lights);
             TableModel dataModel = new AbstractTableModel() {
+
+                private static final long serialVersionUID = 1L;
 
                 @Override
                 public int getColumnCount() {

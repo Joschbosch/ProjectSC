@@ -9,6 +9,13 @@ import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.projectsc.core.components.impl.ModelAndTextureComponent;
+
+/**
+ * Data store for the editor and the necessary {@link ModelAndTextureComponent}.
+ * 
+ * @author Josch Bosch
+ */
 public class EditorData {
 
     private int id = 10000;
@@ -36,6 +43,8 @@ public class EditorData {
     private boolean cycleTextures = false;
 
     private boolean lightAtCamera = true;
+
+    private boolean entityMoving = false;
 
     public EditorData() {
         modelFile = null;
@@ -144,5 +153,13 @@ public class EditorData {
 
     public void setLightAtCameraPostion(boolean value) {
         lightAtCamera = value;
+    }
+
+    public boolean isMoveEntity() {
+        return entityMoving;
+    }
+
+    public void setEntityMoving(boolean value) {
+        entityMoving = value;
     }
 }

@@ -58,6 +58,9 @@ public class AuthenticatedClient {
         return displayName;
     }
 
+    /**
+     * @param arg1 received servermessage
+     */
     public void received(ServerMessage arg1) {
         receiveFromClientQueue.add(arg1);
     }

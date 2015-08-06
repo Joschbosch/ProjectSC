@@ -41,10 +41,6 @@ import de.projectsc.core.utils.Serialization;
  */
 public final class TerrainLoader {
 
-    private static final String ATTENUATION = "attenuation";
-
-    private static final String COLOR = "color";
-
     private static final String POSITION = "position";
 
     private static final String SCALE = "scale";
@@ -148,13 +144,13 @@ public final class TerrainLoader {
             e =
                 new DecorationEntity(objectNode.get(ID).asInt(), objectNode.get(
                     MODEL).asText(), objectNode.get(TEXTURE).asText(), position, rotation, (float) objectNode.get(SCALE)
-                    .asDouble());
+                        .asDouble());
             break;
         case SOLID_BACKGROUND_OBJECT:
             e =
                 new BackgroundEntity(objectNode.get(ID).asInt(), objectNode.get(
                     MODEL).asText(), objectNode.get(TEXTURE).asText(), position, rotation, (float) objectNode.get(SCALE)
-                    .asDouble());
+                        .asDouble());
             break;
         case USABLE_OBJECT:
             // e = new WorldEntity(objectNode.get(ID).asInt(), objectNode.get(
@@ -207,7 +203,7 @@ public final class TerrainLoader {
         map.put(R_TEXTURE, terrain.getRTexture());
         map.put(G_TEXTURE, terrain.getGTexture());
         map.put(B_TEXTURE, terrain.getBTexture());
-        Map<String, Map<String, Float[]>> lights = Serialization.serializeLights(terrain.getStaticLights());
+        Map<String, Map<String, Float[]>> lights = Serialization.createSerializableMap(terrain.getStaticLights());
         map.put(STATIC_LIGHTS, lights);
 
         Map<Integer, WorldEntity> staticObjects = terrain.getStaticObjects();

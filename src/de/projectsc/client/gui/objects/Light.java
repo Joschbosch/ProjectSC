@@ -14,7 +14,7 @@ import org.lwjgl.util.vector.Vector3f;
  */
 public class Light implements Comparable<Light> {
 
-    private Vector3f position;
+    private final Vector3f position;
 
     private Vector3f color;
 
@@ -41,6 +41,9 @@ public class Light implements Comparable<Light> {
         return position;
     }
 
+    /**
+     * @param position new position
+     */
     public void setPosition(Vector3f position) {
         this.position.x = position.x;
         this.position.y = position.y;

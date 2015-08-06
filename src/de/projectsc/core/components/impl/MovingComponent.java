@@ -22,7 +22,10 @@ import de.projectsc.core.entities.Entity;
  */
 public class MovingComponent extends Component {
 
-    public static final String name = "Moving Component";
+    /**
+     * Name.
+     */
+    public static final String NAME = "Moving Component";
 
     private int turnSpeed = 60;
 
@@ -36,10 +39,10 @@ public class MovingComponent extends Component {
 
     private Queue<Tile> path;
 
-    private float targetRotation;
+    // private float targetRotation;
 
     public MovingComponent() {
-        super(name);
+        super(NAME);
         type = ComponentType.PREPHYSICS;
     }
 
@@ -70,7 +73,7 @@ public class MovingComponent extends Component {
             if (currentTarget.x < e.getPosition().x) {
                 rotationTarget = -rotationTarget;
             }
-            this.targetRotation = rotationTarget;
+            // this.targetRotation = rotationTarget;
         }
     }
 
@@ -114,6 +117,7 @@ public class MovingComponent extends Component {
     /**
      * Moves the entity with the given deltas.
      * 
+     * @param e entity
      * @param dx x delta
      * @param dy y delta
      * @param dz z delta

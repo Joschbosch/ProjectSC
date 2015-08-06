@@ -30,14 +30,17 @@ import de.projectsc.core.utils.Serialization;
  */
 public class EmittingLightComponent extends Component {
 
-    public static final String name = "Emitting light component";
+    /**
+     * Name.
+     */
+    public static final String NAME = "Emitting light component";
 
     private final List<Light> lights = new LinkedList<>();
 
     private final Map<Light, Vector3f> offsets = new HashMap<>();
 
     public EmittingLightComponent() {
-        super(name);
+        super(NAME);
         type = ComponentType.GRAPHICS;
     }
 
@@ -68,7 +71,8 @@ public class EmittingLightComponent extends Component {
     }
 
     /**
-     * Add light to entity. Note that the lights postion will be the offset of the entities position.
+     * Add light to entity. Note that the lights postion will be the offset of the entities
+     * position.
      * 
      * @param e owner entity
      * @param light to add
@@ -121,7 +125,7 @@ public class EmittingLightComponent extends Component {
 
     @Override
     public String serialize() throws JsonGenerationException, JsonMappingException, IOException {
-        Map<String, Map<String, Float[]>> serializedLights = Serialization.serializeLights(lights);
+        Map<String, Map<String, Float[]>> serializedLights = Serialization.createSerializableMap(lights);
         for (Light l : offsets.keySet()) {
             Map<String, Float[]> values = serializedLights.get(l.getName());
             values.put("offset", new Float[] { offsets.get(l).x, offsets.get(l).y, offsets.get(l).z });
@@ -131,7 +135,7 @@ public class EmittingLightComponent extends Component {
 
     @Override
     public void deserialize(JsonNode input) throws JsonProcessingException, IOException {
-        Map<String, Map<String, List<Double>>> deserializedLights =
+        @SuppressWarnings("unchecked") Map<String, Map<String, List<Double>>> deserializedLights =
             mapper.readValue(input.getTextValue(), new HashMap<String, Map<String, List<Double>>>().getClass());
         for (String lightName : deserializedLights.keySet()) {
             Vector3f position = readVector(deserializedLights.get(lightName), "position");

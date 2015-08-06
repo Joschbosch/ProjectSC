@@ -7,6 +7,12 @@ package de.projectsc.client.core.elements;
 
 import de.projectsc.core.game.GameConfiguration;
 
+/**
+ * 
+ * .
+ * 
+ * @author Josch Bosch
+ */
 public class GameConfigurationView implements UIElement {
 
     private final GameConfiguration gameConfiguration;
