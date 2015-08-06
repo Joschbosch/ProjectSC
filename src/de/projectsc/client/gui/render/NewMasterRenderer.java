@@ -18,16 +18,20 @@ import org.lwjgl.opengl.GL30;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector4f;
 
+import de.projectsc.client.gui.models.RawModel;
 import de.projectsc.client.gui.models.TexturedModel;
 import de.projectsc.client.gui.objects.Camera;
 import de.projectsc.client.gui.objects.Light;
+import de.projectsc.client.gui.shaders.CollisionBoxShader;
 import de.projectsc.client.gui.shaders.EntityShader;
 import de.projectsc.client.gui.shaders.TerrainShader;
 import de.projectsc.client.gui.terrain.TerrainModel;
 import de.projectsc.client.gui.tools.Loader;
+import de.projectsc.core.components.impl.BoundingComponent;
 import de.projectsc.core.components.impl.EmittingLightComponent;
 import de.projectsc.core.components.impl.ModelAndTextureComponent;
 import de.projectsc.core.entities.Entity;
+import de.projectsc.core.utils.BoundingBox;
 
 /**
  * Coordinates rendering of multiple entites.
@@ -64,12 +68,20 @@ public class NewMasterRenderer {
 
     private final List<TerrainModel> terrains = new ArrayList<>();
 
+    private final CollisionBoxShader collisionBoxShader;
+
+    private final NewCollisionBoxRenderer collisionBoxRenderer;
+
+    private Map<RawModel, List<BoundingBox>> boundingBoxes;
+
     public NewMasterRenderer(Loader loader) {
         enableCulling();
         GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
         createProjectionMatrix();
         entityShader = new EntityShader();
         entityRenderer = new NewEntityRenderer(entityShader, projectionMatrix);
+        collisionBoxShader = new CollisionBoxShader();
+        collisionBoxRenderer = new NewCollisionBoxRenderer(collisionBoxShader, projectionMatrix);
         terrainShader = new TerrainShader();
         terrainRenderer = new TerrainRenderer(terrainShader, projectionMatrix);
         skyboxRenderer = new SkyboxRenderer(loader, projectionMatrix);
@@ -106,7 +118,11 @@ public class NewMasterRenderer {
                 EmittingLightComponent lightComp = e.getComponent(EmittingLightComponent.class);
                 lights.addAll(lightComp.getLights());
             }
+            if (e.getComponent(BoundingComponent.class) != null) {
+                processBoundingBox(e.getComponent(BoundingComponent.class));
+            }
         }
+
         render(lights, camera, elapsedTime, clipPlane);
     }
 
@@ -114,6 +130,7 @@ public class NewMasterRenderer {
      * General render method .
      * 
      * @param lights to use
+     * @param boxes boundingBoxes to render.
      * @param camera to use
      * @param elapsedTime since last frame
      * @param clipPlane to clip the world
@@ -127,6 +144,10 @@ public class NewMasterRenderer {
         entityShader.loadViewMatrix(camera);
         entityRenderer.render(entities);
         entityShader.stop();
+        collisionBoxShader.start();
+        collisionBoxShader.loadViewMatrix(camera);
+        collisionBoxRenderer.render(boundingBoxes);
+        collisionBoxShader.stop();
         terrainShader.start();
         terrainShader.loadClipPlane(clipPlane);
         terrainShader.loadSkyColor(SKY_R, SKY_G, SKY_B);
@@ -163,6 +184,18 @@ public class NewMasterRenderer {
             List<Entity> newBatch = new ArrayList<>();
             newBatch.add(e);
             entities.put(entityModel, newBatch);
+        }
+    }
+
+    private void processBoundingBox(BoundingComponent component) {
+        RawModel model = component.getBox().getModel();
+        List<BoundingBox> batch = boundingBoxes.get(model);
+        if (batch != null) {
+            batch.add(component.getBox());
+        } else {
+            List<BoundingBox> newBatch = new ArrayList<>();
+            newBatch.add(component.getBox());
+            boundingBoxes.put(model, newBatch);
         }
     }
 
