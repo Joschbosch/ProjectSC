@@ -18,6 +18,7 @@ import de.projectsc.client.gui.tools.Loader;
 import de.projectsc.client.gui.tools.ModelData;
 import de.projectsc.client.gui.tools.NewOBJFileLoader;
 import de.projectsc.core.components.Component;
+import de.projectsc.core.components.ComponentType;
 import de.projectsc.core.entities.Entity;
 import de.projectsc.core.utils.BoundingBox;
 
@@ -36,19 +37,28 @@ public class BoundingComponent extends Component {
 
     private float scale;
 
+    private File boxFile;
+
     public BoundingComponent() {
         super(NAME);
+        setType(ComponentType.PHYSICS);
+        offset = new Vector3f(0f, 0f, 0f);
+        scale = 1.0f;
+        box = null;
+        position = null;
     }
 
     public void loadBoundingBox(Entity owner, Loader loader, File boxObjectFile) {
+        this.setBoxFile(boxObjectFile);
+        System.out.println("load " + boxObjectFile);
         ModelData data = NewOBJFileLoader.loadOBJ(boxObjectFile);
         RawModel model = loader.loadToVAO(data.getVertices(), data.getIndices());
         Vector3f[] minMax = findMinAndMax(data.getVertices());
         box = new BoundingBox(minMax[0], minMax[1]);
         box.setModel(model);
-        position = Vector3f.add(owner.getPosition(), box.getCenter(), null);
-        offset = new Vector3f(0f, 0f, 0f);
-        scale = 1.0f;
+        position = Vector3f.add(owner.getPosition(), offset, null);
+        box.setPosition(position);
+        box.setScale(scale);
     }
 
     private Vector3f[] findMinAndMax(float[] vertices) {
@@ -69,19 +79,21 @@ public class BoundingComponent extends Component {
 
     @Override
     public void update(Entity owner) {
-        position = Vector3f.add(owner.getPosition(), box.getCenter(), null);
-        position = Vector3f.add(position, offset, null);
+        if (owner != null && box != null) {
+            position = Vector3f.add(owner.getPosition(), offset, null);
+            box.setPosition(position);
+            scale = 1.0f;
+            box.setScale(scale);
+        }
     }
 
     @Override
     public String serialize() throws JsonGenerationException, JsonMappingException, IOException {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public void deserialize(JsonNode input) throws JsonProcessingException, IOException {
-        // TODO Auto-generated method stub
 
     }
 
@@ -116,5 +128,18 @@ public class BoundingComponent extends Component {
 
     public BoundingBox getBox() {
         return box;
+    }
+
+    public File getBoxFile() {
+        return boxFile;
+    }
+
+    public void setBoxFile(File boxFile) {
+        this.boxFile = boxFile;
+    }
+
+    @Override
+    public boolean isValidForSaving() {
+        return box != null && boxFile != null && boxFile.exists();
     }
 }

@@ -37,6 +37,7 @@ import de.projectsc.core.TerrainLoader;
 import de.projectsc.core.Tile;
 import de.projectsc.core.components.Component;
 import de.projectsc.core.components.ComponentType;
+import de.projectsc.core.components.impl.BoundingComponent;
 import de.projectsc.core.components.impl.EmittingLightComponent;
 import de.projectsc.core.components.impl.ModelAndTextureComponent;
 import de.projectsc.core.components.impl.MovingComponent;
@@ -158,13 +159,13 @@ public class Editor3DCore implements Runnable {
     }
 
     private void createPlayerEntity() {
-        Entity player = new Entity(10000);
-        ModelAndTextureComponent modelAndTexture = new ModelAndTextureComponent();
-        player.addComponent(modelAndTexture);
-        modelAndTexture.loadModel(loader, player);
-        Vector3f position = entity.getPosition();
-        position.x += 40;
-        player.setPosition(position);
+        // Entity player = new Entity(10000);
+        // ModelAndTextureComponent modelAndTexture = new ModelAndTextureComponent();
+        // player.addComponent(modelAndTexture);
+        // modelAndTexture.loadModel(loader, player);
+        // Vector3f position = entity.getPosition();
+        // position.x += 40;
+        // player.setPosition(position);
     }
 
     private void createSun() {
@@ -178,7 +179,7 @@ public class Editor3DCore implements Runnable {
     }
 
     private void createTerrain() {
-        Tile[][] tiles = new Tile[100][100];
+        Tile[][] tiles = new Tile[200][200];
         String texture = "terrain/grass.png";
         Terrain t =
             new Terrain(tiles, texture, texture, texture, texture, new LinkedList<>(),
@@ -201,6 +202,9 @@ public class Editor3DCore implements Runnable {
             c.setCurrentSpeed(c.getMovementSpeed());
         } else if (c != null) {
             c.setCurrentSpeed(0);
+        }
+        if (entity.getPosition().z >= 100) {
+            entity.setPosition(new Vector3f(entity.getPosition().x, entity.getPosition().y, 0));
         }
     }
 
@@ -300,6 +304,10 @@ public class Editor3DCore implements Runnable {
             if (msg.equals("updateTexture")) {
                 updateTexture();
             }
+            if (msg.equals("LoadBoundingBox")) {
+                BoundingComponent c = getCurrentEntity().getComponent(BoundingComponent.class);
+                c.loadBoundingBox(entity, loader, c.getBoxFile());
+            }
         }
     }
 
@@ -326,6 +334,9 @@ public class Editor3DCore implements Runnable {
         }
         if (MovingComponent.NAME.equals(component)) {
             entity.addComponent(new MovingComponent());
+        }
+        if (BoundingComponent.NAME.equals(component)) {
+            entity.addComponent(new BoundingComponent());
         }
     }
 
@@ -381,5 +392,9 @@ public class Editor3DCore implements Runnable {
      */
     public void triggerUpdateTexture() {
         incomingQueue.offer("updateTexture");
+    }
+
+    public void triggerLoadBoundingBox() {
+        incomingQueue.offer("LoadBoundingBox");
     }
 }

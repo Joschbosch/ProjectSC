@@ -26,6 +26,10 @@ public class BoundingBox {
 
     private RawModel model;
 
+    private Vector3f position;
+
+    private float scale;
+
     /**
      * Minimum and maximum value for all axis.
      * 
@@ -86,5 +90,21 @@ public class BoundingBox {
 
     public RawModel getModel() {
         return model;
+    }
+
+    public Vector3f getPosition() {
+        return position;
+    }
+
+    public void setPosition(Vector3f position) {
+        this.position = position;
+    }
+
+    public float getScale() {
+        return scale;
+    }
+
+    public void setScale(float scale) {
+        this.scale = scale;
     }
 }

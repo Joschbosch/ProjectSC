@@ -72,7 +72,7 @@ public class NewMasterRenderer {
 
     private final NewCollisionBoxRenderer collisionBoxRenderer;
 
-    private Map<RawModel, List<BoundingBox>> boundingBoxes;
+    private Map<RawModel, List<BoundingBox>> boundingBoxes = new HashMap<>();
 
     public NewMasterRenderer(Loader loader) {
         enableCulling();
@@ -118,8 +118,9 @@ public class NewMasterRenderer {
                 EmittingLightComponent lightComp = e.getComponent(EmittingLightComponent.class);
                 lights.addAll(lightComp.getLights());
             }
-            if (e.getComponent(BoundingComponent.class) != null) {
-                processBoundingBox(e.getComponent(BoundingComponent.class));
+            BoundingComponent component = e.getComponent(BoundingComponent.class);
+            if (component != null) {
+                processBoundingBox(component);
             }
         }
 
@@ -130,7 +131,6 @@ public class NewMasterRenderer {
      * General render method .
      * 
      * @param lights to use
-     * @param boxes boundingBoxes to render.
      * @param camera to use
      * @param elapsedTime since last frame
      * @param clipPlane to clip the world
@@ -188,14 +188,16 @@ public class NewMasterRenderer {
     }
 
     private void processBoundingBox(BoundingComponent component) {
-        RawModel model = component.getBox().getModel();
-        List<BoundingBox> batch = boundingBoxes.get(model);
-        if (batch != null) {
-            batch.add(component.getBox());
-        } else {
-            List<BoundingBox> newBatch = new ArrayList<>();
-            newBatch.add(component.getBox());
-            boundingBoxes.put(model, newBatch);
+        if (component.getBox() != null) {
+            RawModel model = component.getBox().getModel();
+            List<BoundingBox> batch = boundingBoxes.get(model);
+            if (batch != null) {
+                batch.add(component.getBox());
+            } else {
+                List<BoundingBox> newBatch = new ArrayList<>();
+                newBatch.add(component.getBox());
+                boundingBoxes.put(model, newBatch);
+            }
         }
     }
 

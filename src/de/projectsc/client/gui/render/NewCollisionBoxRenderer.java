@@ -65,7 +65,7 @@ public class NewCollisionBoxRenderer {
 
     private void prepareInstance(BoundingBox b) {
         Matrix4f transformationMatrix =
-            Maths.createTransformationMatrix(b.getCenter(), 0, 0, 0, 1);
+            Maths.createTransformationMatrix(b.getPosition(), 0, 0, 0, b.getScale());
         shader.loadTransformationMatrix(transformationMatrix);
     }
 }

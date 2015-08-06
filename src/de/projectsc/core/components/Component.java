@@ -40,6 +40,8 @@ public abstract class Component {
      */
     public abstract void update(Entity owner);
 
+    public abstract boolean isValidForSaving();
+
     /**
      * 
      * @return serialized string

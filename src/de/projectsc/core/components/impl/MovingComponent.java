@@ -103,7 +103,7 @@ public class MovingComponent extends Component {
                 setCurrentTarget(owner, new Vector3f(0f, 0f, 0f));
             }
         }
-        float distance = currentSpeed * delta;
+        float distance = currentSpeed * delta / 1000.0f;
         float dx = (float) (distance * Math.sin(Math.toRadians(owner.getRotY())));
         float dz = (float) (distance * Math.cos(Math.toRadians(owner.getRotY())));
         increasePostion(owner, dx, 0, dz);
@@ -176,5 +176,10 @@ public class MovingComponent extends Component {
 
     public int getMovementSpeed() {
         return movementSpeed;
+    }
+
+    @Override
+    public boolean isValidForSaving() {
+        return true;
     }
 }

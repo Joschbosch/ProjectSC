@@ -60,10 +60,12 @@ import org.codehaus.jackson.map.ObjectMapper;
 
 import de.projectsc.core.CoreConstants;
 import de.projectsc.core.components.Component;
+import de.projectsc.core.components.impl.BoundingComponent;
 import de.projectsc.core.components.impl.EmittingLightComponent;
 import de.projectsc.core.components.impl.MovingComponent;
 import de.projectsc.editor.Editor3DCore;
 import de.projectsc.editor.EditorData;
+import de.projectsc.editor.componentViews.BoundingComponentView;
 import de.projectsc.editor.componentViews.EmittingLightComponentView;
 import de.projectsc.editor.componentViews.MovingComponentView;
 
@@ -147,7 +149,7 @@ public class EntityEditor extends JFrame {
 
     private JComboBox<String> componentCombo;
 
-    private final String[] componentNames = { EmittingLightComponent.NAME, MovingComponent.NAME };
+    private final String[] componentNames = { EmittingLightComponent.NAME, MovingComponent.NAME, BoundingComponent.NAME };
 
     private JList<String> componentList;
 
@@ -321,6 +323,12 @@ public class EntityEditor extends JFrame {
                         MovingComponent component = (MovingComponent) editor3dCore.getComponent(MovingComponent.NAME);
                         MovingComponentView dialog =
                             new MovingComponentView(component, editor3dCore.getCurrentEntity());
+                        dialog.setSize(450, 130);
+                        dialog.setVisible(true);
+                    } else if (componentList.getSelectedValue().equals(BoundingComponent.NAME)) {
+                        BoundingComponent component = (BoundingComponent) editor3dCore.getComponent(BoundingComponent.NAME);
+                        BoundingComponentView dialog =
+                            new BoundingComponentView(component, editor3dCore);
                         dialog.setSize(450, 130);
                         dialog.setVisible(true);
                     }
@@ -680,7 +688,9 @@ public class EntityEditor extends JFrame {
                     Map<String, String> components = new HashMap<>();
                     for (String component : data.getComponentsAdded()) {
                         Component c = editor3dCore.getComponent(component);
-                        components.put(component, c.serialize());
+                        if (c.isValidForSaving()) {
+                            components.put(component, c.serialize());
+                        }
                     }
                     serialization.put(COMPONENTS, components);
                     ObjectMapper mapper = new ObjectMapper();
@@ -754,8 +764,7 @@ public class EntityEditor extends JFrame {
     }
 
     /**
-     * Once the Canvas is created its add notify method will call this method to start the LWJGL
-     * Display and game loop in another thread.
+     * Once the Canvas is created its add notify method will call this method to start the LWJGL Display and game loop in another thread.
      */
     public void startLWJGL() {
         messageQueue = new LinkedBlockingQueue<String>();
@@ -766,8 +775,8 @@ public class EntityEditor extends JFrame {
     }
 
     /**
-     * Tell game loop to stop running, after which the LWJGL Display will be destoryed. The main
-     * thread will wait for the Display.destroy() to complete
+     * Tell game loop to stop running, after which the LWJGL Display will be destoryed. The main thread will wait for the Display.destroy()
+     * to complete
      */
     private void stopLWJGL() {
         try {

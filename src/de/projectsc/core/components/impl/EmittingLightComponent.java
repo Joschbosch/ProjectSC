@@ -71,8 +71,7 @@ public class EmittingLightComponent extends Component {
     }
 
     /**
-     * Add light to entity. Note that the lights postion will be the offset of the entities
-     * position.
+     * Add light to entity. Note that the lights postion will be the offset of the entities position.
      * 
      * @param e owner entity
      * @param light to add
@@ -153,6 +152,11 @@ public class EmittingLightComponent extends Component {
         double v2 = list.get(1);
         double v3 = list.get(2);
         return new Vector3f((float) v1, (float) v2, (float) v3);
+    }
+
+    @Override
+    public boolean isValidForSaving() {
+        return true;
     }
 
 }

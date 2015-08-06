@@ -17,8 +17,7 @@ import de.projectsc.core.components.Component;
 import de.projectsc.core.components.ComponentType;
 
 /**
- * All game objects in the game are entities. All entities have components, that define their role
- * and behavior.
+ * All game objects in the game are entities. All entities have components, that define their role and behavior.
  * 
  * @author Josch Bosch
  */
@@ -217,7 +216,13 @@ public class Entity {
     }
 
     public void setPosition(Vector3f position) {
-        this.position = position;
+        if (this.position == null) {
+            this.position = position;
+        } else {
+            this.position.x = position.x;
+            this.position.z = position.y;
+            this.position.y = position.z;
+        }
     }
 
     public void setRotation(Vector3f rotation) {

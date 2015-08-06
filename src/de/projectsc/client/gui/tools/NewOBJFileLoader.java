@@ -47,7 +47,7 @@ public final class NewOBJFileLoader {
      */
     public static ModelData loadOBJ(String filePath) {
         try {
-            File objFile = new File(NewOBJFileLoader.class.getResource(filePath + CoreConstants.MODEL_FILENAME).toURI());
+            File objFile = new File(NewOBJFileLoader.class.getResource(filePath + "/" + CoreConstants.MODEL_FILENAME).toURI());
             return loadOBJ(objFile);
         } catch (URISyntaxException e) {
             LOGGER.error(e);

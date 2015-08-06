@@ -108,10 +108,10 @@ public class ModelAndTextureComponent extends Component {
     public void loadModel(Loader loader, Entity owner) {
         try {
             String filePath =
-                String.format("/%s/%s/%d", CoreConstants.MODEL_DIRECTORY_NAME, CoreConstants.MODEL_DIRECTORY_PREFIX,
+                String.format("/%s/%s%d", CoreConstants.MODEL_DIRECTORY_NAME, CoreConstants.MODEL_DIRECTORY_PREFIX,
                     owner.getEntityTypeId());
-            File pathToSchema;
-            pathToSchema = new File(this.getClass().getResource(filePath).toURI());
+
+            File pathToSchema = new File(this.getClass().getResource(filePath).toURI());
 
             ModelData data = NewOBJFileLoader.loadOBJ(filePath);
             model = loader.loadToVAO(data.getVertices(), data.getTextureCoords(), data.getNormals(), data.getIndices());
@@ -224,5 +224,10 @@ public class ModelAndTextureComponent extends Component {
     @Override
     public void deserialize(JsonNode input) {
 
+    }
+
+    @Override
+    public boolean isValidForSaving() {
+        return model != null;
     }
 }
