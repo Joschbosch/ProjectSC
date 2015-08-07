@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 
+ * Copyright (C) 2015
  */
 
 package de.projectsc.client.gui.objects;
@@ -43,7 +43,13 @@ public class Particle implements Comparable<Particle> {
     }
 
     public void setSpeed(Vector3f speed) {
-        this.speed = speed;
+        if (this.speed != null) {
+            this.speed.x = speed.x;
+            this.speed.y = speed.y;
+            this.speed.z = speed.z;
+        } else {
+            this.speed = speed;
+        }
     }
 
     public Vector4f getColor() {
