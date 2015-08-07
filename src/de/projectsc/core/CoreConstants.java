@@ -43,6 +43,16 @@ public final class CoreConstants {
      */
     public static final String GRAPHICS_DIRECTORY_NAME = "/graphics";
 
+    /**
+     * Constant.
+     */
+    public static final float[] SQUARE_VERTICES = {
+        -0.5f, -0.5f, 0.0f,
+        -0.5f, 0.5f, 0.0f,
+        0.5f, -0.5f, 0.0f,
+        0.5f, 0.5f, 0.0f,
+    };
+
     private CoreConstants() {
 
     }

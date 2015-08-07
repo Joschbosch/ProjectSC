@@ -15,13 +15,13 @@ import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.core.components.Component;
 import de.projectsc.core.components.ComponentType;
+import de.projectsc.core.components.impl.BoundingComponent;
 import de.projectsc.core.components.impl.MovingComponent;
 import de.projectsc.core.utils.BoundingBox;
 import de.projectsc.core.utils.PhysicalObject;
 
 /**
- * All game objects in the game are entities. All entities have components, that define their role
- * and behavior.
+ * All game objects in the game are entities. All entities have components, that define their role and behavior.
  * 
  * @author Josch Bosch
  */
@@ -256,6 +256,9 @@ public class Entity implements PhysicalObject {
 
     @Override
     public BoundingBox getBoundingBox() {
+        if (hasComponent(BoundingComponent.class)) {
+            return getComponent(BoundingComponent.class).getBox();
+        }
         return null;
     }
 

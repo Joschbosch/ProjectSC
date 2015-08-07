@@ -6,6 +6,8 @@
 
 package de.projectsc.client.gui.render;
 
+import java.io.File;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -16,15 +18,18 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.util.vector.Matrix4f;
+import org.lwjgl.util.vector.Vector2f;
+import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
 import de.projectsc.client.gui.models.RawModel;
 import de.projectsc.client.gui.models.TexturedModel;
+import de.projectsc.client.gui.objects.Billboard;
 import de.projectsc.client.gui.objects.Camera;
 import de.projectsc.client.gui.objects.Light;
-import de.projectsc.client.gui.shaders.WireFrameShader;
 import de.projectsc.client.gui.shaders.EntityShader;
 import de.projectsc.client.gui.shaders.TerrainShader;
+import de.projectsc.client.gui.shaders.WireFrameShader;
 import de.projectsc.client.gui.terrain.TerrainModel;
 import de.projectsc.client.gui.tools.Loader;
 import de.projectsc.core.components.impl.BoundingComponent;
@@ -64,6 +69,8 @@ public class MasterRenderer {
 
     private final SkyboxRenderer skyboxRenderer;
 
+    private final BillboardRenderer billboardRenderer;
+
     private final Map<TexturedModel, List<Entity>> entities = new HashMap<>();
 
     private final List<TerrainModel> terrains = new ArrayList<>();
@@ -73,6 +80,8 @@ public class MasterRenderer {
     private final WireFrameRenderer collisionBoxRenderer;
 
     private Map<RawModel, List<BoundingBox>> boundingBoxes = new HashMap<>();
+
+    private Billboard billboard;
 
     public MasterRenderer(Loader loader) {
         enableCulling();
@@ -84,7 +93,18 @@ public class MasterRenderer {
         collisionBoxRenderer = new WireFrameRenderer(collisionBoxShader, projectionMatrix);
         terrainShader = new TerrainShader();
         terrainRenderer = new TerrainRenderer(terrainShader, projectionMatrix);
+        billboardRenderer = new BillboardRenderer(loader, projectionMatrix);
         skyboxRenderer = new SkyboxRenderer(loader, projectionMatrix);
+
+        billboard = new Billboard(loader);
+        billboard.setPosition(new Vector3f(0.0f, 10.0f, 0.0f));
+        billboard.setSize(new Vector2f(2.0f, 2.0f));
+        try {
+            billboard.setImageFile(new File(MasterRenderer.class.getResource("/graphics/lamp.png").toURI()));
+        } catch (URISyntaxException e) {
+            System.err.println("Could not load file");
+        }
+
     }
 
     /**
@@ -108,8 +128,12 @@ public class MasterRenderer {
     public void renderScene(TerrainModel terrain, List<Entity> allEntities,
         Camera camera, long elapsedTime, Vector4f clipPlane) {
         List<Light> lights = new LinkedList<>();
+        List<Billboard> billboards = new LinkedList<>();
+        billboards.add(billboard);
+        billboardRenderer.setCamera(camera);
         processTerrain(terrain);
         for (Entity e : allEntities) {
+            billboard.setPosition(Vector3f.add(e.getPosition(), new Vector3f(0, 10.0f, 0), null));
             if (e.getComponent(ModelAndTextureComponent.class) != null
                 && e.getComponent(ModelAndTextureComponent.class).getTexturedModel() != null) {
                 processEntity(e, e.getComponent(ModelAndTextureComponent.class));
@@ -124,18 +148,19 @@ public class MasterRenderer {
             }
         }
 
-        render(lights, camera, elapsedTime, clipPlane);
+        render(lights, billboards, camera, elapsedTime, clipPlane);
     }
 
     /**
      * General render method .
      * 
      * @param lights to use
+     * @param billboards to render
      * @param camera to use
      * @param elapsedTime since last frame
      * @param clipPlane to clip the world
      */
-    public void render(List<Light> lights, Camera camera, long elapsedTime, Vector4f clipPlane) {
+    public void render(List<Light> lights, List<Billboard> billboards, Camera camera, long elapsedTime, Vector4f clipPlane) {
         prepare();
         entityShader.start();
         entityShader.loadClipPlane(clipPlane);
@@ -156,8 +181,11 @@ public class MasterRenderer {
         terrainRenderer.render(terrains);
         terrainShader.stop();
         skyboxRenderer.render(elapsedTime, camera, SKY_R, SKY_G, SKY_B);
+        billboardRenderer.render(billboards);
+
         entities.clear();
         terrains.clear();
+        boundingBoxes.clear();
     }
 
     /**
