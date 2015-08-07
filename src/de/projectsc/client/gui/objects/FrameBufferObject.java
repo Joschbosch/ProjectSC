@@ -1,7 +1,5 @@
 /*
- * Copyright (C) 2015 Project SC
- * 
- * All rights reserved
+ * Project SC - 2015
  */
 package de.projectsc.client.gui.objects;
 

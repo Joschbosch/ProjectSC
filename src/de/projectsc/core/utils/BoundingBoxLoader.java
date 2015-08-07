@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2015 Project SC
+ * Project SC - 2015
  * 
- * All rights reserved
+ * 
  */
 
 package de.projectsc.core.utils;
@@ -34,7 +34,8 @@ public final class BoundingBoxLoader {
     private BoundingBoxLoader() {}
 
     /**
-     * Reads the bounding box of the given enttity by reading its model file and checking out min/max vertices.
+     * Reads the bounding box of the given enttity by reading its model file and checking out
+     * min/max vertices.
      * 
      * @param entity to create the box of.
      * @return the box

@@ -1,7 +1,7 @@
 /*
-6 * Copyright (C) 2015 Project SC
+6 * Project SC - 2015
  * 
- * All rights reserved
+ * 
  */
 
 package de.projectsc.core.entities;

@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2015 Project SC
+ * Project SC - 2015
  * 
- * All rights reserved
+ * 
  */
 package de.projectsc.editor.componentViews;
 
@@ -43,15 +43,15 @@ public class BoundingComponentView extends JDialog {
 
     protected static final Log LOGGER = LogFactory.getLog(BoundingComponentView.class);
 
-    private JTextField offsetXText;
+    private final JTextField offsetXText;
 
-    private JTextField offsetYText;
+    private final JTextField offsetYText;
 
-    private JTextField offsetZText;
+    private final JTextField offsetZText;
 
-    private BoundingComponent component;
+    private final BoundingComponent component;
 
-    private Editor3DCore core;
+    private final Editor3DCore core;
 
     public BoundingComponentView(BoundingComponent component, Editor3DCore core) {
         setTitle("Bounding Component");
@@ -159,7 +159,7 @@ public class BoundingComponentView extends JDialog {
 
         private static final long serialVersionUID = 1L;
 
-        private int index;
+        private final int index;
 
         public OffsetDocument(int i) {
             this.index = i;

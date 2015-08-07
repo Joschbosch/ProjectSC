@@ -148,14 +148,13 @@
   <module name="FileTabCharacter">
     <property name="fileExtensions" value="java,properties,pom,MF"/>
   </module>
-  <module name="Header">
-    <property name="header" value="/*\n * Copyright (C) 2015 Project SC\n * \n * All rights reserved\n */"/>
-    <property name="ignoreLines" value="2"/>
-    <property name="fileExtensions" value="java"/>
-  </module>
   <module name="SuppressionCommentFilter">
     <property name="offCommentFormat" value="CHECKSTYLE\:DISABLE \((\w+)\)"/>
     <property name="onCommentFormat" value="CHECKSTYLE\:ENABLE \((\w+)\)"/>
     <property name="checkFormat" value="$1"/>
+  </module>
+  <module name="Header">
+    <property name="header" value="/*\n * Project SC - 2015\n * \n * \n */"/>
+    <property name="fileExtensions" value="*.java"/>
   </module>
 </module>

@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2015 Project SC
+ * Project SC - 2015
  * 
- * All rights reserved
+ * 
  */
 
 package de.projectsc.client.gui.models;
@@ -13,9 +13,9 @@ package de.projectsc.client.gui.models;
  */
 public class RawModel {
 
-    private int vaoID;
+    private final int vaoID;
 
-    private int vertexCount;
+    private final int vertexCount;
 
     public RawModel(int vaoID, int vertexCount) {
         super();
