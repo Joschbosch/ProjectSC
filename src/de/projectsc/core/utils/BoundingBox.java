@@ -28,6 +28,8 @@ public class BoundingBox {
 
     private Vector3f position;
 
+    private Vector3f rotation;
+
     private float scale;
 
     /**
@@ -97,7 +99,13 @@ public class BoundingBox {
     }
 
     public void setPosition(Vector3f position) {
-        this.position = position;
+        if (this.position == null) {
+            this.position = position;
+        } else {
+            this.position.x = position.x;
+            this.position.y = position.y;
+            this.position.z = position.z;
+        }
     }
 
     public float getScale() {
@@ -106,5 +114,19 @@ public class BoundingBox {
 
     public void setScale(float scale) {
         this.scale = scale;
+    }
+
+    public Vector3f getRotation() {
+        return rotation;
+    }
+
+    public void setRotation(Vector3f rotation) {
+        if (this.rotation == null) {
+            this.rotation = rotation;
+        } else {
+            this.rotation.x = rotation.x;
+            this.rotation.y = rotation.y;
+            this.rotation.z = rotation.z;
+        }
     }
 }

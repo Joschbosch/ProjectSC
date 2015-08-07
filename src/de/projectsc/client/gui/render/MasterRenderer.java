@@ -8,6 +8,7 @@ package de.projectsc.client.gui.render;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -17,14 +18,20 @@ import org.lwjgl.opengl.GL30;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector4f;
 
+import de.projectsc.client.gui.models.RawModel;
 import de.projectsc.client.gui.models.TexturedModel;
 import de.projectsc.client.gui.objects.Camera;
-import de.projectsc.client.gui.objects.GraphicalEntity;
 import de.projectsc.client.gui.objects.Light;
+import de.projectsc.client.gui.shaders.WireFrameShader;
 import de.projectsc.client.gui.shaders.EntityShader;
 import de.projectsc.client.gui.shaders.TerrainShader;
 import de.projectsc.client.gui.terrain.TerrainModel;
 import de.projectsc.client.gui.tools.Loader;
+import de.projectsc.core.components.impl.BoundingComponent;
+import de.projectsc.core.components.impl.EmittingLightComponent;
+import de.projectsc.core.components.impl.ModelAndTextureComponent;
+import de.projectsc.core.entities.Entity;
+import de.projectsc.core.utils.BoundingBox;
 
 /**
  * Coordinates rendering of multiple entites.
@@ -57,9 +64,15 @@ public class MasterRenderer {
 
     private final SkyboxRenderer skyboxRenderer;
 
-    private final Map<TexturedModel, List<GraphicalEntity>> entities = new HashMap<>();
+    private final Map<TexturedModel, List<Entity>> entities = new HashMap<>();
 
     private final List<TerrainModel> terrains = new ArrayList<>();
+
+    private final WireFrameShader collisionBoxShader;
+
+    private final WireFrameRenderer collisionBoxRenderer;
+
+    private Map<RawModel, List<BoundingBox>> boundingBoxes = new HashMap<>();
 
     public MasterRenderer(Loader loader) {
         enableCulling();
@@ -67,6 +80,8 @@ public class MasterRenderer {
         createProjectionMatrix();
         entityShader = new EntityShader();
         entityRenderer = new EntityRenderer(entityShader, projectionMatrix);
+        collisionBoxShader = new WireFrameShader();
+        collisionBoxRenderer = new WireFrameRenderer(collisionBoxShader, projectionMatrix);
         terrainShader = new TerrainShader();
         terrainRenderer = new TerrainRenderer(terrainShader, projectionMatrix);
         skyboxRenderer = new SkyboxRenderer(loader, projectionMatrix);
@@ -85,23 +100,30 @@ public class MasterRenderer {
      * Render the whole scene with all objects.
      * 
      * @param terrain to render
-     * @param staticWorldEntities all static entities to render
-     * @param dynamicRenderEntities all dynamic entities to render
-     * @param lights to render
+     * @param allEntities all entities
      * @param camera for view
      * @param elapsedTime since last frame
      * @param clipPlane to clip the world
      */
-    public void renderScene(TerrainModel terrain, List<GraphicalEntity> staticWorldEntities, List<GraphicalEntity> dynamicRenderEntities,
-        List<Light> lights,
+    public void renderScene(TerrainModel terrain, List<Entity> allEntities,
         Camera camera, long elapsedTime, Vector4f clipPlane) {
+        List<Light> lights = new LinkedList<>();
         processTerrain(terrain);
-        for (GraphicalEntity e : staticWorldEntities) {
-            processEntity(e);
+        for (Entity e : allEntities) {
+            if (e.getComponent(ModelAndTextureComponent.class) != null
+                && e.getComponent(ModelAndTextureComponent.class).getTexturedModel() != null) {
+                processEntity(e, e.getComponent(ModelAndTextureComponent.class));
+            }
+            if (e.getComponent(EmittingLightComponent.class) != null) {
+                EmittingLightComponent lightComp = e.getComponent(EmittingLightComponent.class);
+                lights.addAll(lightComp.getLights());
+            }
+            BoundingComponent component = e.getComponent(BoundingComponent.class);
+            if (component != null) {
+                processBoundingBox(component);
+            }
         }
-        for (GraphicalEntity e : dynamicRenderEntities) {
-            processEntity(e);
-        }
+
         render(lights, camera, elapsedTime, clipPlane);
     }
 
@@ -122,6 +144,10 @@ public class MasterRenderer {
         entityShader.loadViewMatrix(camera);
         entityRenderer.render(entities);
         entityShader.stop();
+        collisionBoxShader.start();
+        collisionBoxShader.loadViewMatrix(camera);
+        collisionBoxRenderer.render(boundingBoxes);
+        collisionBoxShader.stop();
         terrainShader.start();
         terrainShader.loadClipPlane(clipPlane);
         terrainShader.loadSkyColor(SKY_R, SKY_G, SKY_B);
@@ -146,17 +172,32 @@ public class MasterRenderer {
     /**
      * Add entity for rendering.
      * 
-     * @param entity to render.
+     * @param e entity
+     * @param component to render.
      */
-    public void processEntity(GraphicalEntity entity) {
-        TexturedModel entityModel = entity.getModel();
-        List<GraphicalEntity> batch = entities.get(entityModel);
+    public void processEntity(Entity e, ModelAndTextureComponent component) {
+        TexturedModel entityModel = component.getTexturedModel();
+        List<Entity> batch = entities.get(entityModel);
         if (batch != null) {
-            batch.add(entity);
+            batch.add(e);
         } else {
-            List<GraphicalEntity> newBatch = new ArrayList<>();
-            newBatch.add(entity);
+            List<Entity> newBatch = new ArrayList<>();
+            newBatch.add(e);
             entities.put(entityModel, newBatch);
+        }
+    }
+
+    private void processBoundingBox(BoundingComponent component) {
+        if (component.getBox() != null) {
+            RawModel model = component.getBox().getModel();
+            List<BoundingBox> batch = boundingBoxes.get(model);
+            if (batch != null) {
+                batch.add(component.getBox());
+            } else {
+                List<BoundingBox> newBatch = new ArrayList<>();
+                newBatch.add(component.getBox());
+                boundingBoxes.put(model, newBatch);
+            }
         }
     }
 

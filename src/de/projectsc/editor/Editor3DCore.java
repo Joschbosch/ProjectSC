@@ -26,12 +26,13 @@ import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
 import de.projectsc.client.gui.objects.Light;
-import de.projectsc.client.gui.render.NewMasterRenderer;
+import de.projectsc.client.gui.render.MasterRenderer;
 import de.projectsc.client.gui.terrain.TerrainModel;
 import de.projectsc.client.gui.textures.TerrainTexture;
 import de.projectsc.client.gui.textures.TerrainTexturePack;
 import de.projectsc.client.gui.tools.Loader;
 import de.projectsc.client.gui.tools.MousePicker;
+import de.projectsc.core.CoreConstants;
 import de.projectsc.core.Terrain;
 import de.projectsc.core.TerrainLoader;
 import de.projectsc.core.Tile;
@@ -42,7 +43,6 @@ import de.projectsc.core.components.impl.EmittingLightComponent;
 import de.projectsc.core.components.impl.ModelAndTextureComponent;
 import de.projectsc.core.components.impl.MovingComponent;
 import de.projectsc.core.entities.Entity;
-import de.projectsc.core.entities.WorldEntity;
 
 /**
  * Core class for the GUI.
@@ -69,7 +69,7 @@ public class Editor3DCore implements Runnable {
 
     private TerrainModel terrainModel;
 
-    private NewMasterRenderer masterRenderer;
+    private MasterRenderer masterRenderer;
 
     private final List<Entity> entities = new LinkedList<>();
 
@@ -111,7 +111,7 @@ public class Editor3DCore implements Runnable {
         camera = new EditorCamera();
         loader = new Loader();
         createNewEntity();
-        masterRenderer = new NewMasterRenderer(loader);
+        masterRenderer = new MasterRenderer(loader);
         createPlayerEntity();
         createSun();
         createTerrain();
@@ -183,7 +183,7 @@ public class Editor3DCore implements Runnable {
         String texture = "terrain/grass.png";
         Terrain t =
             new Terrain(tiles, texture, texture, texture, texture, new LinkedList<>(),
-                new HashMap<Integer, WorldEntity>());
+                new HashMap<Integer, Entity>());
         TerrainTexture backgroundTex = new TerrainTexture(loader.loadTexture(texture));
         TerrainTexture rTex = new TerrainTexture(loader.loadTexture(texture));
         TerrainTexture gTex = new TerrainTexture(loader.loadTexture(texture));
@@ -275,7 +275,8 @@ public class Editor3DCore implements Runnable {
     private void loadModel() {
         modelComponent = new ModelAndTextureComponent();
         try {
-            modelComponent.loadModel(loader, editorData.getModelFile(), new File(Editor3DCore.class.getResource("/white.png").toURI()));
+            modelComponent.loadModel(loader, editorData.getModelFile(),
+                new File(Editor3DCore.class.getResource(CoreConstants.GRAPHICS_DIRECTORY_NAME + "/white.png").toURI()));
         } catch (URISyntaxException e) {
             LOGGER.error(e);
         }

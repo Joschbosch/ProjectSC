@@ -1,22 +1,15 @@
 /*
  * Project SC - 2015
  * 
- *  
+ * 
  */
 package testing;
 
-import java.awt.image.BufferedImage;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.lwjgl.util.vector.Vector3f;
-
-import de.projectsc.core.entities.MovingEntity;
-import de.projectsc.core.entities.WorldEntity;
-import de.projectsc.core.utils.BoundingBox;
 import de.projectsc.core.utils.GraphEdge;
 import de.projectsc.core.utils.GraphNode;
-import de.projectsc.core.utils.OctTree;
 
 public class Tests {
 
@@ -82,33 +75,33 @@ public class Tests {
         // System.out.println();
         // }
         // TerrainLoader.createBlendMap(t);
-        WorldEntity e =
-            new MovingEntity("goat", "white.png", new Vector3f(100, 0, 100), new Vector3f(0, 0, 0),
-                1);
-        WorldEntity f =
-            new MovingEntity("goat", "white.png", new Vector3f(300, 0, 300), new Vector3f(0, 0, 0),
-                1);
-        OctTree<WorldEntity> tree = new OctTree<WorldEntity>(new BoundingBox(new Vector3f(0, 0,
-            0), new Vector3f(500, 500, 500)));
-        tree.addEntity(e);
-        tree.addEntity(f);
-        tree.recalculateTree();
-
-        System.out.println(tree.toString());
-        e.getPosition().x = 300;
-        e.getPosition().z = 300;
-        ((MovingEntity) e).setMoved(true);
-        tree.update();
-        tree.update();
-        WorldEntity g =
-            new MovingEntity("goat", "white.png", new Vector3f(450, 0, 450), new Vector3f(0, 0, 0),
-                1);
-        tree.addEntity(g);
-        tree.recalculateTree();
-        System.out.println();
-        System.out.println();
-        System.out.println(tree.toString());
-        tree.drawImage(new BufferedImage(800, 800, BufferedImage.TYPE_INT_RGB).getGraphics());
+        // WorldEntity e =
+        // new MovingEntity("goat", "white.png", new Vector3f(100, 0, 100), new Vector3f(0, 0, 0),
+        // 1);
+        // WorldEntity f =
+        // new MovingEntity("goat", "white.png", new Vector3f(300, 0, 300), new Vector3f(0, 0, 0),
+        // 1);
+        // OctTree<WorldEntity> tree = new OctTree<WorldEntity>(new BoundingBox(new Vector3f(0, 0,
+        // 0), new Vector3f(500, 500, 500)));
+        // tree.addEntity(e);
+        // tree.addEntity(f);
+        // tree.recalculateTree();
+        //
+        // System.out.println(tree.toString());
+        // e.getPosition().x = 300;
+        // e.getPosition().z = 300;
+        // ((MovingEntity) e).setMoved(true);
+        // tree.update();
+        // tree.update();
+        // WorldEntity g =
+        // new MovingEntity("goat", "white.png", new Vector3f(450, 0, 450), new Vector3f(0, 0, 0),
+        // 1);
+        // tree.addEntity(g);
+        // tree.recalculateTree();
+        // System.out.println();
+        // System.out.println();
+        // System.out.println(tree.toString());
+        // tree.drawImage(new BufferedImage(800, 800, BufferedImage.TYPE_INT_RGB).getGraphics());
         // City saarbuecken = new City("sa", 222);
         // City kaiserslautern = new City("kal", 158);
         // City Frankfurt = new City("ff", 96);

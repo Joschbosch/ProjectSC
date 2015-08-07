@@ -105,7 +105,7 @@ public class BoundingComponentView extends JDialog {
                 JFileChooser chooser = new JFileChooser();
                 FileNameExtensionFilter filter = new FileNameExtensionFilter("Model Files", "obj");
                 try {
-                    File folder = new File(EntityEditor.class.getResource("/" + CoreConstants.MODEL_DIRECTORY_NAME).toURI());
+                    File folder = new File(EntityEditor.class.getResource("/" + CoreConstants.SCHEME_DIRECTORY_NAME).toURI());
                     chooser.setCurrentDirectory(folder);
                 } catch (URISyntaxException e1) {
                     LOGGER.info("Loading box model failed", e1);

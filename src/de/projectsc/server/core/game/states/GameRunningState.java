@@ -16,8 +16,7 @@ import org.apache.commons.logging.LogFactory;
 import de.projectsc.core.Terrain;
 import de.projectsc.core.Tile;
 import de.projectsc.core.data.messages.GameMessageConstants;
-import de.projectsc.core.entities.PlayerEntity;
-import de.projectsc.core.entities.WorldEntity;
+import de.projectsc.core.entities.Entity;
 import de.projectsc.core.utils.OctTree;
 import de.projectsc.server.core.ServerPlayer;
 import de.projectsc.server.core.game.GameContext;
@@ -37,7 +36,7 @@ public class GameRunningState extends GameState {
 
     private static final Log LOGGER = LogFactory.getLog(LoadingState.class);
 
-    private OctTree<WorldEntity> collisionTree;
+    private OctTree<Entity> collisionTree;
 
     private Terrain terrain;
 
@@ -56,10 +55,6 @@ public class GameRunningState extends GameState {
     @Override
     public void loop() {
         gameTick++;
-        PlayerEntity e = context.getPlayers().get(0L).getEntity();
-        terrain.markEntityPosition(e, Tile.WALKABLE);
-        e.move(GAME_TICK_TIME);
-        terrain.markEntityPosition(e, Tile.NOT_WALKABLE);
         collisionTree.update();
         if (gameTick % 5 == 0) {
             new Thread(new Runnable() {

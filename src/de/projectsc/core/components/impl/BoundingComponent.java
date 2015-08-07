@@ -31,9 +31,9 @@ public class BoundingComponent extends Component {
 
     private BoundingBox box;
 
-    private Vector3f position;
+    private final Vector3f offset;
 
-    private Vector3f offset;
+    private final Vector3f offsetRotation;
 
     private float scale;
 
@@ -43,21 +43,20 @@ public class BoundingComponent extends Component {
         super(NAME);
         setType(ComponentType.PHYSICS);
         offset = new Vector3f(0f, 0f, 0f);
+        offsetRotation = new Vector3f(0f, 0f, 0f);
         scale = 1.0f;
         box = null;
-        position = null;
     }
 
     public void loadBoundingBox(Entity owner, Loader loader, File boxObjectFile) {
         this.setBoxFile(boxObjectFile);
-        System.out.println("load " + boxObjectFile);
         ModelData data = NewOBJFileLoader.loadOBJ(boxObjectFile);
         RawModel model = loader.loadToVAO(data.getVertices(), data.getIndices());
         Vector3f[] minMax = findMinAndMax(data.getVertices());
         box = new BoundingBox(minMax[0], minMax[1]);
         box.setModel(model);
-        position = Vector3f.add(owner.getPosition(), offset, null);
-        box.setPosition(position);
+        box.setPosition(Vector3f.add(owner.getPosition(), offset, null));
+        box.setRotation(Vector3f.add(owner.getRotation(), offsetRotation, null));
         box.setScale(scale);
     }
 
@@ -80,9 +79,8 @@ public class BoundingComponent extends Component {
     @Override
     public void update(Entity owner) {
         if (owner != null && box != null) {
-            position = Vector3f.add(owner.getPosition(), offset, null);
-            box.setPosition(position);
-            scale = 1.0f;
+            box.setPosition(Vector3f.add(owner.getPosition(), offset, null));
+            box.setRotation(Vector3f.add(owner.getRotation(), offsetRotation, null));
             box.setScale(scale);
         }
     }
@@ -98,7 +96,7 @@ public class BoundingComponent extends Component {
     }
 
     public Vector3f getPosition() {
-        return position;
+        return box.getPosition();
     }
 
     public float getScale() {
@@ -110,10 +108,23 @@ public class BoundingComponent extends Component {
     }
 
     public void setPosition(Vector3f position) {
-        this.position.x = position.x;
-        this.position.y = position.y;
-        this.position.z = position.z;
+        this.box.setPosition(position);
 
+    }
+
+    public void setrotation(Vector3f rotation) {
+        this.box.setRotation(rotation);
+
+    }
+
+    public void setOffsetRotation(Vector3f rotation) {
+        this.offsetRotation.x = rotation.x;
+        this.offsetRotation.y = rotation.y;
+        this.offsetRotation.z = rotation.z;
+    }
+
+    public Vector3f getOffsetRotation() {
+        return offsetRotation;
     }
 
     public void setOffset(Vector3f position) {

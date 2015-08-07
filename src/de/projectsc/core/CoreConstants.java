@@ -16,12 +16,12 @@ public final class CoreConstants {
     /**
      * Constant.
      */
-    public static final String MODEL_DIRECTORY_NAME = "model";
+    public static final String SCHEME_DIRECTORY_NAME = "schemes";
 
     /**
      * Constant.
      */
-    public static final String MODEL_DIRECTORY_PREFIX = "M";
+    public static final String SCHEME_DIRECTORY_PREFIX = "S";
 
     /**
      * Constant.
@@ -37,6 +37,11 @@ public final class CoreConstants {
      * Constant.
      */
     public static final String ENTITY_FILENAME = "entity.ent";
+
+    /**
+     * Constant.
+     */
+    public static final String GRAPHICS_DIRECTORY_NAME = "/graphics";
 
     private CoreConstants() {
 

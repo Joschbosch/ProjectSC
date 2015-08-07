@@ -99,7 +99,7 @@ public class EntityEditor extends JFrame {
 
     private static final long serialVersionUID = 3313139728699706144L;
 
-    private static final String SLASHED_MODEL_DIR = "/" + CoreConstants.MODEL_DIRECTORY_NAME + "/";
+    private static final String SLASHED_MODEL_DIR = "/" + CoreConstants.SCHEME_DIRECTORY_NAME + "/";
 
     private JPanel contentPane;
 
@@ -162,7 +162,7 @@ public class EntityEditor extends JFrame {
         try {
             File folder = new File(EntityEditor.class.getResource(SLASHED_MODEL_DIR).toURI());
             for (int i = 0; i < 10000; i++) {
-                File f = new File(folder, CoreConstants.MODEL_DIRECTORY_PREFIX + (MINIMUM_ID + i));
+                File f = new File(folder, CoreConstants.SCHEME_DIRECTORY_PREFIX + (MINIMUM_ID + i));
                 if (!f.exists()) {
                     data.setId(MINIMUM_ID + i);
                     break;
@@ -670,7 +670,7 @@ public class EntityEditor extends JFrame {
                 File folder;
                 try {
                     folder = new File(EntityEditor.class.getResource(SLASHED_MODEL_DIR).toURI());
-                    File targetFolder = new File(folder, "M" + Integer.parseInt(idTextfield.getText()));
+                    File targetFolder = new File(folder, CoreConstants.SCHEME_DIRECTORY_PREFIX + Integer.parseInt(idTextfield.getText()));
                     targetFolder.mkdirs();
                     if (data.getModelFile() != null && !data.getModelFile().equals(new File(targetFolder, MODEL_OBJ))) {
                         FileUtils.copyFile(data.getModelFile(), new File(targetFolder, MODEL_OBJ));
@@ -718,7 +718,8 @@ public class EntityEditor extends JFrame {
                 }
                 chooser.showOpenDialog(null);
                 File chosen = chooser.getSelectedFile();
-                if (chosen != null && chosen.getName().matches("M\\d{5}") && new File(chosen, ENTITY_ENT).exists()) {
+                if (chosen != null && chosen.getName().matches(CoreConstants.SCHEME_DIRECTORY_PREFIX + "\\d{5}")
+                    && new File(chosen, ENTITY_ENT).exists()) {
                     editor3dCore.doRender(false);
                     data = new EditorData();
                     editor3dCore.setEditorData(data);
@@ -764,7 +765,8 @@ public class EntityEditor extends JFrame {
     }
 
     /**
-     * Once the Canvas is created its add notify method will call this method to start the LWJGL Display and game loop in another thread.
+     * Once the Canvas is created its add notify method will call this method to start the LWJGL
+     * Display and game loop in another thread.
      */
     public void startLWJGL() {
         messageQueue = new LinkedBlockingQueue<String>();
@@ -775,8 +777,8 @@ public class EntityEditor extends JFrame {
     }
 
     /**
-     * Tell game loop to stop running, after which the LWJGL Display will be destoryed. The main thread will wait for the Display.destroy()
-     * to complete
+     * Tell game loop to stop running, after which the LWJGL Display will be destoryed. The main
+     * thread will wait for the Display.destroy() to complete
      */
     private void stopLWJGL() {
         try {
@@ -850,7 +852,7 @@ public class EntityEditor extends JFrame {
         int id = Integer.parseInt(text);
         try {
             File folder = new File(EntityEditor.class.getResource(SLASHED_MODEL_DIR).toURI());
-            File folder2 = new File(folder, "M" + id);
+            File folder2 = new File(folder, CoreConstants.SCHEME_DIRECTORY_PREFIX + id);
             if (folder2.exists()) {
                 isvalid = false;
             }

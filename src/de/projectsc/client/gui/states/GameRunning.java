@@ -6,7 +6,6 @@
 package de.projectsc.client.gui.states;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -17,10 +16,7 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Vector4f;
 
-import de.projectsc.client.gui.models.RawModel;
-import de.projectsc.client.gui.models.TexturedModel;
 import de.projectsc.client.gui.objects.Camera;
-import de.projectsc.client.gui.objects.GraphicalEntity;
 import de.projectsc.client.gui.objects.Light;
 import de.projectsc.client.gui.render.MasterRenderer;
 import de.projectsc.client.gui.render.UIRenderer;
@@ -28,18 +24,14 @@ import de.projectsc.client.gui.render.WaterRenderer;
 import de.projectsc.client.gui.terrain.TerrainModel;
 import de.projectsc.client.gui.terrain.water.WaterFrameBuffers;
 import de.projectsc.client.gui.terrain.water.WaterTile;
-import de.projectsc.client.gui.textures.ModelTexture;
 import de.projectsc.client.gui.textures.TerrainTexture;
 import de.projectsc.client.gui.textures.TerrainTexturePack;
 import de.projectsc.client.gui.tools.Loader;
-import de.projectsc.client.gui.tools.ModelData;
 import de.projectsc.client.gui.tools.MousePicker;
-import de.projectsc.client.gui.tools.OBJFileLoader;
 import de.projectsc.client.gui.ui.UITexture;
 import de.projectsc.core.Terrain;
 import de.projectsc.core.TerrainLoader;
-import de.projectsc.core.entities.PlayerEntity;
-import de.projectsc.core.entities.WorldEntity;
+import de.projectsc.core.entities.Entity;
 
 /**
  * 
@@ -67,11 +59,7 @@ public class GameRunning implements State {
 
     private TerrainModel terrainModel;
 
-    private Map<Integer, WorldEntity> staticEntities;
-
-    private List<GraphicalEntity> staticRenderEntities;
-
-    private GraphicalEntity player;
+    private Map<Integer, Entity> staticEntities;
 
     private List<UITexture> ui;
 
@@ -87,11 +75,7 @@ public class GameRunning implements State {
 
     private boolean renderBoundingBoxes = false;
 
-    private final Map<Integer, WorldEntity> movingEntities;
-
-    private List<GraphicalEntity> dynamicRenderEntities;
-
-    private Map<String, Integer> textureMap;
+    private final Map<Long, Entity> movingEntities;
 
     public GameRunning() {
         movingEntities = new TreeMap<>();
@@ -105,43 +89,9 @@ public class GameRunning implements State {
         waterfbo = new WaterFrameBuffers();
         waterRenderer = new WaterRenderer(loader, masterRenderer.getProjectionMatrix(), waterfbo);
         loadDemoObjects();
-        staticRenderEntities = new ArrayList<>();
-        loadEntityModels(staticRenderEntities, staticEntities);
-        dynamicRenderEntities = new ArrayList<>();
-        loadEntityModels(dynamicRenderEntities, movingEntities);
         camera = new Camera();
-        camera.setPosition(player.getPosition().x, player.getPosition().y, player.getPosition().z);
         mousePicker = new MousePicker(camera, masterRenderer.getProjectionMatrix(), terrainModel);
         LOGGER.debug("Terrain, models and lights loaded");
-    }
-
-    private void loadEntityModels(List<GraphicalEntity> renderList, Map<Integer, WorldEntity> entityList) {
-
-        textureMap = new HashMap<>();
-        for (WorldEntity e : entityList.values()) {
-            loadGraphicalEntity(renderList, e);
-        }
-    }
-
-    private GraphicalEntity loadGraphicalEntity(List<GraphicalEntity> renderList, WorldEntity e) {
-        ModelData data = OBJFileLoader.loadOBJ(e.getModel());
-        RawModel model = loader.loadToVAO(data.getVertices(), data.getTextureCoords(), data.getNormals(), data.getIndices());
-        int texture = 0 - 1;
-        if (textureMap.containsKey(e.getTexture())) {
-            texture = textureMap.get(e.getTexture());
-        } else {
-            texture = loader.loadTexture(e.getTexture());
-            textureMap.put(e.getTexture(), texture);
-        }
-        ModelTexture modelTexture = new ModelTexture(texture);
-        GraphicalEntity graphicalEntity = new GraphicalEntity(e, new TexturedModel(model, modelTexture));
-        renderList.add(graphicalEntity);
-        if (e instanceof PlayerEntity) {
-            player = graphicalEntity;
-            camera.getPosition().x = player.getPosition().x;
-            camera.getPosition().z = player.getPosition().z;
-        }
-        return graphicalEntity;
     }
 
     private void loadDemoObjects() {
@@ -204,20 +154,20 @@ public class GameRunning implements State {
             float distance = 2 * (camera.getPosition().y - waters.get(0).getHeight());
             camera.getPosition().y -= distance;
             camera.invertPitch();
-            masterRenderer.renderScene(terrainModel, staticRenderEntities, dynamicRenderEntities, lights, camera, elapsedTime,
+            masterRenderer.renderScene(terrainModel, (List<Entity>) staticEntities.values(), camera, elapsedTime,
                 new Vector4f(0, 1, 0, -waters
                     .get(0).getHeight()));
             camera.getPosition().y += distance;
             camera.invertPitch();
 
             waterfbo.bindRefractionFrameBuffer();
-            masterRenderer.renderScene(terrainModel, staticRenderEntities, dynamicRenderEntities, lights, camera, elapsedTime,
+            masterRenderer.renderScene(terrainModel, (List<Entity>) staticEntities.values(), camera, elapsedTime,
                 new Vector4f(0, 0 - 1, 0, waters
                     .get(0).getHeight()));
 
             waterfbo.unbindCurrentFrameBuffer();
         }
-        masterRenderer.renderScene(terrainModel, staticRenderEntities, dynamicRenderEntities, lights, camera, elapsedTime, new Vector4f(0,
+        masterRenderer.renderScene(terrainModel, (List<Entity>) staticEntities.values(), camera, elapsedTime, new Vector4f(0,
             1, 0, CLIPPING_PLANE_NOT_RENDERING));
         if (waters != null && waters.size() > 0) {
             waterRenderer.render(waters, camera, elapsedTime);
@@ -274,9 +224,8 @@ public class GameRunning implements State {
      * 
      * @param e new entity
      */
-    public void addWorldEntity(WorldEntity e) {
+    public void addWorldEntity(Entity e) {
         movingEntities.put(e.getID(), e);
-        loadGraphicalEntity(dynamicRenderEntities, e);
     }
 
     /**
@@ -286,13 +235,6 @@ public class GameRunning implements State {
      */
     public void removeWorldEntity(int id) {
         movingEntities.remove(id);
-        GraphicalEntity remove = null;
-        for (GraphicalEntity e : dynamicRenderEntities) {
-            if (e.getEntity().getID().equals(id)) {
-                remove = e;
-            }
-        }
-        dynamicRenderEntities.remove(remove);
     }
 
 }

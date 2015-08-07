@@ -28,10 +28,7 @@ import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.client.gui.objects.Light;
-import de.projectsc.core.entities.BackgroundEntity;
-import de.projectsc.core.entities.DecorationEntity;
-import de.projectsc.core.entities.EntityType;
-import de.projectsc.core.entities.WorldEntity;
+import de.projectsc.core.entities.Entity;
 import de.projectsc.core.utils.Serialization;
 
 /**
@@ -117,7 +114,7 @@ public final class TerrainLoader {
             List<Light> staticLights = Serialization.deserializeLights(mapper, lightsNode);
 
             ArrayNode staticObjectsNode = (ArrayNode) tree.get(STATIC_OBJECTS);
-            Map<Integer, WorldEntity> staticObjects = new TreeMap<Integer, WorldEntity>();
+            Map<Integer, Entity> staticObjects = new TreeMap<>();
             if (staticObjectsNode != null) {
                 for (JsonNode object : staticObjectsNode) {
                     ObjectNode objectNode = (ObjectNode) object;
@@ -127,7 +124,7 @@ public final class TerrainLoader {
                     float yRot = rotationValues[1];
                     Vector3f rotation = new Vector3f(rotationValues[0], yRot, rotationValues[2]);
 
-                    staticObjects.put(objectNode.get(ID).asInt(), newEntity(objectNode, position, rotation));
+                    staticObjects.put(objectNode.get(ID).asInt(), new Entity(10000));
                 }
             }
             return new Terrain(map, bgTexture, rTexture, gTexture, bTexture, staticLights, staticObjects);
@@ -135,41 +132,6 @@ public final class TerrainLoader {
             LOGGER.error("Error loading map: ", e);
         }
         return null;
-    }
-
-    private static WorldEntity newEntity(ObjectNode objectNode, Vector3f position, Vector3f rotation) {
-        WorldEntity e = null;
-        switch (EntityType.valueOf(objectNode.get(TYPE).asText())) {
-        case DECORATION:
-            e =
-                new DecorationEntity(objectNode.get(ID).asInt(), objectNode.get(
-                    MODEL).asText(), objectNode.get(TEXTURE).asText(), position, rotation, (float) objectNode.get(SCALE)
-                        .asDouble());
-            break;
-        case SOLID_BACKGROUND_OBJECT:
-            e =
-                new BackgroundEntity(objectNode.get(ID).asInt(), objectNode.get(
-                    MODEL).asText(), objectNode.get(TEXTURE).asText(), position, rotation, (float) objectNode.get(SCALE)
-                        .asDouble());
-            break;
-        case USABLE_OBJECT:
-            // e = new WorldEntity(objectNode.get(ID).asInt(), objectNode.get(
-            // MODEL).asText(), objectNode.get(TEXTURE).asText(), position, rotation, (float)
-            // objectNode.get(SCALE)
-            // .asDouble());
-            break;
-        case COLLECTABLE:
-            break;
-        case EFFECT:
-            break;
-        case MOVEABLE_OBJECT:
-            break;
-        case PLAYER:
-            break;
-        default:
-            break;
-        }
-        return e;
     }
 
     /**
@@ -206,20 +168,21 @@ public final class TerrainLoader {
         Map<String, Map<String, Float[]>> lights = Serialization.createSerializableMap(terrain.getStaticLights());
         map.put(STATIC_LIGHTS, lights);
 
-        Map<Integer, WorldEntity> staticObjects = terrain.getStaticObjects();
-        List<Map<String, Object>> entities = new LinkedList<Map<String, Object>>();
-        for (WorldEntity e : staticObjects.values()) {
-            Map<String, Object> newEntity = new HashMap<String, Object>();
-            newEntity.put(ID, e.getID());
-            newEntity.put(TYPE, e.getType().toString());
-            newEntity.put(MODEL, e.getModel());
-            newEntity.put(TEXTURE, e.getTexture());
-            newEntity.put(SCALE, e.getScale());
-            newEntity.put(POSITION, new Float[] { e.getPosition().x, e.getPosition().y, e.getPosition().z });
-            newEntity.put(ROTATION, new Float[] { e.getRotX(), e.getRotY(), e.getRotZ() });
-            entities.add(newEntity);
-        }
-        map.put(STATIC_OBJECTS, entities);
+        // Map<Integer, Entity> staticObjects = terrain.getStaticObjects();
+        // List<Map<String, Object>> entities = new LinkedList<Map<String, Object>>();
+        // for (Entity e : staticObjects.values()) {
+        // Map<String, Object> newEntity = new HashMap<String, Object>();
+        // newEntity.put(ID, e.getID());
+        // newEntity.put(TYPE, e.getType().toString());
+        // newEntity.put(MODEL, e.getModel());
+        // newEntity.put(TEXTURE, e.getTexture());
+        // newEntity.put(SCALE, e.getScale());
+        // newEntity.put(POSITION, new Float[] { e.getPosition().x, e.getPosition().y,
+        // e.getPosition().z });
+        // newEntity.put(ROTATION, new Float[] { e.getRotX(), e.getRotY(), e.getRotZ() });
+        // entities.add(newEntity);
+        // }
+        // map.put(STATIC_OBJECTS, entities);
         try {
             ObjectMapper mapper = new ObjectMapper();
             mapper.writerWithDefaultPrettyPrinter().writeValue(target, map);

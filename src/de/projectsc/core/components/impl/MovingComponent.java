@@ -182,4 +182,5 @@ public class MovingComponent extends Component {
     public boolean isValidForSaving() {
         return true;
     }
+
 }

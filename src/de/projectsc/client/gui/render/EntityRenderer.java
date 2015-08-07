@@ -16,10 +16,11 @@ import org.lwjgl.util.vector.Matrix4f;
 
 import de.projectsc.client.gui.models.RawModel;
 import de.projectsc.client.gui.models.TexturedModel;
-import de.projectsc.client.gui.objects.GraphicalEntity;
 import de.projectsc.client.gui.shaders.EntityShader;
 import de.projectsc.client.gui.textures.ModelTexture;
 import de.projectsc.client.gui.tools.Maths;
+import de.projectsc.core.components.impl.ModelAndTextureComponent;
+import de.projectsc.core.entities.Entity;
 
 /**
  * This class will get {@link GraphicalEntity} objects to render onto the screen.
@@ -28,7 +29,7 @@ import de.projectsc.client.gui.tools.Maths;
  */
 public class EntityRenderer {
 
-    private EntityShader shader;
+    private final EntityShader shader;
 
     public EntityRenderer(EntityShader shader, Matrix4f projectionMatrix) {
         this.shader = shader;
@@ -40,15 +41,16 @@ public class EntityRenderer {
     /**
      * Renders all textured models without switching vaos to often.
      * 
-     * @param entities to render.
+     * @param entitiesWithModel to render.
      */
-    public void render(Map<TexturedModel, List<GraphicalEntity>> entities) {
-        for (TexturedModel model : entities.keySet()) {
+    public void render(Map<TexturedModel, List<Entity>> entitiesWithModel) {
+        for (TexturedModel model : entitiesWithModel.keySet()) {
             prepareTexturedModel(model);
-            List<GraphicalEntity> batch = entities.get(model);
-            for (GraphicalEntity e : batch) {
-                prepareInstance(e);
-                GL11.glDrawElements(GL11.GL_TRIANGLES, e.getModel().getRawModel().getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
+            List<Entity> batch = entitiesWithModel.get(model);
+            for (Entity e : batch) {
+                ModelAndTextureComponent modelComponent = e.getComponent(ModelAndTextureComponent.class);
+                prepareInstance(e, modelComponent);
+                GL11.glDrawElements(GL11.GL_TRIANGLES, modelComponent.getModel().getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
             }
             unbindTexturedModel();
         }
@@ -79,11 +81,11 @@ public class EntityRenderer {
         MasterRenderer.enableCulling();
     }
 
-    private void prepareInstance(GraphicalEntity entity) {
+    private void prepareInstance(Entity entity, ModelAndTextureComponent modelComponent) {
         Matrix4f transformationMatrix =
             Maths.createTransformationMatrix(entity.getPosition(), entity.getRotX(), entity.getRotY(), entity.getRotZ(), entity.getScale());
         shader.loadTransformationMatrix(transformationMatrix);
-        shader.loadOffset(entity.getTextureOffsetX(), entity.getTextureOffsetY());
+        shader.loadOffset(modelComponent.getTextureOffsetX(), modelComponent.getTextureOffsetY());
 
     }
 }

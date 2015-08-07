@@ -15,13 +15,17 @@ import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.core.components.Component;
 import de.projectsc.core.components.ComponentType;
+import de.projectsc.core.components.impl.MovingComponent;
+import de.projectsc.core.utils.BoundingBox;
+import de.projectsc.core.utils.PhysicalObject;
 
 /**
- * All game objects in the game are entities. All entities have components, that define their role and behavior.
+ * All game objects in the game are entities. All entities have components, that define their role
+ * and behavior.
  * 
  * @author Josch Bosch
  */
-public class Entity {
+public class Entity implements PhysicalObject {
 
     private static int idCount = 1000;
 
@@ -167,6 +171,7 @@ public class Entity {
         return components;
     }
 
+    @Override
     public Vector3f getPosition() {
         return position;
     }
@@ -242,6 +247,25 @@ public class Entity {
         if (this.rotation != null) {
             this.rotation.y = targetRotation;
         }
+    }
+
+    @Override
+    public boolean isMovable() {
+        return hasComponent(MovingComponent.class);
+    }
+
+    @Override
+    public BoundingBox getBoundingBox() {
+        return null;
+    }
+
+    @Override
+    public boolean hasMoved() {
+        if (hasComponent(MovingComponent.class)) {
+            return getComponent(MovingComponent.class).isMoved();
+
+        }
+        return false;
     }
 
 }

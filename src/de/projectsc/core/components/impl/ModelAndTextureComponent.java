@@ -108,7 +108,7 @@ public class ModelAndTextureComponent extends Component {
     public void loadModel(Loader loader, Entity owner) {
         try {
             String filePath =
-                String.format("/%s/%s%d", CoreConstants.MODEL_DIRECTORY_NAME, CoreConstants.MODEL_DIRECTORY_PREFIX,
+                String.format("/%s/%s%d", CoreConstants.SCHEME_DIRECTORY_NAME, CoreConstants.SCHEME_DIRECTORY_PREFIX,
                     owner.getEntityTypeId());
 
             File pathToSchema = new File(this.getClass().getResource(filePath).toURI());
