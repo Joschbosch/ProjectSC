@@ -10,8 +10,6 @@ import java.util.List;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
-import de.projectsc.client.gui.tools.Loader;
-
 public class ParticleSource {
 
     public static final int MAX_PARTICLES_PER_SOURCE = 1000;
@@ -28,15 +26,15 @@ public class ParticleSource {
 
     private final float particleLifetimeMargin = 0.5f;
 
-    private final Camera camera;
-
     private int particleCount;
 
-    private final float[] positionBuffer;
+    private float[] positionBuffer;
 
-    private final byte[] colorBuffer;
+    private byte[] colorBuffer;
 
-    public ParticleSource(Camera camera, Loader loader) {
+    private Vector3f cameraPostion;
+
+    public ParticleSource() {
         float[] positions = new float[MAX_PARTICLES_PER_SOURCE * 4];
         byte[] color = new byte[MAX_PARTICLES_PER_SOURCE * 4];
         for (int i = 0; i < MAX_PARTICLES_PER_SOURCE; i++) {
@@ -60,7 +58,7 @@ public class ParticleSource {
             particles.add(p);
         }
         particleCount = MAX_PARTICLES_PER_SOURCE;
-        this.camera = camera;
+        this.cameraPostion = new Vector3f(0, 0, 0);
     }
 
     public void update() {
@@ -88,7 +86,7 @@ public class ParticleSource {
                     newSpeed.scale(delta);
                     Vector3f newPosition = Vector3f.add(p.getPosition(), newSpeed, null);
                     p.setPosition(newPosition);
-                    p.setCameradistance(Vector3f.sub(p.getPosition(), camera.getPosition(), null).lengthSquared());
+                    p.setCameradistance(Vector3f.sub(p.getPosition(), cameraPostion, null).lengthSquared());
 
                     positionBuffer[4 * particleCount + 0] = newPosition.x;
                     positionBuffer[4 * particleCount + 1] = newPosition.y;
@@ -143,4 +141,7 @@ public class ParticleSource {
         return particleCount;
     }
 
+    public void setCameraPostion(Vector3f cameraPostion) {
+        this.cameraPostion = cameraPostion;
+    }
 }

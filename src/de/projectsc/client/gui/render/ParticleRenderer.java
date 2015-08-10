@@ -4,6 +4,8 @@
 
 package de.projectsc.client.gui.render;
 
+import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 import java.util.List;
 
 import org.lwjgl.opengl.GL11;
@@ -11,6 +13,7 @@ import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
+import org.lwjgl.opengl.GL31;
 import org.lwjgl.util.vector.Matrix4f;
 
 import de.projectsc.client.gui.models.RawModel;
@@ -29,6 +32,8 @@ public class ParticleRenderer {
 
     private Camera camera;
 
+    private Loader loader;
+
     public ParticleRenderer(Loader loader, Matrix4f projectionMatrix) {
         // Just x and z vertex positions here, y is set to 0 in v.shader
         float[] vertices = {
@@ -39,11 +44,16 @@ public class ParticleRenderer {
             -1, 1,
             1, 1 };
         quad = loader.loadToVAO(vertices, 2);
-        quad.addStreamingBuffer(loader.createStreamingVBO(quad.getVaoID(), 1, ParticleSource.MAX_PARTICLES_PER_SOURCE * 4 * 32, 4));
-        quad.addStreamingBuffer(loader.createStreamingVBO(quad.getVaoID(), 2, ParticleSource.MAX_PARTICLES_PER_SOURCE * 4 * 8, 4));
+        float[] data = new float[ParticleSource.MAX_PARTICLES_PER_SOURCE * 4];
+        FloatBuffer positionsBuffer = loader.storeDataInFloatBuffer(data);
+        quad.addStreamingBuffer(loader.createStreamingFloatVBO(quad.getVaoID(), 1, positionsBuffer, 4));
+        byte[] data2 = new byte[ParticleSource.MAX_PARTICLES_PER_SOURCE * 3];
+        ByteBuffer buffer2 = loader.storeDataInByteBuffer(data2);
+        quad.addStreamingBuffer(loader.createStreamingByteVBO(quad.getVaoID(), 2, buffer2, 4));
 
         shader = new ParticleShader();
         this.projectionMatrix = projectionMatrix;
+        this.loader = loader;
     }
 
     /**
@@ -67,17 +77,19 @@ public class ParticleRenderer {
 
             GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, quad.getBuffer(0));
             GL15.glBufferData(GL15.GL_ARRAY_BUFFER, ParticleSource.MAX_PARTICLES_PER_SOURCE * 4 * 32, GL15.GL_STREAM_DRAW);
-            // GL15.glBufferSubData(GL15.GL_ARRAY_BUFFER, 0, source.getParticleCount() * 32 * 4, );
+            FloatBuffer positionBuffer = loader.storeDataInFloatBuffer(source.getPositionBuffer());
+            GL15.glBufferSubData(GL15.GL_ARRAY_BUFFER, 0, positionBuffer);
 
             GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, quad.getBuffer(1));
             GL15.glBufferData(GL15.GL_ARRAY_BUFFER, ParticleSource.MAX_PARTICLES_PER_SOURCE * 4 * 4, GL15.GL_STREAM_DRAW);
-            // GL15.glBufferSubData(GL15.GL_ARRAY_BUFFER, 0, source.getParticleCount() * 4 * 4,
-            // source.getColorBuffer());
+            ByteBuffer colorBuffer = loader.storeDataInByteBuffer(source.getColorBuffer());
+            GL15.glBufferSubData(GL15.GL_ARRAY_BUFFER, 0, colorBuffer);
 
             GL13.glActiveTexture(GL13.GL_TEXTURE0);
             GL11.glBindTexture(GL11.GL_TEXTURE_2D, source.getTextureAtlas());
             shader.loadPositionAttributes(camera.createViewMatrix(), projectionMatrix);
-            GL11.glDrawArrays(GL11.GL_TRIANGLE_STRIP, 0, quad.getVertexCount());
+            GL31.glDrawArraysInstanced(GL11.GL_TRIANGLE_STRIP, 0, 4, source.getParticleCount());
+
         }
 
         GL20.glDisableVertexAttribArray(2);

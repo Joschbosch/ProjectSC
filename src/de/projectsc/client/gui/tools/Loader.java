@@ -106,14 +106,28 @@ public class Loader {
         return new RawModel(vaoID, positions.length / dimensions);
     }
 
-    public int createStreamingVBO(int vaoID, int attrNumber, long size, int dimension) {
+    public int createStreamingFloatVBO(int vaoID, int attrNumber, FloatBuffer buffer, int dimension) {
         // bind vao
         GL30.glBindVertexArray(vaoID);
         int vboID = GL15.glGenBuffers();
         vbos.add(vboID);
-        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, size, GL15.GL_STREAM_DRAW);
+        GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, buffer, GL15.GL_DYNAMIC_DRAW);
+        // check for errors
         GL20.glVertexAttribPointer(attrNumber, dimension, GL11.GL_FLOAT, false, 0, 0);
-        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
+        unbind();
+        return vboID;
+    }
+
+    public int createStreamingByteVBO(int vaoID, int attrNumber, ByteBuffer buffer, int dimension) {
+        // bind vao
+        GL30.glBindVertexArray(vaoID);
+        int vboID = GL15.glGenBuffers();
+        vbos.add(vboID);
+        GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, buffer, GL15.GL_DYNAMIC_DRAW);
+        GL20.glVertexAttribPointer(attrNumber, dimension, GL11.GL_BYTE, false, 0, 0);
+        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
+        unbind();
         return vboID;
     }
 
