@@ -106,6 +106,17 @@ public class Loader {
         return new RawModel(vaoID, positions.length / dimensions);
     }
 
+    public int createStreamingVBO(int vaoID, int attrNumber, long size, int dimension) {
+        // bind vao
+        GL30.glBindVertexArray(vaoID);
+        int vboID = GL15.glGenBuffers();
+        vbos.add(vboID);
+        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, size, GL15.GL_STREAM_DRAW);
+        GL20.glVertexAttribPointer(attrNumber, dimension, GL11.GL_FLOAT, false, 0, 0);
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+        return vboID;
+    }
+
     private int createVAO() {
         int vaoID = GL30.glGenVertexArrays();
         vaos.add(vaoID);
@@ -183,7 +194,7 @@ public class Loader {
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
     }
 
-    private FloatBuffer storeDataInFloatBuffer(float[] data) {
+    public FloatBuffer storeDataInFloatBuffer(float[] data) {
         FloatBuffer buffer = BufferUtils.createFloatBuffer(data.length);
         buffer.put(data);
         buffer.flip();
@@ -196,6 +207,13 @@ public class Loader {
         GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, vboId);
         IntBuffer buffer = storeDataInIntBuffer(indices);
         GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, buffer, GL15.GL_STATIC_DRAW);
+    }
+
+    public ByteBuffer storeDataInByteBuffer(byte[] color) {
+        ByteBuffer buffer = BufferUtils.createByteBuffer(color.length);
+        buffer.put(color);
+        buffer.flip();
+        return buffer;
     }
 
     private IntBuffer storeDataInIntBuffer(int[] data) {
@@ -266,4 +284,5 @@ public class Loader {
     private void unbind() {
         GL30.glBindVertexArray(0);
     }
+
 }
