@@ -16,6 +16,7 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.util.vector.Matrix4f;
+import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
 import de.projectsc.client.gui.models.RawModel;
@@ -105,7 +106,7 @@ public class MasterRenderer {
         // } catch (URISyntaxException e) {
         // System.err.println("Could not load file");
         // }
-        particle = new ParticleSource();
+        particle = new ParticleSource(loader, new Vector3f(0, 0, 0));
 
     }
 
@@ -131,9 +132,9 @@ public class MasterRenderer {
         Camera camera, long elapsedTime, Vector4f clipPlane) {
         List<Light> lights = new LinkedList<>();
         List<Billboard> billboards = new LinkedList<>();
-        billboards.add(billboard);
+        // billboards.add(billboard);
         billboardRenderer.setCamera(camera);
-
+        particleRenderer.setCamera(camera);
         List<ParticleSource> particles = new LinkedList<>();
         particles.add(particle);
         particle.setCameraPostion(camera.getPosition());

@@ -4,11 +4,14 @@
 
 package de.projectsc.client.gui.objects;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
+
+import de.projectsc.client.gui.tools.Loader;
 
 public class ParticleSource {
 
@@ -34,31 +37,35 @@ public class ParticleSource {
 
     private Vector3f cameraPostion;
 
-    public ParticleSource() {
-        float[] positions = new float[MAX_PARTICLES_PER_SOURCE * 4];
-        byte[] color = new byte[MAX_PARTICLES_PER_SOURCE * 4];
+    public ParticleSource(Loader loader, Vector3f position) {
+        positionBuffer = new float[MAX_PARTICLES_PER_SOURCE * 4];
+        colorBuffer = new byte[MAX_PARTICLES_PER_SOURCE * 4];
+        particles = new ArrayList<>();
         for (int i = 0; i < MAX_PARTICLES_PER_SOURCE; i++) {
             Particle p = new Particle();
             p.setAngle(0.0f);
             p.setCameradistance(-1);
             p.setColor(new Vector4f(0, 0, 0, 0));
-            color[i] = 0;
-            color[i + 1] = 0;
-            color[i + 2] = 0;
-            color[i + 3] = 0;
+            colorBuffer[i] = 0;
+            colorBuffer[i + 1] = 0;
+            colorBuffer[i + 2] = 0;
+            colorBuffer[i + 3] = 0;
             p.setLifetime(-1);
             p.setPosition(new Vector3f(0, 0, 0));
             p.setSize(1.0f);
-            positions[i * 4] = 0;
-            positions[i * 4 + 1] = 0;
-            positions[i * 4 + 2] = 0;
-            positions[i * 4 + 3] = 1.0f;
+            positionBuffer[i * 4] = 0;
+            positionBuffer[i * 4 + 1] = 0;
+            positionBuffer[i * 4 + 2] = 0;
+            positionBuffer[i * 4 + 3] = 1.0f;
             p.setSpeed(new Vector3f(1.0f, 1.0f, 1.0f));
             p.setWeight(1.0f);
             particles.add(p);
         }
         particleCount = MAX_PARTICLES_PER_SOURCE;
         this.cameraPostion = new Vector3f(0, 0, 0);
+        this.position = position;
+
+        loader.loadTexture("black.png");
     }
 
     public void update() {
@@ -76,7 +83,7 @@ public class ParticleSource {
         particleCount = 0;
         for (int i = 0; i < MAX_PARTICLES_PER_SOURCE; i++) {
             Particle p = particles.get(i);
-            if (p.getLifetime() > 0.0f) {
+            if (p != null && p.getLifetime() > 0.0f) {
                 p.setLifetime(p.getLifetime() - delta);
                 if (p.getLifetime() > 0.0f) {
                     Vector3f gravity = new Vector3f(0.0f, -9.81f, 0.0f);

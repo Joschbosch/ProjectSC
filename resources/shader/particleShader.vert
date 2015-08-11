@@ -8,7 +8,7 @@ out vec2 UV;
 out vec4 particleColor;
 
 uniform vec3 cameraRightWorldspace;
-uniform vec3 CameraUp_worldspace;
+uniform vec3 cameraUpWorldspace;
 uniform mat4 modelViewProjectionMatrix; 
 
 void main()
