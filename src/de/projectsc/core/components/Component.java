@@ -6,6 +6,8 @@
 package de.projectsc.core.components;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.JsonNode;
@@ -13,7 +15,14 @@ import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 
+import de.projectsc.client.gui.models.RawModel;
+import de.projectsc.client.gui.models.TexturedModel;
+import de.projectsc.client.gui.objects.Billboard;
+import de.projectsc.client.gui.objects.Camera;
+import de.projectsc.client.gui.objects.Light;
+import de.projectsc.client.gui.objects.ParticleEmitter;
 import de.projectsc.core.entities.Entity;
+import de.projectsc.core.utils.BoundingBox;
 
 /**
  * 
@@ -41,6 +50,10 @@ public abstract class Component {
     public abstract void update(Entity owner);
 
     public abstract boolean isValidForSaving();
+
+    public abstract void render(Entity owner, Map<TexturedModel, List<Entity>> entities, Map<RawModel, List<BoundingBox>> boundingBoxes,
+        List<Light> lights,
+        List<Billboard> billboards, List<ParticleEmitter> particles, Camera camera, long elapsedTime);
 
     /**
      * 

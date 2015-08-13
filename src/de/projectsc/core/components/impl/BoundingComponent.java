@@ -6,6 +6,9 @@ package de.projectsc.core.components.impl;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.JsonNode;
@@ -14,6 +17,11 @@ import org.codehaus.jackson.map.JsonMappingException;
 import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.client.gui.models.RawModel;
+import de.projectsc.client.gui.models.TexturedModel;
+import de.projectsc.client.gui.objects.Billboard;
+import de.projectsc.client.gui.objects.Camera;
+import de.projectsc.client.gui.objects.Light;
+import de.projectsc.client.gui.objects.ParticleEmitter;
 import de.projectsc.client.gui.tools.Loader;
 import de.projectsc.client.gui.tools.ModelData;
 import de.projectsc.client.gui.tools.NewOBJFileLoader;
@@ -82,6 +90,23 @@ public class BoundingComponent extends Component {
             box.setPosition(Vector3f.add(owner.getPosition(), offset, null));
             box.setRotation(Vector3f.add(owner.getRotation(), offsetRotation, null));
             box.setScale(scale);
+        }
+    }
+
+    @Override
+    public void render(Entity owner, Map<TexturedModel, List<Entity>> entities, Map<RawModel, List<BoundingBox>> boundingBoxes,
+        List<Light> lights,
+        List<Billboard> billboards, List<ParticleEmitter> particles, Camera camera, long elapsedTime) {
+        if (getBox() != null) {
+            RawModel model = getBox().getModel();
+            List<BoundingBox> batch = boundingBoxes.get(model);
+            if (batch != null) {
+                batch.add(getBox());
+            } else {
+                List<BoundingBox> newBatch = new ArrayList<>();
+                newBatch.add(getBox());
+                boundingBoxes.put(model, newBatch);
+            }
         }
     }
 

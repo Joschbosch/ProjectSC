@@ -19,7 +19,7 @@ import org.lwjgl.util.vector.Matrix4f;
 
 import de.projectsc.client.gui.models.RawModel;
 import de.projectsc.client.gui.objects.Camera;
-import de.projectsc.client.gui.objects.ParticleSource;
+import de.projectsc.client.gui.objects.ParticleEmitter;
 import de.projectsc.client.gui.shaders.ParticleShader;
 import de.projectsc.client.gui.tools.Loader;
 
@@ -45,11 +45,11 @@ public class ParticleRenderer {
             -1, 1,
             1, 1 };
         quad = loader.loadToVAO(vertices, 2);
-        float[] data = new float[ParticleSource.MAX_PARTICLES_PER_SOURCE * 4];
+        float[] data = new float[ParticleEmitter.MAX_PARTICLES_PER_SOURCE * 4];
         FloatBuffer positionsBuffer = loader.storeDataInFloatBuffer(data);
 
         quad.addStreamingBuffer(loader.createStreamingFloatVBO(quad.getVaoID(), 1, positionsBuffer, 4));
-        byte[] data2 = new byte[ParticleSource.MAX_PARTICLES_PER_SOURCE * 3];
+        byte[] data2 = new byte[ParticleEmitter.MAX_PARTICLES_PER_SOURCE * 3];
         ByteBuffer buffer2 = loader.storeDataInByteBuffer(data2);
         quad.addStreamingBuffer(loader.createStreamingByteVBO(quad.getVaoID(), 2, buffer2, 4));
 
@@ -63,9 +63,9 @@ public class ParticleRenderer {
      * 
      * @param particles to render
      */
-    public void render(List<ParticleSource> particleSources) {
+    public void render(List<ParticleEmitter> particleSources) {
 
-        ParticleSource source = particleSources.get(0);
+        ParticleEmitter source = particleSources.get(0);
         GL30.glBindVertexArray(quad.getVaoID());
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, quad.getBuffer(0));
         FloatBuffer positionBuffer = loader.storeDataInFloatBuffer(source.getPositionBuffer());

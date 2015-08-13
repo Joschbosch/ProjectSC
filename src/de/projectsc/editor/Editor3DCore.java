@@ -42,6 +42,7 @@ import de.projectsc.core.components.impl.BoundingComponent;
 import de.projectsc.core.components.impl.EmittingLightComponent;
 import de.projectsc.core.components.impl.ModelAndTextureComponent;
 import de.projectsc.core.components.impl.MovingComponent;
+import de.projectsc.core.components.impl.ParticleEmitterComponent;
 import de.projectsc.core.entities.Entity;
 
 /**
@@ -309,6 +310,10 @@ public class Editor3DCore implements Runnable {
                 BoundingComponent c = getCurrentEntity().getComponent(BoundingComponent.class);
                 c.loadBoundingBox(entity, loader, c.getBoxFile());
             }
+            if (msg.equals("particleEmitter")) {
+                ParticleEmitterComponent c = getCurrentEntity().getComponent(ParticleEmitterComponent.class);
+                c.createNewEmitter(loader, new Vector3f(0, 10, 0));
+            }
         }
     }
 
@@ -338,6 +343,10 @@ public class Editor3DCore implements Runnable {
         }
         if (BoundingComponent.NAME.equals(component)) {
             entity.addComponent(new BoundingComponent());
+        }
+        if (ParticleEmitterComponent.NAME.equals(component)) {
+            entity.addComponent(new ParticleEmitterComponent());
+            triggerAddParticleEmitter();
         }
     }
 
@@ -393,6 +402,10 @@ public class Editor3DCore implements Runnable {
      */
     public void triggerUpdateTexture() {
         incomingQueue.offer("updateTexture");
+    }
+
+    private void triggerAddParticleEmitter() {
+        incomingQueue.offer("particleEmitter");
     }
 
     public void triggerLoadBoundingBox() {

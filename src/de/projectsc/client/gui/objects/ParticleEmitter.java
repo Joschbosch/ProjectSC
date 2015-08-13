@@ -13,13 +13,15 @@ import org.lwjgl.util.vector.Vector4f;
 
 import de.projectsc.client.gui.tools.Loader;
 
-public class ParticleSource {
+public class ParticleEmitter {
 
     public static final int MAX_PARTICLES_PER_SOURCE = 1000;
 
-    private Vector3f position;
+    private final Vector3f position;
 
-    private List<Particle> particles;
+    private final List<Particle> particles;
+
+    private int particleCount;
 
     private int lastUsedParticle = 0;
 
@@ -29,50 +31,52 @@ public class ParticleSource {
 
     private final float particleLifetimeMargin = 0.5f;
 
-    private int particleCount;
+    private final float[] positionBuffer;
 
-    private float[] positionBuffer;
-
-    private byte[] colorBuffer;
+    private final byte[] colorBuffer;
 
     private Vector3f cameraPostion;
 
-    public ParticleSource(Loader loader, Vector3f position) {
+    public ParticleEmitter(Loader loader, Vector3f position) {
         positionBuffer = new float[MAX_PARTICLES_PER_SOURCE * 4];
         colorBuffer = new byte[MAX_PARTICLES_PER_SOURCE * 4];
         particles = new ArrayList<>();
         for (int i = 0; i < MAX_PARTICLES_PER_SOURCE; i++) {
-            Particle p = new Particle();
-            p.setAngle(0.0f);
-            p.setCameradistance(-1);
-            p.setColor(new Vector4f(0, 0, 0, 0));
-            colorBuffer[i] = 0;
-            colorBuffer[i + 1] = 0;
-            colorBuffer[i + 2] = 0;
-            colorBuffer[i + 3] = 0;
-            p.setLifetime(-1);
-            p.setPosition(new Vector3f(0, 0, 0));
-            p.setSize(1.0f);
-            positionBuffer[i * 4] = 0;
-            positionBuffer[i * 4 + 1] = 0;
-            positionBuffer[i * 4 + 2] = 0;
-            positionBuffer[i * 4 + 3] = 1.0f;
-            p.setSpeed(new Vector3f(1.0f, 1.0f, 1.0f));
-            p.setWeight(1.0f);
-            particles.add(p);
+            createNewParticle(i);
         }
         particleCount = MAX_PARTICLES_PER_SOURCE;
         this.cameraPostion = new Vector3f(0, 0, 0);
         this.position = position;
-
         loader.loadTexture("black.png");
+    }
+
+    private void createNewParticle(int i) {
+        Particle p = new Particle();
+        p.setAngle(0.0f);
+        p.setCameradistance(-1);
+        p.setColor(new Vector4f(0, 0, 0, 0));
+        colorBuffer[i] = 0;
+        colorBuffer[i + 1] = 0;
+        colorBuffer[i + 2] = 0;
+        colorBuffer[i + 3] = 0;
+        p.setLifetime(-1);
+        p.setPosition(new Vector3f(0, 0, 0));
+        p.setSize(1.0f);
+        positionBuffer[i * 4] = 0;
+        positionBuffer[i * 4 + 1] = 0;
+        positionBuffer[i * 4 + 2] = 0;
+        positionBuffer[i * 4 + 3] = 1.0f;
+        p.setSpeed(new Vector3f(1.0f, 1.0f, 1.0f));
+        p.setWeight(1.0f);
+        particles.add(p);
     }
 
     public void update() {
         float delta = 0.016f;
         int newparticles = (int) (delta * 10000.0);
-        if (newparticles > (int) (0.016f * 10000.0))
+        if (newparticles > (int) (0.016f * 10000.0)) {
             newparticles = (int) (0.016f * 10000.0);
+        }
         for (int i = 0; i < newparticles; i++) {
             int index = findUnsuedSlot();
             particles.get(index).setLifetime(

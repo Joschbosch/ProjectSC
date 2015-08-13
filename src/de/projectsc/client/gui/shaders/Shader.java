@@ -16,6 +16,7 @@ import org.apache.commons.logging.LogFactory;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
+import org.lwjgl.opengl.GL32;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
@@ -42,12 +43,29 @@ public abstract class Shader {
 
     private final int fragmentShader;
 
+    private final int geometryShader;
+
     public Shader(String vertexFile, String fragmentFile) {
         vertexShader = loadShader(vertexFile, GL20.GL_VERTEX_SHADER);
         fragmentShader = loadShader(fragmentFile, GL20.GL_FRAGMENT_SHADER);
         shaderProgram = GL20.glCreateProgram();
+        geometryShader = -1;
         GL20.glAttachShader(shaderProgram, vertexShader);
         GL20.glAttachShader(shaderProgram, fragmentShader);
+        bindAttributes();
+        GL20.glLinkProgram(shaderProgram);
+        GL20.glValidateProgram(shaderProgram);
+        getAllUniformLocations();
+    }
+
+    public Shader(String vertexFile, String fragmentFile, String geometryFile) {
+        vertexShader = loadShader(vertexFile, GL20.GL_VERTEX_SHADER);
+        fragmentShader = loadShader(fragmentFile, GL20.GL_FRAGMENT_SHADER);
+        geometryShader = loadShader(geometryFile, GL32.GL_GEOMETRY_SHADER);
+        shaderProgram = GL20.glCreateProgram();
+        GL20.glAttachShader(shaderProgram, vertexShader);
+        GL20.glAttachShader(shaderProgram, fragmentShader);
+        GL20.glAttachShader(shaderProgram, geometryShader);
         bindAttributes();
         GL20.glLinkProgram(shaderProgram);
         GL20.glValidateProgram(shaderProgram);

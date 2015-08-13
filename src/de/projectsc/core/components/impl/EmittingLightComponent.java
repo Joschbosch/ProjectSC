@@ -17,10 +17,16 @@ import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.lwjgl.util.vector.Vector3f;
 
+import de.projectsc.client.gui.models.RawModel;
+import de.projectsc.client.gui.models.TexturedModel;
+import de.projectsc.client.gui.objects.Billboard;
+import de.projectsc.client.gui.objects.Camera;
 import de.projectsc.client.gui.objects.Light;
+import de.projectsc.client.gui.objects.ParticleEmitter;
 import de.projectsc.core.components.Component;
 import de.projectsc.core.components.ComponentType;
 import de.projectsc.core.entities.Entity;
+import de.projectsc.core.utils.BoundingBox;
 import de.projectsc.core.utils.Serialization;
 
 /**
@@ -51,6 +57,13 @@ public class EmittingLightComponent extends Component {
         }
     }
 
+    @Override
+    public void render(Entity owner, Map<TexturedModel, List<Entity>> entities, Map<RawModel, List<BoundingBox>> boundingBoxes,
+        List<Light> lights,
+        List<Billboard> billboards, List<ParticleEmitter> particles, Camera camera, long elapsedTime) {
+        lights.addAll(getLights());
+    }
+
     /**
      * Return light with the given name.
      * 
@@ -71,7 +84,8 @@ public class EmittingLightComponent extends Component {
     }
 
     /**
-     * Add light to entity. Note that the lights postion will be the offset of the entities position.
+     * Add light to entity. Note that the lights postion will be the offset of the entities
+     * position.
      * 
      * @param e owner entity
      * @param light to add

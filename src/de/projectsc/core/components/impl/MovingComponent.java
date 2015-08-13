@@ -5,15 +5,24 @@
  */
 package de.projectsc.core.components.impl;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 
 import org.codehaus.jackson.JsonNode;
 import org.lwjgl.util.vector.Vector3f;
 
+import de.projectsc.client.gui.models.RawModel;
+import de.projectsc.client.gui.models.TexturedModel;
+import de.projectsc.client.gui.objects.Billboard;
+import de.projectsc.client.gui.objects.Camera;
+import de.projectsc.client.gui.objects.Light;
+import de.projectsc.client.gui.objects.ParticleEmitter;
 import de.projectsc.core.Tile;
 import de.projectsc.core.components.Component;
 import de.projectsc.core.components.ComponentType;
 import de.projectsc.core.entities.Entity;
+import de.projectsc.core.utils.BoundingBox;
 
 /**
  * Entity component to allow movement.
@@ -112,6 +121,12 @@ public class MovingComponent extends Component {
         } else {
             moved = false;
         }
+    }
+
+    @Override
+    public void render(Entity owner, Map<TexturedModel, List<Entity>> entities, Map<RawModel, List<BoundingBox>> boundingBoxes,
+        List<Light> lights, List<Billboard> billboards, List<ParticleEmitter> particles, Camera camera, long elapsedTime) {
+
     }
 
     /**

@@ -24,15 +24,13 @@ import de.projectsc.client.gui.models.TexturedModel;
 import de.projectsc.client.gui.objects.Billboard;
 import de.projectsc.client.gui.objects.Camera;
 import de.projectsc.client.gui.objects.Light;
-import de.projectsc.client.gui.objects.ParticleSource;
+import de.projectsc.client.gui.objects.ParticleEmitter;
 import de.projectsc.client.gui.shaders.EntityShader;
 import de.projectsc.client.gui.shaders.TerrainShader;
 import de.projectsc.client.gui.shaders.WireFrameShader;
 import de.projectsc.client.gui.terrain.TerrainModel;
 import de.projectsc.client.gui.tools.Loader;
-import de.projectsc.core.components.impl.BoundingComponent;
-import de.projectsc.core.components.impl.EmittingLightComponent;
-import de.projectsc.core.components.impl.ModelAndTextureComponent;
+import de.projectsc.core.components.Component;
 import de.projectsc.core.entities.Entity;
 import de.projectsc.core.utils.BoundingBox;
 
@@ -77,13 +75,13 @@ public class MasterRenderer {
 
     private final WireFrameRenderer collisionBoxRenderer;
 
-    private Map<RawModel, List<BoundingBox>> boundingBoxes = new HashMap<>();
+    private final Map<RawModel, List<BoundingBox>> boundingBoxes = new HashMap<>();
 
     private Billboard billboard;
 
-    private ParticleSource particle;
+    private final ParticleEmitter particle;
 
-    private ParticleRenderer particleRenderer;
+    private final ParticleRenderer particleRenderer;
 
     public MasterRenderer(Loader loader) {
         enableCulling();
@@ -102,11 +100,12 @@ public class MasterRenderer {
         // billboard.setPosition(new Vector3f(0.0f, 10.0f, 0.0f));
         // billboard.setSize(new Vector2f(2.0f, 2.0f));
         // try {
-        // billboard.setImageFile(new File(MasterRenderer.class.getResource("/graphics/lamp.png").toURI()));
+        // billboard.setImageFile(new
+        // File(MasterRenderer.class.getResource("/graphics/lamp.png").toURI()));
         // } catch (URISyntaxException e) {
         // System.err.println("Could not load file");
         // }
-        particle = new ParticleSource(loader, new Vector3f(0, 0, 0));
+        particle = new ParticleEmitter(loader, new Vector3f(0, 10, 0));
 
     }
 
@@ -132,27 +131,21 @@ public class MasterRenderer {
         Camera camera, long elapsedTime, Vector4f clipPlane) {
         List<Light> lights = new LinkedList<>();
         List<Billboard> billboards = new LinkedList<>();
+        List<ParticleEmitter> particles = new LinkedList<>();
+
         // billboards.add(billboard);
         billboardRenderer.setCamera(camera);
         particleRenderer.setCamera(camera);
-        List<ParticleSource> particles = new LinkedList<>();
+
+        // TEST CODE!
         particles.add(particle);
         particle.setCameraPostion(camera.getPosition());
         particle.update();
 
         processTerrain(terrain);
         for (Entity e : allEntities) {
-            if (e.getComponent(ModelAndTextureComponent.class) != null
-                && e.getComponent(ModelAndTextureComponent.class).getTexturedModel() != null) {
-                processEntity(e, e.getComponent(ModelAndTextureComponent.class));
-            }
-            if (e.getComponent(EmittingLightComponent.class) != null) {
-                EmittingLightComponent lightComp = e.getComponent(EmittingLightComponent.class);
-                lights.addAll(lightComp.getLights());
-            }
-            BoundingComponent component = e.getComponent(BoundingComponent.class);
-            if (component != null) {
-                processBoundingBox(component);
+            for (Component c : e.getComponents().values()) {
+                c.render(e, entities, boundingBoxes, lights, billboards, particles, camera, elapsedTime);
             }
         }
 
@@ -169,7 +162,7 @@ public class MasterRenderer {
      * @param elapsedTime since last frame
      * @param clipPlane to clip the world
      */
-    public void render(List<Light> lights, List<Billboard> billboards, List<ParticleSource> particles, Camera camera, long elapsedTime,
+    public void render(List<Light> lights, List<Billboard> billboards, List<ParticleEmitter> particles, Camera camera, long elapsedTime,
         Vector4f clipPlane) {
         prepare();
         entityShader.start();
@@ -193,7 +186,6 @@ public class MasterRenderer {
         skyboxRenderer.render(elapsedTime, camera, SKY_R, SKY_G, SKY_B);
         billboardRenderer.render(billboards);
         particleRenderer.render(particles);
-
         entities.clear();
         terrains.clear();
         boundingBoxes.clear();
@@ -206,38 +198,6 @@ public class MasterRenderer {
      */
     public void processTerrain(TerrainModel terrain) {
         terrains.add(terrain);
-    }
-
-    /**
-     * Add entity for rendering.
-     * 
-     * @param e entity
-     * @param component to render.
-     */
-    public void processEntity(Entity e, ModelAndTextureComponent component) {
-        TexturedModel entityModel = component.getTexturedModel();
-        List<Entity> batch = entities.get(entityModel);
-        if (batch != null) {
-            batch.add(e);
-        } else {
-            List<Entity> newBatch = new ArrayList<>();
-            newBatch.add(e);
-            entities.put(entityModel, newBatch);
-        }
-    }
-
-    private void processBoundingBox(BoundingComponent component) {
-        if (component.getBox() != null) {
-            RawModel model = component.getBox().getModel();
-            List<BoundingBox> batch = boundingBoxes.get(model);
-            if (batch != null) {
-                batch.add(component.getBox());
-            } else {
-                List<BoundingBox> newBatch = new ArrayList<>();
-                newBatch.add(component.getBox());
-                boundingBoxes.put(model, newBatch);
-            }
-        }
     }
 
     /**

@@ -63,6 +63,7 @@ import de.projectsc.core.components.Component;
 import de.projectsc.core.components.impl.BoundingComponent;
 import de.projectsc.core.components.impl.EmittingLightComponent;
 import de.projectsc.core.components.impl.MovingComponent;
+import de.projectsc.core.components.impl.ParticleEmitterComponent;
 import de.projectsc.editor.Editor3DCore;
 import de.projectsc.editor.EditorData;
 import de.projectsc.editor.componentViews.BoundingComponentView;
@@ -149,7 +150,8 @@ public class EntityEditor extends JFrame {
 
     private JComboBox<String> componentCombo;
 
-    private final String[] componentNames = { EmittingLightComponent.NAME, MovingComponent.NAME, BoundingComponent.NAME };
+    private final String[] componentNames =
+        { EmittingLightComponent.NAME, MovingComponent.NAME, BoundingComponent.NAME, ParticleEmitterComponent.NAME };
 
     private JList<String> componentList;
 
