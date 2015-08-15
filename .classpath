@@ -39,5 +39,6 @@
 	<classpathentry kind="lib" path="lib/kryonet-2.21/jars/production/onejar/kryonet-2.21-all.jar"/>
 	<classpathentry kind="lib" path="lib/kryonet-2.21/kryo-3.0.2.jar"/>
 	<classpathentry kind="lib" path="lib/kryonet-2.21/asm-all-5.0.4.jar"/>
+	<classpathentry kind="lib" path="lib/mysql-connector-java-5.1.36-bin.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

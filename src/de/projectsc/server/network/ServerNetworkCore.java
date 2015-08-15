@@ -90,7 +90,7 @@ class ClientListener extends Listener {
     @Override
     public void disconnected(Connection client) {
         super.disconnected(client);
-        coreQueue.add(new ClientDisconnectedServerMessage());
+        coreQueue.add(new ClientDisconnectedServerMessage(client));
         clientToSendThreadMap.get(client).interrupt();
     }
     
@@ -108,7 +108,7 @@ class ClientListener extends Listener {
                 Thread thread = new Thread(runnable);
                 clientToSendThreadMap.put(newClient, thread);
                 thread.start();
-                coreQueue.add(new NewClientConnectedServerMessage());
+                coreQueue.add(new NewClientConnectedServerMessage(client));
                 LOGGER.debug(String.format("New connection accepted: User %s ID %d", newClient.getDisplayName(), newClient.getId()));
             }            
         }
