@@ -12,7 +12,7 @@ import com.esotericsoftware.kryonet.Connection;
  *
  * @author David Scholz
  */
-public class AuthentificationRequestServerMessage extends ServerMessage {
+public class AuthentificationRequestServerMessage implements ServerMessage {
     
     private final Connection client;
     
@@ -28,11 +28,5 @@ public class AuthentificationRequestServerMessage extends ServerMessage {
     public Connection getConnection() {
         return client;
     }
-
-    @Override
-    public String getMessage() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
+    
 }

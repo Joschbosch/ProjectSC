@@ -12,7 +12,7 @@ import com.esotericsoftware.kryonet.Connection;
  *
  * @author David Scholz
  */
-public class ClientDisconnectedServerMessage extends ServerMessage {
+public class ClientDisconnectedServerMessage implements ServerMessage {
     
     private final Connection connection;
     
@@ -24,11 +24,5 @@ public class ClientDisconnectedServerMessage extends ServerMessage {
     public Connection getConnection() {
         return connection;
     }
-
-    @Override
-    public String getMessage() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
+    
 }
