@@ -2,20 +2,20 @@
  * Project SC-2015 
  */
  
-package de.projectsc.server.authentification.impl;
+package de.projectsc.server.authentification.impl.reader;
 
 import de.projectsc.server.authentification.api.AuthentificationReader;
 
 /**
  * 
- * SQL implementation of {@link AuthentificationReader}.
+ * CSV implementation of {@link AuthentificationReader}.
  *
  * @author David Scholz
  */
-public class MySQLAuthentificationReader implements AuthentificationReader {
+public class CSVAuthentificationReader implements AuthentificationReader {
 
-    public MySQLAuthentificationReader() {
-        // TODO Auto-generated constructor stub
+    public CSVAuthentificationReader() {
+        
     }
     
     @Override

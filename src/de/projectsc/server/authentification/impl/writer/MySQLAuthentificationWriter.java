@@ -2,7 +2,7 @@
  * Project SC-2015 
  */
  
-package de.projectsc.server.authentification.impl;
+package de.projectsc.server.authentification.impl.writer;
 
 import de.projectsc.server.authentification.api.AuthentificationWriter;
 
