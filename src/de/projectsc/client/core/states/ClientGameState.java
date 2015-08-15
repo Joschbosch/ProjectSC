@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2015 Project SC
+ * Project SC - 2015
  * 
- * All rights reserved
+ * 
  */
 package de.projectsc.client.core.states;
 
@@ -37,20 +37,32 @@ public abstract class ClientGameState implements ContextHandler<ClientGameContex
     /**
      * Main loop for the state.
      * 
-     * @param tickTime
+     * @param tickTime mostly static
      */
     public abstract void loop(long tickTime);
 
+    /**
+     * Read input from user.
+     */
     public abstract void readInput();
 
     protected void sendMessageToServer(ClientMessage msg) {
         context.getCore().sendMessageToServer(msg);
     }
 
+    /**
+     * Notice gui change.
+     */
     public void changeGUI() {
         context.getGUI().changeState((ClientStates) context.getState());
     }
 
+    /**
+     * Rendering.
+     * 
+     * @param elapsed time since last rendering.
+     * @param lag of rendering
+     */
     public abstract void render(long elapsed, long lag);
 
 }

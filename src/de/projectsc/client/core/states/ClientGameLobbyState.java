@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2015 Project SC
+ * Project SC - 2015
  * 
- * All rights reserved
+ * 
  */
 package de.projectsc.client.core.states;
 
@@ -43,6 +43,7 @@ public class ClientGameLobbyState extends ClientGameState {
         this.gui = context.getGUI();
         chat = new Chat();
         config = new GameConfigurationView(gameContext.getGameConfiguration());
+        config.getGameConfiguration();
         context.getCore().changeState(this);
     }
 

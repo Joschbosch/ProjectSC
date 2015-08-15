@@ -1,5 +1,8 @@
 /*
- * Copyright (C) 2015 
+ * 
+ * Project SC - 2015
+ * 
+ * 
  */
  
 package de.projectsc.server.network;

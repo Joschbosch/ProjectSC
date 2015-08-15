@@ -1,11 +1,13 @@
 /*
- * Copyright (C) 2015 Project SC
+ * Project SC - 2015
  * 
- * All rights reserved
+ * 
  */
 package de.projectsc.core.utils;
 
 import org.lwjgl.util.vector.Vector3f;
+
+import de.projectsc.client.gui.models.RawModel;
 
 /**
  * An axis aligned bounding box for each entitiy.
@@ -21,6 +23,14 @@ public class BoundingBox {
     private Vector3f center;
 
     private Vector3f size;
+
+    private RawModel model;
+
+    private Vector3f position;
+
+    private Vector3f rotation;
+
+    private float scale;
 
     /**
      * Minimum and maximum value for all axis.
@@ -74,5 +84,49 @@ public class BoundingBox {
         String result = String.format("Bounding box:\n\tMinium (%s)\n\tMaximum (%s)\n\tCenter (%s)\n\tSize (%s)", min, max, center, size);
         return result;
 
+    }
+
+    public void setModel(RawModel model) {
+        this.model = model;
+    }
+
+    public RawModel getModel() {
+        return model;
+    }
+
+    public Vector3f getPosition() {
+        return position;
+    }
+
+    public void setPosition(Vector3f position) {
+        if (this.position == null) {
+            this.position = position;
+        } else {
+            this.position.x = position.x;
+            this.position.y = position.y;
+            this.position.z = position.z;
+        }
+    }
+
+    public float getScale() {
+        return scale;
+    }
+
+    public void setScale(float scale) {
+        this.scale = scale;
+    }
+
+    public Vector3f getRotation() {
+        return rotation;
+    }
+
+    public void setRotation(Vector3f rotation) {
+        if (this.rotation == null) {
+            this.rotation = rotation;
+        } else {
+            this.rotation.x = rotation.x;
+            this.rotation.y = rotation.y;
+            this.rotation.z = rotation.z;
+        }
     }
 }

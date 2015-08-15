@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2015 Project SC
+ * Project SC - 2015
  * 
- * All rights reserved
+ * 
  */
 package de.projectsc.client.gui.objects;
 
@@ -12,9 +12,9 @@ import org.lwjgl.util.vector.Vector3f;
  * 
  * @author Josch Bosch
  */
-public class Light {
+public class Light implements Comparable<Light> {
 
-    private Vector3f position;
+    private final Vector3f position;
 
     private Vector3f color;
 
@@ -41,8 +41,13 @@ public class Light {
         return position;
     }
 
+    /**
+     * @param position new position
+     */
     public void setPosition(Vector3f position) {
-        this.position = position;
+        this.position.x = position.x;
+        this.position.y = position.y;
+        this.position.z = position.z;
     }
 
     public Vector3f getColor() {
@@ -67,6 +72,11 @@ public class Light {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    @Override
+    public int compareTo(Light o) {
+        return getName().compareTo(o.getName());
     }
 
 }

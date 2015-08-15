@@ -1,13 +1,11 @@
 /*
- * Copyright (C) 2015 Project SC
+ * Project SC - 2015
  * 
- * All rights reserved
+ * 
  */
 package de.projectsc.client.core.states;
 
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -26,13 +24,10 @@ public class ClientLoadingState extends ClientGameState {
 
     private ClientGameContext context;
 
-    private Map<Long, Byte> playerLoadingProgress;
-
     @Override
     public void call(ClientGameContext gameContext) throws Exception {
         this.context = gameContext;
         LOGGER.debug("Entered game state " + gameContext.getState());
-        playerLoadingProgress = new TreeMap<>();
         new Thread(new Runnable() {
 
             @Override

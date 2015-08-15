@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2015 Project SC
+ * Project SC - 2015
  * 
- * All rights reserved
+ * 
  */
 package de.projectsc.client.gui.objects;
 
@@ -11,7 +11,7 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
 
-import de.projectsc.client.gui.Timer;
+import de.projectsc.core.entities.Entity;
 
 /**
  * Class for moving around in the world.
@@ -20,64 +20,60 @@ import de.projectsc.client.gui.Timer;
  */
 public class Camera {
 
-    private static final int CONSTANT_DISTANCE_FROM_ENTITY = 80;
+    protected static final int DEGREES_180 = 180;
 
-    private static final int MINIMUM_Y_POSITION = 50;
+    protected static final int CONSTANT_DISTANCE_FROM_ENTITY = 80;
 
-    private static final int MAXIMUM_Y_POSITION = 80;
+    protected static final int MINIMUM_Y_POSITION = 50;
 
-    private static final boolean MOBA_MODE = true;
+    protected static final int MAXIMUM_Y_POSITION = 80;
 
-    private static final float ANGLE_AROUND_PLAYER_FACTOR = 0.3f;
+    protected static final boolean MOBA_MODE = true;
 
-    private static final float PITCH_FACTOR = 0.1f;
+    protected static final float ANGLE_AROUND_PLAYER_FACTOR = 0.3f;
 
-    private static final float MOUSE_WHEEL_ZOOM_FACTOR = 0.05f;
+    protected static final float PITCH_FACTOR = 0.1f;
 
-    private static final int MAXIMUM_PITCH_ANGLE = 90;
+    protected static final float MOUSE_WHEEL_ZOOM_FACTOR = 0.05f;
 
-    private static final float MINIMUM_PITCH_ANGLE = -25.0f;
+    protected static final int MAXIMUM_PITCH_ANGLE = 90;
 
-    private static final int MAX_DISTANCE_TO_PLAYER = 100;
+    protected static final float MINIMUM_PITCH_ANGLE = -25.0f;
+
+    protected static final int MAX_DISTANCE_TO_PLAYER = 100;
 
     // private static final float PLAYER_CENTER_Y_AXIS = 15.5f;
 
-    private static final int DEGREES_180 = 180;
+    protected static final int FAST_MOVEMENT_SPEED_FACTOR = 5;
 
-    private static final int FAST_MOVEMENT_SPEED_FACTOR = 5;
+    protected static final float MOVEMENT_SPEED = 60f;
 
-    private static final float MOVEMENT_SPEED = 60f;
+    protected static final int SCROLL_MARGIN = 15;
 
-    private static final int SCROLL_MARGIN = 15;
+    protected static final boolean NO_CAMERA_MOVING = false;
 
-    private final Vector3f position = new Vector3f(0, 80f, 0);
+    protected float distanceFromCenterPoint = 3 * 10f;
 
-    private float pitch = 5 * 10;
+    protected float yaw = 0;
 
-    private float yaw = 0;
+    protected float angleAroundPlayer = 0;
 
-    private float roll = 0;
+    protected final Vector3f position = new Vector3f(0, 80f, 0);
 
-    private final GraphicalEntity player;
+    protected float pitch = 5 * 10;
 
-    private float distanceFromPlayer = 3 * 10f;
+    protected Vector3f centeringPoint = new Vector3f(0, 0, 0);
 
-    private float angleAroundPlayer = 0;
+    protected float roll = 0;
 
     private float currentSpeedX;
 
     private float currentSpeedZ;
 
-    private GraphicalEntity boundToEntity = null;
+    private boolean bound;
 
-    private final Object entityLockObject = new Object();
+    public Camera() {
 
-    public Camera(GraphicalEntity player) {
-        this.player = player;
-        if (player != null) {
-            position.x = player.getPosition().x;
-            position.z = player.getPosition().z + distanceFromPlayer;
-        }
     }
 
     /**
@@ -86,30 +82,31 @@ public class Camera {
      * @param delta elapsed time.
      */
     public void move(float delta) {
+        if (NO_CAMERA_MOVING) {
+            return;
+        }
         if (!MOBA_MODE) {
             calculateZoom();
             calculatePitch();
             calculateAngleAroundPlayer();
             float horizontalDistance = calculateHorizontalDistance();
             float verticalDistance = calculateVerticalDistance();
-            calculateCameraPosition(horizontalDistance, verticalDistance);
-            this.yaw = DEGREES_180 - (player.getRotY() + angleAroundPlayer);
+            calculateCameraPosition(centeringPoint, horizontalDistance, verticalDistance);
+            this.yaw = DEGREES_180 - (0 + angleAroundPlayer);
         } else {
-            synchronized (entityLockObject) {
-                checkInputs();
-                if (boundToEntity == null) {
-                    calculateZoom();
-                    calculateCameraPosition(delta);
-                } else {
-                    float horizontalDistance = calculateHorizontalDistance();
-                    float verticalDistance = calculateVerticalDistance();
-                    calculateCameraPosition(horizontalDistance, verticalDistance);
-                }
+            checkInputs();
+            if (!bound) {
+                calculateZoom();
+                calculateCameraPosition(delta);
+            } else {
+                float horizontalDistance = calculateHorizontalDistance();
+                float verticalDistance = calculateVerticalDistance();
+                calculateCameraPosition(centeringPoint, horizontalDistance, verticalDistance);
             }
         }
     }
 
-    private void checkInputs() {
+    protected void checkInputs() {
         float movementSpeed = MOVEMENT_SPEED;
         if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)) {
             movementSpeed *= FAST_MOVEMENT_SPEED_FACTOR;
@@ -148,18 +145,20 @@ public class Camera {
         }
     }
 
-    private boolean isBetween(float value, int lower, int upper) {
+    protected boolean isBetween(float value, int lower, int upper) {
         return value <= upper && value >= lower;
     }
 
-    private void calculateCameraPosition(float delta) {
-        position.x = position.x + delta / Timer.SECONDS_CONSTANT * currentSpeedX;
-        position.z = position.z + delta / Timer.SECONDS_CONSTANT * currentSpeedZ;
+    protected void calculateCameraPosition(float delta) {
+        centeringPoint.x = centeringPoint.x + delta / 1000.0f * currentSpeedX;
+        centeringPoint.z = centeringPoint.z + delta / 1000.0f * currentSpeedX;
+        position.x = position.x + delta / 1000.0f * currentSpeedX;
+        position.z = position.z + delta / 1000.0f * currentSpeedZ;
     }
 
-    private void calculateCameraPosition(float horizontalDistance, float verticalDistance) {
-        position.x = boundToEntity.getPosition().x;
-        position.z = boundToEntity.getPosition().z + CONSTANT_DISTANCE_FROM_ENTITY;
+    protected void calculateCameraPosition(Vector3f lookAtPoint, float horizontalDistance, float verticalDistance) {
+        position.x = lookAtPoint.x;
+        position.z = lookAtPoint.z + CONSTANT_DISTANCE_FROM_ENTITY;
     }
 
     /**
@@ -205,14 +204,14 @@ public class Camera {
         return position;
     }
 
-    private void calculateZoom() {
+    protected void calculateZoom() {
         if (!MOBA_MODE) {
             float zoomLevel = Mouse.getDWheel() * MOUSE_WHEEL_ZOOM_FACTOR;
-            distanceFromPlayer -= zoomLevel;
-            if (distanceFromPlayer < 0) {
-                distanceFromPlayer = 0;
-            } else if (distanceFromPlayer > MAX_DISTANCE_TO_PLAYER) {
-                distanceFromPlayer = MAX_DISTANCE_TO_PLAYER;
+            distanceFromCenterPoint -= zoomLevel;
+            if (distanceFromCenterPoint < 0) {
+                distanceFromCenterPoint = 0;
+            } else if (distanceFromCenterPoint > MAX_DISTANCE_TO_PLAYER) {
+                distanceFromCenterPoint = MAX_DISTANCE_TO_PLAYER;
             }
         } else {
             float zoomLevel = Mouse.getDWheel() * MOUSE_WHEEL_ZOOM_FACTOR;
@@ -224,7 +223,7 @@ public class Camera {
         }
     }
 
-    private void calculatePitch() {
+    protected void calculatePitch() {
         if (Mouse.isButtonDown(1)) {
             float pitchChange = Mouse.getDY() * PITCH_FACTOR;
             pitch -= pitchChange;
@@ -236,19 +235,19 @@ public class Camera {
         }
     }
 
-    private void calculateAngleAroundPlayer() {
+    protected void calculateAngleAroundPlayer() {
         if (Mouse.isButtonDown(0)) {
             float angleChange = Mouse.getDX() * ANGLE_AROUND_PLAYER_FACTOR;
             angleAroundPlayer -= angleChange;
         }
     }
 
-    private float calculateHorizontalDistance() {
-        return (float) (distanceFromPlayer * Math.cos(Math.toRadians(pitch)));
+    protected float calculateHorizontalDistance() {
+        return (float) (distanceFromCenterPoint * Math.cos(Math.toRadians(pitch)));
     }
 
-    private float calculateVerticalDistance() {
-        return (float) (distanceFromPlayer * Math.sin(Math.toRadians(pitch)));
+    protected float calculateVerticalDistance() {
+        return (float) (distanceFromCenterPoint * Math.sin(Math.toRadians(pitch)));
     }
 
     /**
@@ -263,13 +262,36 @@ public class Camera {
      * 
      * @param entity to bind to.
      */
-    public void bindToEntity(GraphicalEntity entity) {
-        synchronized (entityLockObject) {
-            if (boundToEntity == null) {
-                boundToEntity = entity;
-            } else {
-                boundToEntity = null;
-            }
+    public void bindToEntity(Entity entity) {
+        if (entity == null) {
+            Vector3f newCenterPoint = new Vector3f(centeringPoint.x, centeringPoint.y, centeringPoint.z);
+            centeringPoint = newCenterPoint;
+            bound = false;
+        } else {
+            centeringPoint = entity.getPosition();
+            bound = true;
         }
+    }
+
+    /**
+     * @param x coord
+     * @param y coord
+     * @param z coord
+     */
+    public void setPosition(float x, float y, float z) {
+        position.x = x;
+        position.y = y;
+        position.z = z;
+    }
+
+    /**
+     * @param x coord
+     * @param y coord
+     * @param z coord
+     */
+    public void setLookAtPoint(float x, float y, float z) {
+        centeringPoint.x = x;
+        centeringPoint.y = y;
+        centeringPoint.z = z;
     }
 }

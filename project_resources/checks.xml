@@ -5,7 +5,7 @@
     This configuration file was written by the eclipse-cs plugin configuration editor
 -->
 <!--
-    Checkstyle-Configuration: Project SC Checks
+    Checkstyle-Configuration: Project SC
     Description: none
 -->
 <module name="Checker">
@@ -43,7 +43,9 @@
     </module>
     <module name="InnerAssignment"/>
     <module name="MagicNumber">
+      <property name="severity" value="ignore"/>
       <property name="ignoreNumbers" value="0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10"/>
+      <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
     </module>
     <module name="MissingSwitchDefault"/>
     <module name="ModifiedControlVariable"/>
@@ -146,14 +148,13 @@
   <module name="FileTabCharacter">
     <property name="fileExtensions" value="java,properties,pom,MF"/>
   </module>
-  <module name="Header">
-    <property name="header" value="/*\n * Copyright (C) 2015 Project SC\n * \n * All rights reserved\n */"/>
-    <property name="ignoreLines" value="2"/>
-    <property name="fileExtensions" value="java"/>
-  </module>
   <module name="SuppressionCommentFilter">
     <property name="offCommentFormat" value="CHECKSTYLE\:DISABLE \((\w+)\)"/>
     <property name="onCommentFormat" value="CHECKSTYLE\:ENABLE \((\w+)\)"/>
     <property name="checkFormat" value="$1"/>
+  </module>
+  <module name="Header">
+    <property name="header" value="/*\n * Project SC - 2015\n * \n * \n */"/>
+    <property name="fileExtensions" value="*.java"/>
   </module>
 </module>

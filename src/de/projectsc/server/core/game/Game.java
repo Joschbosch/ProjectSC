@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2015 Project SC
+ * Project SC - 2015
  * 
- * All rights reserved
+ * 
  */
 
 package de.projectsc.server.core.game;
@@ -20,7 +20,6 @@ import au.com.ds.ef.FlowBuilder;
 import au.com.ds.ef.StateEnum;
 import au.com.ds.ef.call.ContextHandler;
 import de.projectsc.core.data.messages.GameMessageConstants;
-import de.projectsc.core.data.messages.MessageConstants;
 import de.projectsc.core.data.messages.MessageConstants;
 import de.projectsc.core.game.GameAttributes;
 import de.projectsc.core.game.GameConfiguration;

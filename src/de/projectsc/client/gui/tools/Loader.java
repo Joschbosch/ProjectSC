@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2015 Project SC
+ * Project SC - 2015
  * 
- * All rights reserved
+ * 
  */
 
 package de.projectsc.client.gui.tools;
@@ -16,6 +16,8 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -46,11 +48,29 @@ public class Loader {
 
     private static final Log LOGGER = LogFactory.getLog(Loader.class);
 
+    private static Map<String, Integer> textureMap = new TreeMap<>();
+
     private final List<Integer> vaos = new ArrayList<>();
 
     private final List<Integer> vbos = new ArrayList<>();
 
     private final List<Integer> textures = new ArrayList<>();
+
+    /**
+     * Loading given data positions into a VAO.
+     * 
+     * @param positions to load
+     * @param indices for vao
+     * 
+     * @return the model with the vao
+     */
+    public RawModel loadToVAO(float[] positions, int[] indices) {
+        int vaoID = createVAO();
+        bindIndicesBuffer(indices);
+        storeDataInAttributeList(0, 3, positions);
+        unbind();
+        return new RawModel(vaoID, indices.length);
+    }
 
     /**
      * Loading given data positions into a VAO.
@@ -86,6 +106,32 @@ public class Loader {
         return new RawModel(vaoID, positions.length / dimensions);
     }
 
+    public int createStreamingFloatVBO(int vaoID, int attrNumber, FloatBuffer buffer, int dimension) {
+        // bind vao
+        GL30.glBindVertexArray(vaoID);
+
+        int vboID = GL15.glGenBuffers();
+        vbos.add(vboID);
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vboID);
+        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, buffer.capacity() * Float.SIZE, GL15.GL_DYNAMIC_DRAW);
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+        unbind();
+
+        return vboID;
+    }
+
+    public int createStreamingByteVBO(int vaoID, int attrNumber, ByteBuffer buffer, int dimension) {
+        // bind vao
+        GL30.glBindVertexArray(vaoID);
+        int vboID = GL15.glGenBuffers();
+        vbos.add(vboID);
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vboID);
+        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, buffer.capacity() * Byte.SIZE, GL15.GL_DYNAMIC_DRAW);
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+        unbind();
+        return vboID;
+    }
+
     private int createVAO() {
         int vaoID = GL30.glGenVertexArrays();
         vaos.add(vaoID);
@@ -100,7 +146,13 @@ public class Loader {
      * @return location of texture
      */
     public int loadTexture(String filename) {
-        return loadTexture(Loader.class.getResourceAsStream("/graphics/" + filename), "PNG");
+        if (textureMap.containsKey(filename)) {
+            return textureMap.get(filename);
+        } else {
+            int textureID = loadTexture(Loader.class.getResourceAsStream("/graphics/" + filename), "PNG");
+            textureMap.put(filename, textureID);
+            return textureID;
+        }
     }
 
     /**
@@ -110,10 +162,17 @@ public class Loader {
      * @return location of texture
      */
     public int loadTexture(File file) {
-        try {
-            return loadTexture(new FileInputStream(file), "PNG");
-        } catch (FileNotFoundException e) {
-            LOGGER.error(e);
+        if (textureMap.containsKey(file.getAbsolutePath())) {
+            return textureMap.get(file.getAbsolutePath());
+        } else {
+            try {
+                int texId = loadTexture(new FileInputStream(file), "PNG");
+                textureMap.put(file.getAbsolutePath(), texId);
+
+                return texId;
+            } catch (FileNotFoundException e) {
+                LOGGER.error(e);
+            }
         }
         return 0 - 1;
     }
@@ -150,7 +209,7 @@ public class Loader {
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
     }
 
-    private FloatBuffer storeDataInFloatBuffer(float[] data) {
+    public FloatBuffer storeDataInFloatBuffer(float[] data) {
         FloatBuffer buffer = BufferUtils.createFloatBuffer(data.length);
         buffer.put(data);
         buffer.flip();
@@ -163,6 +222,13 @@ public class Loader {
         GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, vboId);
         IntBuffer buffer = storeDataInIntBuffer(indices);
         GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, buffer, GL15.GL_STATIC_DRAW);
+    }
+
+    public ByteBuffer storeDataInByteBuffer(byte[] color) {
+        ByteBuffer buffer = BufferUtils.createByteBuffer(color.length);
+        buffer.put(color);
+        buffer.flip();
+        return buffer;
     }
 
     private IntBuffer storeDataInIntBuffer(int[] data) {
@@ -233,4 +299,5 @@ public class Loader {
     private void unbind() {
         GL30.glBindVertexArray(0);
     }
+
 }

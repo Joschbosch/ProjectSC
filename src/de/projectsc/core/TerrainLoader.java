@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2015 Project SC
+ * Project SC - 2015
  * 
- * All rights reserved
+ * 
  */
 package de.projectsc.core;
 
@@ -10,9 +10,7 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -30,10 +28,8 @@ import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.client.gui.objects.Light;
-import de.projectsc.core.entities.BackgroundEntity;
-import de.projectsc.core.entities.DecorationEntity;
-import de.projectsc.core.entities.EntityType;
-import de.projectsc.core.entities.WorldEntity;
+import de.projectsc.core.entities.Entity;
+import de.projectsc.core.utils.Serialization;
 
 /**
  * Loader for a terrain map with its static lights and objects.
@@ -41,6 +37,8 @@ import de.projectsc.core.entities.WorldEntity;
  * @author Josch Bosch
  */
 public final class TerrainLoader {
+
+    private static final String POSITION = "position";
 
     private static final String SCALE = "scale";
 
@@ -55,12 +53,6 @@ public final class TerrainLoader {
     private static final String ROTATION = "rotation";
 
     private static final String STATIC_OBJECTS = "staticObjects";
-
-    private static final String ATTENUATION = "attenuation";
-
-    private static final String COLOR = "color";
-
-    private static final String POSITION = "position";
 
     private static final String STATIC_LIGHTS = "staticLights";
 
@@ -118,23 +110,11 @@ public final class TerrainLoader {
             String bTexture = mapper.readValue(tree.get(B_TEXTURE), String.class);
 
             ObjectNode lightsNode = (ObjectNode) tree.get(STATIC_LIGHTS);
-            Iterator<String> lightsIterator = lightsNode.getFieldNames();
-            List<Light> staticLights = new ArrayList<Light>();
-            while (lightsIterator.hasNext()) {
-                String light = lightsIterator.next();
-                Vector3f[] attributes = new Vector3f[3];
-                int i = 0;
-                for (String attributeName : new String[] { POSITION, COLOR, ATTENUATION }) {
-                    Float[] attribute = mapper.readValue(lightsNode.get(light).get(attributeName), new Float[3].getClass());
-                    attributes[i++] = new Vector3f(attribute[0], attribute[1], attribute[2]);
 
-                }
-                Light l = new Light(attributes[0], attributes[1], attributes[2], light);
-                staticLights.add(l);
-            }
+            List<Light> staticLights = Serialization.deserializeLights(mapper, lightsNode);
 
             ArrayNode staticObjectsNode = (ArrayNode) tree.get(STATIC_OBJECTS);
-            Map<Integer, WorldEntity> staticObjects = new TreeMap<Integer, WorldEntity>();
+            Map<Integer, Entity> staticObjects = new TreeMap<>();
             if (staticObjectsNode != null) {
                 for (JsonNode object : staticObjectsNode) {
                     ObjectNode objectNode = (ObjectNode) object;
@@ -144,7 +124,7 @@ public final class TerrainLoader {
                     float yRot = rotationValues[1];
                     Vector3f rotation = new Vector3f(rotationValues[0], yRot, rotationValues[2]);
 
-                    staticObjects.put(objectNode.get(ID).asInt(), newEntity(objectNode, position, rotation));
+                    staticObjects.put(objectNode.get(ID).asInt(), new Entity(10000));
                 }
             }
             return new Terrain(map, bgTexture, rTexture, gTexture, bTexture, staticLights, staticObjects);
@@ -152,41 +132,6 @@ public final class TerrainLoader {
             LOGGER.error("Error loading map: ", e);
         }
         return null;
-    }
-
-    private static WorldEntity newEntity(ObjectNode objectNode, Vector3f position, Vector3f rotation) {
-        WorldEntity e = null;
-        switch (EntityType.valueOf(objectNode.get(TYPE).asText())) {
-        case DECORATION:
-            e =
-                new DecorationEntity(objectNode.get(ID).asInt(), objectNode.get(
-                    MODEL).asText(), objectNode.get(TEXTURE).asText(), position, rotation, (float) objectNode.get(SCALE)
-                    .asDouble());
-            break;
-        case SOLID_BACKGROUND_OBJECT:
-            e =
-                new BackgroundEntity(objectNode.get(ID).asInt(), objectNode.get(
-                    MODEL).asText(), objectNode.get(TEXTURE).asText(), position, rotation, (float) objectNode.get(SCALE)
-                    .asDouble());
-            break;
-        case USABLE_OBJECT:
-            // e = new WorldEntity(objectNode.get(ID).asInt(), objectNode.get(
-            // MODEL).asText(), objectNode.get(TEXTURE).asText(), position, rotation, (float)
-            // objectNode.get(SCALE)
-            // .asDouble());
-            break;
-        case COLLECTABLE:
-            break;
-        case EFFECT:
-            break;
-        case MOVEABLE_OBJECT:
-            break;
-        case PLAYER:
-            break;
-        default:
-            break;
-        }
-        return e;
     }
 
     /**
@@ -220,31 +165,24 @@ public final class TerrainLoader {
         map.put(R_TEXTURE, terrain.getRTexture());
         map.put(G_TEXTURE, terrain.getGTexture());
         map.put(B_TEXTURE, terrain.getBTexture());
-        List<Light> staticLights = terrain.getStaticLights();
-        Map<String, Map<String, Float[]>> lights = new HashMap<>();
-        for (Light l : staticLights) {
-            Map<String, Float[]> light = new HashMap<>();
-            light.put(ATTENUATION, new Float[] { l.getAttenuation().x, l.getAttenuation().y, l.getAttenuation().z });
-            light.put(COLOR, new Float[] { l.getColor().x, l.getColor().y, l.getColor().z });
-            light.put(POSITION, new Float[] { l.getPosition().x, l.getPosition().y, l.getPosition().z });
-            lights.put(l.getName(), light);
-        }
+        Map<String, Map<String, Float[]>> lights = Serialization.createSerializableMap(terrain.getStaticLights());
         map.put(STATIC_LIGHTS, lights);
 
-        Map<Integer, WorldEntity> staticObjects = terrain.getStaticObjects();
-        List<Map<String, Object>> entities = new LinkedList<Map<String, Object>>();
-        for (WorldEntity e : staticObjects.values()) {
-            Map<String, Object> newEntity = new HashMap<String, Object>();
-            newEntity.put(ID, e.getID());
-            newEntity.put(TYPE, e.getType().toString());
-            newEntity.put(MODEL, e.getModel());
-            newEntity.put(TEXTURE, e.getTexture());
-            newEntity.put(SCALE, e.getScale());
-            newEntity.put(POSITION, new Float[] { e.getPosition().x, e.getPosition().y, e.getPosition().z });
-            newEntity.put(ROTATION, new Float[] { e.getRotX(), e.getRotY(), e.getRotZ() });
-            entities.add(newEntity);
-        }
-        map.put(STATIC_OBJECTS, entities);
+        // Map<Integer, Entity> staticObjects = terrain.getStaticObjects();
+        // List<Map<String, Object>> entities = new LinkedList<Map<String, Object>>();
+        // for (Entity e : staticObjects.values()) {
+        // Map<String, Object> newEntity = new HashMap<String, Object>();
+        // newEntity.put(ID, e.getID());
+        // newEntity.put(TYPE, e.getType().toString());
+        // newEntity.put(MODEL, e.getModel());
+        // newEntity.put(TEXTURE, e.getTexture());
+        // newEntity.put(SCALE, e.getScale());
+        // newEntity.put(POSITION, new Float[] { e.getPosition().x, e.getPosition().y,
+        // e.getPosition().z });
+        // newEntity.put(ROTATION, new Float[] { e.getRotX(), e.getRotY(), e.getRotZ() });
+        // entities.add(newEntity);
+        // }
+        // map.put(STATIC_OBJECTS, entities);
         try {
             ObjectMapper mapper = new ObjectMapper();
             mapper.writerWithDefaultPrettyPrinter().writeValue(target, map);

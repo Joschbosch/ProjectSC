@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2015 Project SC
+ * Project SC - 2015
  * 
- * All rights reserved
+ * 
  */
 package de.projectsc.client.core;
 
@@ -14,6 +14,8 @@ import de.projectsc.core.game.GameConfiguration;
  * @author Josch Bosch
  */
 public class ClientGameContext extends StatefulContext {
+
+    private static final long serialVersionUID = -1363044117352387082L;
 
     private final ClientCore core;
 
@@ -29,8 +31,8 @@ public class ClientGameContext extends StatefulContext {
         return core;
     }
 
-    public void setGUI(GUI gui) {
-        this.gui = gui;
+    public void setGUI(GUI sgui) {
+        this.gui = sgui;
     }
 
     public GUI getGUI() {

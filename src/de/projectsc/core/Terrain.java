@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2015 Project SC
+ * Project SC - 2015
  * 
- * All rights reserved
+ * 
  */
 
 package de.projectsc.core;
@@ -13,7 +13,7 @@ import java.util.Map;
 import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.client.gui.objects.Light;
-import de.projectsc.core.entities.WorldEntity;
+import de.projectsc.core.entities.Entity;
 import de.projectsc.core.utils.BoundingBox;
 import de.projectsc.core.utils.GraphEdge;
 
@@ -48,12 +48,12 @@ public class Terrain {
 
     private List<Light> staticLights;
 
-    private Map<Integer, WorldEntity> staticObjects;
+    private Map<Integer, Entity> staticObjects;
 
     private BoundingBox mapBox;
 
     public Terrain(Tile[][] tiles, String bgTexture, String rTexture, String gTexture,
-        String bTexture, List<Light> lights, Map<Integer, WorldEntity> staticObjects) {
+        String bTexture, List<Light> lights, Map<Integer, Entity> staticObjects) {
         this.tiles = tiles;
         this.mapSize = tiles.length;
         this.bgTexture = bgTexture;
@@ -153,9 +153,9 @@ public class Terrain {
      * Set all static object to not walkable on map.
      */
     public void makeStaticObjectsNotWalkable() {
-        for (WorldEntity e : staticObjects.values()) {
-            markEntityPosition(e, Tile.NOT_WALKABLE);
-        }
+        // for (WorldEntity e : staticObjects.values()) {
+        // markEntityPosition(e, Tile.NOT_WALKABLE);
+        // }
     }
 
     /**
@@ -164,8 +164,8 @@ public class Terrain {
      * @param mark to set to
      * @param list of entities
      */
-    public void markEntitiyObjects(byte mark, List<WorldEntity> list) {
-        for (WorldEntity e : list) {
+    public void markEntitiyObjects(byte mark, List<Entity> list) {
+        for (Entity e : list) {
             markEntityPosition(e, mark);
         }
     }
@@ -176,7 +176,7 @@ public class Terrain {
      * @param e entity
      * @param mark to set to
      */
-    public void markEntityPosition(WorldEntity e, byte mark) {
+    public void markEntityPosition(Entity e, byte mark) {
         if (e.getBoundingBox() != null) {
             Vector3f realMinPos = Vector3f.add(e.getBoundingBox().getMin(), e.getPosition(), null);
             Vector3f realMaxPos = Vector3f.add(e.getBoundingBox().getMax(), e.getPosition(), null);
@@ -227,11 +227,11 @@ public class Terrain {
         this.staticLights = staticLights;
     }
 
-    public Map<Integer, WorldEntity> getStaticObjects() {
+    public Map<Integer, Entity> getStaticObjects() {
         return staticObjects;
     }
 
-    public void setStaticObjects(Map<Integer, WorldEntity> staticObjects) {
+    public void setStaticObjects(Map<Integer, Entity> staticObjects) {
         this.staticObjects = staticObjects;
     }
 

@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2015 Project SC
+ * Project SC - 2015
  * 
- * All rights reserved
+ * 
  */
 package de.projectsc.server.core.game.states;
 
@@ -9,18 +9,14 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.rits.cloning.Cloner;
-
 import de.projectsc.core.Terrain;
 import de.projectsc.core.Tile;
 import de.projectsc.core.data.messages.GameMessageConstants;
-import de.projectsc.core.entities.PlayerEntity;
-import de.projectsc.core.entities.WorldEntity;
+import de.projectsc.core.entities.Entity;
 import de.projectsc.core.utils.OctTree;
 import de.projectsc.server.core.ServerPlayer;
 import de.projectsc.server.core.game.GameContext;
@@ -40,17 +36,11 @@ public class GameRunningState extends GameState {
 
     private static final Log LOGGER = LogFactory.getLog(LoadingState.class);
 
-    private OctTree<WorldEntity> collisionTree;
+    private OctTree<Entity> collisionTree;
 
     private Terrain terrain;
 
-    private Map<Integer, WorldEntity> staticEntities;
-
-    private Map<Integer, WorldEntity> entities;
-
     private long gameTick = 0;
-
-    private long time = 0;
 
     @Override
     public void call(GameContext context) throws Exception {
@@ -58,21 +48,13 @@ public class GameRunningState extends GameState {
         this.context = context;
         this.collisionTree = context.getCollisionTree();
         this.terrain = context.getTerrain();
-        this.entities = context.getEntities();
-        this.staticEntities = context.getStaticEntities();
         sendMessageToAllPlayers(new ServerMessage(GameMessageConstants.BEGIN_GAME));
-        time = System.currentTimeMillis();
         context.getGame().changeState(this);
     }
 
     @Override
     public void loop() {
         gameTick++;
-        time = System.currentTimeMillis();
-        PlayerEntity e = context.getPlayers().get(0L).getEntity();
-        terrain.markEntityPosition(e, Tile.WALKABLE);
-        e.move(GAME_TICK_TIME);
-        terrain.markEntityPosition(e, Tile.NOT_WALKABLE);
         collisionTree.update();
         if (gameTick % 5 == 0) {
             new Thread(new Runnable() {
@@ -90,7 +72,7 @@ public class GameRunningState extends GameState {
     }
 
     private void createSnapshot() {
-        Cloner cloner = new Cloner();
+        // Cloner cloner = new Cloner();
 
         // MyClass clone=cloner.deepClone(o);
     }

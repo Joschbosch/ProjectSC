@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2015 Project SC
+ * Project SC - 2015
  * 
- * All rights reserved
+ * 
  */
 package de.projectsc.client.core;
 
@@ -128,6 +128,9 @@ public class ClientCore implements Runnable {
         }
     }
 
+    /**
+     * @param clientMessage to send to server
+     */
     public void sendMessageToServer(ClientMessage clientMessage) {
         networkSendQueue.offer(clientMessage);
     }

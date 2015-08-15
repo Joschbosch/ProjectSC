@@ -1,16 +1,27 @@
 /*
- * Copyright (C) 2015
+ * Project SC - 2015
+ * 
+ * 
  */
-
 package de.projectsc.client.core.elements;
 
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Chat implementation for ui.
+ * 
+ * @author Josch Bosch
+ */
 public class Chat implements UIElement {
 
-    List<String> lines = new ArrayList<>();
+    private final List<String> lines = new ArrayList<>();
 
+    /**
+     * New line.
+     * 
+     * @param line to add
+     */
     public void addLine(String line) {
         lines.add(line);
     }
