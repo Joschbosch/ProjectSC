@@ -78,7 +78,6 @@ public class DatabaseConnection {
         connection.close();
     }
     
-    
     public synchronized static DatabaseConnection getInstance() {
         if (instance == null) {
             instance = new DatabaseConnection();

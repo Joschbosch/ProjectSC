@@ -28,7 +28,7 @@ import de.projectsc.server.core.messages.ServerMessage;
  *
  * @author David Scholz
  */
-public class AuthentificationServer {
+public class AuthentificationServer implements Runnable {
     
     private static final String PATH = "";
     
@@ -37,31 +37,41 @@ public class AuthentificationServer {
     private final BlockingQueue<ServerMessage> authentificationQueue;
     
     public AuthentificationServer() {
-        this.authentificationQueue = new LinkedBlockingQueue<>();
+        authentificationQueue = new LinkedBlockingQueue<>();
     }
     
-    public void handleAuthentificationRequests() {
-        ServerMessage msg = authentificationQueue.poll();
-        
-        if (msg instanceof AuthentificationRequestServerMessage) {
-            AuthentificationRequestServerMessage authetificationMsg = (AuthentificationRequestServerMessage) msg;
-            Map<RequestEnum, String> requestMap = authetificationMsg.getRequest();
-            try {
-                AuthentificationReader reader = new CSVAuthentificationReader(new FileReader(new File(PATH)), null);
-                Line l = reader.next();
-                ServerMessage response = null;
-                if (l.get("Name").equals(requestMap.get(RequestEnum.NAME)) && 
-                    l.get("Email").equals(requestMap.get(RequestEnum.EMAIL)) && 
-                    l.get("Password").equals(requestMap.get(RequestEnum.PASSWORD))) {
-                    response = new AuthentificationResponseServerMessage(authetificationMsg.getClient(), true);
-                } else {
-                    response = new AuthentificationResponseServerMessage(authetificationMsg.getClient(), false);
+    @Override
+    public void run() {
+        LOGGER.debug("Starting authentification server...");
+        while (!Thread.currentThread().isInterrupted()) {
+            handleAuthentificationRequestMessages();
+        }
+    }
+
+    private void handleAuthentificationRequestMessages() {
+        while (!authentificationQueue.isEmpty()) {
+            ServerMessage msg = authentificationQueue.poll();
+            
+            if (msg instanceof AuthentificationRequestServerMessage) {
+                AuthentificationRequestServerMessage authetificationMsg = (AuthentificationRequestServerMessage) msg;
+                Map<RequestEnum, String> requestMap = authetificationMsg.getRequest();
+                try {
+                    AuthentificationReader reader = new CSVAuthentificationReader(new FileReader(new File(PATH)), null);
+                    Line l = reader.next();
+                    ServerMessage response = null;
+                    if (l.get("Name").equals(requestMap.get(RequestEnum.NAME)) && 
+                        l.get("Email").equals(requestMap.get(RequestEnum.EMAIL)) && 
+                        l.get("Password").equals(requestMap.get(RequestEnum.PASSWORD))) {
+                        response = new AuthentificationResponseServerMessage(authetificationMsg.getClient(), true);
+                    } else {
+                        response = new AuthentificationResponseServerMessage(authetificationMsg.getClient(), false);
+                    }
+                    authentificationQueue.put(response);
+                } catch (IOException e) {
+                    LOGGER.error(e);
+                } catch (InterruptedException e) {
+                    LOGGER.error(e);
                 }
-                authentificationQueue.put(response);
-            } catch (IOException e) {
-                LOGGER.error(e);
-            } catch (InterruptedException e) {
-                LOGGER.error(e);
             }
         }
     }
