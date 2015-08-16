@@ -4,6 +4,8 @@
  
 package de.projectsc.server.authentification.api;
 
+import java.io.IOException;
+
 /**
  * 
  * Writer Interface.
@@ -12,8 +14,8 @@ package de.projectsc.server.authentification.api;
  */
 public interface AuthentificationWriter {
     
-    void write();
+    void write() throws IOException;
     
-    void close();
+    void close() throws IOException;
 
 }

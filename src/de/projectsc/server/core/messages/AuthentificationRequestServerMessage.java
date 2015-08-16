@@ -4,6 +4,8 @@
  
 package de.projectsc.server.core.messages;
 
+import java.util.Map;
+
 import com.esotericsoftware.kryonet.Connection;
 
 /**
@@ -16,12 +18,19 @@ public class AuthentificationRequestServerMessage implements ServerMessage {
     
     private final Connection client;
     
-    public AuthentificationRequestServerMessage(Connection connection) {
+    private final Map<RequestEnum, String> request;
+    
+    public AuthentificationRequestServerMessage(Connection connection, Map<RequestEnum, String> request) {
         this.client = connection;
+        this.request = request;
     }
     
     public Connection getClient() {
         return client;
+    }
+    
+    public Map<RequestEnum, String>  getRequest() {
+        return request;
     }
 
     @Override
