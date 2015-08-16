@@ -87,7 +87,6 @@ public class CSVAuthentificationReader implements AuthentificationReader {
             }
         }
         
-        
         return null;
     }
 

@@ -19,6 +19,7 @@ import org.apache.commons.logging.LogFactory;
 import de.projectsc.core.data.messages.MessageConstants;
 import de.projectsc.server.core.client.AuthenticatedClient;
 import de.projectsc.server.core.game.Game;
+import de.projectsc.server.core.messages.ChatMessage;
 import de.projectsc.server.core.messages.NewClientConnectedServerMessage;
 import de.projectsc.server.core.messages.ServerMessage;
 
@@ -100,7 +101,7 @@ public class ServerCore implements Runnable {
     }
 
     private void handleClientMessage(AuthenticatedClient client, ServerMessage msg, List<AuthenticatedClient> toRemove) {
-        if (msg.getMessage().equals(MessageConstants.CHAT_MESSAGE)) {
+        if (msg instanceof ChatMessage) {
             receiveQueue.offer(new ServerMessage(msg.getMessage(), msg.getData()[0], clientsInMainLobby.get(client.getId())
                 .getDisplayName()));
         } else if (msg.getMessage().equals(MessageConstants.CREATE_NEW_GAME_REQUEST)) {
