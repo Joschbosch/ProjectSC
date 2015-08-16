@@ -7,6 +7,7 @@ package de.projectsc;
 
 import de.projectsc.client.core.ClientCore;
 import de.projectsc.client.network.ClientNetworkCore;
+import de.projectsc.server.authentification.AuthentificationServer;
 import de.projectsc.server.core.ServerCore;
 import de.projectsc.server.network.ServerNetworkCore;
 
@@ -30,7 +31,8 @@ public class Main {
         // ClientCore core = new ClientCore();
         if (args.length > 0 && args[0] != null && args[0].equals("server")) {
             ServerCore serverCore = new ServerCore();
-            new ServerNetworkCore(serverCore, serverCore.getReceiveQueue());
+            AuthentificationServer authentificationServer = new AuthentificationServer();
+            new ServerNetworkCore(serverCore, serverCore.getReceiveQueue(), authentificationServer.getAuthentificationQueue());
             new Thread(serverCore).start();
 
         } else {

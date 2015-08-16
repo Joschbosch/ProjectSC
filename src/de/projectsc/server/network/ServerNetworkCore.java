@@ -26,6 +26,7 @@ import de.projectsc.server.core.messages.AuthentificationRequestServerMessage;
 import de.projectsc.server.core.messages.AuthentificationResponseServerMessage;
 import de.projectsc.server.core.messages.ClientDisconnectedServerMessage;
 import de.projectsc.server.core.messages.NewClientConnectedServerMessage;
+import de.projectsc.server.core.messages.RequestEnum;
 import de.projectsc.server.core.messages.ServerMessage;
 import de.projectsc.server.network.utils.ServerNetworkUtils;
 
@@ -42,13 +43,16 @@ public class ServerNetworkCore {
 	
 	private final BlockingQueue<ServerMessage> coreQueue;
 	
-	public ServerNetworkCore(ServerCore serverCore, BlockingQueue<ServerMessage> coreQueue) {
+	private final BlockingQueue<ServerMessage> authentificationQueue;
+	
+	public ServerNetworkCore(ServerCore serverCore, BlockingQueue<ServerMessage> coreQueue, BlockingQueue<ServerMessage> authentificationQueue) {
 			this.serverCore = serverCore;
 			this.coreQueue = coreQueue;
+			this.authentificationQueue = authentificationQueue;
 			Server server = new Server();
 			LOGGER.debug("Server started...");
 			new Thread(server).start();
-			server.addListener(new ClientListener(coreQueue));
+			server.addListener(new ClientListener(coreQueue, authentificationQueue));
 			ServerNetworkUtils.register(server);
 	}
 	
@@ -58,6 +62,10 @@ public class ServerNetworkCore {
 	
 	public BlockingQueue<ServerMessage> getCoreQueue() {
 	    return coreQueue;
+	}
+	
+	public BlockingQueue<ServerMessage> getAuthentificationQueue() {
+	    return authentificationQueue;
 	}
 
 }
@@ -73,18 +81,25 @@ class ClientListener extends Listener {
     
     private final BlockingQueue<ServerMessage> coreQueue;
     
+    private final BlockingQueue<ServerMessage> authentificationQueue;
+    
     private Map<Client, Thread> clientToSendThreadMap = new HashMap<>();
     
     private Client newClient;
     
-    public ClientListener(BlockingQueue<ServerMessage> coreQueue) {
+    public ClientListener(BlockingQueue<ServerMessage> coreQueue, BlockingQueue<ServerMessage> authentificationQueue) {
         this.coreQueue = coreQueue;
+        this.authentificationQueue = authentificationQueue;
     }
     
     @Override
     public void connected(Connection client) {
         super.connected(client);
-        coreQueue.add(new AuthentificationRequestServerMessage(client));
+        Map<RequestEnum, String> requestMap = new  HashMap<>();
+        requestMap.put(RequestEnum.NAME, "ubuntix");
+        requestMap.put(RequestEnum.EMAIL, "coolMail@mail.com");
+        requestMap.put(RequestEnum.PASSWORD, "verySafe");
+        authentificationQueue.add(new AuthentificationRequestServerMessage(client, requestMap));
     }
     
     @Override
