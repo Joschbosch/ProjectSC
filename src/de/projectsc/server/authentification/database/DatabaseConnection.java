@@ -40,6 +40,7 @@ public class DatabaseConnection {
     
     public DatabaseConnection() {
         super();
+        initConnection();
     }
     
     private void initConnection() {
