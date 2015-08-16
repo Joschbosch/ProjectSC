@@ -4,6 +4,8 @@
  
 package de.projectsc.server.authentification.api;
 
+import java.io.IOException;
+
 /**
  * 
  * Reader interface.
@@ -24,6 +26,6 @@ public interface AuthentificationReader {
     
     Line next();
     
-    void close();
+    void close() throws IOException;
     
 }
