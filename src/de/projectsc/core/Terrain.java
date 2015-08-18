@@ -34,7 +34,9 @@ public class Terrain {
      */
     public static final float HEIGHT_TILE_SIZE = 8.0f;
 
-    private final int mapSize;
+    private final int mapSizeX;
+
+    private int mapSizeY;
 
     private final Tile[][] tiles;
 
@@ -55,7 +57,8 @@ public class Terrain {
     public Terrain(Tile[][] tiles, String bgTexture, String rTexture, String gTexture,
         String bTexture, List<Light> lights, Map<Integer, Entity> staticObjects) {
         this.tiles = tiles;
-        this.mapSize = tiles.length;
+        this.mapSizeX = tiles.length;
+        this.mapSizeY = tiles[0].length;
         this.bgTexture = bgTexture;
         this.rTexture = rTexture;
         this.gTexture = gTexture;
@@ -68,7 +71,7 @@ public class Terrain {
     private BoundingBox calculateMapBox() {
         Vector3f minimum = new Vector3f(0, 0, 0);
         Vector3f maximum =
-            new Vector3f(mapSize * Terrain.TERRAIN_TILE_SIZE, mapSize * Terrain.TERRAIN_TILE_SIZE, mapSize * Terrain.TERRAIN_TILE_SIZE);
+            new Vector3f(mapSizeX * Terrain.TERRAIN_TILE_SIZE, mapSizeX * Terrain.TERRAIN_TILE_SIZE, mapSizeX * Terrain.TERRAIN_TILE_SIZE);
 
         return new BoundingBox(minimum, maximum);
     }
@@ -116,8 +119,8 @@ public class Terrain {
      * Build up neighborhood for the loaded terrain.
      */
     public void buildNeighborhood() {
-        for (int i = 0; i < mapSize; i++) {
-            for (int j = 0; j < mapSize; j++) {
+        for (int i = 0; i < mapSizeX; i++) {
+            for (int j = 0; j < mapSizeX; j++) {
                 List<GraphEdge> neighbors = new LinkedList<>();
                 if (tiles[i][j] != null) {
                     for (int k = 0 - 1; k < 2; k++) {
@@ -138,7 +141,7 @@ public class Terrain {
 
     private GraphEdge getNeightborAt(Tile source, int i, int j) {
         GraphEdge result = new GraphEdge(source, null, 0 - 1);
-        if (i >= 0 && j >= 0 && i < mapSize && j < mapSize) {
+        if (i >= 0 && j >= 0 && i < mapSizeX && j < mapSizeX) {
             if (tiles[i][j] != null) {
                 result.setTarget(tiles[i][j]);
                 result.setCost(
@@ -195,8 +198,12 @@ public class Terrain {
         }
     }
 
-    public int getMapSize() {
-        return mapSize;
+    public int getMapSizeX() {
+        return mapSizeX;
+    }
+
+    public int getMapSizeY() {
+        return mapSizeY;
     }
 
     public Tile[][] getTerrain() {

@@ -42,8 +42,8 @@ public class TerrainModel {
     public TerrainModel(Terrain terrain, float x, float z, TerrainTexturePack texture, TerrainTexture blendMap, Loader loader) {
         super();
         this.terrain = terrain;
-        this.xCoord = x * terrain.getMapSize() * Terrain.TERRAIN_TILE_SIZE;
-        this.zCoord = z * terrain.getMapSize() * Terrain.TERRAIN_TILE_SIZE;
+        this.xCoord = x * terrain.getMapSizeX() * Terrain.TERRAIN_TILE_SIZE;
+        this.zCoord = z * terrain.getMapSizeX() * Terrain.TERRAIN_TILE_SIZE;
         this.texture = texture;
         this.blendMap = blendMap;
         this.model = generateTerrainModel(loader);
@@ -52,35 +52,35 @@ public class TerrainModel {
     private RawModel generateTerrainModel(Loader loader) {
 
         LOGGER.debug("Start generating terrain.");
-        int vertCount = terrain.getMapSize();
+        int vertCountX = terrain.getMapSizeX();
         Tile[][] tiles = terrain.getTerrain();
-        int count = vertCount * vertCount;
+        int count = vertCountX * vertCountX;
         float[] vertices = new float[count * 3];
         float[] normals = new float[count * 3];
         float[] textureCoords = new float[count * 2];
-        int[] indices = new int[6 * (vertCount - 1) * (vertCount - 1)];
+        int[] indices = new int[6 * (vertCountX - 1) * (vertCountX - 1)];
         int vertexPointer = 0;
-        for (int i = 0; i < vertCount; i++) {
-            for (int j = 0; j < vertCount; j++) {
-                vertices[vertexPointer * 3] = j / ((float) vertCount - 1) * vertCount * Terrain.TERRAIN_TILE_SIZE;
+        for (int i = 0; i < vertCountX; i++) {
+            for (int j = 0; j < vertCountX; j++) {
+                vertices[vertexPointer * 3] = j / ((float) vertCountX - 1) * vertCountX * Terrain.TERRAIN_TILE_SIZE;
                 float height = tiles[i][j] != null ? tiles[i][j].getHeight() : 0;
                 vertices[vertexPointer * 3 + 1] = height;
-                vertices[vertexPointer * 3 + 2] = i / ((float) vertCount - 1) * vertCount * Terrain.TERRAIN_TILE_SIZE;
+                vertices[vertexPointer * 3 + 2] = i / ((float) vertCountX - 1) * vertCountX * Terrain.TERRAIN_TILE_SIZE;
                 Vector3f normal = calculateNormal(j, i);
                 normals[vertexPointer * 3] = normal.x;
                 normals[vertexPointer * 3 + 1] = normal.y;
                 normals[vertexPointer * 3 + 2] = normal.z;
-                textureCoords[vertexPointer * 2] = j / ((float) vertCount - 1);
-                textureCoords[vertexPointer * 2 + 1] = i / ((float) vertCount - 1);
+                textureCoords[vertexPointer * 2] = j / ((float) vertCountX - 1);
+                textureCoords[vertexPointer * 2 + 1] = i / ((float) vertCountX - 1);
                 vertexPointer++;
             }
         }
         int pointer = 0;
-        for (int gz = 0; gz < vertCount - 1; gz++) {
-            for (int gx = 0; gx < vertCount - 1; gx++) {
-                int topLeft = (gz * vertCount) + gx;
+        for (int gz = 0; gz < vertCountX - 1; gz++) {
+            for (int gx = 0; gx < vertCountX - 1; gx++) {
+                int topLeft = (gz * vertCountX) + gx;
                 int topRight = topLeft + 1;
-                int bottomLeft = ((gz + 1) * vertCount) + gx;
+                int bottomLeft = ((gz + 1) * vertCountX) + gx;
                 int bottomRight = bottomLeft + 1;
                 indices[pointer++] = topLeft;
                 indices[pointer++] = bottomLeft;
@@ -103,10 +103,10 @@ public class TerrainModel {
     public float getHeightOfTerrain(float xWorld, float zWorld) {
         float terrainX = xWorld - this.xCoord;
         float terrainZ = zWorld - this.zCoord;
-        float gridSize = terrain.getMapSize() / ((float) terrain.getMapSize() - 1);
+        float gridSize = terrain.getMapSizeX() / ((float) terrain.getMapSizeX() - 1);
         int gridX = (int) Math.floor(terrainX / gridSize);
         int gridZ = (int) Math.floor(terrainZ / gridSize);
-        if (gridX >= terrain.getMapSize() - 1 || gridZ >= terrain.getMapSize() - 1 || gridX < 0 || gridZ < 0) {
+        if (gridX >= terrain.getMapSizeX() - 1 || gridZ >= terrain.getMapSizeX() - 1 || gridX < 0 || gridZ < 0) {
             return 0;
         }
         float xCoordPlayer = (terrainX % gridSize) / gridSize;

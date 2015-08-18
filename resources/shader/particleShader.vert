@@ -22,7 +22,7 @@ void main()
 		+ cameraUpWorldspace * squareVertices.y * particleSize;
 
 	// Output position of the vertex
-	gl_Position = modelViewProjectionMatrix * vec4(vertexPosition_worldspace, 1.0f);
+	gl_Position = modelViewProjectionMatrix * vec4(xyzs.xyz, 1.0f);
 
 	// UV of the vertex. No special space for this one.
 	UV = squareVertices.xy + vec2(0.5, 0.5);

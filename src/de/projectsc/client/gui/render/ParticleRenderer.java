@@ -11,7 +11,10 @@ import java.util.List;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
+import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
+import org.lwjgl.opengl.GL31;
+import org.lwjgl.opengl.GL33;
 import org.lwjgl.util.vector.Matrix4f;
 
 import de.projectsc.client.gui.models.RawModel;
@@ -38,6 +41,8 @@ public class ParticleRenderer {
 
     private int particles_color_buffer;
 
+    private int VertexArrayID;
+
     public ParticleRenderer(Loader loader, Matrix4f projectionMatrix) {
 
         this.projectionMatrix = projectionMatrix;
@@ -61,7 +66,7 @@ public class ParticleRenderer {
         //
         // this.projectionMatrix = projectionMatrix;
         // this.loader = loader;
-        int VertexArrayID = GL30.glGenVertexArrays();
+        VertexArrayID = GL30.glGenVertexArrays();
         GL30.glBindVertexArray(VertexArrayID);
 
         billboard_vertex_buffer = GL15.glGenBuffers();
@@ -81,6 +86,7 @@ public class ParticleRenderer {
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, particles_color_buffer);
         GL15.glBufferData(GL15.GL_ARRAY_BUFFER, ParticleEmitter.MAX_PARTICLES_PER_SOURCE * 4 * Byte.SIZE, GL15.GL_STREAM_DRAW);
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+
     }
 
     /**
@@ -91,20 +97,21 @@ public class ParticleRenderer {
     public void render(List<ParticleEmitter> particleSources) {
 
         ParticleEmitter e = particleSources.get(0);
+        // GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_LINE);
 
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, particles_position_buffer);
-        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, ParticleEmitter.MAX_PARTICLES_PER_SOURCE * 4 * Float.SIZE, GL15.GL_STREAM_DRAW);
+        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, ParticleEmitter.MAX_PARTICLES_PER_SOURCE * 4 * Float.SIZE, GL15.GL_STATIC_DRAW);
         FloatBuffer buffer = BufferUtils.createFloatBuffer(e.getPositionBuffer().length);
         buffer.put(e.getPositionBuffer());
         buffer.flip();
-        GL15.glBufferSubData(GL15.GL_ARRAY_BUFFER, buffer.capacity(), buffer);
+        // GL15.glBufferSubData(GL15.GL_ARRAY_BUFFER, buffer.capacity(), buffer);
 
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, particles_color_buffer);
-        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, ParticleEmitter.MAX_PARTICLES_PER_SOURCE * 4 * Byte.SIZE, GL15.GL_STREAM_DRAW);
+        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, ParticleEmitter.MAX_PARTICLES_PER_SOURCE * 4 * Byte.SIZE, GL15.GL_STATIC_DRAW);
         ByteBuffer buffer2 = BufferUtils.createByteBuffer(e.getColorBuffer().length);
         buffer2.put(e.getColorBuffer());
         buffer2.flip();
-        GL15.glBufferSubData(GL15.GL_ARRAY_BUFFER, buffer2.capacity(), buffer2);
+        // GL15.glBufferSubData(GL15.GL_ARRAY_BUFFER, buffer2.capacity(), buffer2);
         GL11.glEnable(GL11.GL_BLEND);
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         GL11.glDisable(GL11.GL_DEPTH_TEST);
@@ -112,9 +119,27 @@ public class ParticleRenderer {
 
         shader.start();
         shader.loadPositionAttributes(camera.createViewMatrix(), projectionMatrix);
-        GL30.glBindVertexArray(quad.getVaoID());
+        GL30.glBindVertexArray(VertexArrayID);
+        GL20.glEnableVertexAttribArray(0);
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, billboard_vertex_buffer);
+        GL20.glVertexAttribPointer(0, 3, GL11.GL_FLOAT, false, 0, 0);
+        GL20.glEnableVertexAttribArray(1);
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, particles_position_buffer);
+        GL20.glVertexAttribPointer(1, 4, GL11.GL_FLOAT, false, 0, 0);
+        GL20.glEnableVertexAttribArray(2);
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, particles_color_buffer);
+        GL20.glVertexAttribPointer(2, 4, GL11.GL_UNSIGNED_BYTE, true, 0, 0);
+        GL33.glVertexAttribDivisor(0, 0);
+        GL33.glVertexAttribDivisor(1, 1);
+        GL33.glVertexAttribDivisor(2, 1);
+        GL31.glDrawArraysInstanced(GL11.GL_TRIANGLE_STRIP, 0, 4, e.getParticleCount());
+        GL20.glDisableVertexAttribArray(0);
+        GL20.glDisableVertexAttribArray(1);
+        GL20.glDisableVertexAttribArray(2);
 
+        GL30.glBindVertexArray(0);
         shader.stop();
+        GL11.glDisable(GL11.GL_BLEND);
     }
 
     public void setCamera(Camera camera) {

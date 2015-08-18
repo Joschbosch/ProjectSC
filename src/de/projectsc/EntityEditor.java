@@ -151,7 +151,7 @@ public class EntityEditor extends JFrame {
     private JComboBox<String> componentCombo;
 
     private final String[] componentNames =
-        { EmittingLightComponent.NAME, MovingComponent.NAME, BoundingComponent.NAME, ParticleEmitterComponent.NAME };
+    { EmittingLightComponent.NAME, MovingComponent.NAME, BoundingComponent.NAME, ParticleEmitterComponent.NAME };
 
     private JList<String> componentList;
 
@@ -686,6 +686,8 @@ public class EntityEditor extends JFrame {
                     serialization.put("numColumns", data.getNumColums());
                     serialization.put("reflectivity", data.getReflectivity());
                     serialization.put("shineDamper", data.getShineDamper());
+                    serialization.put("fakeLighting", data.isFakeLighting());
+
                     serialization.put("scale", data.getScale());
                     Map<String, String> components = new HashMap<>();
                     for (String component : data.getComponentsAdded()) {
@@ -767,8 +769,7 @@ public class EntityEditor extends JFrame {
     }
 
     /**
-     * Once the Canvas is created its add notify method will call this method to start the LWJGL
-     * Display and game loop in another thread.
+     * Once the Canvas is created its add notify method will call this method to start the LWJGL Display and game loop in another thread.
      */
     public void startLWJGL() {
         messageQueue = new LinkedBlockingQueue<String>();
@@ -779,8 +780,8 @@ public class EntityEditor extends JFrame {
     }
 
     /**
-     * Tell game loop to stop running, after which the LWJGL Display will be destoryed. The main
-     * thread will wait for the Display.destroy() to complete
+     * Tell game loop to stop running, after which the LWJGL Display will be destoryed. The main thread will wait for the Display.destroy()
+     * to complete
      */
     private void stopLWJGL() {
         try {

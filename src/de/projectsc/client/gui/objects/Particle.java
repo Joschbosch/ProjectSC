@@ -27,7 +27,14 @@ public class Particle implements Comparable<Particle> {
 
     @Override
     public int compareTo(Particle arg0) {
-        return (int) (this.cameradistance - arg0.getCameradistance());
+        float dist = (this.cameradistance - arg0.getCameradistance());
+        if (dist > 0 && dist <= 1) {
+            return 1;
+        } else if (dist < 0 && dist >= -1) {
+            return -1;
+        } else {
+            return (int) (this.cameradistance - arg0.getCameradistance());
+        }
     }
 
     public Vector3f getPosition() {

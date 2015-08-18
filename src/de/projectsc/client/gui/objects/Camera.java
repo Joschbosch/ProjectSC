@@ -85,6 +85,7 @@ public class Camera {
         if (NO_CAMERA_MOVING) {
             return;
         }
+
         if (!MOBA_MODE) {
             calculateZoom();
             calculatePitch();
@@ -94,6 +95,7 @@ public class Camera {
             calculateCameraPosition(centeringPoint, horizontalDistance, verticalDistance);
             this.yaw = DEGREES_180 - (0 + angleAroundPlayer);
         } else {
+
             checkInputs();
             if (!bound) {
                 calculateZoom();

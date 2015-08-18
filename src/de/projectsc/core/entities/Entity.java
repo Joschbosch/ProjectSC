@@ -13,6 +13,8 @@ import java.util.Map.Entry;
 
 import org.lwjgl.util.vector.Vector3f;
 
+import com.rits.cloning.Cloner;
+
 import de.projectsc.core.components.Component;
 import de.projectsc.core.components.ComponentType;
 import de.projectsc.core.components.impl.BoundingComponent;
@@ -225,8 +227,8 @@ public class Entity implements PhysicalObject {
             this.position = position;
         } else {
             this.position.x = position.x;
-            this.position.z = position.y;
-            this.position.y = position.z;
+            this.position.y = position.y;
+            this.position.z = position.z;
         }
     }
 
@@ -269,6 +271,11 @@ public class Entity implements PhysicalObject {
 
         }
         return false;
+    }
+
+    public Entity createClone() {
+        Entity newEntity = Cloner.shared().deepClone(this);
+        return newEntity;
     }
 
 }

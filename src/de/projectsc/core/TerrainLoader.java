@@ -145,8 +145,8 @@ public final class TerrainLoader {
         File target = new File(file);
         Map<String, Object> map = new HashMap<>();
         List<Object> terrainList = new LinkedList<>();
-        for (int i = 0; i < terrain.getMapSize(); i++) {
-            for (int j = 0; j < terrain.getMapSize(); j++) {
+        for (int i = 0; i < terrain.getMapSizeX(); i++) {
+            for (int j = 0; j < terrain.getMapSizeX(); j++) {
                 if (terrain.getTerrain()[i][j] != null) {
                     Map<String, Object> terrainData = new HashMap<>();
                     Tile current = terrain.getTerrain()[i][j];
@@ -160,7 +160,7 @@ public final class TerrainLoader {
         }
 
         map.put(TERRAIN_DATA, terrainList);
-        map.put(SIZE, terrain.getMapSize());
+        map.put(SIZE, terrain.getMapSizeX());
         map.put(BG_TEXTURE, terrain.getBgTexture());
         map.put(R_TEXTURE, terrain.getRTexture());
         map.put(G_TEXTURE, terrain.getGTexture());
@@ -199,10 +199,10 @@ public final class TerrainLoader {
      * @return file to the blend map created
      */
     public static File createBlendMap(Terrain terrain) {
-        BufferedImage img = new BufferedImage(terrain.getMapSize(), terrain.getMapSize(), BufferedImage.TYPE_INT_RGB);
+        BufferedImage img = new BufferedImage(terrain.getMapSizeX(), terrain.getMapSizeY(), BufferedImage.TYPE_INT_RGB);
         Graphics g = img.getGraphics();
-        for (int i = 0; i < terrain.getMapSize(); i++) {
-            for (int j = 0; j < terrain.getMapSize(); j++) {
+        for (int i = 0; i < terrain.getMapSizeX(); i++) {
+            for (int j = 0; j < terrain.getMapSizeY(); j++) {
                 if (terrain.getTerrain()[i][j] != null) {
                     switch (terrain.getTerrain()[i][j].getWalkAble()) {
                     case 0:
