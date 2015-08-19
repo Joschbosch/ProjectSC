@@ -86,6 +86,7 @@ public class EntityRenderer {
             Maths.createTransformationMatrix(entity.getPosition(), entity.getRotX(), entity.getRotY(), entity.getRotZ(), entity.getScale());
         shader.loadTransformationMatrix(transformationMatrix);
         shader.loadOffset(modelComponent.getTextureOffsetX(), modelComponent.getTextureOffsetY());
+        shader.loadSelected(entity.isHighlighted(), entity.isSelected());
 
     }
 }

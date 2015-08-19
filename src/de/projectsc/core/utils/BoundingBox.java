@@ -121,6 +121,10 @@ public class BoundingBox {
 
     public void setScale(float scale) {
         this.scale = scale;
+        min = (Vector3f) min.scale(scale);
+        max = (Vector3f) max.scale(scale);
+        center = Vector3f.add(min, max, null);
+        center.scale(1.0f / 2.0f);
     }
 
     public Vector3f getRotation() {

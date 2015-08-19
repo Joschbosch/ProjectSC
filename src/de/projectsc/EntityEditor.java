@@ -90,6 +90,8 @@ public class EntityEditor extends JFrame {
 
     private static final String MODEL_OBJ = CoreConstants.MODEL_FILENAME;
 
+    private static final String BOXFILE_NAME = CoreConstants.BOX_FILENAME;
+
     private static final String COMPONENTS = "components";
 
     private static final String DOT = ".";
@@ -680,6 +682,13 @@ public class EntityEditor extends JFrame {
                     if (data.getTextureFile() != null && !data.getTextureFile().equals(new File(targetFolder, TEXTURE_PNG))) {
                         FileUtils.copyFile(data.getTextureFile(), new File(targetFolder, TEXTURE_PNG));
                     }
+                    if (editor3dCore.getCurrentEntity().hasComponent(BoundingComponent.class)
+                        && editor3dCore.getCurrentEntity().getComponent(BoundingComponent.class).isValidForSaving()
+                        && !editor3dCore.getCurrentEntity().getComponent(BoundingComponent.class).getBoxFile()
+                            .equals(new File(targetFolder, BOXFILE_NAME))) {
+                        FileUtils.copyFile(editor3dCore.getCurrentEntity().getComponent(BoundingComponent.class).getBoxFile(), new File(
+                            targetFolder, BOXFILE_NAME));
+                    }
                     File nameFile = new File(targetFolder, FilenameUtils.removeExtension(data.getModelFile().getName()));
                     nameFile.createNewFile();
                     Map<String, Object> serialization = new HashMap<>();
@@ -737,7 +746,7 @@ public class EntityEditor extends JFrame {
                         data.setScale((float) tree.get("scale").getDoubleValue());
                         if (new File(chosen, MODEL_OBJ).exists()) {
                             data.setModelFile(new File(chosen, MODEL_OBJ));
-                            editor3dCore.createNewEntity();
+                            editor3dCore.createNewEntity(data.getId());
                             editor3dCore.triggerLoadModel();
                         }
                         if (new File(chosen, TEXTURE_PNG).exists()) {
@@ -750,7 +759,12 @@ public class EntityEditor extends JFrame {
                             String name = componentNamesIterator.next();
                             editor3dCore.addComponent(name);
                             Component c = editor3dCore.getComponent(name);
-                            c.deserialize(tree.get(COMPONENTS).get(name));
+                            if (!(c instanceof BoundingComponent)) {
+                                c.deserialize(tree.get(COMPONENTS).get(name), chosen);
+                            } else {
+                                System.out.println("trig");
+                                editor3dCore.triggerLoadBoundingBox();
+                            }
                             data.getComponentsAdded().add(name);
                         }
                     } catch (IOException e1) {

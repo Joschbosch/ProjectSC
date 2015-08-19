@@ -7,6 +7,7 @@ package de.projectsc.core.components.impl;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,13 +26,14 @@ import de.projectsc.client.gui.objects.ParticleEmitter;
 import de.projectsc.client.gui.tools.Loader;
 import de.projectsc.client.gui.tools.ModelData;
 import de.projectsc.client.gui.tools.OBJFileLoader;
+import de.projectsc.core.CoreConstants;
 import de.projectsc.core.components.Component;
 import de.projectsc.core.components.ComponentType;
 import de.projectsc.core.entities.Entity;
 import de.projectsc.core.utils.BoundingBox;
 
 /**
- * Component for having bounding boxes on an entity.
+ * Bounding boxes for entites.
  * 
  * @author Josch Bosch
  */
@@ -52,8 +54,8 @@ public class BoundingComponent extends Component {
 
     private File boxFile;
 
-    public BoundingComponent() {
-        super(NAME);
+    public BoundingComponent(Entity owner) {
+        super(NAME, owner);
         setType(ComponentType.PHYSICS);
         offset = new Vector3f(0f, 0f, 0f);
         offsetRotation = new Vector3f(0f, 0f, 0f);
@@ -123,12 +125,28 @@ public class BoundingComponent extends Component {
 
     @Override
     public String serialize() throws JsonGenerationException, JsonMappingException, IOException {
-        return null;
+        Map<String, Object> serialized = new HashMap<>();
+        serialized.put("offset", offset);
+        serialized.put("offsetRotation", offsetRotation);
+        serialized.put("scale", scale);
+        return mapper.writeValueAsString(serialized);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public void deserialize(JsonNode input) throws JsonProcessingException, IOException {
-
+    public void deserialize(JsonNode input, File schemaDir) throws JsonProcessingException, IOException {
+        Map<String, Object> values = mapper.readValue(input.asText(), new HashMap<String, Object>().getClass());
+        boxFile = new File(schemaDir, CoreConstants.BOX_FILENAME);
+        loadBoundingBox(owner, boxFile);
+        this.scale = (Float.parseFloat("" + values.get("scale")));
+        Vector3f newOffset = new Vector3f(Float.parseFloat("" + ((Map<String, Double>) values.get("offset")).get("x")),
+            Float.parseFloat("" + ((Map<String, Double>) values.get("offset")).get("y")),
+            Float.parseFloat("" + ((Map<String, Double>) values.get("offset")).get("z")));
+        Vector3f newRotation = new Vector3f(Float.parseFloat("" + ((Map<String, Double>) values.get("offsetRotation")).get("x")),
+            Float.parseFloat("" + ((Map<String, Double>) values.get("offsetRotation")).get("y")),
+            Float.parseFloat("" + ((Map<String, Double>) values.get("offsetRotation")).get("z")));
+        this.setOffset(newOffset);
+        this.setRotation(newRotation);
     }
 
     /**
@@ -138,53 +156,40 @@ public class BoundingComponent extends Component {
      * @param ray to intersect
      * @return true if it intersects
      */
-    public boolean intersects(Vector3f orig, Vector3f ray) {
-        Vector3f bMin = Vector3f.add(box.getPosition(), box.getMin(), null);
-        Vector3f bMax = Vector3f.add(box.getPosition(), box.getMax(), null);
-        float tminX = bMin.x - orig.x / ray.x;
-        float tminY = bMin.y - orig.y / ray.y;
-        float tminZ = bMin.z - orig.z / ray.z;
-        float tmaxX = bMax.x - orig.x / ray.x;
-        float tmaxY = bMax.y - orig.y / ray.y;
-        float tmaxZ = bMax.z - orig.z / ray.z;
+    public float intersects(Vector3f org, Vector3f ray) {
+        Vector3f lb = Vector3f.add(box.getPosition(), box.getMin(), null);
+        Vector3f rt = Vector3f.add(box.getPosition(), box.getMax(), null);
+        // r.dir is unit direction vector of ray
+        float dirfracx = 1.0f / ray.x;
+        float dirfracy = 1.0f / ray.y;
+        float dirfracz = 1.0f / ray.z;
+        // lb is the corner of AABB with minimal coordinates - left bottom, rt is maximal corner
+        // r.org is origin of ray
+        float t1 = (lb.x - org.x) * dirfracx;
+        float t2 = (rt.x - org.x) * dirfracx;
+        float t3 = (lb.y - org.y) * dirfracy;
+        float t4 = (rt.y - org.y) * dirfracy;
+        float t5 = (lb.z - org.z) * dirfracz;
+        float t6 = (rt.z - org.z) * dirfracz;
 
-        if (tminX > tmaxY) {
-            float temp = tminX;
-            tminX = tmaxX;
-            tmaxX = temp;
-        }
-        if (tminY > tmaxY) {
-            float temp = tminY;
-            tminY = tmaxY;
-            tmaxY = temp;
-        }
-        if (tminZ > tmaxY) {
-            float temp = tminZ;
-            tminZ = tmaxZ;
-            tmaxZ = temp;
-        }
-        if ((tminX > tmaxY) || (tminY > tmaxX)) {
-            return false;
-        }
-        if (tminY > tminX) {
-            tminX = tminY;
-        }
-        if (tmaxY < tmaxX) {
-            tmaxX = tmaxY;
+        float tmin = Math.max(Math.max(Math.min(t1, t2), Math.min(t3, t4)), Math.min(t5, t6));
+        float tmax = Math.min(Math.min(Math.max(t1, t2), Math.max(t3, t4)), Math.max(t5, t6));
+
+        float t;
+        // if tmax < 0, ray (line) is intersecting AABB, but whole AABB is behing us
+        if (tmax < 0) {
+            t = tmax;
+            return -1;
         }
 
-        if ((tminX > tmaxZ) || (tminZ > tmaxX)) {
-            return false;
+        // if tmin > tmax, ray doesn't intersect AABB
+        if (tmin > tmax) {
+            t = tmax;
+            return -1;
         }
 
-        if (tminZ > tminX) {
-            tminX = tminZ;
-        }
-
-        if (tmaxZ < tmaxX) {
-            tmaxX = tmaxZ;
-        }
-        return true;
+        t = tmin;
+        return t;
     }
 
     public Vector3f getPosition() {
@@ -197,6 +202,7 @@ public class BoundingComponent extends Component {
 
     public void setScale(float scale) {
         this.scale = scale;
+        box.setScale(scale);
     }
 
     /**
@@ -212,7 +218,7 @@ public class BoundingComponent extends Component {
      * @param rotation to set for the box
      */
     public void setRotation(Vector3f rotation) {
-        this.box.setRotation(rotation);
+        box.setRotation(rotation);
 
     }
 

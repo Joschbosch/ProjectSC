@@ -80,6 +80,8 @@ public class MasterRenderer {
 
     private final ParticleRenderer particleRenderer;
 
+    private boolean showWireFrames = true;
+
     public MasterRenderer() {
         enableCulling();
         GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
@@ -169,10 +171,12 @@ public class MasterRenderer {
         entityShader.loadViewMatrix(camera);
         entityRenderer.render(entities);
         entityShader.stop();
-        collisionBoxShader.start();
-        collisionBoxShader.loadViewMatrix(camera);
-        collisionBoxRenderer.render(boundingBoxes);
-        collisionBoxShader.stop();
+        if (showWireFrames) {
+            collisionBoxShader.start();
+            collisionBoxShader.loadViewMatrix(camera);
+            collisionBoxRenderer.render(boundingBoxes);
+            collisionBoxShader.stop();
+        }
         terrainShader.start();
         terrainShader.loadClipPlane(clipPlane);
         terrainShader.loadSkyColor(SKY_R, SKY_G, SKY_B);

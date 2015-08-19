@@ -45,8 +45,8 @@ public class TerrainModel {
         this.zCoord = z * Terrain.TERRAIN_CHUNK_SIZE * Terrain.TERRAIN_TILE_SIZE;
         this.texture = texture;
         this.blendMap = blendMap;
-        this.model = generateTerrainModel();
         this.tiles = tiles;
+        this.model = generateTerrainModel();
     }
 
     private RawModel generateTerrainModel() {
@@ -115,12 +115,12 @@ public class TerrainModel {
         if (xCoordPlayer <= (1 - zCoordPlayer)) {
             answer = Maths.barryCentric(new Vector3f(0, getHeight(gridX, gridZ) * Terrain.HEIGHT_TILE_SIZE, 0), new Vector3f(1,
                 getHeight(gridX + 1, gridZ) * Terrain.HEIGHT_TILE_SIZE, 0), new Vector3f(0,
-                    getHeight(gridX, gridZ + 1) * Terrain.HEIGHT_TILE_SIZE, 1),
+                getHeight(gridX, gridZ + 1) * Terrain.HEIGHT_TILE_SIZE, 1),
                 new Vector2f(xCoordPlayer, zCoordPlayer));
         } else {
             answer = Maths.barryCentric(new Vector3f(1, getHeight(gridX + 1, gridZ) * Terrain.HEIGHT_TILE_SIZE, 0), new Vector3f(1,
                 getHeight(gridX + 1, gridZ + 1) * Terrain.HEIGHT_TILE_SIZE, 1), new Vector3f(0,
-                    getHeight(gridX, gridZ + 1) * Terrain.HEIGHT_TILE_SIZE, 1),
+                getHeight(gridX, gridZ + 1) * Terrain.HEIGHT_TILE_SIZE, 1),
                 new Vector2f(xCoordPlayer, zCoordPlayer));
         }
         return answer;

@@ -58,6 +58,10 @@ public class EntityShader extends Shader {
 
     private int locationPlane;
 
+    private int locationSelected;
+
+    private int locationHighlighted;
+
     public EntityShader() {
         super(VERTEX_FILE, FRAGMENT_FILE);
         LOGGER.debug("Static shader loaded.");
@@ -90,6 +94,8 @@ public class EntityShader extends Shader {
             locationLightColor[i] = getUniformLocation(String.format("lightColor[%s]", i));
             locationAttenuation[i] = getUniformLocation(String.format("attenuation[%s]", i));
         }
+        locationSelected = super.getUniformLocation("selected");
+        locationHighlighted = super.getUniformLocation("highlighted");
     }
 
     /**
@@ -196,5 +202,13 @@ public class EntityShader extends Shader {
     public void loadShineValues(float damper, float reflectivity) {
         super.loadFloat(locationShineDamper, damper);
         super.loadFloat(locationReflectivity, reflectivity);
+    }
+
+    /**
+     * @param selected true, if entity is selected
+     */
+    public void loadSelected(boolean highlighted, boolean selected) {
+        super.loadBoolean(locationHighlighted, highlighted);
+        super.loadBoolean(locationSelected, selected);
     }
 }

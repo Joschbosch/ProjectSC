@@ -32,6 +32,8 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
+import com.rits.cloning.Cloner;
+
 import de.projectsc.EntityEditor;
 import de.projectsc.client.gui.objects.Camera;
 import de.projectsc.client.gui.objects.Light;
@@ -124,8 +126,8 @@ public class MapEditorGraphicsCore implements Runnable {
         createSun();
         loadEntitySchemas();
         entitySchemaAtCursor = entitySchemas.get(10000L);
-        selectedEntity = null;
         entities.add(entitySchemaAtCursor);
+        selectedEntity = null;
         gameLoop();
     }
 
@@ -158,12 +160,12 @@ public class MapEditorGraphicsCore implements Runnable {
                             matc.setShineDamper((float) tree.get("shineDamper").getDoubleValue());
                             newEntitySchema.setScale((float) tree.get("scale").getDoubleValue());
                             Iterator<String> componentNamesIterator = tree.get("components").getFieldNames();
-                            while (componentNamesIterator.hasNext()) {
-                                String name = componentNamesIterator.next();
-                                addComponent(name, tree.get("components").get(name));
-                            }
                             newEntitySchema.setPosition(new Vector3f(0, 0, 0));
                             newEntitySchema.setRotation(new Vector3f(0, 0, 0));
+                            while (componentNamesIterator.hasNext()) {
+                                String name = componentNamesIterator.next();
+                                addComponent(newEntitySchema, name, tree.get("components").get(name), schemaDir);
+                            }
                             entitySchemas.put(newEntitySchema.getEntityTypeId(), newEntitySchema);
                         }
                     } catch (IOException e) {
@@ -179,26 +181,31 @@ public class MapEditorGraphicsCore implements Runnable {
     /**
      * Add new component to entity.
      * 
+     * @param newEntitySchema
+     * 
      * @param component to add
      * @param jsonNode with information
+     * @param schemaDir
      * @throws IOException e
      * @throws JsonProcessingException e
      */
-    public void addComponent(String component, JsonNode jsonNode) throws JsonProcessingException, IOException {
+    public void addComponent(Entity newEntitySchema, String component, JsonNode jsonNode, File schemaDir) throws JsonProcessingException,
+        IOException {
         Component newComponent = null;
         if (EmittingLightComponent.NAME.equals(component)) {
-            newComponent = new EmittingLightComponent();
+            newComponent = new EmittingLightComponent(newEntitySchema);
         }
         if (MovingComponent.NAME.equals(component)) {
-            newComponent = new MovingComponent();
+            newComponent = new MovingComponent(newEntitySchema);
         }
         if (BoundingComponent.NAME.equals(component)) {
-            newComponent = new BoundingComponent();
+            newComponent = new BoundingComponent(newEntitySchema);
         }
         if (ParticleEmitterComponent.NAME.equals(component)) {
-            newComponent = new ParticleEmitterComponent();
+            newComponent = new ParticleEmitterComponent(newEntitySchema);
         }
-        newComponent.deserialize(jsonNode);
+        newComponent.deserialize(jsonNode, schemaDir);
+        newEntitySchema.addComponent(newComponent);
     }
 
     protected void gameLoop() {
@@ -210,15 +217,32 @@ public class MapEditorGraphicsCore implements Runnable {
             readMessages();
 
             camera.move(delta);
-            mousePicker.update();
-            readInput();
-            for (ComponentType type : ComponentType.values()) {
-                for (Entity e : entities) {
-                    e.update(type);
-                }
-            }
             if (terrain != null) {
-
+                mousePicker.update();
+                readInput();
+                for (ComponentType type : ComponentType.values()) {
+                    for (Entity e : entities) {
+                        e.update(type);
+                    }
+                }
+                if (camera != null && mousePicker.getCurrentRay() != null) {
+                    Entity highlightingEntity = null;
+                    float tMin = Float.MAX_VALUE;
+                    for (Entity e : entities) {
+                        if (e.hasComponent(BoundingComponent.class)) {
+                            float t = e.getComponent(BoundingComponent.class).intersects(camera.getPosition(),
+                                mousePicker.getCurrentRay());
+                            if (t > 0 && t < tMin) {
+                                tMin = t;
+                                highlightingEntity = e;
+                            }
+                        }
+                        e.setHighlighted(false);
+                    }
+                    if (highlightingEntity != null) {
+                        highlightingEntity.setHighlighted(true);
+                    }
+                }
                 if (mousePicker.getCurrentTerrainPoint() != null) {
                     entitySchemaAtCursor.setPosition(mousePicker.getCurrentTerrainPoint());
                 }
@@ -243,30 +267,52 @@ public class MapEditorGraphicsCore implements Runnable {
     private void readInput() {
         if (Keyboard.isKeyDown(Keyboard.KEY_R)) {
             entitySchemaAtCursor.setScale(entitySchemaAtCursor.getScale() + 0.5f);
+            if (entitySchemaAtCursor.hasComponent(BoundingComponent.class)) {
+                BoundingComponent component = entitySchemaAtCursor.getComponent(BoundingComponent.class);
+                component.setScale(component.getScale() + 0.5f);
+            }
         }
         if (Keyboard.isKeyDown(Keyboard.KEY_F)) {
-            entitySchemaAtCursor.setScale(entitySchemaAtCursor.getScale() - 0.5f);
+            if (entitySchemaAtCursor.getScale() > 0.5) {
+                entitySchemaAtCursor.setScale(entitySchemaAtCursor.getScale() - 0.5f);
+                if (entitySchemaAtCursor.hasComponent(BoundingComponent.class)) {
+                    BoundingComponent component = entitySchemaAtCursor.getComponent(BoundingComponent.class);
+                    component.setScale(component.getScale() - 0.5f);
+                }
+            }
         }
         if (Keyboard.isKeyDown(Keyboard.KEY_Q)) {
             entitySchemaAtCursor.setRotY(entitySchemaAtCursor.getRotY() + 1f);
+            if (entitySchemaAtCursor.hasComponent(BoundingComponent.class)) {
+                BoundingComponent component = entitySchemaAtCursor.getComponent(BoundingComponent.class);
+                component.setOffsetRotation(new Vector3f(component.getOffsetRotation().x, component.getOffsetRotation().y + 1f, component
+                    .getOffsetRotation().z));
+            }
         }
         if (Keyboard.isKeyDown(Keyboard.KEY_E)) {
             entitySchemaAtCursor.setRotY(entitySchemaAtCursor.getRotY() - 1f);
+            if (entitySchemaAtCursor.hasComponent(BoundingComponent.class)) {
+                BoundingComponent component = entitySchemaAtCursor.getComponent(BoundingComponent.class);
+                component.setOffsetRotation(new Vector3f(component.getOffsetRotation().x, component.getOffsetRotation().y - 1f, component
+                    .getOffsetRotation().z));
+            }
         }
         if (Mouse.isButtonDown(0) && mode == 0 && !alreadyClicked) {
             alreadyClicked = true;
-            Entity oldEntity = entitySchemaAtCursor;
-            entitySchemaAtCursor = new Entity(entitySchemaAtCursor.getEntityTypeId());
-            entitySchemaAtCursor.setPosition(oldEntity.getPosition());
-            entitySchemaAtCursor.setRotation(oldEntity.getRotation());
-            entitySchemaAtCursor.setScale(oldEntity.getScale());
-            entities.add(entitySchemaAtCursor);
+            Entity newEntity = Cloner.standard().deepClone(entitySchemaAtCursor);
+            entities.add(newEntity);
         }
         if (Mouse.isButtonDown(0) && mode == 1 && !alreadyClicked) {
+            alreadyClicked = true;
             for (Entity e : entities) {
                 if (e.hasComponent(BoundingComponent.class)) {
-                    System.out
-                        .println(e.getComponent(BoundingComponent.class).intersects(camera.getPosition(), mousePicker.getCurrentRay()));
+                    if (e.getComponent(BoundingComponent.class).intersects(camera.getPosition(), mousePicker.getCurrentRay()) > 0) {
+                        if (selectedEntity != null) {
+                            selectedEntity.setSelected(false);
+                        }
+                        selectedEntity = e;
+                        selectedEntity.setSelected(true);
+                    }
                 }
             }
         }
@@ -294,7 +340,7 @@ public class MapEditorGraphicsCore implements Runnable {
     private void createSun() {
         Entity lightEntity = new Entity(-2);
         lightEntity.setPosition(new Vector3f(0, 0, 0));
-        EmittingLightComponent lightComponent = new EmittingLightComponent();
+        EmittingLightComponent lightComponent = new EmittingLightComponent(lightEntity);
         sun = new Light(new Vector3f(0.0f, 500.0f, 500.0f), new Vector3f(1.0f, 1.0f, 1.0f), "sun");
         lightComponent.addLight(lightEntity, sun);
         lightEntity.addComponent(lightComponent);
@@ -302,17 +348,16 @@ public class MapEditorGraphicsCore implements Runnable {
     }
 
     private void createTerrain(int terrainWidth, int terrainHeight, String textureName) {
-        String texture = "terrain/" + textureName + ".png";
+        String texture = "terrain/grass.png";
         terrain =
             new Terrain(-0.5f, -0.5f, texture, texture, texture, texture);
-
         mousePicker = new MousePicker(camera, masterRenderer.getProjectionMatrix(), terrain);
     }
 
     protected void initGL() {}
 
     private void loadModel(Entity e, File modelFile, File texFile) {
-        modelComponent = new ModelAndTextureComponent();
+        modelComponent = new ModelAndTextureComponent(e);
         modelComponent.loadModel(modelFile, texFile);
         e.addComponent(modelComponent);
         modelComponent.loadAndApplyTexture(texFile);
@@ -372,6 +417,16 @@ public class MapEditorGraphicsCore implements Runnable {
                 }
             }
 
+        }
+    }
+
+    public Entity getSelectedEntity() {
+        return selectedEntity;
+    }
+
+    public void removeSelectedEntity() {
+        if (selectedEntity != null) {
+            entities.remove(selectedEntity);
         }
     }
 }

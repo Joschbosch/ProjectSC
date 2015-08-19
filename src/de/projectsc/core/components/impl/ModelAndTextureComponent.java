@@ -54,14 +54,14 @@ public class ModelAndTextureComponent extends Component {
 
     private int textureIndex = 0;
 
-    public ModelAndTextureComponent() {
-        super(NAME);
+    public ModelAndTextureComponent(Entity owner) {
+        super(NAME, owner);
         textureIndex = 0;
         type = ComponentType.GRAPHICS;
     }
 
-    public ModelAndTextureComponent(int textureIndex) {
-        super(NAME);
+    public ModelAndTextureComponent(int textureIndex, Entity owner) {
+        super(NAME, owner);
         this.textureIndex = textureIndex;
         type = ComponentType.GRAPHICS;
 
@@ -242,7 +242,7 @@ public class ModelAndTextureComponent extends Component {
     }
 
     @Override
-    public void deserialize(JsonNode input) {
+    public void deserialize(JsonNode input, File schemaDir) {
 
     }
 

@@ -53,6 +53,11 @@ public final class CoreConstants {
         0.5f, 0.5f, 0.0f,
     };
 
+    /**
+     * Name of bounding box file.
+     */
+    public static final String BOX_FILENAME = "boundingBox.obj";
+
     private CoreConstants() {
 
     }

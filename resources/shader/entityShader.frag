@@ -14,7 +14,8 @@ uniform float shineDamper;
 uniform float reflectivity;
 uniform vec3 skyColor;
 uniform vec3 attenuation[lightSources];
-
+uniform bool selected;
+uniform bool highlighted;
 void main(void){
    vec3 normalUnit = normalize(surfaceNormal);
    vec3 toCamUnit = normalize(toCameraVector);
@@ -44,5 +45,12 @@ void main(void){
 	}
    out_Color = vec4(totalDiffuse, 1.0) * textureColor + vec4(totalSpecular, 1.0);
    out_Color = mix(vec4(skyColor, 1.0), out_Color, visibility);
+   
+   if (!selected && highlighted){
+   	 out_Color = mix(vec4(0, 1.0, 0, 1.0), out_Color, 0.7);
+   }
+   if (selected){
+   	 out_Color = mix(vec4(1.0, 0, 0, 1.0), out_Color, 0.7);
+   }
    
  }

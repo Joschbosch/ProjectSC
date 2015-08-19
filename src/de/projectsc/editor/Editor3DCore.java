@@ -7,6 +7,7 @@ package de.projectsc.editor;
 
 import java.awt.Canvas;
 import java.io.File;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.LinkedList;
 import java.util.List;
@@ -16,6 +17,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
@@ -162,7 +165,7 @@ public class Editor3DCore implements Runnable {
     private void createSun() {
         Entity lightEntity = new Entity(-2);
         lightEntity.setPosition(new Vector3f(0, 0, 0));
-        EmittingLightComponent lightComponent = new EmittingLightComponent();
+        EmittingLightComponent lightComponent = new EmittingLightComponent(entity);
         sun = new Light(new Vector3f(0.0f, 100.0f, 100.0f), new Vector3f(1.0f, 1.0f, 1.0f), "sun");
         lightComponent.addLight(lightEntity, sun);
         lightEntity.addComponent(lightComponent);
@@ -234,15 +237,12 @@ public class Editor3DCore implements Runnable {
         }
     }
 
-    /**
-     * Creates a new entity.
-     */
-    public void createNewEntity() {
+    public void createNewEntity(long id) {
         if (entity != null) {
             entities.remove(entity);
         }
         if (editorData != null) {
-            entity = new Entity(0);
+            entity = new Entity(id);
             entity.setPosition(new Vector3f(0, 0, 0));
             entity.setRotation(new Vector3f(0, 0, 0));
             entities.add(entity);
@@ -253,8 +253,15 @@ public class Editor3DCore implements Runnable {
         }
     }
 
+    /**
+     * Creates a new entity.
+     */
+    public void createNewEntity() {
+        createNewEntity(0);
+    }
+
     private void loadModel() {
-        modelComponent = new ModelAndTextureComponent();
+        modelComponent = new ModelAndTextureComponent(entity);
         try {
             modelComponent.loadModel(editorData.getModelFile(),
                 new File(Editor3DCore.class.getResource(CoreConstants.GRAPHICS_DIRECTORY_NAME + "/white.png").toURI()));
@@ -288,7 +295,20 @@ public class Editor3DCore implements Runnable {
             }
             if (msg.equals("LoadBoundingBox")) {
                 BoundingComponent c = getCurrentEntity().getComponent(BoundingComponent.class);
-                c.loadBoundingBox(entity, c.getBoxFile());
+                ObjectMapper mapper = new ObjectMapper();
+                File schemaDir;
+                try {
+                    schemaDir = new File(Editor3DCore.class.getResource("/" + CoreConstants.SCHEME_DIRECTORY_NAME + "/"
+                        + CoreConstants.SCHEME_DIRECTORY_PREFIX + entity.getEntityTypeId()).toURI());
+
+                    JsonNode tree =
+                        mapper.readTree(new File(schemaDir, CoreConstants.ENTITY_FILENAME));
+                    c.deserialize(tree.get("components").get(c.getComponentName()), schemaDir);
+                    c.loadBoundingBox(entity, c.getBoxFile());
+                } catch (URISyntaxException | IOException e) {
+                    System.out.println("loading");
+                    e.printStackTrace();
+                }
             }
             if (msg.equals("particleEmitter")) {
                 ParticleEmitterComponent c = getCurrentEntity().getComponent(ParticleEmitterComponent.class);
@@ -315,17 +335,17 @@ public class Editor3DCore implements Runnable {
      */
     public void addComponent(String component) {
         if (EmittingLightComponent.NAME.equals(component)) {
-            EmittingLightComponent lightComponent = new EmittingLightComponent();
+            EmittingLightComponent lightComponent = new EmittingLightComponent(entity);
             entity.addComponent(lightComponent);
         }
         if (MovingComponent.NAME.equals(component)) {
-            entity.addComponent(new MovingComponent());
+            entity.addComponent(new MovingComponent(entity));
         }
         if (BoundingComponent.NAME.equals(component)) {
-            entity.addComponent(new BoundingComponent());
+            entity.addComponent(new BoundingComponent(entity));
         }
         if (ParticleEmitterComponent.NAME.equals(component)) {
-            entity.addComponent(new ParticleEmitterComponent());
+            entity.addComponent(new ParticleEmitterComponent(entity));
             triggerAddParticleEmitter();
         }
     }
@@ -394,4 +414,5 @@ public class Editor3DCore implements Runnable {
     public void triggerLoadBoundingBox() {
         incomingQueue.offer("LoadBoundingBox");
     }
+
 }

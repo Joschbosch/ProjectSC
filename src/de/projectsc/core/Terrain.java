@@ -9,6 +9,7 @@ package de.projectsc.core;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.client.gui.terrain.TerrainModel;
@@ -34,7 +35,7 @@ public class Terrain {
     /**
      * One terrain has always the chunk size of tiles.
      */
-    public static final byte TERRAIN_CHUNK_SIZE = 16;
+    public static final int TERRAIN_CHUNK_SIZE = 32;
 
     /**
      * Tile size height.
@@ -56,6 +57,12 @@ public class Terrain {
     public Terrain(float x, float z, String bgTexture, String rTexture, String gTexture,
         String bTexture) {
         this.tiles = new Tile[TERRAIN_CHUNK_SIZE][TERRAIN_CHUNK_SIZE];
+        for (int i = 0; i < TERRAIN_CHUNK_SIZE; i++) {
+            for (int j = 0; j < TERRAIN_CHUNK_SIZE; j++) {
+                tiles[i][j] =
+                    new Tile(new Vector2f(x + i * TERRAIN_TILE_SIZE, z + j * TERRAIN_TILE_SIZE), (byte) 0, Tile.WALKABLE, (byte) 0);
+            }
+        }
         this.mapSize = TERRAIN_CHUNK_SIZE;
         this.setMapBox(calculateMapBox());
         this.worldPositionX = x;

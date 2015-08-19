@@ -21,8 +21,7 @@ import de.projectsc.core.utils.BoundingBox;
 import de.projectsc.core.utils.PhysicalObject;
 
 /**
- * All game objects in the game are entities. All entities have components, that define their role
- * and behavior.
+ * All game objects in the game are entities. All entities have components, that define their role and behavior.
  * 
  * @author Josch Bosch
  */
@@ -36,6 +35,8 @@ public class Entity implements PhysicalObject {
 
     protected float scale;
 
+    protected boolean selected = false;
+
     protected Map<Class<? extends Component>, Component> components;
 
     protected Map<ComponentType, List<Component>> typeMap = new HashMap<>();
@@ -43,6 +44,8 @@ public class Entity implements PhysicalObject {
     private final long entityTypeID;
 
     private final long entityUID;
+
+    private boolean highlighted;
 
     public Entity(long entityTypeId) {
         super();
@@ -252,6 +255,8 @@ public class Entity implements PhysicalObject {
     public void setRotY(float targetRotation) {
         if (this.rotation != null) {
             this.rotation.y = targetRotation;
+        } else {
+            System.out.println("error");
         }
     }
 
@@ -275,6 +280,22 @@ public class Entity implements PhysicalObject {
 
         }
         return false;
+    }
+
+    public void setSelected(boolean b) {
+        selected = b;
+    }
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setHighlighted(boolean highlighted) {
+        this.highlighted = highlighted;
+    }
+
+    public boolean isHighlighted() {
+        return highlighted;
     }
 
 }

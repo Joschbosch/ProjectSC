@@ -5,6 +5,7 @@
  */
 package de.projectsc.core.components;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -38,8 +39,11 @@ public abstract class Component {
 
     protected ObjectMapper mapper = new ObjectMapper();
 
-    public Component(String newName) {
+    protected Entity owner;
+
+    public Component(String newName, Entity owner) {
         this.componentName = newName;
+        this.owner = owner;
     }
 
     /**
@@ -82,10 +86,11 @@ public abstract class Component {
     /**
      * 
      * @param input to deserialize
+     * @param schemaDir directory of schema
      * @throws JsonProcessingException e
      * @throws IOException e
      */
-    public abstract void deserialize(JsonNode input) throws JsonProcessingException, IOException;
+    public abstract void deserialize(JsonNode input, File schemaDir) throws JsonProcessingException, IOException;
 
     public ComponentType getType() {
         return type;

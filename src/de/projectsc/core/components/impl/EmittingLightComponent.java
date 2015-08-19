@@ -5,6 +5,7 @@
  */
 package de.projectsc.core.components.impl;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -45,8 +46,8 @@ public class EmittingLightComponent extends Component {
 
     private final Map<Light, Vector3f> offsets = new HashMap<>();
 
-    public EmittingLightComponent() {
-        super(NAME);
+    public EmittingLightComponent(Entity owner) {
+        super(NAME, owner);
         type = ComponentType.GRAPHICS;
     }
 
@@ -84,8 +85,7 @@ public class EmittingLightComponent extends Component {
     }
 
     /**
-     * Add light to entity. Note that the lights postion will be the offset of the entities
-     * position.
+     * Add light to entity. Note that the lights postion will be the offset of the entities position.
      * 
      * @param e owner entity
      * @param light to add
@@ -141,13 +141,15 @@ public class EmittingLightComponent extends Component {
         Map<String, Map<String, Float[]>> serializedLights = Serialization.createSerializableMap(lights);
         for (Light l : offsets.keySet()) {
             Map<String, Float[]> values = serializedLights.get(l.getName());
-            values.put("offset", new Float[] { offsets.get(l).x, offsets.get(l).y, offsets.get(l).z });
+            if (values != null) {
+                values.put("offset", new Float[] { offsets.get(l).x, offsets.get(l).y, offsets.get(l).z });
+            }
         }
         return mapper.writeValueAsString(serializedLights);
     }
 
     @Override
-    public void deserialize(JsonNode input) throws JsonProcessingException, IOException {
+    public void deserialize(JsonNode input, File schemaDir) throws JsonProcessingException, IOException {
         @SuppressWarnings("unchecked") Map<String, Map<String, List<Double>>> deserializedLights =
             mapper.readValue(input.getTextValue(), new HashMap<String, Map<String, List<Double>>>().getClass());
         for (String lightName : deserializedLights.keySet()) {

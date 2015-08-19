@@ -4,6 +4,7 @@
 
 package de.projectsc.core.components.impl;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
@@ -40,8 +41,8 @@ public class ParticleEmitterComponent extends Component {
 
     private final List<ParticleEmitter> emitter = new LinkedList<>();
 
-    public ParticleEmitterComponent() {
-        super(NAME);
+    public ParticleEmitterComponent(Entity owner) {
+        super(NAME, owner);
         type = ComponentType.GRAPHICS;
     }
 
@@ -84,7 +85,7 @@ public class ParticleEmitterComponent extends Component {
     }
 
     @Override
-    public void deserialize(JsonNode input) throws JsonProcessingException, IOException {
+    public void deserialize(JsonNode input, File schemaDir) throws JsonProcessingException, IOException {
 
     }
 

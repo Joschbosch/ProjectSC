@@ -5,6 +5,7 @@
  */
 package de.projectsc.core.components.impl;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -50,8 +51,8 @@ public class MovingComponent extends Component {
 
     // private float targetRotation;
 
-    public MovingComponent() {
-        super(NAME);
+    public MovingComponent(Entity owner) {
+        super(NAME, owner);
         type = ComponentType.PREPHYSICS;
     }
 
@@ -96,7 +97,6 @@ public class MovingComponent extends Component {
         // increaseRotation(owner, 0f, -TURN_SPEED * delta, 0f);
         // }
         // } else {
-        owner.setRotY(0);
         // }
         if (nextTarget != null && Vector3f.sub(owner.getPosition(), nextTarget, null).lengthSquared() > 2) {
             currentSpeed = movementSpeed;
@@ -108,8 +108,6 @@ public class MovingComponent extends Component {
                 } else {
                     currentSpeed = 0;
                 }
-            } else {
-                setCurrentTarget(owner, new Vector3f(0f, 0f, 0f));
             }
         }
         float distance = currentSpeed * delta / 1000.0f;
@@ -149,7 +147,7 @@ public class MovingComponent extends Component {
     }
 
     @Override
-    public void deserialize(JsonNode input) {
+    public void deserialize(JsonNode input, File schemaDir) {
         movementSpeed = Integer.valueOf(input.getTextValue());
     }
 
