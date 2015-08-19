@@ -29,7 +29,6 @@ import de.projectsc.client.gui.shaders.EntityShader;
 import de.projectsc.client.gui.shaders.TerrainShader;
 import de.projectsc.client.gui.shaders.WireFrameShader;
 import de.projectsc.client.gui.terrain.TerrainModel;
-import de.projectsc.client.gui.tools.Loader;
 import de.projectsc.core.components.Component;
 import de.projectsc.core.entities.Entity;
 import de.projectsc.core.utils.BoundingBox;
@@ -77,13 +76,11 @@ public class MasterRenderer {
 
     private final Map<RawModel, List<BoundingBox>> boundingBoxes = new HashMap<>();
 
-    private Billboard billboard;
-
     private final ParticleEmitter particle;
 
     private final ParticleRenderer particleRenderer;
 
-    public MasterRenderer(Loader loader) {
+    public MasterRenderer() {
         enableCulling();
         GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
         createProjectionMatrix();
@@ -93,9 +90,9 @@ public class MasterRenderer {
         collisionBoxRenderer = new WireFrameRenderer(collisionBoxShader, projectionMatrix);
         terrainShader = new TerrainShader();
         terrainRenderer = new TerrainRenderer(terrainShader, projectionMatrix);
-        billboardRenderer = new BillboardRenderer(loader, projectionMatrix);
-        skyboxRenderer = new SkyboxRenderer(loader, projectionMatrix);
-        particleRenderer = new ParticleRenderer(loader, projectionMatrix);
+        billboardRenderer = new BillboardRenderer(projectionMatrix);
+        skyboxRenderer = new SkyboxRenderer(projectionMatrix);
+        particleRenderer = new ParticleRenderer(projectionMatrix);
         // billboard = new Billboard(loader);
         // billboard.setPosition(new Vector3f(0.0f, 10.0f, 0.0f));
         // billboard.setSize(new Vector2f(2.0f, 2.0f));
@@ -105,7 +102,7 @@ public class MasterRenderer {
         // } catch (URISyntaxException e) {
         // System.err.println("Could not load file");
         // }
-        particle = new ParticleEmitter(loader, new Vector3f(0, 10, 0));
+        particle = new ParticleEmitter(new Vector3f(0, 10, 0));
 
     }
 

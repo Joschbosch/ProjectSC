@@ -21,32 +21,47 @@ import de.projectsc.client.gui.objects.Billboard;
 import de.projectsc.client.gui.objects.Camera;
 import de.projectsc.client.gui.objects.Light;
 import de.projectsc.client.gui.objects.ParticleEmitter;
-import de.projectsc.client.gui.tools.Loader;
 import de.projectsc.core.components.Component;
 import de.projectsc.core.components.ComponentType;
 import de.projectsc.core.entities.Entity;
 import de.projectsc.core.utils.BoundingBox;
 
+/**
+ * Component for adding particle emitter.
+ * 
+ * @author Josch Bosch
+ */
 public class ParticleEmitterComponent extends Component {
-
-    private final List<ParticleEmitter> emitter = new LinkedList<>();
 
     /**
      * Name.
      */
     public static final String NAME = "Particle emitter component";
 
+    private final List<ParticleEmitter> emitter = new LinkedList<>();
+
     public ParticleEmitterComponent() {
         super(NAME);
         type = ComponentType.GRAPHICS;
     }
 
+    /**
+     * Add Emitter.
+     * 
+     * @param e to add
+     */
     public void addNewEmitter(ParticleEmitter e) {
         emitter.add(e);
     }
 
-    public void createNewEmitter(Loader loader, Vector3f position) {
-        ParticleEmitter e = new ParticleEmitter(loader, position);
+    /**
+     * Create a new Emitter at position.
+     * 
+     * @param loader to load quads
+     * @param position to create the emitter at
+     */
+    public void createNewEmitter(Vector3f position) {
+        ParticleEmitter e = new ParticleEmitter(position);
         emitter.add(e);
     }
 

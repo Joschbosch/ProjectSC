@@ -26,7 +26,7 @@ import de.projectsc.client.gui.objects.ParticleEmitter;
 import de.projectsc.client.gui.textures.ModelTexture;
 import de.projectsc.client.gui.tools.Loader;
 import de.projectsc.client.gui.tools.ModelData;
-import de.projectsc.client.gui.tools.NewOBJFileLoader;
+import de.projectsc.client.gui.tools.OBJFileLoader;
 import de.projectsc.core.CoreConstants;
 import de.projectsc.core.components.Component;
 import de.projectsc.core.components.ComponentType;
@@ -113,21 +113,20 @@ public class ModelAndTextureComponent extends Component {
      * @param modelFile model file
      * @param textureFile texture image
      */
-    public void loadModel(Loader loader, File modelFile, File textureFile) {
+    public void loadModel(File modelFile, File textureFile) {
         if (modelFile != null) {
-            ModelData data = NewOBJFileLoader.loadOBJ(modelFile);
-            model = loader.loadToVAO(data.getVertices(), data.getTextureCoords(), data.getNormals(), data.getIndices());
-            loadAndApplyTexture(loader, textureFile);
+            ModelData data = OBJFileLoader.loadOBJ(modelFile);
+            model = Loader.loadToVAO(data.getVertices(), data.getTextureCoords(), data.getNormals(), data.getIndices());
+            loadAndApplyTexture(textureFile);
         }
     }
 
     /**
      * Load model and texture using the owners id for the path.
      * 
-     * @param loader to load
      * @param owner with the id.
      */
-    public void loadModel(Loader loader, Entity owner) {
+    public void loadModel(Entity owner) {
         try {
             String filePath =
                 String.format("/%s/%s%d", CoreConstants.SCHEME_DIRECTORY_NAME, CoreConstants.SCHEME_DIRECTORY_PREFIX,
@@ -135,11 +134,11 @@ public class ModelAndTextureComponent extends Component {
 
             File pathToSchema = new File(this.getClass().getResource(filePath).toURI());
 
-            ModelData data = NewOBJFileLoader.loadOBJ(filePath);
-            model = loader.loadToVAO(data.getVertices(), data.getTextureCoords(), data.getNormals(), data.getIndices());
+            ModelData data = OBJFileLoader.loadOBJ(filePath);
+            model = Loader.loadToVAO(data.getVertices(), data.getTextureCoords(), data.getNormals(), data.getIndices());
             File textureFile = new File(pathToSchema, CoreConstants.TEXTURE_FILENAME);
             if (textureFile.exists()) {
-                loadAndApplyTexture(loader, textureFile);
+                loadAndApplyTexture(textureFile);
             }
             // load texture settings for this model
             ObjectMapper mapper = new ObjectMapper();
@@ -156,13 +155,12 @@ public class ModelAndTextureComponent extends Component {
     /**
      * loads and applys the given texture file.
      * 
-     * @param loader to load
      * @param textureFile to load
      */
-    public void loadAndApplyTexture(Loader loader, File textureFile) {
+    public void loadAndApplyTexture(File textureFile) {
         if (textureFile != null) {
             int texture = 0 - 1;
-            texture = loader.loadTexture(textureFile);
+            texture = Loader.loadTexture(textureFile);
             if (modelTexture == null) {
                 modelTexture = new ModelTexture(texture);
             } else {

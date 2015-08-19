@@ -8,11 +8,13 @@ package de.projectsc.core;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import org.lwjgl.util.vector.Vector3f;
 
-import de.projectsc.client.gui.objects.Light;
+import de.projectsc.client.gui.terrain.TerrainModel;
+import de.projectsc.client.gui.textures.TerrainTexture;
+import de.projectsc.client.gui.textures.TerrainTexturePack;
+import de.projectsc.client.gui.tools.Loader;
 import de.projectsc.core.entities.Entity;
 import de.projectsc.core.utils.BoundingBox;
 import de.projectsc.core.utils.GraphEdge;
@@ -30,49 +32,49 @@ public class Terrain {
     public static final float TERRAIN_TILE_SIZE = 4.0f;
 
     /**
+     * One terrain has always the chunk size of tiles.
+     */
+    public static final byte TERRAIN_CHUNK_SIZE = 16;
+
+    /**
      * Tile size height.
      */
     public static final float HEIGHT_TILE_SIZE = 8.0f;
 
-    private final int mapSizeX;
+    private final int mapSize;
 
-    private int mapSizeY;
+    private final float worldPositionX;
+
+    private final float worldPositionZ;
 
     private final Tile[][] tiles;
 
-    private final String bgTexture;
-
-    private final String rTexture;
-
-    private final String gTexture;
-
-    private final String bTexture;
-
-    private List<Light> staticLights;
-
-    private Map<Integer, Entity> staticObjects;
+    private final TerrainModel model;
 
     private BoundingBox mapBox;
 
-    public Terrain(Tile[][] tiles, String bgTexture, String rTexture, String gTexture,
-        String bTexture, List<Light> lights, Map<Integer, Entity> staticObjects) {
-        this.tiles = tiles;
-        this.mapSizeX = tiles.length;
-        this.mapSizeY = tiles[0].length;
-        this.bgTexture = bgTexture;
-        this.rTexture = rTexture;
-        this.gTexture = gTexture;
-        this.bTexture = bTexture;
-        this.setStaticLights(lights);
-        this.staticObjects = staticObjects;
+    public Terrain(float x, float z, String bgTexture, String rTexture, String gTexture,
+        String bTexture) {
+        this.tiles = new Tile[TERRAIN_CHUNK_SIZE][TERRAIN_CHUNK_SIZE];
+        this.mapSize = TERRAIN_CHUNK_SIZE;
         this.setMapBox(calculateMapBox());
+        this.worldPositionX = x;
+        this.worldPositionZ = z;
+
+        TerrainTexture backgroundTex = new TerrainTexture(Loader.loadTexture(bgTexture));
+        TerrainTexture rTex = new TerrainTexture(Loader.loadTexture(rTexture));
+        TerrainTexture gTex = new TerrainTexture(Loader.loadTexture(gTexture));
+        TerrainTexture bTex = new TerrainTexture(Loader.loadTexture(bTexture));
+        TerrainTexturePack texturePack = new TerrainTexturePack(backgroundTex, rTex, gTex, bTex);
+        TerrainTexture blendMap = new TerrainTexture(Loader.loadTexture(TerrainLoader.createBlendMap(this)));
+
+        this.model = new TerrainModel(x, z, tiles, texturePack, blendMap);
     }
 
     private BoundingBox calculateMapBox() {
         Vector3f minimum = new Vector3f(0, 0, 0);
         Vector3f maximum =
-            new Vector3f(mapSizeX * Terrain.TERRAIN_TILE_SIZE, mapSizeX * Terrain.TERRAIN_TILE_SIZE, mapSizeX * Terrain.TERRAIN_TILE_SIZE);
-
+            new Vector3f(mapSize * Terrain.TERRAIN_TILE_SIZE, mapSize * Terrain.TERRAIN_TILE_SIZE, mapSize * Terrain.TERRAIN_TILE_SIZE);
         return new BoundingBox(minimum, maximum);
     }
 
@@ -105,22 +107,14 @@ public class Terrain {
             return tiles[x][z].getHeight();
         }
         return 0;
-        // if (x < 0 || x >= map.getHeight() || z < 0 || z >= map.getWidth()) {
-        // return 0;
-        // }
-        // float height = map.getRGB(x, z);
-        // height += MAX_PIXEL_COLOR / 2f;
-        // height /= MAX_PIXEL_COLOR / 2f;
-        // height *= MAXIMUM_HEIGHT;
-        // return height;
     }
 
     /**
      * Build up neighborhood for the loaded terrain.
      */
     public void buildNeighborhood() {
-        for (int i = 0; i < mapSizeX; i++) {
-            for (int j = 0; j < mapSizeX; j++) {
+        for (int i = 0; i < mapSize; i++) {
+            for (int j = 0; j < mapSize; j++) {
                 List<GraphEdge> neighbors = new LinkedList<>();
                 if (tiles[i][j] != null) {
                     for (int k = 0 - 1; k < 2; k++) {
@@ -141,7 +135,7 @@ public class Terrain {
 
     private GraphEdge getNeightborAt(Tile source, int i, int j) {
         GraphEdge result = new GraphEdge(source, null, 0 - 1);
-        if (i >= 0 && j >= 0 && i < mapSizeX && j < mapSizeX) {
+        if (i >= 0 && j >= 0 && i < mapSize && j < mapSize) {
             if (tiles[i][j] != null) {
                 result.setTarget(tiles[i][j]);
                 result.setCost(
@@ -198,48 +192,12 @@ public class Terrain {
         }
     }
 
-    public int getMapSizeX() {
-        return mapSizeX;
-    }
-
-    public int getMapSizeY() {
-        return mapSizeY;
+    public int getMapSize() {
+        return mapSize;
     }
 
     public Tile[][] getTerrain() {
         return tiles;
-    }
-
-    public String getBgTexture() {
-        return bgTexture;
-    }
-
-    public String getRTexture() {
-        return rTexture;
-    }
-
-    public String getGTexture() {
-        return gTexture;
-    }
-
-    public String getBTexture() {
-        return bTexture;
-    }
-
-    public List<Light> getStaticLights() {
-        return staticLights;
-    }
-
-    public void setStaticLights(List<Light> staticLights) {
-        this.staticLights = staticLights;
-    }
-
-    public Map<Integer, Entity> getStaticObjects() {
-        return staticObjects;
-    }
-
-    public void setStaticObjects(Map<Integer, Entity> staticObjects) {
-        this.staticObjects = staticObjects;
     }
 
     public BoundingBox getMapBoundingBox() {
@@ -248,6 +206,18 @@ public class Terrain {
 
     public void setMapBox(BoundingBox mapBox) {
         this.mapBox = mapBox;
+    }
+
+    public float getWorldPositionX() {
+        return worldPositionX;
+    }
+
+    public float getWorldPositionZ() {
+        return worldPositionZ;
+    }
+
+    public TerrainModel getModel() {
+        return model;
     }
 
 }

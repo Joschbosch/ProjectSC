@@ -63,10 +63,6 @@ public class MapEditor extends JFrame {
 
     private static final String COMPONENTS = "components";
 
-    private static final String DOT = ".";
-
-    private static final String FONT = "Monospaced";
-
     private static final Log LOGGER = LogFactory.getLog(MapEditor.class);
 
     private static final long serialVersionUID = 3313139728699706144L;
@@ -79,11 +75,11 @@ public class MapEditor extends JFrame {
 
     private Thread gameThread;
 
-    private MapEditorGraphicsCore editor3dCore;
+    private MapEditorGraphicsCore graphicsCore;
 
     private BlockingQueue<String> messageQueue;
 
-    private EditorData data;
+    private final EditorData data;
 
     /**
      * Create the frame.
@@ -174,13 +170,34 @@ public class MapEditor extends JFrame {
         btnRemove.setBounds(120, 53, 89, 23);
         contentPane.add(btnRemove);
 
-        JRadioButton rdbtnNewRadioButton = new JRadioButton("Add Entity");
-        rdbtnNewRadioButton.setBounds(6, 23, 109, 23);
-        contentPane.add(rdbtnNewRadioButton);
+        JRadioButton addButton = new JRadioButton("Add Entity");
+        addButton.setBounds(6, 23, 109, 23);
 
-        JRadioButton rdbtnNewRadioButton_1 = new JRadioButton("Select entity");
-        rdbtnNewRadioButton_1.setBounds(120, 23, 109, 23);
-        contentPane.add(rdbtnNewRadioButton_1);
+        contentPane.add(addButton);
+
+        JRadioButton selectButton = new JRadioButton("Select entity");
+        selectButton.setBounds(120, 23, 109, 23);
+        addButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (addButton.isSelected()) {
+                    graphicsCore.setMode("add");
+                    selectButton.setSelected(false);
+                }
+            }
+        });
+        selectButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (selectButton.isSelected()) {
+                    addButton.setSelected(false);
+                    graphicsCore.setMode("select");
+                }
+            }
+        });
+        contentPane.add(selectButton);
     }
 
     private void createMenue() {
@@ -195,7 +212,7 @@ public class MapEditor extends JFrame {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                editor3dCore.triggerCreateTerrain(1000, 100, "mud");
+                graphicsCore.triggerCreateTerrain(1000, 100, "mud");
             }
         });
         menueFile.add(menueItemNew);
@@ -252,7 +269,7 @@ public class MapEditor extends JFrame {
                 File chosen = chooser.getSelectedFile();
                 if (chosen != null) {
 
-                    editor3dCore.doRender(true);
+                    graphicsCore.doRender(true);
 
                 }
             }
@@ -261,22 +278,23 @@ public class MapEditor extends JFrame {
     }
 
     /**
-     * Once the Canvas is created its add notify method will call this method to start the LWJGL Display and game loop in another thread.
+     * Once the Canvas is created its add notify method will call this method to start the LWJGL
+     * Display and game loop in another thread.
      */
     public void startLWJGL() {
         messageQueue = new LinkedBlockingQueue<String>();
-        editor3dCore = new MapEditorGraphicsCore(displayParent, 1024, 768, messageQueue);
-        gameThread = new Thread(editor3dCore);
+        graphicsCore = new MapEditorGraphicsCore(displayParent, 1024, 768, messageQueue);
+        gameThread = new Thread(graphicsCore);
         gameThread.start();
     }
 
     /**
-     * Tell game loop to stop running, after which the LWJGL Display will be destoryed. The main thread will wait for the Display.destroy()
-     * to complete
+     * Tell game loop to stop running, after which the LWJGL Display will be destoryed. The main
+     * thread will wait for the Display.destroy() to complete
      */
     private void stopLWJGL() {
         try {
-            editor3dCore.stop();
+            graphicsCore.stop();
             gameThread.join();
         } catch (InterruptedException e) {
         }

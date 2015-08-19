@@ -49,8 +49,23 @@ public abstract class Component {
      */
     public abstract void update(Entity owner);
 
+    /**
+     * @return true, if the component has all attributes to be saved.
+     */
     public abstract boolean isValidForSaving();
 
+    /**
+     * Adds everything for rendering.
+     * 
+     * @param owner of component
+     * @param entities all others
+     * @param boundingBoxes to render
+     * @param lights to render
+     * @param billboards to render
+     * @param particles to render
+     * @param camera for positions
+     * @param elapsedTime since last frame
+     */
     public abstract void render(Entity owner, Map<TexturedModel, List<Entity>> entities, Map<RawModel, List<BoundingBox>> boundingBoxes,
         List<Light> lights,
         List<Billboard> billboards, List<ParticleEmitter> particles, Camera camera, long elapsedTime);

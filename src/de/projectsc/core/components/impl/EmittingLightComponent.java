@@ -59,9 +59,9 @@ public class EmittingLightComponent extends Component {
 
     @Override
     public void render(Entity owner, Map<TexturedModel, List<Entity>> entities, Map<RawModel, List<BoundingBox>> boundingBoxes,
-        List<Light> lights,
+        List<Light> renderLights,
         List<Billboard> billboards, List<ParticleEmitter> particles, Camera camera, long elapsedTime) {
-        lights.addAll(getLights());
+        renderLights.addAll(getLights());
     }
 
     /**

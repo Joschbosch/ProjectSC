@@ -8,7 +8,6 @@ package de.projectsc.editor;
 import java.awt.Canvas;
 import java.io.File;
 import java.net.URISyntaxException;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
@@ -27,15 +26,9 @@ import org.lwjgl.util.vector.Vector4f;
 
 import de.projectsc.client.gui.objects.Light;
 import de.projectsc.client.gui.render.MasterRenderer;
-import de.projectsc.client.gui.terrain.TerrainModel;
-import de.projectsc.client.gui.textures.TerrainTexture;
-import de.projectsc.client.gui.textures.TerrainTexturePack;
-import de.projectsc.client.gui.tools.Loader;
 import de.projectsc.client.gui.tools.MousePicker;
 import de.projectsc.core.CoreConstants;
 import de.projectsc.core.Terrain;
-import de.projectsc.core.TerrainLoader;
-import de.projectsc.core.Tile;
 import de.projectsc.core.components.Component;
 import de.projectsc.core.components.ComponentType;
 import de.projectsc.core.components.impl.BoundingComponent;
@@ -62,13 +55,9 @@ public class Editor3DCore implements Runnable {
 
     private final int height;
 
-    private Loader loader;
-
     private EditorCamera camera;
 
     private MousePicker mousePicker;
-
-    private TerrainModel terrainModel;
 
     private MasterRenderer masterRenderer;
 
@@ -87,6 +76,8 @@ public class Editor3DCore implements Runnable {
     private final AtomicBoolean doRender = new AtomicBoolean(true);
 
     private final AtomicBoolean moveEntity = new AtomicBoolean(false);
+
+    private Terrain terrain;
 
     public Editor3DCore(Canvas displayParent, int width, int height, BlockingQueue<String> messageQueue) {
         incomingQueue = new LinkedBlockingQueue<>();
@@ -110,9 +101,8 @@ public class Editor3DCore implements Runnable {
         }
 
         camera = new EditorCamera();
-        loader = new Loader();
         createNewEntity();
-        masterRenderer = new MasterRenderer(loader);
+        masterRenderer = new MasterRenderer();
         createPlayerEntity();
         createSun();
         createTerrain();
@@ -138,11 +128,11 @@ public class Editor3DCore implements Runnable {
                     e.update(type);
                 }
             }
-            if (terrainModel != null) {
+            if (terrain != null) {
                 camera.move(delta);
                 mousePicker.update();
                 if (doRender.get()) {
-                    masterRenderer.renderScene(terrainModel, entities,
+                    masterRenderer.renderScene(terrain.getModel(), entities,
                         camera, delta, new Vector4f(0, 1, 0, 100000));
                 }
             } else {
@@ -180,21 +170,11 @@ public class Editor3DCore implements Runnable {
     }
 
     private void createTerrain() {
-        Tile[][] tiles = new Tile[200][200];
         String texture = "terrain/grass.png";
-        Terrain t =
-            new Terrain(tiles, texture, texture, texture, texture, new LinkedList<>(),
-                new HashMap<Integer, Entity>());
-        TerrainTexture backgroundTex = new TerrainTexture(loader.loadTexture(texture));
-        TerrainTexture rTex = new TerrainTexture(loader.loadTexture(texture));
-        TerrainTexture gTex = new TerrainTexture(loader.loadTexture(texture));
-        TerrainTexture bTex = new TerrainTexture(loader.loadTexture(texture));
-        TerrainTexturePack texturePack = new TerrainTexturePack(backgroundTex, rTex, gTex, bTex);
-        TerrainTexture blendMap = new TerrainTexture(loader.loadTexture(TerrainLoader.createBlendMap(t)));
+        terrain =
+            new Terrain(-0.5f, -0.5f, texture, texture, texture, texture);
 
-        terrainModel = new TerrainModel(t, -0.5f, -0.5f, texturePack, blendMap, loader);
-
-        mousePicker = new MousePicker(camera, masterRenderer.getProjectionMatrix(), terrainModel);
+        mousePicker = new MousePicker(camera, masterRenderer.getProjectionMatrix(), terrain);
     }
 
     private void moveEntity() {
@@ -276,7 +256,7 @@ public class Editor3DCore implements Runnable {
     private void loadModel() {
         modelComponent = new ModelAndTextureComponent();
         try {
-            modelComponent.loadModel(loader, editorData.getModelFile(),
+            modelComponent.loadModel(editorData.getModelFile(),
                 new File(Editor3DCore.class.getResource(CoreConstants.GRAPHICS_DIRECTORY_NAME + "/white.png").toURI()));
         } catch (URISyntaxException e) {
             LOGGER.error(e);
@@ -292,7 +272,7 @@ public class Editor3DCore implements Runnable {
      */
     public void updateTexture() {
         if (modelComponent != null) {
-            modelComponent.loadAndApplyTexture(loader, editorData.getTextureFile());
+            modelComponent.loadAndApplyTexture(editorData.getTextureFile());
             updateData(editorData);
         }
     }
@@ -308,11 +288,11 @@ public class Editor3DCore implements Runnable {
             }
             if (msg.equals("LoadBoundingBox")) {
                 BoundingComponent c = getCurrentEntity().getComponent(BoundingComponent.class);
-                c.loadBoundingBox(entity, loader, c.getBoxFile());
+                c.loadBoundingBox(entity, c.getBoxFile());
             }
             if (msg.equals("particleEmitter")) {
                 ParticleEmitterComponent c = getCurrentEntity().getComponent(ParticleEmitterComponent.class);
-                c.createNewEmitter(loader, new Vector3f(0, 10, 0));
+                c.createNewEmitter(new Vector3f(0, 10, 0));
             }
         }
     }
@@ -408,6 +388,9 @@ public class Editor3DCore implements Runnable {
         incomingQueue.offer("particleEmitter");
     }
 
+    /**
+     * trigger.
+     */
     public void triggerLoadBoundingBox() {
         incomingQueue.offer("LoadBoundingBox");
     }

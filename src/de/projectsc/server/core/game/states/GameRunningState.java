@@ -79,15 +79,15 @@ public class GameRunningState extends GameState {
 
     private BufferedImage createWalkablePathImage() {
         BufferedImage path =
-            new BufferedImage((int) (terrain.getMapSizeX() * Terrain.TERRAIN_TILE_SIZE),
-                (int) (terrain.getMapSizeX() * Terrain.TERRAIN_TILE_SIZE),
+            new BufferedImage((int) (terrain.getMapSize() * Terrain.TERRAIN_TILE_SIZE),
+                (int) (terrain.getMapSize() * Terrain.TERRAIN_TILE_SIZE),
                 BufferedImage.TYPE_INT_RGB);
         Graphics pathG = path.getGraphics();
         pathG.setColor(Color.BLACK);
         pathG.fillRect(0, 0, path.getWidth(), path.getHeight());
         pathG.setColor(Color.RED);
-        for (int i = 0; i < terrain.getMapSizeX(); i++) {
-            for (int j = 0; j < terrain.getMapSizeX(); j++) {
+        for (int i = 0; i < terrain.getMapSize(); i++) {
+            for (int j = 0; j < terrain.getMapSize(); j++) {
                 if (terrain.getTerrain()[i][j] != null) {
                     if (terrain.getTerrain()[i][j].getWalkAble() == Tile.WALKABLE) {
                         pathG.setColor(Color.GREEN);
@@ -108,8 +108,8 @@ public class GameRunningState extends GameState {
 
     private BufferedImage createCollisionTreeImage() {
         BufferedImage tree =
-            new BufferedImage((int) (terrain.getMapSizeX() * Terrain.TERRAIN_TILE_SIZE),
-                (int) (terrain.getMapSizeX() * Terrain.TERRAIN_TILE_SIZE),
+            new BufferedImage((int) (terrain.getMapSize() * Terrain.TERRAIN_TILE_SIZE),
+                (int) (terrain.getMapSize() * Terrain.TERRAIN_TILE_SIZE),
                 BufferedImage.TYPE_INT_RGB);
         Graphics treeG = tree.getGraphics();
         treeG.setColor(Color.BLACK);

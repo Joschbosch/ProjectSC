@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 
+ * Copyright (C) 2015
  */
 
 package de.projectsc.client.gui.render;
@@ -18,17 +18,22 @@ import de.projectsc.client.gui.objects.Camera;
 import de.projectsc.client.gui.shaders.BillboardShader;
 import de.projectsc.client.gui.tools.Loader;
 
+/**
+ * Renderer for billboards.
+ * 
+ * @author Josch Bosch
+ */
 public class BillboardRenderer {
 
-    private BillboardShader shader;
+    private final BillboardShader shader;
 
-    private RawModel quad;
+    private final RawModel quad;
 
-    private Matrix4f projectionMatrix;
+    private final Matrix4f projectionMatrix;
 
     private Camera camera;
 
-    public BillboardRenderer(Loader loader, Matrix4f projectionMatrix) {
+    public BillboardRenderer(Matrix4f projectionMatrix) {
         // Just x and z vertex positions here, y is set to 0 in v.shader
         float[] vertices = {
             -1, -1,
@@ -37,7 +42,7 @@ public class BillboardRenderer {
             1, -1,
             -1, 1,
             1, 1 };
-        quad = loader.loadToVAO(vertices, 2);
+        quad = Loader.loadToVAO(vertices, 2);
         shader = new BillboardShader();
         this.projectionMatrix = projectionMatrix;
     }

@@ -13,8 +13,16 @@ import org.lwjgl.util.vector.Vector4f;
 
 import de.projectsc.client.gui.tools.Loader;
 
+/**
+ * Emitter class for particles.
+ *
+ * @author Josch Bosch
+ */
 public class ParticleEmitter {
 
+    /**
+     * Maximal particles for one emitter.
+     */
     public static final int MAX_PARTICLES_PER_SOURCE = 1000;
 
     private final Vector3f position;
@@ -37,7 +45,7 @@ public class ParticleEmitter {
 
     private Vector3f cameraPostion;
 
-    public ParticleEmitter(Loader loader, Vector3f position) {
+    public ParticleEmitter(Vector3f position) {
         positionBuffer = new float[MAX_PARTICLES_PER_SOURCE * 4];
         colorBuffer = new byte[MAX_PARTICLES_PER_SOURCE * 4];
         particles = new ArrayList<>();
@@ -47,7 +55,7 @@ public class ParticleEmitter {
         particleCount = MAX_PARTICLES_PER_SOURCE;
         this.cameraPostion = new Vector3f(0, 0, 0);
         this.position = position;
-        loader.loadTexture("black.png");
+        Loader.loadTexture("black.png");
     }
 
     private void createNewParticle(int i) {
@@ -71,6 +79,9 @@ public class ParticleEmitter {
         particles.add(p);
     }
 
+    /**
+     * update particles.
+     */
     public void update() {
         float delta = 0.016f;
         int newparticles = (int) (delta * 10000.0);

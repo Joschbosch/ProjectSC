@@ -30,9 +30,9 @@ public class UIRenderer {
 
     private final UIShader shader;
 
-    public UIRenderer(Loader loader) {
+    public UIRenderer() {
         float[] positions = { 0 - 1, 1, 0 - 1, 0 - 1, 1, 1, 1, 0 - 1 };
-        quad = loader.loadToVAO(positions, 2);
+        quad = Loader.loadToVAO(positions, 2);
         shader = new UIShader();
     }
 

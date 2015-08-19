@@ -17,33 +17,32 @@ import org.lwjgl.opengl.GL31;
 import org.lwjgl.opengl.GL33;
 import org.lwjgl.util.vector.Matrix4f;
 
-import de.projectsc.client.gui.models.RawModel;
 import de.projectsc.client.gui.objects.Camera;
 import de.projectsc.client.gui.objects.ParticleEmitter;
 import de.projectsc.client.gui.shaders.ParticleShader;
-import de.projectsc.client.gui.tools.Loader;
 
+/**
+ * Renderer for particles.
+ * 
+ * @author Josch Bosch
+ */
 public class ParticleRenderer {
 
     private final ParticleShader shader;
-
-    private RawModel quad;
 
     private final Matrix4f projectionMatrix;
 
     private Camera camera;
 
-    private Loader loader;
+    private final int billboardVertexBuffer;
 
-    private int billboard_vertex_buffer;
+    private final int particlesPositionBuffer;
 
-    private int particles_position_buffer;
+    private final int particlesColorBuffer;
 
-    private int particles_color_buffer;
+    private final int vertexArrayID;
 
-    private int VertexArrayID;
-
-    public ParticleRenderer(Loader loader, Matrix4f projectionMatrix) {
+    public ParticleRenderer(Matrix4f projectionMatrix) {
 
         this.projectionMatrix = projectionMatrix;
         // Just x and z vertex positions here, y is set to 0 in v.shader
@@ -59,31 +58,32 @@ public class ParticleRenderer {
         // float[] data = new float[ParticleEmitter.MAX_PARTICLES_PER_SOURCE * 4];
         // FloatBuffer positionsBuffer = loader.storeDataInFloatBuffer(data);
         //
-        // quad.addStreamingBuffer(loader.createStreamingFloatVBO(quad.getVaoID(), 1, positionsBuffer, 4));
+        // quad.addStreamingBuffer(loader.createStreamingFloatVBO(quad.getVaoID(), 1,
+        // positionsBuffer, 4));
         // byte[] data2 = new byte[ParticleEmitter.MAX_PARTICLES_PER_SOURCE * 3];
         // ByteBuffer buffer2 = loader.storeDataInByteBuffer(data2);
         // quad.addStreamingBuffer(loader.createStreamingByteVBO(quad.getVaoID(), 2, buffer2, 4));
         //
         // this.projectionMatrix = projectionMatrix;
         // this.loader = loader;
-        VertexArrayID = GL30.glGenVertexArrays();
-        GL30.glBindVertexArray(VertexArrayID);
+        vertexArrayID = GL30.glGenVertexArrays();
+        GL30.glBindVertexArray(vertexArrayID);
 
-        billboard_vertex_buffer = GL15.glGenBuffers();
-        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, billboard_vertex_buffer);
+        billboardVertexBuffer = GL15.glGenBuffers();
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, billboardVertexBuffer);
         FloatBuffer buffer = BufferUtils.createFloatBuffer(vertices.length);
         buffer.put(vertices);
         buffer.flip();
         GL15.glBufferData(GL15.GL_ARRAY_BUFFER, buffer, GL15.GL_STATIC_DRAW);
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
 
-        particles_position_buffer = GL15.glGenBuffers();
-        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, particles_position_buffer);
+        particlesPositionBuffer = GL15.glGenBuffers();
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, particlesPositionBuffer);
         GL15.glBufferData(GL15.GL_ARRAY_BUFFER, ParticleEmitter.MAX_PARTICLES_PER_SOURCE * 4 * Float.SIZE, GL15.GL_STREAM_DRAW);
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
 
-        particles_color_buffer = GL15.glGenBuffers();
-        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, particles_color_buffer);
+        particlesColorBuffer = GL15.glGenBuffers();
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, particlesColorBuffer);
         GL15.glBufferData(GL15.GL_ARRAY_BUFFER, ParticleEmitter.MAX_PARTICLES_PER_SOURCE * 4 * Byte.SIZE, GL15.GL_STREAM_DRAW);
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
 
@@ -92,21 +92,21 @@ public class ParticleRenderer {
     /**
      * Render all particles.
      * 
-     * @param particles to render
+     * @param particleSources to render
      */
     public void render(List<ParticleEmitter> particleSources) {
 
         ParticleEmitter e = particleSources.get(0);
         // GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_LINE);
 
-        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, particles_position_buffer);
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, particlesPositionBuffer);
         GL15.glBufferData(GL15.GL_ARRAY_BUFFER, ParticleEmitter.MAX_PARTICLES_PER_SOURCE * 4 * Float.SIZE, GL15.GL_STATIC_DRAW);
         FloatBuffer buffer = BufferUtils.createFloatBuffer(e.getPositionBuffer().length);
         buffer.put(e.getPositionBuffer());
         buffer.flip();
         // GL15.glBufferSubData(GL15.GL_ARRAY_BUFFER, buffer.capacity(), buffer);
 
-        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, particles_color_buffer);
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, particlesColorBuffer);
         GL15.glBufferData(GL15.GL_ARRAY_BUFFER, ParticleEmitter.MAX_PARTICLES_PER_SOURCE * 4 * Byte.SIZE, GL15.GL_STATIC_DRAW);
         ByteBuffer buffer2 = BufferUtils.createByteBuffer(e.getColorBuffer().length);
         buffer2.put(e.getColorBuffer());
@@ -119,15 +119,15 @@ public class ParticleRenderer {
 
         shader.start();
         shader.loadPositionAttributes(camera.createViewMatrix(), projectionMatrix);
-        GL30.glBindVertexArray(VertexArrayID);
+        GL30.glBindVertexArray(vertexArrayID);
         GL20.glEnableVertexAttribArray(0);
-        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, billboard_vertex_buffer);
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, billboardVertexBuffer);
         GL20.glVertexAttribPointer(0, 3, GL11.GL_FLOAT, false, 0, 0);
         GL20.glEnableVertexAttribArray(1);
-        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, particles_position_buffer);
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, particlesPositionBuffer);
         GL20.glVertexAttribPointer(1, 4, GL11.GL_FLOAT, false, 0, 0);
         GL20.glEnableVertexAttribArray(2);
-        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, particles_color_buffer);
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, particlesColorBuffer);
         GL20.glVertexAttribPointer(2, 4, GL11.GL_UNSIGNED_BYTE, true, 0, 0);
         GL33.glVertexAttribDivisor(0, 0);
         GL33.glVertexAttribDivisor(1, 1);

@@ -41,19 +41,19 @@ public class WaterRenderer {
 
     private final WaterFrameBuffers fbos;
 
-    private int dudvTexture;
+    private final int dudvTexture;
 
     private float moveFactor = 0;
 
-    public WaterRenderer(Loader loader, Matrix4f projectionMatrix, WaterFrameBuffers fbos) {
+    public WaterRenderer(Matrix4f projectionMatrix, WaterFrameBuffers fbos) {
         this.shader = new WaterShader();
         this.fbos = fbos;
-        dudvTexture = loader.loadTexture(DUDV_MAP);
+        dudvTexture = Loader.loadTexture(DUDV_MAP);
         shader.start();
         shader.loadTextures();
         shader.loadProjectionMatrix(projectionMatrix);
         shader.stop();
-        setUpVAO(loader);
+        setUpVAO();
     }
 
     /**
@@ -99,10 +99,10 @@ public class WaterRenderer {
         shader.stop();
     }
 
-    private void setUpVAO(Loader loader) {
+    private void setUpVAO() {
         // Just x and z vectex positions here, y is set to 0 in v.shader
         float[] vertices = { 0 - 1, 0 - 1, 0 - 1, 1, 1, 0 - 1, 1, 0 - 1, 0 - 1, 1, 1, 1 };
-        quad = loader.loadToVAO(vertices, 2);
+        quad = Loader.loadToVAO(vertices, 2);
     }
 
     /**

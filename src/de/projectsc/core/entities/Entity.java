@@ -13,8 +13,6 @@ import java.util.Map.Entry;
 
 import org.lwjgl.util.vector.Vector3f;
 
-import com.rits.cloning.Cloner;
-
 import de.projectsc.core.components.Component;
 import de.projectsc.core.components.ComponentType;
 import de.projectsc.core.components.impl.BoundingComponent;
@@ -23,7 +21,8 @@ import de.projectsc.core.utils.BoundingBox;
 import de.projectsc.core.utils.PhysicalObject;
 
 /**
- * All game objects in the game are entities. All entities have components, that define their role and behavior.
+ * All game objects in the game are entities. All entities have components, that define their role
+ * and behavior.
  * 
  * @author Josch Bosch
  */
@@ -222,6 +221,11 @@ public class Entity implements PhysicalObject {
         return 0;
     }
 
+    /**
+     * Sets the position.
+     * 
+     * @param position to set
+     */
     public void setPosition(Vector3f position) {
         if (this.position == null) {
             this.position = position;
@@ -271,11 +275,6 @@ public class Entity implements PhysicalObject {
 
         }
         return false;
-    }
-
-    public Entity createClone() {
-        Entity newEntity = Cloner.shared().deepClone(this);
-        return newEntity;
     }
 
 }

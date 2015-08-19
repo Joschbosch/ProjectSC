@@ -17,15 +17,11 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Vector4f;
 
 import de.projectsc.client.gui.objects.Camera;
-import de.projectsc.client.gui.objects.Light;
 import de.projectsc.client.gui.render.MasterRenderer;
 import de.projectsc.client.gui.render.UIRenderer;
 import de.projectsc.client.gui.render.WaterRenderer;
-import de.projectsc.client.gui.terrain.TerrainModel;
 import de.projectsc.client.gui.terrain.water.WaterFrameBuffers;
 import de.projectsc.client.gui.terrain.water.WaterTile;
-import de.projectsc.client.gui.textures.TerrainTexture;
-import de.projectsc.client.gui.textures.TerrainTexturePack;
 import de.projectsc.client.gui.tools.Loader;
 import de.projectsc.client.gui.tools.MousePicker;
 import de.projectsc.client.gui.ui.UITexture;
@@ -47,17 +43,13 @@ public class GameRunning implements State {
 
     private static final GUIState STATE = GUIState.GAME;
 
-    private Loader loader;
-
     private Camera camera;
-
-    private List<Light> lights;
 
     private MasterRenderer masterRenderer;
 
     private UIRenderer uiRenderer;
 
-    private TerrainModel terrainModel;
+    private Terrain terrain;
 
     private Map<Integer, Entity> staticEntities;
 
@@ -84,13 +76,12 @@ public class GameRunning implements State {
     @Override
     public void initialize() {
         LOGGER.debug("Loading models and light ... ");
-        loader = new Loader();
-        masterRenderer = new MasterRenderer(loader);
+        masterRenderer = new MasterRenderer();
         waterfbo = new WaterFrameBuffers();
-        waterRenderer = new WaterRenderer(loader, masterRenderer.getProjectionMatrix(), waterfbo);
+        waterRenderer = new WaterRenderer(masterRenderer.getProjectionMatrix(), waterfbo);
         loadDemoObjects();
         camera = new Camera();
-        mousePicker = new MousePicker(camera, masterRenderer.getProjectionMatrix(), terrainModel);
+        mousePicker = new MousePicker(camera, masterRenderer.getProjectionMatrix(), terrain);
         LOGGER.debug("Terrain, models and lights loaded");
     }
 
@@ -98,7 +89,7 @@ public class GameRunning implements State {
         loadTerrain("newDataMap");
 
         ui = new ArrayList<>();
-        uiRenderer = new UIRenderer(loader);
+        uiRenderer = new UIRenderer();
         // UITexture uiTex =
         // new UITexture(loader.loadTexture("health.png"), new Vector2f(-0.75f, -0.9f), new
         // Vector2f(0.25f, 0.25f));
@@ -117,19 +108,10 @@ public class GameRunning implements State {
         Terrain terrain = TerrainLoader.loadTerrain(mapName + ".psc");
         terrain.buildNeighborhood();
         terrain.makeStaticObjectsNotWalkable();
-        TerrainTexture backgroundTex = new TerrainTexture(loader.loadTexture(terrain.getBgTexture()));
-        TerrainTexture rTex = new TerrainTexture(loader.loadTexture(terrain.getRTexture()));
-        TerrainTexture gTex = new TerrainTexture(loader.loadTexture(terrain.getGTexture()));
-        TerrainTexture bTex = new TerrainTexture(loader.loadTexture(terrain.getBgTexture()));
-        TerrainTexturePack texturePack = new TerrainTexturePack(backgroundTex, rTex, gTex, bTex);
-        TerrainTexture blendMap = new TerrainTexture(loader.loadTexture(TerrainLoader.createBlendMap(terrain)));
 
-        terrainModel = new TerrainModel(terrain, 0, 0, texturePack, blendMap, loader);
-        lights = terrain.getStaticLights();
         if (staticEntities == null) {
             staticEntities = new TreeMap<>();
         }
-        staticEntities.putAll(terrain.getStaticObjects());
     }
 
     @Override
@@ -154,20 +136,20 @@ public class GameRunning implements State {
             float distance = 2 * (camera.getPosition().y - waters.get(0).getHeight());
             camera.getPosition().y -= distance;
             camera.invertPitch();
-            masterRenderer.renderScene(terrainModel, (List<Entity>) staticEntities.values(), camera, elapsedTime,
+            masterRenderer.renderScene(terrain.getModel(), (List<Entity>) staticEntities.values(), camera, elapsedTime,
                 new Vector4f(0, 1, 0, -waters
                     .get(0).getHeight()));
             camera.getPosition().y += distance;
             camera.invertPitch();
 
             waterfbo.bindRefractionFrameBuffer();
-            masterRenderer.renderScene(terrainModel, (List<Entity>) staticEntities.values(), camera, elapsedTime,
+            masterRenderer.renderScene(terrain.getModel(), (List<Entity>) staticEntities.values(), camera, elapsedTime,
                 new Vector4f(0, 0 - 1, 0, waters
                     .get(0).getHeight()));
 
             waterfbo.unbindCurrentFrameBuffer();
         }
-        masterRenderer.renderScene(terrainModel, (List<Entity>) staticEntities.values(), camera, elapsedTime, new Vector4f(0,
+        masterRenderer.renderScene(terrain.getModel(), (List<Entity>) staticEntities.values(), camera, elapsedTime, new Vector4f(0,
             1, 0, CLIPPING_PLANE_NOT_RENDERING));
         if (waters != null && waters.size() > 0) {
             waterRenderer.render(waters, camera, elapsedTime);
@@ -208,7 +190,7 @@ public class GameRunning implements State {
     @Override
     public void terminate() {
         LOGGER.debug("Terminate state " + STATE.name());
-        loader.dispose();
+        Loader.dispose();
         masterRenderer.dispose();
         uiRenderer.dispose();
 

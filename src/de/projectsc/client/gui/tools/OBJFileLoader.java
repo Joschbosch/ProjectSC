@@ -22,6 +22,8 @@ import org.apache.commons.logging.LogFactory;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
+import de.projectsc.core.CoreConstants;
+
 /**
  * Load an *.obj model file.
  * 
@@ -33,31 +35,42 @@ public final class OBJFileLoader {
 
     private static final String FACE_SEPERATION_CHAR = "/";
 
-    private static final String RES_LOC = "/meshes/";
-
-    private static Map<String, ModelData> loadedModels = new TreeMap<>();
+    private static Map<File, ModelData> loadedModels = new TreeMap<>();
 
     private OBJFileLoader() {
 
     }
 
     /**
+     * @param filePath to load obj file from
+     * @return data
+     */
+    public static ModelData loadOBJ(String filePath) {
+        try {
+            File objFile = new File(OBJFileLoader.class.getResource(filePath + "/" + CoreConstants.MODEL_FILENAME).toURI());
+            return loadOBJ(objFile);
+        } catch (URISyntaxException e) {
+            LOGGER.error(e);
+        }
+        return null;
+    }
+
+    /**
      * Load given file.
      * 
-     * @param objFileName just the name without suffix.
+     * @param objFile file from obj
      * @return {@link ModelData} with all information
      */
-    public static ModelData loadOBJ(String objFileName) {
-        if (loadedModels.containsKey(objFileName)) {
-            return loadedModels.get(objFileName);
+    public static ModelData loadOBJ(File objFile) {
+        if (loadedModels.containsKey(objFile)) {
+            return loadedModels.get(objFile);
         }
         BufferedReader reader = null;
         try {
             FileReader isr = null;
-            File objFile = new File(OBJFileLoader.class.getResource(RES_LOC + objFileName + ".obj").toURI());
             isr = new FileReader(objFile);
             reader = new BufferedReader(isr);
-        } catch (FileNotFoundException | URISyntaxException e) {
+        } catch (FileNotFoundException e) {
             System.err.println("File not found in res; don't use any extention");
         }
         if (reader != null) {
@@ -70,7 +83,7 @@ public final class OBJFileLoader {
                 while (true) {
                     line = reader.readLine();
                     if (line.startsWith("v ")) {
-                        String[] currentLine = line.split(" ");
+                        String[] currentLine = line.split("\\s");
                         Vector3f vertex = new Vector3f(Float.valueOf(currentLine[1]),
                             Float.valueOf(currentLine[2]),
                             Float.valueOf(currentLine[3]));
@@ -116,23 +129,38 @@ public final class OBJFileLoader {
             int[] indicesArray = convertIndicesListToArray(indices);
             ModelData data = new ModelData(verticesArray, texturesArray, normalsArray, indicesArray,
                 furthest);
-            loadedModels.put(objFileName, data);
+            loadedModels.put(objFile, data);
             return data;
         } else {
-            LOGGER.error("Could not load model " + objFileName);
+            LOGGER.error("Could not load model " + objFile.getAbsolutePath());
             return null;
         }
     }
 
     private static void processVertex(String[] vertex, List<Vertex> vertices, List<Integer> indices) {
-        int index = Integer.parseInt(vertex[0]) - 1;
+        int index = -1;
+        if (!vertex[0].isEmpty()) {
+            index = Integer.parseInt(vertex[0]) - 1;
+        }
         Vertex currentVertex = vertices.get(index);
-        int textureIndex = Integer.parseInt(vertex[1]) - 1;
-        int normalIndex = Integer.parseInt(vertex[2]) - 1;
+        int textureIndex = -1;
+        if (!vertex[1].isEmpty()) {
+            textureIndex = Integer.parseInt(vertex[1]) - 1;
+        }
+        int normalIndex = -1;
+        if (!vertex[2].isEmpty()) {
+            normalIndex = Integer.parseInt(vertex[2]) - 1;
+        }
         if (!currentVertex.isSet()) {
-            currentVertex.setTextureIndex(textureIndex);
-            currentVertex.setNormalIndex(normalIndex);
-            indices.add(index);
+            if (textureIndex != -1) {
+                currentVertex.setTextureIndex(textureIndex);
+            }
+            if (normalIndex != -1) {
+                currentVertex.setNormalIndex(normalIndex);
+            }
+            if (index != -1) {
+                indices.add(index);
+            }
         } else {
             dealWithAlreadyProcessedVertex(currentVertex, textureIndex, normalIndex, indices,
                 vertices);

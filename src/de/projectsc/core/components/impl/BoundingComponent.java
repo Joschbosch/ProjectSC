@@ -24,12 +24,17 @@ import de.projectsc.client.gui.objects.Light;
 import de.projectsc.client.gui.objects.ParticleEmitter;
 import de.projectsc.client.gui.tools.Loader;
 import de.projectsc.client.gui.tools.ModelData;
-import de.projectsc.client.gui.tools.NewOBJFileLoader;
+import de.projectsc.client.gui.tools.OBJFileLoader;
 import de.projectsc.core.components.Component;
 import de.projectsc.core.components.ComponentType;
 import de.projectsc.core.entities.Entity;
 import de.projectsc.core.utils.BoundingBox;
 
+/**
+ * Component for having bounding boxes on an entity.
+ * 
+ * @author Josch Bosch
+ */
 public class BoundingComponent extends Component {
 
     /**
@@ -56,10 +61,16 @@ public class BoundingComponent extends Component {
         box = null;
     }
 
-    public void loadBoundingBox(Entity owner, Loader loader, File boxObjectFile) {
+    /**
+     * Loads bounding box file and creates simplified bounding box.
+     * 
+     * @param owner of box
+     * @param boxObjectFile to load
+     */
+    public void loadBoundingBox(Entity owner, File boxObjectFile) {
         this.setBoxFile(boxObjectFile);
-        ModelData data = NewOBJFileLoader.loadOBJ(boxObjectFile);
-        RawModel model = loader.loadToVAO(data.getVertices(), data.getIndices());
+        ModelData data = OBJFileLoader.loadOBJ(boxObjectFile);
+        RawModel model = Loader.loadToVAO(data.getVertices(), data.getIndices());
         Vector3f[] minMax = findMinAndMax(data.getVertices());
         box = new BoundingBox(minMax[0], minMax[1]);
         box.setModel(model);
@@ -120,6 +131,62 @@ public class BoundingComponent extends Component {
 
     }
 
+    /**
+     * Check if the current entity intersects with the picking ray.
+     * 
+     * @param orig position of camera
+     * @param ray to intersect
+     * @return true if it intersects
+     */
+    public boolean intersects(Vector3f orig, Vector3f ray) {
+        Vector3f bMin = Vector3f.add(box.getPosition(), box.getMin(), null);
+        Vector3f bMax = Vector3f.add(box.getPosition(), box.getMax(), null);
+        float tminX = bMin.x - orig.x / ray.x;
+        float tminY = bMin.y - orig.y / ray.y;
+        float tminZ = bMin.z - orig.z / ray.z;
+        float tmaxX = bMax.x - orig.x / ray.x;
+        float tmaxY = bMax.y - orig.y / ray.y;
+        float tmaxZ = bMax.z - orig.z / ray.z;
+
+        if (tminX > tmaxY) {
+            float temp = tminX;
+            tminX = tmaxX;
+            tmaxX = temp;
+        }
+        if (tminY > tmaxY) {
+            float temp = tminY;
+            tminY = tmaxY;
+            tmaxY = temp;
+        }
+        if (tminZ > tmaxY) {
+            float temp = tminZ;
+            tminZ = tmaxZ;
+            tmaxZ = temp;
+        }
+        if ((tminX > tmaxY) || (tminY > tmaxX)) {
+            return false;
+        }
+        if (tminY > tminX) {
+            tminX = tminY;
+        }
+        if (tmaxY < tmaxX) {
+            tmaxX = tmaxY;
+        }
+
+        if ((tminX > tmaxZ) || (tminZ > tmaxX)) {
+            return false;
+        }
+
+        if (tminZ > tminX) {
+            tminX = tminZ;
+        }
+
+        if (tmaxZ < tmaxX) {
+            tmaxX = tmaxZ;
+        }
+        return true;
+    }
+
     public Vector3f getPosition() {
         return box.getPosition();
     }
@@ -132,16 +199,28 @@ public class BoundingComponent extends Component {
         this.scale = scale;
     }
 
+    /**
+     * 
+     * @param position to set for the box
+     */
     public void setPosition(Vector3f position) {
         this.box.setPosition(position);
 
     }
 
-    public void setrotation(Vector3f rotation) {
+    /**
+     * @param rotation to set for the box
+     */
+    public void setRotation(Vector3f rotation) {
         this.box.setRotation(rotation);
 
     }
 
+    /**
+     * Set offset of component rotation.
+     * 
+     * @param rotation to set.
+     */
     public void setOffsetRotation(Vector3f rotation) {
         this.offsetRotation.x = rotation.x;
         this.offsetRotation.y = rotation.y;
@@ -152,6 +231,11 @@ public class BoundingComponent extends Component {
         return offsetRotation;
     }
 
+    /**
+     * Set offset of component position.
+     * 
+     * @param position to set.
+     */
     public void setOffset(Vector3f position) {
         this.offset.x = position.x;
         this.offset.y = position.y;

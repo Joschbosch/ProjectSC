@@ -75,6 +75,10 @@ public class BoundingBox {
         return center;
     }
 
+    public Vector3f getCenterWithPosition() {
+        return Vector3f.add(center, position, null);
+    }
+
     public void setCenter(Vector3f center) {
         this.center = center;
     }
@@ -98,6 +102,9 @@ public class BoundingBox {
         return position;
     }
 
+    /**
+     * @param position to set
+     */
     public void setPosition(Vector3f position) {
         if (this.position == null) {
             this.position = position;
@@ -120,6 +127,9 @@ public class BoundingBox {
         return rotation;
     }
 
+    /**
+     * @param rotation to set
+     */
     public void setRotation(Vector3f rotation) {
         if (this.rotation == null) {
             this.rotation = rotation;

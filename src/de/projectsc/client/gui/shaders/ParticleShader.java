@@ -34,6 +34,7 @@ public class ParticleShader extends Shader {
      * Loads the transformation matrix to the shader.
      * 
      * @param matrix transformation matrix
+     * @param proMatrix projection matrix
      */
     public void loadPositionAttributes(Matrix4f matrix, Matrix4f proMatrix) {
         super.loadVector(locationCameraRightWorldspace, new Vector3f(matrix.m00, matrix.m10, matrix.m20));

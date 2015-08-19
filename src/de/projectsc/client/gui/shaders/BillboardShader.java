@@ -39,6 +39,7 @@ public class BillboardShader extends Shader {
      * Loads the transformation matrix to the shader.
      * 
      * @param matrix transformation matrix
+     * @param proMatrix projection matrix.
      */
     public void loadPositionAttributes(Matrix4f matrix, Matrix4f proMatrix) {
         super.loadVector(locationCameraRightWorldspace, new Vector3f(matrix.m00, matrix.m10, matrix.m20));
@@ -46,6 +47,10 @@ public class BillboardShader extends Shader {
         super.loadMatrix(locationModelViewProjectionMatrix, Matrix4f.mul(proMatrix, matrix, null));
     }
 
+    /**
+     * @param position to load
+     * @param size to load
+     */
     public void loadBillboardAttributes(Vector3f position, Vector2f size) {
         super.loadVector(locationBillboardPos, position);
         super.loadVector(locationBillboardSize, size);

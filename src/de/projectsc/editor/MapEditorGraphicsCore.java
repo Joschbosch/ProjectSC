@@ -9,7 +9,6 @@ import java.awt.Canvas;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -37,15 +36,9 @@ import de.projectsc.EntityEditor;
 import de.projectsc.client.gui.objects.Camera;
 import de.projectsc.client.gui.objects.Light;
 import de.projectsc.client.gui.render.MasterRenderer;
-import de.projectsc.client.gui.terrain.TerrainModel;
-import de.projectsc.client.gui.textures.TerrainTexture;
-import de.projectsc.client.gui.textures.TerrainTexturePack;
-import de.projectsc.client.gui.tools.Loader;
 import de.projectsc.client.gui.tools.MousePicker;
 import de.projectsc.core.CoreConstants;
 import de.projectsc.core.Terrain;
-import de.projectsc.core.TerrainLoader;
-import de.projectsc.core.Tile;
 import de.projectsc.core.components.Component;
 import de.projectsc.core.components.ComponentType;
 import de.projectsc.core.components.impl.BoundingComponent;
@@ -62,6 +55,10 @@ import de.projectsc.core.entities.Entity;
  */
 public class MapEditorGraphicsCore implements Runnable {
 
+    private static final String SLASHED_MODEL_DIR = "/" + CoreConstants.SCHEME_DIRECTORY_NAME + "/";
+
+    private static final String SEPARATOR = ";";
+
     private static final Log LOGGER = LogFactory.getLog(MapEditorGraphicsCore.class);
 
     private boolean running;
@@ -72,13 +69,9 @@ public class MapEditorGraphicsCore implements Runnable {
 
     private final int height;
 
-    private Loader loader;
-
     private Camera camera;
 
     private MousePicker mousePicker;
-
-    private TerrainModel terrainModel;
 
     private MasterRenderer masterRenderer;
 
@@ -92,11 +85,17 @@ public class MapEditorGraphicsCore implements Runnable {
 
     private final AtomicBoolean doRender = new AtomicBoolean(true);
 
-    private Map<Long, Entity> entitySchemas = new TreeMap<>();
+    private final Map<Long, Entity> entitySchemas = new TreeMap<>();
 
     private Entity entitySchemaAtCursor;
 
-    private boolean createdEntity;
+    private boolean alreadyClicked;
+
+    private int mode;
+
+    private Entity selectedEntity;
+
+    private Terrain terrain;
 
     public MapEditorGraphicsCore(Canvas displayParent, int width, int height, BlockingQueue<String> messageQueue) {
         incomingQueue = new LinkedBlockingQueue<>();
@@ -121,16 +120,14 @@ public class MapEditorGraphicsCore implements Runnable {
 
         camera = new Camera();
         camera.setLookAtPoint(0, 0, 0);
-        loader = new Loader();
-        masterRenderer = new MasterRenderer(loader);
+        masterRenderer = new MasterRenderer();
         createSun();
         loadEntitySchemas();
         entitySchemaAtCursor = entitySchemas.get(10000L);
+        selectedEntity = null;
         entities.add(entitySchemaAtCursor);
         gameLoop();
     }
-
-    private static final String SLASHED_MODEL_DIR = "/" + CoreConstants.SCHEME_DIRECTORY_NAME + "/";
 
     private void loadEntitySchemas() {
         try {
@@ -149,7 +146,7 @@ public class MapEditorGraphicsCore implements Runnable {
                             if (new File(schemaDir, CoreConstants.TEXTURE_FILENAME).exists()) {
                                 texture = new File(schemaDir, CoreConstants.TEXTURE_FILENAME);
                             } else {
-                                // texture = standardTexture;
+                                texture = null; // load standard texture;
                             }
                             loadModel(newEntitySchema, new File(schemaDir, CoreConstants.MODEL_FILENAME), texture);
                             ModelAndTextureComponent matc = newEntitySchema.getComponent(ModelAndTextureComponent.class);
@@ -211,27 +208,27 @@ public class MapEditorGraphicsCore implements Runnable {
             long delta = now - time;
             time = now;
             readMessages();
-            readInput();
+
             camera.move(delta);
+            mousePicker.update();
+            readInput();
             for (ComponentType type : ComponentType.values()) {
                 for (Entity e : entities) {
                     e.update(type);
                 }
             }
-            if (terrainModel != null) {
-                camera.move(delta);
-                mousePicker.update();
+            if (terrain != null) {
 
                 if (mousePicker.getCurrentTerrainPoint() != null) {
                     entitySchemaAtCursor.setPosition(mousePicker.getCurrentTerrainPoint());
                 }
                 if (doRender.get()) {
-                    masterRenderer.renderScene(terrainModel, entities,
+                    masterRenderer.renderScene(terrain.getModel(), entities,
                         camera, delta, new Vector4f(0, 1, 0, 100000));
                 }
             } else {
                 if (Keyboard.isKeyDown(Keyboard.KEY_SPACE)) {
-                    GL11.glClearColor(1f, 0, 0, 0);
+                    GL11.glClearColor(1f, 1f, 1f, 0);
                 } else {
                     GL11.glClearColor(1f, 1f, 0f, 0f);
                 }
@@ -256,13 +253,26 @@ public class MapEditorGraphicsCore implements Runnable {
         if (Keyboard.isKeyDown(Keyboard.KEY_E)) {
             entitySchemaAtCursor.setRotY(entitySchemaAtCursor.getRotY() - 1f);
         }
-        if (Mouse.isButtonDown(0) && !createdEntity) {
-            createdEntity = true;
-            Entity newEntity = entitySchemaAtCursor.createClone();
-            entities.add(newEntity);
+        if (Mouse.isButtonDown(0) && mode == 0 && !alreadyClicked) {
+            alreadyClicked = true;
+            Entity oldEntity = entitySchemaAtCursor;
+            entitySchemaAtCursor = new Entity(entitySchemaAtCursor.getEntityTypeId());
+            entitySchemaAtCursor.setPosition(oldEntity.getPosition());
+            entitySchemaAtCursor.setRotation(oldEntity.getRotation());
+            entitySchemaAtCursor.setScale(oldEntity.getScale());
+            entities.add(entitySchemaAtCursor);
         }
+        if (Mouse.isButtonDown(0) && mode == 1 && !alreadyClicked) {
+            for (Entity e : entities) {
+                if (e.hasComponent(BoundingComponent.class)) {
+                    System.out
+                        .println(e.getComponent(BoundingComponent.class).intersects(camera.getPosition(), mousePicker.getCurrentRay()));
+                }
+            }
+        }
+
         if (!Mouse.isButtonDown(0)) {
-            createdEntity = false;
+            alreadyClicked = false;
         }
         while (Keyboard.next()) {
             if (Keyboard.getEventKey() == Keyboard.KEY_RIGHT) {
@@ -291,31 +301,21 @@ public class MapEditorGraphicsCore implements Runnable {
         entities.add(lightEntity);
     }
 
-    private void createTerrain(int width, int height, String textureName) {
-        Tile[][] tiles = new Tile[width][height];
+    private void createTerrain(int terrainWidth, int terrainHeight, String textureName) {
         String texture = "terrain/" + textureName + ".png";
-        Terrain t =
-            new Terrain(tiles, texture, texture, texture, texture, new LinkedList<>(),
-                new HashMap<Integer, Entity>());
-        TerrainTexture backgroundTex = new TerrainTexture(loader.loadTexture(texture));
-        TerrainTexture rTex = new TerrainTexture(loader.loadTexture(texture));
-        TerrainTexture gTex = new TerrainTexture(loader.loadTexture(texture));
-        TerrainTexture bTex = new TerrainTexture(loader.loadTexture(texture));
-        TerrainTexturePack texturePack = new TerrainTexturePack(backgroundTex, rTex, gTex, bTex);
-        TerrainTexture blendMap = new TerrainTexture(loader.loadTexture(TerrainLoader.createBlendMap(t)));
+        terrain =
+            new Terrain(-0.5f, -0.5f, texture, texture, texture, texture);
 
-        terrainModel = new TerrainModel(t, -0.5f, -0.5f, texturePack, blendMap, loader);
-
-        mousePicker = new MousePicker(camera, masterRenderer.getProjectionMatrix(), terrainModel);
+        mousePicker = new MousePicker(camera, masterRenderer.getProjectionMatrix(), terrain);
     }
 
     protected void initGL() {}
 
     private void loadModel(Entity e, File modelFile, File texFile) {
         modelComponent = new ModelAndTextureComponent();
-        modelComponent.loadModel(loader, modelFile, texFile);
+        modelComponent.loadModel(modelFile, texFile);
         e.addComponent(modelComponent);
-        modelComponent.loadAndApplyTexture(loader, texFile);
+        modelComponent.loadAndApplyTexture(texFile);
 
     }
 
@@ -323,7 +323,7 @@ public class MapEditorGraphicsCore implements Runnable {
         while (!incomingQueue.isEmpty()) {
             String msg = incomingQueue.poll();
             if (msg.startsWith("createTerrain")) {
-                String[] parsed = msg.split(";");
+                String[] parsed = msg.split(SEPARATOR);
                 createTerrain(Integer.parseInt(parsed[1]), Integer.parseInt(parsed[2]), parsed[3]);
             }
         }
@@ -344,9 +344,34 @@ public class MapEditorGraphicsCore implements Runnable {
     }
 
     /**
-     * triggers to load model in gui thread.
+     * @param terrainWidth width
+     * @param terrainHeight height
+     * @param name of terrain texture.
      */
-    public void triggerCreateTerrain(int width, int height, String name) {
-        incomingQueue.offer("createTerrain;" + width + ";" + width + ";" + name);
+    public void triggerCreateTerrain(int terrainWidth, int terrainHeight, String name) {
+        incomingQueue.offer("createTerrain;" + terrainWidth + SEPARATOR + terrainWidth + SEPARATOR + name);
+    }
+
+    /**
+     * @param mode selection or adding mode
+     */
+    public void setMode(String mode) {
+        if (mode.equals("add")) {
+            if (this.mode != 0) {
+                this.mode = 0;
+                entities.remove(selectedEntity);
+                entities.add(entitySchemaAtCursor);
+            }
+
+        } else {
+            if (this.mode != 1) {
+                this.mode = 1;
+                entities.remove(entitySchemaAtCursor);
+                if (selectedEntity != null) {
+                    entities.add(selectedEntity);
+                }
+            }
+
+        }
     }
 }

@@ -14,7 +14,7 @@ import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
 import de.projectsc.client.gui.objects.Camera;
-import de.projectsc.client.gui.terrain.TerrainModel;
+import de.projectsc.core.Terrain;
 
 /**
  * Calculates the vertex on the terrain from the mouse cursor.
@@ -35,15 +35,15 @@ public class MousePicker {
 
     private final Camera camera;
 
-    private final TerrainModel terrain;
+    private final Terrain terrain;
 
     private Vector3f currentTerrainPoint;
 
-    public MousePicker(Camera cam, Matrix4f projection, TerrainModel terrain) {
+    public MousePicker(Camera cam, Matrix4f projection, Terrain t) {
         camera = cam;
         projectionMatrix = projection;
         viewMatrix = camera.createViewMatrix();
-        this.terrain = terrain;
+        this.terrain = t;
     }
 
     public Vector3f getCurrentTerrainPoint() {
@@ -108,7 +108,7 @@ public class MousePicker {
         float half = start + ((finish - start) / 2f);
         if (count >= RECURSION_COUNT) {
             Vector3f endPoint = getPointOnRay(ray, half);
-            TerrainModel terrainSearch = getTerrain(endPoint.getX(), endPoint.getZ());
+            Terrain terrainSearch = getTerrain(endPoint.getX(), endPoint.getZ());
             if (terrainSearch != null) {
                 return endPoint;
             } else {
@@ -129,15 +129,15 @@ public class MousePicker {
     }
 
     private boolean isUnderGround(Vector3f testPoint) {
-        TerrainModel currentTerrain = getTerrain(testPoint.getX(), testPoint.getZ());
+        Terrain currentTerrain = getTerrain(testPoint.getX(), testPoint.getZ());
         float height = 0;
         if (currentTerrain != null) {
-            height = currentTerrain.getHeightOfTerrain(testPoint.getX(), testPoint.getZ());
+            height = currentTerrain.getModel().getHeightOfTerrain(testPoint.getX(), testPoint.getZ());
         }
         return testPoint.y < height;
     }
 
-    private TerrainModel getTerrain(float worldX, float worldZ) {
+    private Terrain getTerrain(float worldX, float worldZ) {
         return terrain;
     }
 

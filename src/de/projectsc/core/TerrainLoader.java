@@ -127,7 +127,7 @@ public final class TerrainLoader {
                     staticObjects.put(objectNode.get(ID).asInt(), new Entity(10000));
                 }
             }
-            return new Terrain(map, bgTexture, rTexture, gTexture, bTexture, staticLights, staticObjects);
+            return null;
         } catch (IOException e) {
             LOGGER.error("Error loading map: ", e);
         }
@@ -145,8 +145,8 @@ public final class TerrainLoader {
         File target = new File(file);
         Map<String, Object> map = new HashMap<>();
         List<Object> terrainList = new LinkedList<>();
-        for (int i = 0; i < terrain.getMapSizeX(); i++) {
-            for (int j = 0; j < terrain.getMapSizeX(); j++) {
+        for (int i = 0; i < terrain.getMapSize(); i++) {
+            for (int j = 0; j < terrain.getMapSize(); j++) {
                 if (terrain.getTerrain()[i][j] != null) {
                     Map<String, Object> terrainData = new HashMap<>();
                     Tile current = terrain.getTerrain()[i][j];
@@ -160,13 +160,10 @@ public final class TerrainLoader {
         }
 
         map.put(TERRAIN_DATA, terrainList);
-        map.put(SIZE, terrain.getMapSizeX());
-        map.put(BG_TEXTURE, terrain.getBgTexture());
-        map.put(R_TEXTURE, terrain.getRTexture());
-        map.put(G_TEXTURE, terrain.getGTexture());
-        map.put(B_TEXTURE, terrain.getBTexture());
-        Map<String, Map<String, Float[]>> lights = Serialization.createSerializableMap(terrain.getStaticLights());
-        map.put(STATIC_LIGHTS, lights);
+        map.put(SIZE, terrain.getMapSize());
+        // Map<String, Map<String, Float[]>> lights =
+        // Serialization.createSerializableMap(terrain.getStaticLights());
+        // map.put(STATIC_LIGHTS, lights);
 
         // Map<Integer, Entity> staticObjects = terrain.getStaticObjects();
         // List<Map<String, Object>> entities = new LinkedList<Map<String, Object>>();
@@ -199,12 +196,12 @@ public final class TerrainLoader {
      * @return file to the blend map created
      */
     public static File createBlendMap(Terrain terrain) {
-        BufferedImage img = new BufferedImage(terrain.getMapSizeX(), terrain.getMapSizeY(), BufferedImage.TYPE_INT_RGB);
+        BufferedImage img = new BufferedImage(terrain.getMapSize(), terrain.getMapSize(), BufferedImage.TYPE_INT_RGB);
         Graphics g = img.getGraphics();
-        for (int i = 0; i < terrain.getMapSizeX(); i++) {
-            for (int j = 0; j < terrain.getMapSizeY(); j++) {
+        for (int i = 0; i < terrain.getMapSize(); i++) {
+            for (int j = 0; j < terrain.getMapSize(); j++) {
                 if (terrain.getTerrain()[i][j] != null) {
-                    switch (terrain.getTerrain()[i][j].getWalkAble()) {
+                    switch (terrain.getTerrain()[i][j].getType()) {
                     case 0:
                         g.setColor(Color.RED);
                         break;

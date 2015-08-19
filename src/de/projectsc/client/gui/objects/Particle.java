@@ -7,6 +7,11 @@ package de.projectsc.client.gui.objects;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
+/**
+ * One particle.
+ * 
+ * @author Josch Bosch
+ */
 public class Particle implements Comparable<Particle> {
 
     private Vector3f position;
@@ -49,6 +54,9 @@ public class Particle implements Comparable<Particle> {
         return speed;
     }
 
+    /**
+     * @param speed to set.
+     */
     public void setSpeed(Vector3f speed) {
         if (this.speed != null) {
             this.speed.x = speed.x;

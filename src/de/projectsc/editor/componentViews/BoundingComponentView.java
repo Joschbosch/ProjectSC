@@ -39,9 +39,9 @@ import de.projectsc.editor.Editor3DCore;
  */
 public class BoundingComponentView extends JDialog {
 
-    private static final long serialVersionUID = -504709352705363482L;
-
     protected static final Log LOGGER = LogFactory.getLog(BoundingComponentView.class);
+
+    private static final long serialVersionUID = -504709352705363482L;
 
     private final JTextField offsetXText;
 
@@ -51,13 +51,10 @@ public class BoundingComponentView extends JDialog {
 
     private final BoundingComponent component;
 
-    private final Editor3DCore core;
-
     public BoundingComponentView(BoundingComponent component, Editor3DCore core) {
         setTitle("Bounding Component");
         getContentPane().setLayout(null);
         this.component = component;
-        this.core = core;
         JLabel scaleLabel = new JLabel("Scale");
         scaleLabel.setBounds(10, 90, 434, 14);
         getContentPane().add(scaleLabel);
@@ -116,7 +113,6 @@ public class BoundingComponentView extends JDialog {
                 if (chosen != null && chosen.exists()) {
                     modelPathLabel.setText(chosen.getAbsolutePath());
                     component.setBoxFile(chosen);
-                    System.out.println(chosen);
                     if (core != null) {
                         core.triggerLoadBoundingBox();
                     }
@@ -190,8 +186,9 @@ public class BoundingComponentView extends JDialog {
                 case 2:
                     component.getOffset().z = Float.parseFloat(offsetZText.getText());
                     break;
+                default:
+                    break;
                 }
-
             }
         }
 

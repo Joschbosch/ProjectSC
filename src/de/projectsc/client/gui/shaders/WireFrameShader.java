@@ -65,6 +65,9 @@ public class WireFrameShader extends Shader {
         super.loadMatrix(locationViewMatrix, camera.createViewMatrix());
     }
 
+    /**
+     * @param transformationMatrix to load into the shader
+     */
     public void loadTransformationMatrix(Matrix4f transformationMatrix) {
         super.loadMatrix(locationTransformationMatrix, transformationMatrix);
     }
