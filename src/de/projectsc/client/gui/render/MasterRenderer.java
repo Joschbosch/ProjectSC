@@ -16,6 +16,7 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.util.vector.Matrix4f;
+import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
@@ -76,11 +77,13 @@ public class MasterRenderer {
 
     private final Map<RawModel, List<BoundingBox>> boundingBoxes = new HashMap<>();
 
-    private final ParticleEmitter particle;
+    private final ParticleEmitter particleEmitterRainbow;
 
     private final ParticleRenderer particleRenderer;
 
     private boolean showWireFrames = true;
+
+    private ParticleEmitter particleEmitterFire;
 
     public MasterRenderer() {
         enableCulling();
@@ -104,7 +107,8 @@ public class MasterRenderer {
         // } catch (URISyntaxException e) {
         // System.err.println("Could not load file");
         // }
-        particle = new ParticleEmitter(new Vector3f(0, 10, 0));
+        particleEmitterRainbow = new ParticleEmitter(new Vector3f(0, 10, 0), "particleTexture2.png", new Vector2f(0.5f, 0.5f), 2.0f, true);
+        particleEmitterFire = new ParticleEmitter(new Vector3f(10, 10, 10), "particleAtlas.png", new Vector2f(-2.20f, 0.5f), 16.0f, false);
 
     }
 
@@ -137,9 +141,12 @@ public class MasterRenderer {
         particleRenderer.setCamera(camera);
 
         // TEST CODE!
-        particles.add(particle);
-        particle.setCameraPostion(camera.getPosition());
-        particle.update();
+        particles.add(particleEmitterRainbow);
+        particles.add(particleEmitterFire);
+        particleEmitterRainbow.setCameraPostion(camera.getPosition());
+        particleEmitterRainbow.update();
+        particleEmitterFire.setCameraPostion(camera.getPosition());
+        particleEmitterFire.update();
 
         processTerrain(terrain);
         for (Entity e : allEntities) {

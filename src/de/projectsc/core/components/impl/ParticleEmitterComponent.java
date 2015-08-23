@@ -14,6 +14,7 @@ import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.map.JsonMappingException;
+import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.client.gui.models.RawModel;
@@ -62,7 +63,7 @@ public class ParticleEmitterComponent extends Component {
      * @param position to create the emitter at
      */
     public void createNewEmitter(Vector3f position) {
-        ParticleEmitter e = new ParticleEmitter(position);
+        ParticleEmitter e = new ParticleEmitter(position, "particleTexture.png", new Vector2f(0, 0), 1.0f, true);
         emitter.add(e);
     }
 

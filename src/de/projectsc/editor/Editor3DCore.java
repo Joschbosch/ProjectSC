@@ -306,8 +306,6 @@ public class Editor3DCore implements Runnable {
                     c.deserialize(tree.get("components").get(c.getComponentName()), schemaDir);
                     c.loadBoundingBox(entity, c.getBoxFile());
                 } catch (URISyntaxException | IOException e) {
-                    System.out.println("loading");
-                    e.printStackTrace();
                 }
             }
             if (msg.equals("particleEmitter")) {

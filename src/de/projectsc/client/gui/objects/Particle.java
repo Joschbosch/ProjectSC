@@ -16,11 +16,11 @@ public class Particle implements Comparable<Particle> {
 
     private Vector3f position;
 
+    private float size;
+
     private Vector3f speed;
 
     private Vector4f color;
-
-    private float size;
 
     private float angle;
 
@@ -29,6 +29,11 @@ public class Particle implements Comparable<Particle> {
     private float lifetime;
 
     private float cameradistance;
+
+    public Particle() {
+        position = new Vector3f(0, 0, 0);
+        color = new Vector4f(0, 0, 0, 0);
+    }
 
     @Override
     public int compareTo(Particle arg0) {
@@ -47,7 +52,12 @@ public class Particle implements Comparable<Particle> {
     }
 
     public void setPosition(Vector3f position) {
-        this.position = position;
+        if (this.position == null) {
+            this.position = new Vector3f(0, 0, 0);
+        }
+        this.position.x = position.x;
+        this.position.y = position.y;
+        this.position.z = position.z;
     }
 
     public Vector3f getSpeed() {
@@ -72,7 +82,10 @@ public class Particle implements Comparable<Particle> {
     }
 
     public void setColor(Vector4f color) {
-        this.color = color;
+        this.color.x = color.x;
+        this.color.y = color.y;
+        this.color.z = color.z;
+        this.color.w = color.w;
     }
 
     public float getSize() {

@@ -29,7 +29,7 @@ import de.projectsc.client.gui.states.State;
  */
 public class GUICore implements GUI {
 
-    private static final int MAX_FRAME_RATE = 120;
+    private static final int MAX_FRAME_RATE = 60;
 
     private static final int HEIGHT = 1024;
 

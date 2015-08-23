@@ -1,13 +1,11 @@
 #version 330 core
-
 in vec2 UV;
-in vec4 particleColor;
+in vec4 particlecolor;
 
 out vec4 color;
 
 uniform sampler2D myTextureSampler;
 
 void main(){
-	color = texture2D( myTextureSampler, UV ) * particleColor;
-
+	color = texture2D( myTextureSampler, UV ) * particlecolor;
 }

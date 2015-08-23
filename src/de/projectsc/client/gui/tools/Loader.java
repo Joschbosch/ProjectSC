@@ -11,6 +11,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -94,6 +95,15 @@ public final class Loader {
         storeDataInAttributeList(2, 3, normals);
         unbind();
         return new RawModel(vaoID, indices.length);
+    }
+
+    public static int createStreamVBO(Buffer buffer) {
+        int vboID = GL15.glGenBuffers();
+        VBOS.add(vboID);
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vboID);
+        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, buffer.capacity(), GL15.GL_STREAM_DRAW);
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+        return vboID;
     }
 
     /**
