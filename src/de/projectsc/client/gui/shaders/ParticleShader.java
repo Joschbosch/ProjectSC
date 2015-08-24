@@ -49,14 +49,29 @@ public class ParticleShader extends Shader {
         super.loadMatrix(locationModelViewProjectionMatrix, Matrix4f.mul(proMatrix, matrix, null));
     }
 
+    /**
+     * Load up texture for particles.
+     * 
+     * @param textureID to load
+     */
     public void loadTexture(int textureID) {
         super.loadInt(locationTexture, textureID);
     }
 
+    /**
+     * Load offset for particle atlas.
+     * 
+     * @param offset to load
+     */
     public void loadOffset(Vector2f offset) {
         super.loadVector(locationOffset, offset);
     }
 
+    /**
+     * Load number of rows of texture atlas.
+     * 
+     * @param number to load
+     */
     public void loadNumberOfRows(float number) {
         super.loadFloat(locationNumberOfRows, number);
     }

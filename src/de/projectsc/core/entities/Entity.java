@@ -21,7 +21,8 @@ import de.projectsc.core.utils.BoundingBox;
 import de.projectsc.core.utils.PhysicalObject;
 
 /**
- * All game objects in the game are entities. All entities have components, that define their role and behavior.
+ * All game objects in the game are entities. All entities have components, that define their role
+ * and behavior.
  * 
  * @author Josch Bosch
  */
@@ -255,8 +256,6 @@ public class Entity implements PhysicalObject {
     public void setRotY(float targetRotation) {
         if (this.rotation != null) {
             this.rotation.y = targetRotation;
-        } else {
-            System.out.println("error");
         }
     }
 

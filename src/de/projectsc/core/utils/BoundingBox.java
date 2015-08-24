@@ -119,6 +119,11 @@ public class BoundingBox {
         return scale;
     }
 
+    /**
+     * Sets new scale and recalculates center.
+     * 
+     * @param scale to set
+     */
     public void setScale(float scale) {
         this.scale = scale;
         min = (Vector3f) min.scale(scale);

@@ -44,6 +44,12 @@ public class BoundingComponent extends Component {
      */
     public static final String NAME = "Bounding component";
 
+    private static final String SCALE = "scale";
+
+    private static final String OFFSET_ROTATION = "offsetRotation";
+
+    private static final String OFFSET = "offset";
+
     private BoundingBox box;
 
     private final Vector3f offset;
@@ -126,9 +132,9 @@ public class BoundingComponent extends Component {
     @Override
     public String serialize() throws JsonGenerationException, JsonMappingException, IOException {
         Map<String, Object> serialized = new HashMap<>();
-        serialized.put("offset", offset);
-        serialized.put("offsetRotation", offsetRotation);
-        serialized.put("scale", scale);
+        serialized.put(OFFSET, offset);
+        serialized.put(OFFSET_ROTATION, offsetRotation);
+        serialized.put(SCALE, scale);
         return mapper.writeValueAsString(serialized);
     }
 
@@ -138,13 +144,13 @@ public class BoundingComponent extends Component {
         Map<String, Object> values = mapper.readValue(input.asText(), new HashMap<String, Object>().getClass());
         boxFile = new File(schemaDir, CoreConstants.BOX_FILENAME);
         loadBoundingBox(owner, boxFile);
-        this.scale = (Float.parseFloat("" + values.get("scale")));
-        Vector3f newOffset = new Vector3f(Float.parseFloat("" + ((Map<String, Double>) values.get("offset")).get("x")),
-            Float.parseFloat("" + ((Map<String, Double>) values.get("offset")).get("y")),
-            Float.parseFloat("" + ((Map<String, Double>) values.get("offset")).get("z")));
-        Vector3f newRotation = new Vector3f(Float.parseFloat("" + ((Map<String, Double>) values.get("offsetRotation")).get("x")),
-            Float.parseFloat("" + ((Map<String, Double>) values.get("offsetRotation")).get("y")),
-            Float.parseFloat("" + ((Map<String, Double>) values.get("offsetRotation")).get("z")));
+        this.scale = (Float.parseFloat("" + values.get(SCALE)));
+        Vector3f newOffset = new Vector3f(Float.parseFloat("" + ((Map<String, Double>) values.get(OFFSET)).get("x")),
+            Float.parseFloat("" + ((Map<String, Double>) values.get(OFFSET)).get("y")),
+            Float.parseFloat("" + ((Map<String, Double>) values.get(OFFSET)).get("z")));
+        Vector3f newRotation = new Vector3f(Float.parseFloat("" + ((Map<String, Double>) values.get(OFFSET_ROTATION)).get("x")),
+            Float.parseFloat("" + ((Map<String, Double>) values.get(OFFSET_ROTATION)).get("y")),
+            Float.parseFloat("" + ((Map<String, Double>) values.get(OFFSET_ROTATION)).get("z")));
         this.setOffset(newOffset);
         this.setRotation(newRotation);
     }
@@ -152,7 +158,7 @@ public class BoundingComponent extends Component {
     /**
      * Check if the current entity intersects with the picking ray.
      * 
-     * @param orig position of camera
+     * @param org position of camera
      * @param ray to intersect
      * @return true if it intersects
      */
@@ -200,6 +206,11 @@ public class BoundingComponent extends Component {
         return scale;
     }
 
+    /**
+     * Sets new Scale.
+     * 
+     * @param scale to set.
+     */
     public void setScale(float scale) {
         this.scale = scale;
         box.setScale(scale);

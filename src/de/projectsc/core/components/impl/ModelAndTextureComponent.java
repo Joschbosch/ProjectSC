@@ -109,7 +109,6 @@ public class ModelAndTextureComponent extends Component {
     /**
      * Load model and texture from given files.
      * 
-     * @param loader to load
      * @param modelFile model file
      * @param textureFile texture image
      */

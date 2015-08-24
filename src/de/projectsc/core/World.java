@@ -44,6 +44,13 @@ public class World {
         }
     }
 
+    /**
+     * Get terrain tile at the given coords.
+     * 
+     * @param worldX coord
+     * @param worldZ coord
+     * @return the terrain
+     */
     public Terrain getTerrainAt(float worldX, float worldZ) {
         int terrainX = (int) (worldX / (Terrain.TERRAIN_TILE_SIZE * Terrain.TERRAIN_CHUNK_SIZE));
         int terrainZ = (int) (worldZ / (Terrain.TERRAIN_TILE_SIZE * Terrain.TERRAIN_CHUNK_SIZE));
@@ -53,6 +60,13 @@ public class World {
         return null;
     }
 
+    /**
+     * Returns the tile in the terrain at the given coords.
+     * 
+     * @param worldX coord
+     * @param worldZ coord
+     * @return Tile at (worldX, worldZ)
+     */
     public Tile getTileAt(float worldX, float worldZ) {
         Terrain t = getTerrainAt(worldX, worldZ);
         if (t != null) {

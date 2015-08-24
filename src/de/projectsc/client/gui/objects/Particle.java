@@ -20,7 +20,7 @@ public class Particle implements Comparable<Particle> {
 
     private Vector3f speed;
 
-    private Vector4f color;
+    private final Vector4f color;
 
     private float angle;
 
@@ -51,6 +51,9 @@ public class Particle implements Comparable<Particle> {
         return position;
     }
 
+    /**
+     * @param position new position
+     */
     public void setPosition(Vector3f position) {
         if (this.position == null) {
             this.position = new Vector3f(0, 0, 0);
@@ -81,6 +84,10 @@ public class Particle implements Comparable<Particle> {
         return color;
     }
 
+    /**
+     * 
+     * @param color new color
+     */
     public void setColor(Vector4f color) {
         this.color.x = color.x;
         this.color.y = color.y;

@@ -181,11 +181,10 @@ public class MapEditorGraphicsCore implements Runnable {
     /**
      * Add new component to entity.
      * 
-     * @param newEntitySchema
-     * 
+     * @param newEntitySchema to add component
      * @param component to add
      * @param jsonNode with information
-     * @param schemaDir
+     * @param schemaDir of entity
      * @throws IOException e
      * @throws JsonProcessingException e
      */
@@ -424,6 +423,9 @@ public class MapEditorGraphicsCore implements Runnable {
         return selectedEntity;
     }
 
+    /**
+     * unselect entity.
+     */
     public void removeSelectedEntity() {
         if (selectedEntity != null) {
             entities.remove(selectedEntity);

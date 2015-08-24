@@ -289,7 +289,8 @@ public class MapEditor extends JFrame {
     }
 
     /**
-     * Once the Canvas is created its add notify method will call this method to start the LWJGL Display and game loop in another thread.
+     * Once the Canvas is created its add notify method will call this method to start the LWJGL
+     * Display and game loop in another thread.
      */
     public void startLWJGL() {
         messageQueue = new LinkedBlockingQueue<String>();
@@ -299,8 +300,8 @@ public class MapEditor extends JFrame {
     }
 
     /**
-     * Tell game loop to stop running, after which the LWJGL Display will be destoryed. The main thread will wait for the Display.destroy()
-     * to complete
+     * Tell game loop to stop running, after which the LWJGL Display will be destoryed. The main
+     * thread will wait for the Display.destroy() to complete
      */
     private void stopLWJGL() {
         try {

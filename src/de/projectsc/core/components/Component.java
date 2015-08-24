@@ -49,9 +49,9 @@ public abstract class Component {
     /**
      * Update method for the component.
      * 
-     * @param owner entity that has this component.
+     * @param ownerEntity entity that has this component.
      */
-    public abstract void update(Entity owner);
+    public abstract void update(Entity ownerEntity);
 
     /**
      * @return true, if the component has all attributes to be saved.
@@ -61,7 +61,7 @@ public abstract class Component {
     /**
      * Adds everything for rendering.
      * 
-     * @param owner of component
+     * @param ownerEntity of component
      * @param entities all others
      * @param boundingBoxes to render
      * @param lights to render
@@ -70,9 +70,9 @@ public abstract class Component {
      * @param camera for positions
      * @param elapsedTime since last frame
      */
-    public abstract void render(Entity owner, Map<TexturedModel, List<Entity>> entities, Map<RawModel, List<BoundingBox>> boundingBoxes,
-        List<Light> lights,
-        List<Billboard> billboards, List<ParticleEmitter> particles, Camera camera, long elapsedTime);
+    public abstract void render(Entity ownerEntity, Map<TexturedModel, List<Entity>> entities,
+        Map<RawModel, List<BoundingBox>> boundingBoxes, List<Light> lights, List<Billboard> billboards, List<ParticleEmitter> particles,
+        Camera camera, long elapsedTime);
 
     /**
      * 

@@ -205,6 +205,7 @@ public class EntityShader extends Shader {
     }
 
     /**
+     * @param highlighted entity
      * @param selected true, if entity is selected
      */
     public void loadSelected(boolean highlighted, boolean selected) {

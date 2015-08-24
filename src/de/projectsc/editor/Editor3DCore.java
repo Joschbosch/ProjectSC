@@ -237,6 +237,9 @@ public class Editor3DCore implements Runnable {
         }
     }
 
+    /**
+     * @param id of entity type
+     */
     public void createNewEntity(long id) {
         if (entity != null) {
             entities.remove(entity);

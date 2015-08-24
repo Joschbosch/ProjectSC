@@ -59,7 +59,6 @@ public class ParticleEmitterComponent extends Component {
     /**
      * Create a new Emitter at position.
      * 
-     * @param loader to load quads
      * @param position to create the emitter at
      */
     public void createNewEmitter(Vector3f position) {

@@ -24,14 +24,7 @@ public class Billboard {
 
     private File imageFile;
 
-    private final Loader loader;
-
     private int textureID;
-
-    public Billboard(Loader loader) {
-        this.loader = loader;
-
-    }
 
     public int getTexture() {
         return textureID;
@@ -71,7 +64,7 @@ public class Billboard {
      */
     public void setImageFile(File imageFile) {
         this.imageFile = imageFile;
-        textureID = loader.loadTexture(imageFile);
+        textureID = Loader.loadTexture(imageFile);
     }
 
 }

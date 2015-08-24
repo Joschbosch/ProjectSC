@@ -97,6 +97,12 @@ public final class Loader {
         return new RawModel(vaoID, indices.length);
     }
 
+    /**
+     * Creates a VBO for streaming data.
+     * 
+     * @param buffer to create VBO from
+     * @return id of vbo
+     */
     public static int createStreamVBO(Buffer buffer) {
         int vboID = GL15.glGenBuffers();
         VBOS.add(vboID);
