@@ -107,8 +107,9 @@ public class MasterRenderer {
         // } catch (URISyntaxException e) {
         // System.err.println("Could not load file");
         // }
-        particleEmitterRainbow = new ParticleEmitter(new Vector3f(0, 10, 0), "particleTexture2.png", new Vector2f(0.5f, 0.5f), 2.0f, true);
-        particleEmitterFire = new ParticleEmitter(new Vector3f(10, 10, 10), "particleAtlas.png", new Vector2f(-2.20f, 0.5f), 16.0f, false);
+        particleEmitterRainbow = new ParticleEmitter(new Vector3f(0, 10, 0), "particleTexture2.png", new Vector2f(0.0f, 0.0f), 1.0f, true);
+        particleEmitterFire =
+            new ParticleEmitter(new Vector3f(10, 10, 10), "particleAtlas.png", new Vector2f(0.0f, 0.0f), 8.0f, false);
 
     }
 

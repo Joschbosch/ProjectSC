@@ -5,7 +5,6 @@
 package de.projectsc.client.gui.objects;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.lwjgl.util.vector.Vector2f;
@@ -24,7 +23,7 @@ public class ParticleEmitter {
     /**
      * Maximal particles for one emitter.
      */
-    public static final int MAX_PARTICLES_PER_SOURCE = 100000;
+    public static final int MAX_PARTICLES_PER_SOURCE = 100;
 
     private Vector3f position;
 
@@ -36,13 +35,15 @@ public class ParticleEmitter {
 
     private int textureId;
 
-    private final float particleLifetime = 5.0f;
+    private final float particleLifetime = 1.0f;
 
     private final float particleLifetimeMargin = 0.5f;
 
     private final float[] positionBuffer;
 
     private final byte[] colorBuffer;
+
+    private final float[] uvBuffer;
 
     private Vector3f cameraPostion;
 
@@ -55,6 +56,7 @@ public class ParticleEmitter {
     public ParticleEmitter(Vector3f position, String textureName, Vector2f offset, float numberOfRows, boolean useColors) {
         positionBuffer = new float[MAX_PARTICLES_PER_SOURCE * 4];
         colorBuffer = new byte[MAX_PARTICLES_PER_SOURCE * 4];
+        uvBuffer = new float[MAX_PARTICLES_PER_SOURCE * 8];
         particles = new ArrayList<>();
         this.position = position;
         for (int i = 0; i < MAX_PARTICLES_PER_SOURCE; i++) {
@@ -85,8 +87,18 @@ public class ParticleEmitter {
         positionBuffer[i * 4 + 1] = 0;
         positionBuffer[i * 4 + 2] = 0;
         positionBuffer[i * 4 + 3] = 1.0f;
-        p.setSpeed(new Vector3f(1.0f, 1.0f, 1.0f));
-        p.setWeight(1.0f);
+
+        uvBuffer[i * 8] = 0;
+        uvBuffer[i * 8 + 1] = 0;
+        uvBuffer[i * 8 + 2] = 0;
+        uvBuffer[i * 8 + 3] = 0;
+        uvBuffer[i * 8 + 4] = 0;
+        uvBuffer[i * 8 + 5] = 0;
+        uvBuffer[i * 8 + 6] = 0;
+        uvBuffer[i * 8 + 7] = 0;
+
+        p.setDirection(new Vector3f(1.0f, 1.0f, 1.0f));
+        p.setWeight(0.0f);
         particles.add(p);
     }
 
@@ -99,29 +111,48 @@ public class ParticleEmitter {
         if (newparticles > (int) (0.016f * 10000.0)) {
             newparticles = (int) (0.016f * 10000.0);
         }
+        if (newparticles == 0) {
+            newparticles = (int) (MAX_PARTICLES_PER_SOURCE * 1f / 100f);
+        }
         for (int i = 0; i < newparticles; i++) {
             int index = findUnsuedSlot();
-            if (particles.get(index).getLifetime() < 0) {
-                particles.get(index).setLifetime(
+            Particle particle = particles.get(index);
+            if (particle.getLifetime() < 0) {
+                particle.setLifetime(
                     (float) random(particleLifetime, particleLifetimeMargin));
-                particles.get(index).setPosition(position);
+                particle.setStartLifeTime(particle.getLifetime());
+                float radius = 5f;
+                Vector3f startPos =
+                    new Vector3f((float) (position.x + ((2 * Math.random() - 1) * radius)),
+                        (float) (position.y + ((2 * Math.random() - 1) * radius)),
+                        (float) (position.z + ((2 * Math.random() - 1) * radius)));
+
+                while (!(Vector3f.sub(startPos, position, null).length() <= radius)) {
+                    startPos =
+                        new Vector3f((float) (position.x + ((2 * Math.random() - 1) * radius)),
+                            (float) (position.y + ((2 * Math.random() - 1) * radius)),
+                            (float) (position.z + ((2 * Math.random() - 1) * radius)));
+
+                }
+                particle.setPosition(startPos);
+
                 if (useColors) {
-                    particles.get(index).setColor(
+                    particle.setColor(
                         new Vector4f((float) (Math.random() * 255), (float) (Math.random() * 255), (float) (Math.random() * 255),
                             (float) (Math
                                 .random() * 255)));
                 } else {
-                    particles.get(index).setColor(new Vector4f(255, 255, 255, 255));
+                    particle.setColor(new Vector4f(255, 255, 255, 255));
 
                 }
-                float spread = 1.5f;
+                float spread = 1f;
 
-                Vector3f dir = new Vector3f(0, 10, 0);
+                Vector3f dir = new Vector3f(0, 0, 0);
 
                 Vector3f randDir = new Vector3f((float) Math.random(), (float) Math.random(), (float) Math.random());
                 randDir.scale(spread);
-                particles.get(index).setSpeed(Vector3f.add(randDir, dir, null));
-                particles.get(index).setSize((float) Math.random());
+                particle.setDirection(dir);
+                particle.setSize((float) Math.random());
             }
         }
         particleCount = 0;
@@ -131,13 +162,22 @@ public class ParticleEmitter {
                 p.setLifetime(p.getLifetime() - delta);
                 if (p.getLifetime() > 0.0f) {
                     Vector3f gravity = new Vector3f(0.0f, -9.81f, 0.0f);
-                    gravity.scale(delta * 0.5f);
-                    Vector3f newSpeed = Vector3f.add(p.getSpeed(), gravity, null);
-                    p.setSpeed(newSpeed);
+                    gravity.scale(delta * p.getWeight());
+                    Vector3f newSpeed = Vector3f.add(p.getDirection(), gravity, null);
+                    p.setDirection(newSpeed);
                     newSpeed.scale(delta);
                     Vector3f newPosition = Vector3f.add(p.getPosition(), newSpeed, null);
                     p.setPosition(newPosition);
-                    p.setCameradistance(Vector3f.sub(p.getPosition(), cameraPostion, null).lengthSquared());
+                    p.setCameradistance(Vector3f.sub(p.getPosition(), cameraPostion, null).length());
+
+                    int stages = (int) (Math.pow(numberOfRows, 2));
+                    float timePerStage = (p.getStartLifeTime() / stages);
+                    int index = stages - (int) (p.getLifetime() / timePerStage);
+                    int column = (int) (index % getNumberOfRows());
+                    float xCoord0 = (column / getNumberOfRows());
+                    int row = (int) (index / getNumberOfRows());
+                    float yCoord0 = (row / getNumberOfRows());
+                    float size = 1.0f / getNumberOfRows();
 
                     positionBuffer[4 * particleCount + 0] = newPosition.x;
                     positionBuffer[4 * particleCount + 1] = newPosition.y;
@@ -149,13 +189,22 @@ public class ParticleEmitter {
                     colorBuffer[4 * particleCount + 2] = (byte) p.getColor().z;
                     colorBuffer[4 * particleCount + 3] = (byte) p.getColor().w;
 
+                    uvBuffer[particleCount * 8] = xCoord0;
+                    uvBuffer[particleCount * 8 + 1] = yCoord0 + size;
+                    uvBuffer[particleCount * 8 + 2] = xCoord0 + size;
+                    uvBuffer[particleCount * 8 + 3] = yCoord0 + size;
+                    uvBuffer[particleCount * 8 + 4] = xCoord0;
+                    uvBuffer[particleCount * 8 + 5] = yCoord0;
+                    uvBuffer[particleCount * 8 + 6] = xCoord0 + size;
+                    uvBuffer[particleCount * 8 + 7] = yCoord0;
+
                 } else {
                     p.setCameradistance(-1);
                 }
                 particleCount++;
             }
         }
-        Collections.sort(particles);
+        // Collections.sort(particles);
     }
 
     private double random(float base, float margin) {
@@ -214,5 +263,9 @@ public class ParticleEmitter {
 
     public void setOffset(Vector2f offset) {
         this.offset = offset;
+    }
+
+    public float[] getUVBuffer() {
+        return uvBuffer;
     }
 }

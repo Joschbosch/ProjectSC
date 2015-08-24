@@ -47,16 +47,19 @@ public class ParticleRenderer {
 
     private final int colorVBOId;
 
+    private FloatBuffer uvBuffer;
+
+    private int uvVBOId;
+
     public ParticleRenderer(Matrix4f projectionMatrix) {
         this.projectionMatrix = projectionMatrix;
 
         shader = new ParticleShader();
-        // Just x and z vertex positions here, y is set to 0 in v.shader
         float[] vertices = {
-            -1, -1, 0,
-            1, -1, 0,
-            -1, 1, 0,
-            1, 1, 0 };
+            -0.5f, -0.5f, 0,
+            0.5f, -0.5f, 0,
+            -0.5f, 0.5f, 0,
+            0.5f, 0.5f, 0 };
         quad = Loader.loadToVAO(vertices, 3);
 
         positionAndSizeBuffer = BufferUtils.createFloatBuffer(ParticleEmitter.MAX_PARTICLES_PER_SOURCE * 4);
@@ -65,6 +68,8 @@ public class ParticleRenderer {
         colorBuffer = BufferUtils.createByteBuffer(ParticleEmitter.MAX_PARTICLES_PER_SOURCE * 4);
         colorVBOId = Loader.createStreamVBO(colorBuffer);
 
+        uvBuffer = BufferUtils.createFloatBuffer(ParticleEmitter.MAX_PARTICLES_PER_SOURCE * 8);
+        uvVBOId = Loader.createStreamVBO(uvBuffer);
     }
 
     /**
@@ -73,6 +78,8 @@ public class ParticleRenderer {
      * @param emitters list of emitters to render
      */
     public void render(List<ParticleEmitter> emitters) {
+        // GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_LINE);
+
         GL11.glEnable(GL11.GL_BLEND);
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         GL11.glDisable(GL11.GL_DEPTH_TEST);
@@ -82,6 +89,8 @@ public class ParticleRenderer {
         GL20.glEnableVertexAttribArray(0);
         GL20.glEnableVertexAttribArray(1);
         GL20.glEnableVertexAttribArray(2);
+        GL20.glEnableVertexAttribArray(3);
+
         for (ParticleEmitter emitter : emitters) {
             updateBuffer(emitter);
 
@@ -91,20 +100,24 @@ public class ParticleRenderer {
             GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, colorVBOId);
             GL20.glVertexAttribPointer(2, 4, GL11.GL_UNSIGNED_BYTE, true, 0, 0);
 
+            GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, uvVBOId);
+            GL20.glVertexAttribPointer(3, 2, GL11.GL_FLOAT, false, 0, 0);
+
             GL33.glVertexAttribDivisor(0, 0);
             GL33.glVertexAttribDivisor(1, 1);
             GL33.glVertexAttribDivisor(2, 1);
+            GL33.glVertexAttribDivisor(3, 0);
+
             GL13.glActiveTexture(GL13.GL_TEXTURE0);
             GL11.glBindTexture(GL11.GL_TEXTURE_2D, emitter.getTextureAtlas());
             shader.loadTexture(0);
-            shader.loadOffset(emitter.getOffset());
-            shader.loadNumberOfRows(emitter.getNumberOfRows());
             GL31.glDrawArraysInstanced(GL11.GL_TRIANGLE_STRIP, 0, 4, emitter.getParticleCount());
         }
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
         GL20.glDisableVertexAttribArray(0);
         GL20.glDisableVertexAttribArray(1);
         GL20.glDisableVertexAttribArray(2);
+        GL20.glDisableVertexAttribArray(3);
         GL30.glBindVertexArray(0);
         GL11.glDisable(GL11.GL_BLEND);
         GL11.glEnable(GL11.GL_DEPTH_TEST);
@@ -126,6 +139,14 @@ public class ParticleRenderer {
         colorBuffer.flip();
         GL15.glBufferData(GL15.GL_ARRAY_BUFFER, colorBuffer, GL15.GL_STREAM_DRAW);
         GL15.glBufferSubData(GL15.GL_ARRAY_BUFFER, 0, colorBuffer);
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, uvVBOId);
+        uvBuffer.clear();
+        uvBuffer.put(p.getUVBuffer());
+        uvBuffer.flip();
+        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, uvBuffer, GL15.GL_STREAM_DRAW);
+        GL15.glBufferSubData(GL15.GL_ARRAY_BUFFER, 0, uvBuffer);
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
     }
 

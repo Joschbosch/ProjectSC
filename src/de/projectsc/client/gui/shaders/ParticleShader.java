@@ -7,7 +7,6 @@
 package de.projectsc.client.gui.shaders;
 
 import org.lwjgl.util.vector.Matrix4f;
-import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
 /**
@@ -28,10 +27,6 @@ public class ParticleShader extends Shader {
     private int locationModelViewProjectionMatrix;
 
     private int locationTexture;
-
-    private int locationOffset;
-
-    private int locationNumberOfRows;
 
     public ParticleShader() {
         super(VERTEX_FILE, FRAGMENT_FILE);
@@ -58,33 +53,12 @@ public class ParticleShader extends Shader {
         super.loadInt(locationTexture, textureID);
     }
 
-    /**
-     * Load offset for particle atlas.
-     * 
-     * @param offset to load
-     */
-    public void loadOffset(Vector2f offset) {
-        super.loadVector(locationOffset, offset);
-    }
-
-    /**
-     * Load number of rows of texture atlas.
-     * 
-     * @param number to load
-     */
-    public void loadNumberOfRows(float number) {
-        super.loadFloat(locationNumberOfRows, number);
-    }
-
     @Override
     protected void getAllUniformLocations() {
         locationCameraRightWorldspace = super.getUniformLocation("cameraRightWorldspace");
         locationCameraUpWorldspace = super.getUniformLocation("cameraUpWorldspace");
         locationModelViewProjectionMatrix = super.getUniformLocation("modelViewProjectionMatrix");
         locationTexture = super.getUniformLocation("myTextureSampler");
-        locationOffset = super.getUniformLocation("offset");
-        locationNumberOfRows = super.getUniformLocation("numberOfRows");
-
     }
 
     @Override
@@ -92,6 +66,7 @@ public class ParticleShader extends Shader {
         super.bindAttribute(0, "squareVertices;");
         super.bindAttribute(1, "xyzs");
         super.bindAttribute(2, "color");
+        super.bindAttribute(3, "uvCoords");
     }
 
 }

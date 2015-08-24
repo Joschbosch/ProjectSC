@@ -18,7 +18,7 @@ public class Particle implements Comparable<Particle> {
 
     private float size;
 
-    private Vector3f speed;
+    private Vector3f direction;
 
     private final Vector4f color;
 
@@ -29,6 +29,8 @@ public class Particle implements Comparable<Particle> {
     private float lifetime;
 
     private float cameradistance;
+
+    private float startLifeTime;
 
     public Particle() {
         position = new Vector3f(0, 0, 0);
@@ -63,20 +65,20 @@ public class Particle implements Comparable<Particle> {
         this.position.z = position.z;
     }
 
-    public Vector3f getSpeed() {
-        return speed;
+    public Vector3f getDirection() {
+        return direction;
     }
 
     /**
      * @param speed to set.
      */
-    public void setSpeed(Vector3f speed) {
-        if (this.speed != null) {
-            this.speed.x = speed.x;
-            this.speed.y = speed.y;
-            this.speed.z = speed.z;
+    public void setDirection(Vector3f speed) {
+        if (this.direction != null) {
+            this.direction.x = speed.x;
+            this.direction.y = speed.y;
+            this.direction.z = speed.z;
         } else {
-            this.speed = speed;
+            this.direction = speed;
         }
     }
 
@@ -135,4 +137,11 @@ public class Particle implements Comparable<Particle> {
         this.cameradistance = cameradistance;
     }
 
+    public float getStartLifeTime() {
+        return startLifeTime;
+    }
+
+    public void setStartLifeTime(float startLifeTime) {
+        this.startLifeTime = startLifeTime;
+    }
 }

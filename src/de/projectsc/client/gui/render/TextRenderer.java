@@ -19,6 +19,7 @@ import org.lwjgl.opengl.GL33;
 
 import de.projectsc.client.gui.models.RawModel;
 import de.projectsc.client.gui.objects.ParticleEmitter;
+import de.projectsc.client.gui.objects.Text2D;
 import de.projectsc.client.gui.shaders.TextShader;
 import de.projectsc.client.gui.tools.Loader;
 
@@ -104,6 +105,7 @@ public class TextRenderer {
         float[] positions = new float[text.getLength() * 4];
 
         for (int i = 0; i < text.getLength(); i++) {
+            char c = text.getText().charAt(i);
             positions[4 * i] = text.getX() + i * text.getSize();
             positions[4 * i + 1] = text.getX() + i * text.getSize();
             positions[4 * i + 2] = text.getX() + i * text.getSize();
@@ -112,7 +114,7 @@ public class TextRenderer {
 
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, positionVBOId);
         positionAndSizeBuffer.clear();
-        positionAndSizeBuffer.put(p.getPositionBuffer());
+        positionAndSizeBuffer.put(positions);
         positionAndSizeBuffer.flip();
         GL15.glBufferData(GL15.GL_ARRAY_BUFFER, positionAndSizeBuffer, GL15.GL_STREAM_DRAW);
         GL15.glBufferSubData(GL15.GL_ARRAY_BUFFER, 0, positionAndSizeBuffer);
@@ -120,7 +122,7 @@ public class TextRenderer {
 
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, uvVBOId);
         uvBuffer.clear();
-        uvBuffer.put(p.getColorBuffer());
+        uvBuffer.put(new byte[] {});
         uvBuffer.flip();
         GL15.glBufferData(GL15.GL_ARRAY_BUFFER, uvBuffer, GL15.GL_STREAM_DRAW);
         GL15.glBufferSubData(GL15.GL_ARRAY_BUFFER, 0, uvBuffer);
