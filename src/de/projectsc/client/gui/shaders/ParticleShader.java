@@ -28,6 +28,8 @@ public class ParticleShader extends Shader {
 
     private int locationTexture;
 
+    private int locationNumberOfRows;
+
     public ParticleShader() {
         super(VERTEX_FILE, FRAGMENT_FILE);
     }
@@ -59,6 +61,8 @@ public class ParticleShader extends Shader {
         locationCameraUpWorldspace = super.getUniformLocation("cameraUpWorldspace");
         locationModelViewProjectionMatrix = super.getUniformLocation("modelViewProjectionMatrix");
         locationTexture = super.getUniformLocation("myTextureSampler");
+        locationNumberOfRows = super.getUniformLocation("numberOfRows");
+
     }
 
     @Override
@@ -67,6 +71,10 @@ public class ParticleShader extends Shader {
         super.bindAttribute(1, "xyzs");
         super.bindAttribute(2, "color");
         super.bindAttribute(3, "uvCoords");
+    }
+
+    public void loaderNumberOfRows(float numberOfRows) {
+        super.loadFloat(locationNumberOfRows, numberOfRows);
     }
 
 }

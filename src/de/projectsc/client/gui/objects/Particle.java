@@ -41,11 +41,11 @@ public class Particle implements Comparable<Particle> {
     public int compareTo(Particle arg0) {
         float dist = (this.cameradistance - arg0.getCameradistance());
         if (dist > 0 && dist <= 1) {
-            return 1;
-        } else if (dist < 0 && dist >= -1) {
             return -1;
+        } else if (dist < 0 && dist >= -1) {
+            return 1;
         } else {
-            return (int) (this.cameradistance - arg0.getCameradistance());
+            return (int) -(this.cameradistance - arg0.getCameradistance());
         }
     }
 

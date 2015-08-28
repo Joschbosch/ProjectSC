@@ -19,6 +19,7 @@ import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.client.gui.models.RawModel;
 import de.projectsc.client.gui.models.TexturedModel;
+import de.projectsc.client.gui.objects.BasicParticleConfiguration;
 import de.projectsc.client.gui.objects.Billboard;
 import de.projectsc.client.gui.objects.Camera;
 import de.projectsc.client.gui.objects.Light;
@@ -62,7 +63,8 @@ public class ParticleEmitterComponent extends Component {
      * @param position to create the emitter at
      */
     public void createNewEmitter(Vector3f position) {
-        ParticleEmitter e = new ParticleEmitter(position, "particleTexture.png", new Vector2f(0, 0), 1.0f, true);
+        ParticleEmitter e =
+            new ParticleEmitter(position, "particleTexture.png", new Vector2f(0, 0), 1.0f, true, new BasicParticleConfiguration());
         emitter.add(e);
     }
 

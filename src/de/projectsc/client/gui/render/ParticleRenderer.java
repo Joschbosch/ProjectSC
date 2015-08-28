@@ -6,6 +6,7 @@ package de.projectsc.client.gui.render;
 
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
+import java.util.Collections;
 import java.util.List;
 
 import org.lwjgl.BufferUtils;
@@ -68,7 +69,7 @@ public class ParticleRenderer {
         colorBuffer = BufferUtils.createByteBuffer(ParticleEmitter.MAX_PARTICLES_PER_SOURCE * 4);
         colorVBOId = Loader.createStreamVBO(colorBuffer);
 
-        uvBuffer = BufferUtils.createFloatBuffer(ParticleEmitter.MAX_PARTICLES_PER_SOURCE * 8);
+        uvBuffer = BufferUtils.createFloatBuffer(ParticleEmitter.MAX_PARTICLES_PER_SOURCE * 2);
         uvVBOId = Loader.createStreamVBO(uvBuffer);
     }
 
@@ -81,7 +82,6 @@ public class ParticleRenderer {
         // GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_LINE);
 
         GL11.glEnable(GL11.GL_BLEND);
-        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         GL11.glDisable(GL11.GL_DEPTH_TEST);
         shader.start();
         shader.loadPositionAttributes(camera.createViewMatrix(), projectionMatrix);
@@ -91,8 +91,14 @@ public class ParticleRenderer {
         GL20.glEnableVertexAttribArray(2);
         GL20.glEnableVertexAttribArray(3);
 
+        Collections.sort(emitters);
         for (ParticleEmitter emitter : emitters) {
             updateBuffer(emitter);
+            if (emitter.isGlowy()) {
+                GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
+            } else {
+                GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+            }
 
             GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, positionVBOId);
             GL20.glVertexAttribPointer(1, 4, GL11.GL_FLOAT, false, 0, 0);
@@ -106,11 +112,12 @@ public class ParticleRenderer {
             GL33.glVertexAttribDivisor(0, 0);
             GL33.glVertexAttribDivisor(1, 1);
             GL33.glVertexAttribDivisor(2, 1);
-            GL33.glVertexAttribDivisor(3, 0);
+            GL33.glVertexAttribDivisor(3, 1);
 
             GL13.glActiveTexture(GL13.GL_TEXTURE0);
             GL11.glBindTexture(GL11.GL_TEXTURE_2D, emitter.getTextureAtlas());
             shader.loadTexture(0);
+            shader.loaderNumberOfRows(emitter.getNumberOfRows());
             GL31.glDrawArraysInstanced(GL11.GL_TRIANGLE_STRIP, 0, 4, emitter.getParticleCount());
         }
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);

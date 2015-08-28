@@ -22,6 +22,7 @@ import org.lwjgl.util.vector.Vector4f;
 
 import de.projectsc.client.gui.models.RawModel;
 import de.projectsc.client.gui.models.TexturedModel;
+import de.projectsc.client.gui.objects.BasicParticleConfiguration;
 import de.projectsc.client.gui.objects.Billboard;
 import de.projectsc.client.gui.objects.Camera;
 import de.projectsc.client.gui.objects.Light;
@@ -107,9 +108,14 @@ public class MasterRenderer {
         // } catch (URISyntaxException e) {
         // System.err.println("Could not load file");
         // }
-        particleEmitterRainbow = new ParticleEmitter(new Vector3f(0, 10, 0), "particleTexture2.png", new Vector2f(0.0f, 0.0f), 1.0f, true);
+        particleEmitterRainbow =
+            new ParticleEmitter(new Vector3f(0, 0, 0), "particleTexture2.png", new Vector2f(0.0f, 0.0f), 1.0f, true,
+                new BasicParticleConfiguration());
+        particleEmitterRainbow.setGlowy(true);
+        particleEmitterRainbow.setNumberOfParticles(1000);
         particleEmitterFire =
-            new ParticleEmitter(new Vector3f(10, 10, 10), "particleAtlas.png", new Vector2f(0.0f, 0.0f), 8.0f, false);
+            new ParticleEmitter(new Vector3f(10, 10, 0), "particleAtlas.png", new Vector2f(0.0f, 0.0f), 8.0f, false,
+                new BasicParticleConfiguration());
 
     }
 
