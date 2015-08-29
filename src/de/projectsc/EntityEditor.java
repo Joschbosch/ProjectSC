@@ -64,7 +64,7 @@ import de.projectsc.core.components.impl.BoundingComponent;
 import de.projectsc.core.components.impl.EmittingLightComponent;
 import de.projectsc.core.components.impl.MovingComponent;
 import de.projectsc.core.components.impl.ParticleEmitterComponent;
-import de.projectsc.editor.Editor3DCore;
+import de.projectsc.editor.EditorGraphicsCore;
 import de.projectsc.editor.EditorData;
 import de.projectsc.editor.componentViews.BoundingComponentView;
 import de.projectsc.editor.componentViews.EmittingLightComponentView;
@@ -116,7 +116,7 @@ public class EntityEditor extends JFrame {
 
     private Thread gameThread;
 
-    private Editor3DCore editor3dCore;
+    private EditorGraphicsCore editor3dCore;
 
     private BlockingQueue<String> messageQueue;
 
@@ -787,7 +787,7 @@ public class EntityEditor extends JFrame {
      */
     public void startLWJGL() {
         messageQueue = new LinkedBlockingQueue<String>();
-        editor3dCore = new Editor3DCore(displayParent, WIDTH, HEIGHT, messageQueue);
+        editor3dCore = new EditorGraphicsCore(displayParent, WIDTH, HEIGHT, messageQueue);
         editor3dCore.setEditorData(data);
         gameThread = new Thread(editor3dCore);
         gameThread.start();

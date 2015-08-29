@@ -30,7 +30,7 @@ import org.apache.commons.logging.LogFactory;
 import de.projectsc.EntityEditor;
 import de.projectsc.core.CoreConstants;
 import de.projectsc.core.components.impl.BoundingComponent;
-import de.projectsc.editor.Editor3DCore;
+import de.projectsc.editor.EditorGraphicsCore;
 
 /**
  * Editor view for the {@link BoundingComponent}.
@@ -51,7 +51,7 @@ public class BoundingComponentView extends JDialog {
 
     private final BoundingComponent component;
 
-    public BoundingComponentView(BoundingComponent component, Editor3DCore core) {
+    public BoundingComponentView(BoundingComponent component, EditorGraphicsCore core) {
         setTitle("Bounding Component");
         getContentPane().setLayout(null);
         this.component = component;

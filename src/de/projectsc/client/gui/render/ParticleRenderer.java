@@ -150,7 +150,7 @@ public class ParticleRenderer {
 
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, uvVBOId);
         uvBuffer.clear();
-        uvBuffer.put(p.getUVBuffer());
+        uvBuffer.put(p.getLifetimeBuffer());
         uvBuffer.flip();
         GL15.glBufferData(GL15.GL_ARRAY_BUFFER, uvBuffer, GL15.GL_STREAM_DRAW);
         GL15.glBufferSubData(GL15.GL_ARRAY_BUFFER, 0, uvBuffer);

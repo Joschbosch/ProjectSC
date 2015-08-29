@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
@@ -26,7 +25,7 @@ public class ParticleEmitter implements Comparable<ParticleEmitter> {
      */
     public static final int MAX_PARTICLES_PER_SOURCE = 50000;
 
-    private Vector3f position;
+    private final Vector3f position;
 
     private final List<Particle> particles;
 
@@ -34,7 +33,7 @@ public class ParticleEmitter implements Comparable<ParticleEmitter> {
 
     private int lastUsedParticle = 0;
 
-    private int textureId;
+    private final int textureId;
 
     private final float[] positionBuffer;
 
@@ -44,11 +43,9 @@ public class ParticleEmitter implements Comparable<ParticleEmitter> {
 
     private Vector3f cameraPostion;
 
-    private boolean useColors;
+    private final boolean useColors;
 
     private float numberOfRows;
-
-    private Vector2f offset;
 
     private float cameraDistance;
 
@@ -56,9 +53,9 @@ public class ParticleEmitter implements Comparable<ParticleEmitter> {
 
     private boolean glowy = false;
 
-    private BasicParticleConfiguration config;
+    private final BasicParticleConfiguration config;
 
-    public ParticleEmitter(Vector3f position, String textureName, Vector2f offset, float numberOfRows, boolean useColors,
+    public ParticleEmitter(Vector3f position, String textureName, float numberOfRows, boolean useColors,
         BasicParticleConfiguration config) {
         positionBuffer = new float[MAX_PARTICLES_PER_SOURCE * 4];
         colorBuffer = new byte[MAX_PARTICLES_PER_SOURCE * 4];
@@ -71,7 +68,6 @@ public class ParticleEmitter implements Comparable<ParticleEmitter> {
         textureId = Loader.loadTexture(textureName);
         this.useColors = useColors;
         this.setNumberOfRows(numberOfRows);
-        this.setOffset(offset);
         this.config = config;
         config.setPosition(position);
 
@@ -238,15 +234,7 @@ public class ParticleEmitter implements Comparable<ParticleEmitter> {
         this.numberOfRows = numberOfRows;
     }
 
-    public Vector2f getOffset() {
-        return offset;
-    }
-
-    public void setOffset(Vector2f offset) {
-        this.offset = offset;
-    }
-
-    public float[] getUVBuffer() {
+    public float[] getLifetimeBuffer() {
         return lifetimeBuffer;
     }
 

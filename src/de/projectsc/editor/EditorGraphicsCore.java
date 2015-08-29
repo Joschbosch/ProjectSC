@@ -46,9 +46,9 @@ import de.projectsc.core.entities.Entity;
  * 
  * @author Josch Bosch
  */
-public class Editor3DCore implements Runnable {
+public class EditorGraphicsCore implements Runnable {
 
-    private static final Log LOGGER = LogFactory.getLog(Editor3DCore.class);
+    private static final Log LOGGER = LogFactory.getLog(EditorGraphicsCore.class);
 
     private boolean running;
 
@@ -82,7 +82,7 @@ public class Editor3DCore implements Runnable {
 
     private Terrain terrain;
 
-    public Editor3DCore(Canvas displayParent, int width, int height, BlockingQueue<String> messageQueue) {
+    public EditorGraphicsCore(Canvas displayParent, int width, int height, BlockingQueue<String> messageQueue) {
         incomingQueue = new LinkedBlockingQueue<>();
         this.displayParent = displayParent;
         this.width = width;
@@ -267,7 +267,7 @@ public class Editor3DCore implements Runnable {
         modelComponent = new ModelAndTextureComponent(entity);
         try {
             modelComponent.loadModel(editorData.getModelFile(),
-                new File(Editor3DCore.class.getResource(CoreConstants.GRAPHICS_DIRECTORY_NAME + "/white.png").toURI()));
+                new File(EditorGraphicsCore.class.getResource(CoreConstants.GRAPHICS_DIRECTORY_NAME + "/white.png").toURI()));
         } catch (URISyntaxException e) {
             LOGGER.error(e);
         }
@@ -301,7 +301,7 @@ public class Editor3DCore implements Runnable {
                 ObjectMapper mapper = new ObjectMapper();
                 File schemaDir;
                 try {
-                    schemaDir = new File(Editor3DCore.class.getResource("/" + CoreConstants.SCHEME_DIRECTORY_NAME + "/"
+                    schemaDir = new File(EditorGraphicsCore.class.getResource("/" + CoreConstants.SCHEME_DIRECTORY_NAME + "/"
                         + CoreConstants.SCHEME_DIRECTORY_PREFIX + entity.getEntityTypeId()).toURI());
 
                     JsonNode tree =

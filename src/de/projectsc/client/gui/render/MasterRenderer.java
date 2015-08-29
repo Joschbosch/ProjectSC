@@ -16,7 +16,6 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.util.vector.Matrix4f;
-import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
@@ -82,9 +81,9 @@ public class MasterRenderer {
 
     private final ParticleRenderer particleRenderer;
 
-    private boolean showWireFrames = true;
+    private final boolean showWireFrames = true;
 
-    private ParticleEmitter particleEmitterFire;
+    private final ParticleEmitter particleEmitterFire;
 
     public MasterRenderer() {
         enableCulling();
@@ -109,12 +108,12 @@ public class MasterRenderer {
         // System.err.println("Could not load file");
         // }
         particleEmitterRainbow =
-            new ParticleEmitter(new Vector3f(0, 0, 0), "particleTexture2.png", new Vector2f(0.0f, 0.0f), 1.0f, true,
+            new ParticleEmitter(new Vector3f(0, 0, 0), "particleTexture2.png", 1.0f, true,
                 new BasicParticleConfiguration());
         particleEmitterRainbow.setGlowy(true);
         particleEmitterRainbow.setNumberOfParticles(1000);
         particleEmitterFire =
-            new ParticleEmitter(new Vector3f(10, 10, 0), "particleAtlas.png", new Vector2f(0.0f, 0.0f), 8.0f, false,
+            new ParticleEmitter(new Vector3f(10, 10, 0), "particleAtlas.png", 8.0f, false,
                 new BasicParticleConfiguration());
 
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 
+ * Copyright (C) 2015
  */
 
 package de.projectsc.client.gui.objects;
@@ -17,9 +17,7 @@ public class BasicParticleConfiguration {
 
     private float angle = 0;
 
-    private Vector4f color = new Vector4f(0f, 0f, 0f, 255f);
-
-    private float maximumAlphaValue = 128;
+    private Vector4f color = new Vector4f(0f, 0f, 0f, 128f);
 
     private Vector3f position;
 
@@ -39,7 +37,7 @@ public class BasicParticleConfiguration {
 
     private float weight = 0.0f;
 
-    private float speed = 1.0f;
+    private final float speed = 1.0f;
 
     private float spread = 1.5f;
 
@@ -47,7 +45,7 @@ public class BasicParticleConfiguration {
 
     private float sizeMargin = 0.0f;
 
-    private Random random;
+    private final Random random;
 
     public BasicParticleConfiguration() {
         random = new Random();
@@ -58,8 +56,8 @@ public class BasicParticleConfiguration {
     }
 
     public Vector4f createRandomColor() {
-        return new Vector4f(random.nextFloat() * 255, random.nextFloat() * 255, random.nextFloat() * 255, random.nextFloat()
-            * maximumAlphaValue);
+        return new Vector4f(random.nextFloat() * color.x, random.nextFloat() * color.y, random.nextFloat() * color.z, random.nextFloat()
+            * color.w);
     }
 
     public Vector3f createRandomPosition() {
@@ -149,14 +147,6 @@ public class BasicParticleConfiguration {
 
     public void setPositionRadiusX(float positionRadiusX) {
         this.positionRadiusX = positionRadiusX;
-    }
-
-    public float getMaximumAlphaValue() {
-        return maximumAlphaValue;
-    }
-
-    public void setMaximumAlphaValue(float maximumAlphaValue) {
-        this.maximumAlphaValue = maximumAlphaValue;
     }
 
     public float getPositionRadiusY() {
