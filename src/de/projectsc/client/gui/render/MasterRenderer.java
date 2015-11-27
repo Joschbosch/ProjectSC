@@ -16,12 +16,10 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.util.vector.Matrix4f;
-import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
 import de.projectsc.client.gui.models.RawModel;
 import de.projectsc.client.gui.models.TexturedModel;
-import de.projectsc.client.gui.objects.BasicParticleConfiguration;
 import de.projectsc.client.gui.objects.Billboard;
 import de.projectsc.client.gui.objects.Camera;
 import de.projectsc.client.gui.objects.Light;
@@ -30,6 +28,7 @@ import de.projectsc.client.gui.shaders.EntityShader;
 import de.projectsc.client.gui.shaders.TerrainShader;
 import de.projectsc.client.gui.shaders.WireFrameShader;
 import de.projectsc.client.gui.terrain.TerrainModel;
+import de.projectsc.client.gui.text.TextMaster;
 import de.projectsc.core.components.Component;
 import de.projectsc.core.entities.Entity;
 import de.projectsc.core.utils.BoundingBox;
@@ -77,13 +76,14 @@ public class MasterRenderer {
 
     private final Map<RawModel, List<BoundingBox>> boundingBoxes = new HashMap<>();
 
-    private final ParticleEmitter particleEmitterRainbow;
+    // private final ParticleEmitter particleEmitterRainbow;
 
     private final ParticleRenderer particleRenderer;
 
     private final boolean showWireFrames = true;
 
-    private final ParticleEmitter particleEmitterFire;
+    //
+    // private final ParticleEmitter particleEmitterFire;
 
     public MasterRenderer() {
         enableCulling();
@@ -107,14 +107,14 @@ public class MasterRenderer {
         // } catch (URISyntaxException e) {
         // System.err.println("Could not load file");
         // }
-        particleEmitterRainbow =
-            new ParticleEmitter(new Vector3f(0, 0, 0), "particleTexture2.png", 1.0f, true,
-                new BasicParticleConfiguration());
-        particleEmitterRainbow.setGlowy(true);
-        particleEmitterRainbow.setNumberOfParticles(1000);
-        particleEmitterFire =
-            new ParticleEmitter(new Vector3f(10, 10, 0), "particleAtlas.png", 8.0f, false,
-                new BasicParticleConfiguration());
+        // particleEmitterRainbow =
+        // new ParticleEmitter(new Vector3f(10, 10, 0), "particleTexture2.png", 1.0f, true,
+        // new BasicParticleConfiguration());
+        // particleEmitterRainbow.setGlowy(true);
+        // particleEmitterRainbow.setNumberOfParticles(1000);
+        // particleEmitterFire =
+        // new ParticleEmitter(new Vector3f(10, 10, 0), "particleAtlas.png", 8.0f, false,
+        // new BasicParticleConfiguration());
 
     }
 
@@ -147,12 +147,12 @@ public class MasterRenderer {
         particleRenderer.setCamera(camera);
 
         // TEST CODE!
-        particles.add(particleEmitterRainbow);
-        particles.add(particleEmitterFire);
-        particleEmitterRainbow.setCameraPostion(camera.getPosition());
-        particleEmitterRainbow.update();
-        particleEmitterFire.setCameraPostion(camera.getPosition());
-        particleEmitterFire.update();
+        // particles.add(particleEmitterRainbow);
+        // particles.add(particleEmitterFire);
+        // particleEmitterRainbow.setCameraPostion(camera.getPosition());
+        // particleEmitterRainbow.update();
+        // particleEmitterFire.setCameraPostion(camera.getPosition());
+        // particleEmitterFire.update();
 
         processTerrain(terrain);
         for (Entity e : allEntities) {
@@ -203,6 +203,7 @@ public class MasterRenderer {
         entities.clear();
         terrains.clear();
         boundingBoxes.clear();
+        TextMaster.render();
     }
 
     /**

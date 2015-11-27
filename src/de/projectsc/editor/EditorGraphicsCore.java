@@ -24,11 +24,15 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
 import de.projectsc.client.gui.objects.Light;
 import de.projectsc.client.gui.render.MasterRenderer;
+import de.projectsc.client.gui.text.FontType;
+import de.projectsc.client.gui.text.GUIText;
+import de.projectsc.client.gui.text.TextMaster;
 import de.projectsc.client.gui.tools.MousePicker;
 import de.projectsc.core.CoreConstants;
 import de.projectsc.core.Terrain;
@@ -40,6 +44,8 @@ import de.projectsc.core.components.impl.ModelAndTextureComponent;
 import de.projectsc.core.components.impl.MovingComponent;
 import de.projectsc.core.components.impl.ParticleEmitterComponent;
 import de.projectsc.core.entities.Entity;
+import de.projectsc.core.utils.Font;
+import de.projectsc.core.utils.FontStore;
 
 /**
  * Core class for the GUI.
@@ -82,11 +88,14 @@ public class EditorGraphicsCore implements Runnable {
 
     private Terrain terrain;
 
+    private GUIText count;
+
     public EditorGraphicsCore(Canvas displayParent, int width, int height, BlockingQueue<String> messageQueue) {
         incomingQueue = new LinkedBlockingQueue<>();
         this.displayParent = displayParent;
         this.width = width;
         this.height = height;
+
     }
 
     @Override
@@ -102,7 +111,7 @@ public class EditorGraphicsCore implements Runnable {
             initGL();
         } catch (LWJGLException e) {
         }
-
+        TextMaster.init();
         camera = new EditorCamera();
         createNewEntity();
         masterRenderer = new MasterRenderer();
@@ -119,6 +128,11 @@ public class EditorGraphicsCore implements Runnable {
             long now = System.currentTimeMillis();
             long delta = now - time;
             time = now;
+            FontType font = FontStore.getFont(Font.CANDARA);
+            if (count != null) {
+                count.remove();
+            }
+            count = new GUIText("" + (int) (1000 * 1.0 / delta), 2, font, new Vector2f(0, 0), 1.0f, false);
             readMessages();
             camera.move(delta);
             if (editorData.isLightAtCameraPostion()) {
@@ -146,7 +160,7 @@ public class EditorGraphicsCore implements Runnable {
                 }
                 GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
             }
-            Display.sync(60);
+            // Display.sync(60);
             Display.update();
         }
         Display.destroy();

@@ -36,6 +36,7 @@ import de.projectsc.core.utils.Serialization;
  * 
  * @author Josch Bosch
  */
+@SuppressWarnings("unused")
 public final class TerrainLoader {
 
     private static final String POSITION = "position";

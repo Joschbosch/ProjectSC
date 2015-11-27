@@ -105,9 +105,9 @@ public class GameRunning implements State {
 
     private void loadTerrain(String mapName) {
         LOGGER.debug("Loading terrain " + mapName);
-        Terrain terrain = TerrainLoader.loadTerrain(mapName + ".psc");
-        terrain.buildNeighborhood();
-        terrain.makeStaticObjectsNotWalkable();
+        Terrain myTerrain = TerrainLoader.loadTerrain(mapName + ".psc");
+        myTerrain.buildNeighborhood();
+        myTerrain.makeStaticObjectsNotWalkable();
 
         if (staticEntities == null) {
             staticEntities = new TreeMap<>();

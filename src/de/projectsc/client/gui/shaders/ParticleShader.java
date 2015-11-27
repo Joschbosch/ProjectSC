@@ -10,7 +10,7 @@ import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
 
 /**
- * Shader for all UI elements.
+ * Shader for Particle effects.
  * 
  * @author Josch Bosch
  */
@@ -73,6 +73,9 @@ public class ParticleShader extends Shader {
         super.bindAttribute(3, "uvCoords");
     }
 
+    /**
+     * @param numberOfRows in the texture file
+     */
     public void loaderNumberOfRows(float numberOfRows) {
         super.loadFloat(locationNumberOfRows, numberOfRows);
     }

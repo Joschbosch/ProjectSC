@@ -9,6 +9,11 @@ import java.util.Random;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
+/**
+ * Configuration for a particle source.
+ * 
+ * @author Josch Bosch
+ */
 public class BasicParticleConfiguration {
 
     private float particleLifetime = 1.0f;
@@ -51,15 +56,26 @@ public class BasicParticleConfiguration {
         random = new Random();
     }
 
+    /**
+     * Create new random lifetime.
+     * 
+     * @return lifetime
+     */
     public float createParticleLifeTime() {
         return getRandomGauss(particleLifetime, particleLifetimeMargin);
     }
 
+    /**
+     * @return random color
+     */
     public Vector4f createRandomColor() {
         return new Vector4f(random.nextFloat() * color.x, random.nextFloat() * color.y, random.nextFloat() * color.z, random.nextFloat()
             * color.w);
     }
 
+    /**
+     * @return random position
+     */
     public Vector3f createRandomPosition() {
         Vector3f startPosition =
             new Vector3f(getRandomDistributed(position.x, positionRadiusX), getRandomDistributed(position.y, positionRadiusY),
@@ -73,6 +89,9 @@ public class BasicParticleConfiguration {
         return startPosition;
     }
 
+    /**
+     * @return random direction
+     */
     public Vector3f createRandomDirection() {
 
         Vector3f newDir =
@@ -89,6 +108,9 @@ public class BasicParticleConfiguration {
         return dir;
     }
 
+    /**
+     * @return random size
+     */
     public float createRandomSize() {
         return getRandomDistributed(size, sizeMargin);
     }

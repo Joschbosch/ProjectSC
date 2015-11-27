@@ -123,9 +123,7 @@ public class MovingComponent extends Component {
 
     @Override
     public void render(Entity owner, Map<TexturedModel, List<Entity>> entities, Map<RawModel, List<BoundingBox>> boundingBoxes,
-        List<Light> lights, List<Billboard> billboards, List<ParticleEmitter> particles, Camera camera, long elapsedTime) {
-
-    }
+        List<Light> lights, List<Billboard> billboards, List<ParticleEmitter> particles, Camera camera, long elapsedTime) {}
 
     /**
      * Moves the entity with the given deltas.

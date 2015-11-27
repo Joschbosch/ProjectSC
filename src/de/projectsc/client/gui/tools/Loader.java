@@ -98,6 +98,21 @@ public final class Loader {
     }
 
     /**
+     * Loading given data positions into a VAO.
+     * 
+     * @param positions to load
+     * @param textureCoordinates to apply to the model
+     * @return the model with the vao
+     */
+    public static int loadToVAO(float[] positions, float[] textureCoordinates) {
+        int vaoID = createVAO();
+        storeDataInAttributeList(0, 2, positions);
+        storeDataInAttributeList(1, 2, textureCoordinates);
+        unbind();
+        return vaoID;
+    }
+
+    /**
      * Creates a VBO for streaming data.
      * 
      * @param buffer to create VBO from

@@ -184,9 +184,9 @@ public class ParticleEmitter implements Comparable<ParticleEmitter> {
         return cameraDistance;
     }
 
-    private double random(float base, float margin) {
-        return base + 2 * (margin * Math.random()) - margin;
-    }
+    // private double random(float base, float margin) {
+    // return base + 2 * (margin * Math.random()) - margin;
+    // }
 
     private int findUnsuedSlot() {
 
