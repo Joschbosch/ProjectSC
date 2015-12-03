@@ -26,7 +26,6 @@ import org.apache.commons.logging.LogFactory;
 
 import de.projectsc.client.core.ClientCore;
 import de.projectsc.client.core.messages.ClientMessage;
-import de.projectsc.client.guiFake.FakeGUI;
 import de.projectsc.client.network.ClientNetworkCore;
 import de.projectsc.core.data.messages.MessageConstants;
 import de.projectsc.core.game.GameConfiguration;
@@ -130,7 +129,7 @@ public class ServerMock {
 
             @Override
             public void run() {
-                mock.createConsole(fakeInternetQueue, FakeGUI.input);
+                // mock.createConsole(fakeInternetQueue, FakeGUI.input);
             }
 
         }).start();
@@ -173,10 +172,10 @@ public class ServerMock {
         mock.png = new ShowPNG(null);
         mock.png.setVisible(true);
 
-        try {
-            mock.handleCommand(fakeInternetQueue, FakeGUI.input, "input:request:client_connect");
-        } catch (InterruptedException e) {
-        }
+        // try {
+        // mock.handleCommand(fakeInternetQueue, FakeGUI.input, "input:request:client_connect");
+        // } catch (InterruptedException e) {
+        // }
 
     }
 

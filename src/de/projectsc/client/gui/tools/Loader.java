@@ -321,4 +321,8 @@ public final class Loader {
         GL30.glBindVertexArray(0);
     }
 
+    public static int getTextureId(String name) {
+        return textureMap.get(name);
+    }
+
 }

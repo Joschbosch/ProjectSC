@@ -3,7 +3,7 @@
  * 
  * 
  */
-package de.projectsc.client.core.elements;
+package de.projectsc.client.core.ui.elements;
 
 import de.projectsc.core.game.GameConfiguration;
 
@@ -13,7 +13,7 @@ import de.projectsc.core.game.GameConfiguration;
  * 
  * @author Josch Bosch
  */
-public class GameConfigurationView implements UIElement {
+public class GameConfigurationView extends UIElement {
 
     private final GameConfiguration gameConfiguration;
 

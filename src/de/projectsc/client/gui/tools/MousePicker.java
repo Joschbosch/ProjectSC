@@ -6,6 +6,8 @@
 
 package de.projectsc.client.gui.tools;
 
+import java.util.List;
+
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.util.vector.Matrix4f;
@@ -35,15 +37,16 @@ public class MousePicker {
 
     private final Camera camera;
 
-    private final Terrain terrain;
-
     private Vector3f currentTerrainPoint;
 
-    public MousePicker(Camera cam, Matrix4f projection, Terrain t) {
+    private List<Terrain> terrains;
+
+    private Terrain currentTerrain;
+
+    public MousePicker(Camera cam, Matrix4f projection) {
         camera = cam;
         projectionMatrix = projection;
         viewMatrix = camera.createViewMatrix();
-        this.terrain = t;
     }
 
     public Vector3f getCurrentTerrainPoint() {
@@ -57,7 +60,8 @@ public class MousePicker {
     /**
      * Update picker to current camera position.
      */
-    public void update() {
+    public void update(List<Terrain> currentTerrains) {
+        this.terrains = currentTerrains;
         viewMatrix = camera.createViewMatrix();
         currentRay = calculateMouseRay();
         if (intersectionInRange(0, RAY_RANGE, currentRay)) {
@@ -110,8 +114,10 @@ public class MousePicker {
             Vector3f endPoint = getPointOnRay(ray, half);
             Terrain terrainSearch = getTerrain(endPoint.getX(), endPoint.getZ());
             if (terrainSearch != null) {
+                currentTerrain = terrainSearch;
                 return endPoint;
             } else {
+                currentTerrain = null;
                 return null;
             }
         }
@@ -138,7 +144,18 @@ public class MousePicker {
     }
 
     private Terrain getTerrain(float worldX, float worldZ) {
-        return terrain;
+        for (Terrain t : terrains) {
+            if (worldX >= t.getWorldPositionX() && worldZ >= t.getWorldPositionZ()
+                && worldX < t.getWorldPositionX() + Terrain.TERRAIN_TILE_SIZE * Terrain.TERRAIN_CHUNK_SIZE
+                && worldZ < t.getWorldPositionZ() + Terrain.TERRAIN_TILE_SIZE * Terrain.TERRAIN_CHUNK_SIZE) {
+                return t;
+            }
+        }
+        return null;
+    }
+
+    public Terrain getCurrentTerrain() {
+        return currentTerrain;
     }
 
 }

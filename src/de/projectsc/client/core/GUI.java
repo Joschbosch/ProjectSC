@@ -5,11 +5,10 @@
  */
 package de.projectsc.client.core;
 
-import java.util.Queue;
+import java.util.Map;
 
-import de.projectsc.client.core.elements.Snapshot;
-import de.projectsc.client.core.messages.ClientMessage;
-import de.projectsc.client.core.states.ClientStates;
+import de.projectsc.client.core.states.ClientState;
+import de.projectsc.client.core.ui.elements.Snapshot;
 
 /**
  * Interface for GUI implementations.
@@ -27,26 +26,52 @@ public interface GUI {
      * Render gui.
      * 
      * @param state to render
-     * @param elapsedTime since last frame
      * @param data to render
      */
-    void render(ClientStates state, long elapsedTime, Snapshot data);
-
-    /**
-     * @param state to change to
-     */
-    void changeState(ClientStates state);
-
-    /**
-     * Load gui.
-     */
-    void load();
+    void render(ClientState state, Snapshot data);
 
     /**
      * Read user input.
      * 
      * @return messages for core.
      */
-    Queue<ClientMessage> readInput();
+    Map<Integer, Integer> readInput();
 
+    /**
+     * Initialize the state.
+     */
+    void initialize();
+
+    /**
+     * Pause state.
+     */
+    void pause();
+
+    /**
+     * Resume state.
+     *
+     */
+    void resume();
+
+    /**
+     * Update state.
+     */
+    void update();
+
+    /**
+     * handle Input.
+     * 
+     */
+    void handleInput();
+
+    /**
+     * Terminate status.
+     */
+    void terminate();
+
+    boolean initCore();
+
+    boolean initState(ClientState state);
+
+    boolean isRunning();
 }

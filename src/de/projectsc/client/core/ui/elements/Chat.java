@@ -3,7 +3,7 @@
  * 
  * 
  */
-package de.projectsc.client.core.elements;
+package de.projectsc.client.core.ui.elements;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +13,7 @@ import java.util.List;
  * 
  * @author Josch Bosch
  */
-public class Chat implements UIElement {
+public class Chat extends UIElement {
 
     private final List<String> lines = new ArrayList<>();
 

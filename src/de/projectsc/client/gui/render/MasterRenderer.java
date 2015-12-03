@@ -6,9 +6,7 @@
 
 package de.projectsc.client.gui.render;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -18,18 +16,13 @@ import org.lwjgl.opengl.GL30;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector4f;
 
+import de.projectsc.client.core.data.Scene;
 import de.projectsc.client.gui.models.RawModel;
 import de.projectsc.client.gui.models.TexturedModel;
-import de.projectsc.client.gui.objects.Billboard;
 import de.projectsc.client.gui.objects.Camera;
-import de.projectsc.client.gui.objects.Light;
-import de.projectsc.client.gui.objects.ParticleEmitter;
 import de.projectsc.client.gui.shaders.EntityShader;
 import de.projectsc.client.gui.shaders.TerrainShader;
 import de.projectsc.client.gui.shaders.WireFrameShader;
-import de.projectsc.client.gui.terrain.TerrainModel;
-import de.projectsc.client.gui.text.TextMaster;
-import de.projectsc.core.components.Component;
 import de.projectsc.core.entities.Entity;
 import de.projectsc.core.utils.BoundingBox;
 
@@ -66,24 +59,13 @@ public class MasterRenderer {
 
     private final BillboardRenderer billboardRenderer;
 
-    private final Map<TexturedModel, List<Entity>> entities = new HashMap<>();
-
-    private final List<TerrainModel> terrains = new ArrayList<>();
-
     private final WireFrameShader collisionBoxShader;
 
     private final WireFrameRenderer collisionBoxRenderer;
 
-    private final Map<RawModel, List<BoundingBox>> boundingBoxes = new HashMap<>();
-
-    // private final ParticleEmitter particleEmitterRainbow;
-
     private final ParticleRenderer particleRenderer;
 
     private final boolean showWireFrames = true;
-
-    //
-    // private final ParticleEmitter particleEmitterFire;
 
     public MasterRenderer() {
         enableCulling();
@@ -130,89 +112,56 @@ public class MasterRenderer {
     /**
      * Render the whole scene with all objects.
      * 
-     * @param terrain to render
-     * @param allEntities all entities
+     * @param scene to render
      * @param camera for view
      * @param elapsedTime since last frame
      * @param clipPlane to clip the world
      */
-    public void renderScene(TerrainModel terrain, List<Entity> allEntities,
+    public void renderScene(Scene scene,
         Camera camera, long elapsedTime, Vector4f clipPlane) {
-        List<Light> lights = new LinkedList<>();
-        List<Billboard> billboards = new LinkedList<>();
-        List<ParticleEmitter> particles = new LinkedList<>();
-
-        // billboards.add(billboard);
         billboardRenderer.setCamera(camera);
         particleRenderer.setCamera(camera);
-
-        // TEST CODE!
-        // particles.add(particleEmitterRainbow);
-        // particles.add(particleEmitterFire);
-        // particleEmitterRainbow.setCameraPostion(camera.getPosition());
-        // particleEmitterRainbow.update();
-        // particleEmitterFire.setCameraPostion(camera.getPosition());
-        // particleEmitterFire.update();
-
-        processTerrain(terrain);
-        for (Entity e : allEntities) {
-            for (Component c : e.getComponents().values()) {
-                c.render(e, entities, boundingBoxes, lights, billboards, particles, camera, elapsedTime);
-            }
-        }
-
-        render(lights, billboards, particles, camera, elapsedTime, clipPlane);
+        render(scene, camera, elapsedTime, clipPlane);
     }
 
     /**
      * General render method .
      * 
-     * @param lights to use
-     * @param billboards to render+
-     * @param particles to render
+     * @param scene to render
      * @param camera to use
      * @param elapsedTime since last frame
      * @param clipPlane to clip the world
      */
-    public void render(List<Light> lights, List<Billboard> billboards, List<ParticleEmitter> particles, Camera camera, long elapsedTime,
+    public void render(Scene scene, Camera camera, long elapsedTime,
         Vector4f clipPlane) {
         prepare();
         entityShader.start();
         entityShader.loadClipPlane(clipPlane);
         entityShader.loadSkyColor(SKY_R, SKY_G, SKY_B);
-        entityShader.loadLights(lights);
+        entityShader.loadLights(scene.getLights());
         entityShader.loadViewMatrix(camera);
-        entityRenderer.render(entities);
+        entityRenderer.render(scene.getEntities());
         entityShader.stop();
         if (showWireFrames) {
             collisionBoxShader.start();
             collisionBoxShader.loadViewMatrix(camera);
-            collisionBoxRenderer.render(boundingBoxes);
+            collisionBoxRenderer.render(getBoundingBoxes(scene.getEntities()));
             collisionBoxShader.stop();
         }
         terrainShader.start();
         terrainShader.loadClipPlane(clipPlane);
         terrainShader.loadSkyColor(SKY_R, SKY_G, SKY_B);
-        terrainShader.loadLights(lights);
+        terrainShader.loadLights(scene.getLights());
         terrainShader.loadViewMatrix(camera);
-        terrainRenderer.render(terrains);
+        terrainRenderer.render(scene.getTerrain());
         terrainShader.stop();
         skyboxRenderer.render(elapsedTime, camera, SKY_R, SKY_G, SKY_B);
-        billboardRenderer.render(billboards);
-        particleRenderer.render(particles);
-        entities.clear();
-        terrains.clear();
-        boundingBoxes.clear();
-        TextMaster.render();
+        billboardRenderer.render(scene.getBillboards());
+        particleRenderer.render(scene.getParticles());
     }
 
-    /**
-     * Add terrain to be rendered later.
-     * 
-     * @param terrain to render
-     */
-    public void processTerrain(TerrainModel terrain) {
-        terrains.add(terrain);
+    private Map<RawModel, List<BoundingBox>> getBoundingBoxes(Map<TexturedModel, List<Entity>> entities) {
+        return new HashMap<>();
     }
 
     /**

@@ -3,7 +3,7 @@
  * 
  * 
  */
-package de.projectsc.client.core.elements;
+package de.projectsc.client.core.ui.elements;
 
 import java.util.LinkedList;
 import java.util.List;

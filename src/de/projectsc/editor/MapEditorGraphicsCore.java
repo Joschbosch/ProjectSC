@@ -9,6 +9,7 @@ import java.awt.Canvas;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -35,9 +36,12 @@ import org.lwjgl.util.vector.Vector4f;
 import com.rits.cloning.Cloner;
 
 import de.projectsc.EntityEditor;
+import de.projectsc.client.core.data.Scene;
+import de.projectsc.client.gui.models.TexturedModel;
 import de.projectsc.client.gui.objects.Camera;
 import de.projectsc.client.gui.objects.Light;
 import de.projectsc.client.gui.render.MasterRenderer;
+import de.projectsc.client.gui.terrain.TerrainModel;
 import de.projectsc.client.gui.tools.MousePicker;
 import de.projectsc.core.CoreConstants;
 import de.projectsc.core.Terrain;
@@ -97,7 +101,7 @@ public class MapEditorGraphicsCore implements Runnable {
 
     private Entity selectedEntity;
 
-    private Terrain terrain;
+    private List<Terrain> terrains;
 
     public MapEditorGraphicsCore(Canvas displayParent, int width, int height, BlockingQueue<String> messageQueue) {
         incomingQueue = new LinkedBlockingQueue<>();
@@ -216,8 +220,8 @@ public class MapEditorGraphicsCore implements Runnable {
             readMessages();
 
             camera.move(delta);
-            if (terrain != null) {
-                mousePicker.update();
+            if (terrains != null) {
+                mousePicker.update(terrains);
                 readInput();
                 for (ComponentType type : ComponentType.values()) {
                     for (Entity e : entities) {
@@ -246,8 +250,10 @@ public class MapEditorGraphicsCore implements Runnable {
                     entitySchemaAtCursor.setPosition(mousePicker.getCurrentTerrainPoint());
                 }
                 if (doRender.get()) {
-                    masterRenderer.renderScene(terrain.getModel(), entities,
-                        camera, delta, new Vector4f(0, 1, 0, 100000));
+                    Scene s = new Scene();
+                    s.setTerrain(getTerrainModels(terrains));
+                    prepareEntities(s);
+                    masterRenderer.renderScene(s, camera, delta, new Vector4f(0, 1, 0, 100000));
                 }
             } else {
                 if (Keyboard.isKeyDown(Keyboard.KEY_SPACE)) {
@@ -261,6 +267,30 @@ public class MapEditorGraphicsCore implements Runnable {
             Display.update();
         }
         Display.destroy();
+    }
+
+    private List<TerrainModel> getTerrainModels(List<Terrain> terrains) {
+        List<TerrainModel> terrainModels = new LinkedList<>();
+        for (Terrain t : terrains) {
+            terrainModels.add(t.getModel());
+        }
+        return terrainModels;
+    }
+
+    private void prepareEntities(Scene s) {
+        Map<TexturedModel, List<Entity>> map = new HashMap<>();
+        for (Entity e : entities) {
+            ModelAndTextureComponent c = (ModelAndTextureComponent) e.getComponentByName(ModelAndTextureComponent.NAME);
+            if (c != null) {
+                List<Entity> list = map.get(c.getTexturedModel());
+                if (list == null) {
+                    list = new LinkedList<>();
+                    map.put(c.getTexturedModel(), list);
+                }
+                list.add(e);
+            }
+        }
+        s.setEntities(map);
     }
 
     private void readInput() {
@@ -346,11 +376,18 @@ public class MapEditorGraphicsCore implements Runnable {
         entities.add(lightEntity);
     }
 
-    private void createTerrain(int terrainWidth, int terrainHeight, String textureName) {
+    private void createTerrain(int k, int l, String parsed) {
         String texture = "terrain/grass.png";
-        terrain =
-            new Terrain(-0.5f, -0.5f, texture, texture, texture, texture);
-        mousePicker = new MousePicker(camera, masterRenderer.getProjectionMatrix(), terrain);
+        terrains = new LinkedList<>();
+        for (int i = -1; i < 2; i++) {
+            for (int j = -1; j < 2; j++) {
+                Terrain terrain =
+                    new Terrain(-0.5f * i, -0.5f * j, texture, texture, texture, texture);
+                terrains.add(terrain);
+            }
+        }
+
+        mousePicker = new MousePicker(camera, masterRenderer.getProjectionMatrix());
     }
 
     protected void initGL() {}

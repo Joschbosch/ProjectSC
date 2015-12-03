@@ -4,14 +4,14 @@
  * 
  */
 
-package de.projectsc.client.core.elements;
+package de.projectsc.client.core.ui.elements;
 
 /**
  * Screen if client wants to login.
  * 
  * @author Josch Bosch
  */
-public class LoginScreen implements UIElement {
+public class LoginScreen extends UIElement {
 
     private String loginMessage = "";
 

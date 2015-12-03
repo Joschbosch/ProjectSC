@@ -54,6 +54,10 @@ public class Terrain {
 
     private BoundingBox mapBox;
 
+    private float worldPositionXMax;
+
+    private float worldPositionZMax;
+
     public Terrain(float x, float z, String bgTexture, String rTexture, String gTexture,
         String bTexture) {
         this.tiles = new Tile[TERRAIN_CHUNK_SIZE][TERRAIN_CHUNK_SIZE];
@@ -65,9 +69,10 @@ public class Terrain {
         }
         this.mapSize = TERRAIN_CHUNK_SIZE;
         this.setMapBox(calculateMapBox());
-        this.worldPositionX = x;
-        this.worldPositionZ = z;
-
+        this.worldPositionX = x * TERRAIN_CHUNK_SIZE * TERRAIN_TILE_SIZE;
+        this.worldPositionZ = z * TERRAIN_CHUNK_SIZE * TERRAIN_TILE_SIZE;
+        this.setWorldPositionXMax(x + TERRAIN_CHUNK_SIZE * TERRAIN_TILE_SIZE);
+        this.setWorldPositionZMax(z + TERRAIN_CHUNK_SIZE * TERRAIN_TILE_SIZE);
         TerrainTexture backgroundTex = new TerrainTexture(Loader.loadTexture(bgTexture));
         TerrainTexture rTex = new TerrainTexture(Loader.loadTexture(rTexture));
         TerrainTexture gTex = new TerrainTexture(Loader.loadTexture(gTexture));
@@ -225,6 +230,22 @@ public class Terrain {
 
     public TerrainModel getModel() {
         return model;
+    }
+
+    public float getWorldPositionXMax() {
+        return worldPositionXMax;
+    }
+
+    public void setWorldPositionXMax(float worldPositionXMax) {
+        this.worldPositionXMax = worldPositionXMax;
+    }
+
+    public float getWorldPositionZMax() {
+        return worldPositionZMax;
+    }
+
+    public void setWorldPositionZMax(float worldPositionZMax) {
+        this.worldPositionZMax = worldPositionZMax;
     }
 
 }

@@ -27,11 +27,11 @@ public class TerrainModel {
 
     private static final Log LOGGER = LogFactory.getLog(TerrainModel.class);
 
+    private static RawModel model;
+
     private final float xCoord;
 
     private final float zCoord;
-
-    private final RawModel model;
 
     private final TerrainTexturePack texture;
 
@@ -46,7 +46,9 @@ public class TerrainModel {
         this.texture = texture;
         this.blendMap = blendMap;
         this.tiles = tiles;
-        this.model = generateTerrainModel();
+        if (model == null) {
+            model = generateTerrainModel();
+        }
     }
 
     private RawModel generateTerrainModel() {
@@ -89,6 +91,7 @@ public class TerrainModel {
                 indices[pointer++] = bottomRight;
             }
         }
+        LOGGER.debug("Terrain generated");
         return Loader.loadToVAO(vertices, textureCoords, normals, indices);
     }
 

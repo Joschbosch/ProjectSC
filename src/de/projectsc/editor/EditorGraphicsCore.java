@@ -9,8 +9,10 @@ import java.awt.Canvas;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -24,13 +26,14 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
+import de.projectsc.client.core.data.Scene;
+import de.projectsc.client.gui.models.TexturedModel;
 import de.projectsc.client.gui.objects.Light;
 import de.projectsc.client.gui.render.MasterRenderer;
-import de.projectsc.client.gui.text.FontType;
+import de.projectsc.client.gui.terrain.TerrainModel;
 import de.projectsc.client.gui.text.GUIText;
 import de.projectsc.client.gui.text.TextMaster;
 import de.projectsc.client.gui.tools.MousePicker;
@@ -44,8 +47,6 @@ import de.projectsc.core.components.impl.ModelAndTextureComponent;
 import de.projectsc.core.components.impl.MovingComponent;
 import de.projectsc.core.components.impl.ParticleEmitterComponent;
 import de.projectsc.core.entities.Entity;
-import de.projectsc.core.utils.Font;
-import de.projectsc.core.utils.FontStore;
 
 /**
  * Core class for the GUI.
@@ -86,9 +87,9 @@ public class EditorGraphicsCore implements Runnable {
 
     private final AtomicBoolean moveEntity = new AtomicBoolean(false);
 
-    private Terrain terrain;
-
     private GUIText count;
+
+    private List<Terrain> terrains;
 
     public EditorGraphicsCore(Canvas displayParent, int width, int height, BlockingQueue<String> messageQueue) {
         incomingQueue = new LinkedBlockingQueue<>();
@@ -128,11 +129,6 @@ public class EditorGraphicsCore implements Runnable {
             long now = System.currentTimeMillis();
             long delta = now - time;
             time = now;
-            FontType font = FontStore.getFont(Font.CANDARA);
-            if (count != null) {
-                count.remove();
-            }
-            count = new GUIText("" + (int) (1000 * 1.0 / delta), 2, font, new Vector2f(0, 0), 1.0f, false);
             readMessages();
             camera.move(delta);
             if (editorData.isLightAtCameraPostion()) {
@@ -145,12 +141,17 @@ public class EditorGraphicsCore implements Runnable {
                     e.update(type);
                 }
             }
-            if (terrain != null) {
+            if (terrains != null) {
                 camera.move(delta);
-                mousePicker.update();
+                mousePicker.update(terrains);
                 if (doRender.get()) {
-                    masterRenderer.renderScene(terrain.getModel(), entities,
-                        camera, delta, new Vector4f(0, 1, 0, 100000));
+                    Scene s = new Scene();
+                    s.setTerrain(getTerrainModels(terrains));
+                    prepareEntities(s);
+                    List<Light> l = new LinkedList<>();
+                    l.add(sun);
+                    s.setLights(l);
+                    masterRenderer.renderScene(s, camera, delta, new Vector4f(0, 1, 0, 100000));
                 }
             } else {
                 if (Keyboard.isKeyDown(Keyboard.KEY_SPACE)) {
@@ -160,10 +161,36 @@ public class EditorGraphicsCore implements Runnable {
                 }
                 GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
             }
-            // Display.sync(60);
+            Display.sync(60);
             Display.update();
         }
         Display.destroy();
+    }
+
+    private List<TerrainModel> getTerrainModels(List<Terrain> terrains) {
+        List<TerrainModel> terrainModels = new LinkedList<>();
+        for (Terrain t : terrains) {
+            // if (!t.equals(mousePicker.getCurrentTerrain())) {
+            terrainModels.add(t.getModel());
+            // }
+        }
+        return terrainModels;
+    }
+
+    private void prepareEntities(Scene s) {
+        Map<TexturedModel, List<Entity>> map = new HashMap<>();
+        for (Entity e : entities) {
+            ModelAndTextureComponent c = (ModelAndTextureComponent) e.getComponentByName(ModelAndTextureComponent.NAME);
+            if (c != null) {
+                List<Entity> list = map.get(c.getTexturedModel());
+                if (list == null) {
+                    list = new LinkedList<>();
+                    map.put(c.getTexturedModel(), list);
+                }
+                list.add(e);
+            }
+        }
+        s.setEntities(map);
     }
 
     private void createPlayerEntity() {
@@ -188,10 +215,16 @@ public class EditorGraphicsCore implements Runnable {
 
     private void createTerrain() {
         String texture = "terrain/grass.png";
-        terrain =
-            new Terrain(-0.5f, -0.5f, texture, texture, texture, texture);
+        terrains = new LinkedList<>();
+        for (int i = -5; i < 5; i++) {
+            for (int j = -5; j < 5; j++) {
+                Terrain terrain =
+                    new Terrain(i, j, texture, texture, texture, texture);
+                terrains.add(terrain);
+            }
+        }
 
-        mousePicker = new MousePicker(camera, masterRenderer.getProjectionMatrix(), terrain);
+        mousePicker = new MousePicker(camera, masterRenderer.getProjectionMatrix());
     }
 
     private void moveEntity() {
