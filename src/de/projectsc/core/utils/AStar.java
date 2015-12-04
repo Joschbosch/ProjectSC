@@ -133,14 +133,14 @@ class AStarNode<T> implements Comparable<AStarNode<T>> {
 
     private Float priority;
 
-    public AStarNode(T graphNode, Float cost, Float priority) {
+    AStarNode(T graphNode, Float cost, Float priority) {
         this.node = graphNode;
         this.cost = cost;
         this.priority = priority;
         this.previous = null;
     }
 
-    public AStarNode(T node, Float cost, Float priority, AStarNode<T> previous) {
+    AStarNode(T node, Float cost, Float priority, AStarNode<T> previous) {
         this.node = node;
         this.cost = cost;
         this.priority = priority;

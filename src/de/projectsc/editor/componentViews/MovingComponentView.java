@@ -12,8 +12,8 @@ import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import de.projectsc.core.components.impl.MovingComponent;
 import de.projectsc.core.entities.Entity;
+import de.projectsc.core.entities.components.physics.MovingComponent;
 
 /**
  * Editor view for the {@link MovingComponent}.

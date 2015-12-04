@@ -29,7 +29,7 @@ import org.apache.commons.logging.LogFactory;
 
 import de.projectsc.EntityEditor;
 import de.projectsc.core.CoreConstants;
-import de.projectsc.core.components.impl.BoundingComponent;
+import de.projectsc.core.modes.client.gui.components.BoundingComponent;
 import de.projectsc.editor.EditorGraphicsCore;
 
 /**
@@ -157,7 +157,7 @@ public class BoundingComponentView extends JDialog {
 
         private final int index;
 
-        public OffsetDocument(int i) {
+        OffsetDocument(int i) {
             this.index = i;
         }
 

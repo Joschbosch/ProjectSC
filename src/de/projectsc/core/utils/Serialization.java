@@ -19,7 +19,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ObjectNode;
 import org.lwjgl.util.vector.Vector3f;
 
-import de.projectsc.client.gui.objects.Light;
+import de.projectsc.core.modes.client.gui.objects.Light;
 
 /**
  * Utils for Serialization.

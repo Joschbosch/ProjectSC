@@ -12,8 +12,8 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import de.projectsc.client.gui.text.FontType;
-import de.projectsc.client.gui.tools.Loader;
+import de.projectsc.core.modes.client.gui.text.FontType;
+import de.projectsc.core.modes.client.gui.tools.Loader;
 
 /**
  * Stores all fonts available.

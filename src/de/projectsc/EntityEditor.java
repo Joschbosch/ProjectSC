@@ -59,13 +59,13 @@ import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import de.projectsc.core.CoreConstants;
-import de.projectsc.core.components.Component;
-import de.projectsc.core.components.impl.BoundingComponent;
-import de.projectsc.core.components.impl.EmittingLightComponent;
-import de.projectsc.core.components.impl.MovingComponent;
-import de.projectsc.core.components.impl.ParticleEmitterComponent;
-import de.projectsc.editor.EditorGraphicsCore;
+import de.projectsc.core.entities.Component;
+import de.projectsc.core.entities.components.physics.MovingComponent;
+import de.projectsc.core.modes.client.gui.components.graphical.impl.BoundingComponent;
+import de.projectsc.core.modes.client.gui.components.graphical.impl.EmittingLightComponent;
+import de.projectsc.core.modes.client.gui.components.graphical.impl.ParticleEmitterComponent;
 import de.projectsc.editor.EditorData;
+import de.projectsc.editor.EditorGraphicsCore;
 import de.projectsc.editor.componentViews.BoundingComponentView;
 import de.projectsc.editor.componentViews.EmittingLightComponentView;
 import de.projectsc.editor.componentViews.MovingComponentView;
@@ -818,7 +818,7 @@ public class EntityEditor extends JFrame {
 
         private final int type;
 
-        public TextureDocument(JTextField text, int type) {
+        TextureDocument(JTextField text, int type) {
 
             this.textF = text;
             this.type = type;

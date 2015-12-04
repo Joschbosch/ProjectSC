@@ -12,11 +12,10 @@ import java.util.List;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
-import de.projectsc.client.gui.terrain.TerrainModel;
-import de.projectsc.client.gui.textures.TerrainTexture;
-import de.projectsc.client.gui.textures.TerrainTexturePack;
-import de.projectsc.client.gui.tools.Loader;
-import de.projectsc.core.entities.Entity;
+import de.projectsc.core.modes.client.gui.terrain.TerrainModel;
+import de.projectsc.core.modes.client.gui.textures.TerrainTexture;
+import de.projectsc.core.modes.client.gui.textures.TerrainTexturePack;
+import de.projectsc.core.modes.client.gui.tools.Loader;
 import de.projectsc.core.utils.BoundingBox;
 import de.projectsc.core.utils.GraphEdge;
 
@@ -167,42 +166,42 @@ public class Terrain {
         // }
     }
 
-    /**
-     * Set all entities to *mark* on walkable map.
-     * 
-     * @param mark to set to
-     * @param list of entities
-     */
-    public void markEntitiyObjects(byte mark, List<Entity> list) {
-        for (Entity e : list) {
-            markEntityPosition(e, mark);
-        }
-    }
-
-    /**
-     * set entitiy to mark.
-     * 
-     * @param e entity
-     * @param mark to set to
-     */
-    public void markEntityPosition(Entity e, byte mark) {
-        if (e.getBoundingBox() != null) {
-            Vector3f realMinPos = Vector3f.add(e.getBoundingBox().getMin(), e.getPosition(), null);
-            Vector3f realMaxPos = Vector3f.add(e.getBoundingBox().getMax(), e.getPosition(), null);
-            if (realMinPos.x > 0 && realMinPos.z > 0) {
-                realMinPos = (Vector3f) realMinPos.scale(1.0f / Terrain.TERRAIN_TILE_SIZE);
-                realMaxPos = (Vector3f) realMaxPos.scale(1.0f / Terrain.TERRAIN_TILE_SIZE);
-                for (int i = (int) realMinPos.x; i <= (int) realMaxPos.x; i++) {
-                    for (int j = (int) realMinPos.z; j <= (int) realMaxPos.z; j++) {
-                        if (tiles[i][j] != null) {
-                            tiles[i][j].setWalkable(mark);
-
-                        }
-                    }
-                }
-            }
-        }
-    }
+    // /**
+    // * Set all entities to *mark* on walkable map.
+    // *
+    // * @param mark to set to
+    // * @param list of entities
+    // */
+    // public void markEntitiyObjects(byte mark, List<Entity> list) {
+    // for (Entity e : list) {
+    // markEntityPosition(e, mark);
+    // }
+    // }
+    //
+    // /**
+    // * set entitiy to mark.
+    // *
+    // * @param e entity
+    // * @param mark to set to
+    // */
+    // public void markEntityPosition(Entity e, byte mark) {
+    // if (e.getBoundingBox() != null) {
+    // Vector3f realMinPos = Vector3f.add(e.getBoundingBox().getMin(), e.getPosition(), null);
+    // Vector3f realMaxPos = Vector3f.add(e.getBoundingBox().getMax(), e.getPosition(), null);
+    // if (realMinPos.x > 0 && realMinPos.z > 0) {
+    // realMinPos = (Vector3f) realMinPos.scale(1.0f / Terrain.TERRAIN_TILE_SIZE);
+    // realMaxPos = (Vector3f) realMaxPos.scale(1.0f / Terrain.TERRAIN_TILE_SIZE);
+    // for (int i = (int) realMinPos.x; i <= (int) realMaxPos.x; i++) {
+    // for (int j = (int) realMinPos.z; j <= (int) realMaxPos.z; j++) {
+    // if (tiles[i][j] != null) {
+    // tiles[i][j].setWalkable(mark);
+    //
+    // }
+    // }
+    // }
+    // }
+    // }
+    // }
 
     public int getMapSize() {
         return mapSize;
@@ -246,6 +245,17 @@ public class Terrain {
 
     public void setWorldPositionZMax(float worldPositionZMax) {
         this.worldPositionZMax = worldPositionZMax;
+    }
+
+    /**
+     * Get height of terrain from model.
+     * 
+     * @param x world coordinate
+     * @param z world coordinate
+     * @return height
+     */
+    public float getHeightOfTerrain(float x, float z) {
+        return model.getHeightOfTerrain(x, z);
     }
 
 }

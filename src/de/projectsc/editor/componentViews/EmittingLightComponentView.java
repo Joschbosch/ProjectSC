@@ -22,9 +22,9 @@ import javax.swing.table.TableModel;
 
 import org.lwjgl.util.vector.Vector3f;
 
-import de.projectsc.client.gui.objects.Light;
-import de.projectsc.core.components.impl.EmittingLightComponent;
 import de.projectsc.core.entities.Entity;
+import de.projectsc.core.modes.client.gui.components.graphical.impl.EmittingLightComponent;
+import de.projectsc.core.modes.client.gui.objects.Light;
 
 /**
  * Editor view for the {@link EmittingLightComponent}.

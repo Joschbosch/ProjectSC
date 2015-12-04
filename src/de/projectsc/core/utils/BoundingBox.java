@@ -7,7 +7,7 @@ package de.projectsc.core.utils;
 
 import org.lwjgl.util.vector.Vector3f;
 
-import de.projectsc.client.gui.models.RawModel;
+import de.projectsc.core.modes.client.gui.models.RawModel;
 
 /**
  * An axis aligned bounding box for each entitiy.

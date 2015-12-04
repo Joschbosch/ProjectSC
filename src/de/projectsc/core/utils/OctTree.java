@@ -5,8 +5,6 @@
  */
 package de.projectsc.core.utils;
 
-import java.awt.Color;
-import java.awt.Graphics;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -28,21 +26,17 @@ public class OctTree<T extends PhysicalObject> {
 
     private static final int LIFE_INIT_VALUE = -1;
 
+    protected List<T> entities = new LinkedList<>();
+
+    protected final OctTree<T>[] children;
+
     private final Queue<T> pendingEntities = new LinkedList<>();
-
-    private final Color[] colorLevel =
-        new Color[] { Color.RED, Color.GRAY, Color.GREEN, Color.YELLOW, Color.BLUE, Color.CYAN, Color.MAGENTA,
-            Color.PINK };
-
-    private List<T> entities = new LinkedList<>();
 
     private boolean treeBuild = false;
 
     private final BoundingBox region;
 
     private OctTree<T> parent;
-
-    private final OctTree<T>[] children;
 
     private List<T> interSectionList;
 
@@ -99,7 +93,6 @@ public class OctTree<T extends PhysicalObject> {
             return;
         }
         Vector3f dimension = region.getSize();
-
         if (dimension.x <= 1 && dimension.y <= 1 && dimension.z <= 1) {
             entities.add(e);
             return;
@@ -108,29 +101,7 @@ public class OctTree<T extends PhysicalObject> {
         Vector3f center = Vector3f.add(region.getMin(), half, null);
 
         BoundingBox[] octant = new BoundingBox[8];
-
-        octant[0] = children[0] != null ? children[0].region : new BoundingBox(region.getMin(), center);
-        octant[1] = children[1] != null ? children[1].region
-            : new BoundingBox(new Vector3f(center.x, region.getMin().y, region.getMin().z), new Vector3f(region.getMax().x, center.y,
-                center.z));
-        octant[2] = children[2] != null ? children[2].region
-            : new BoundingBox(new Vector3f(center.x, region.getMin().y, center.z), new Vector3f(region.getMax().x, center.y,
-                region.getMax().z));
-        octant[3] = children[3] != null ? children[3].region
-            : new BoundingBox(new Vector3f(region.getMin().x, region.getMin().y, center.z), new Vector3f(center.x, center.y,
-                region.getMax().z));
-        octant[4] = children[4] != null ? children[4].region
-            : new BoundingBox(new Vector3f(region.getMin().x, center.y, region.getMin().z), new Vector3f(center.x, region.getMax().y,
-                center.z));
-        octant[5] =
-            children[5] != null ? children[5].region : new BoundingBox(new Vector3f(center.x, center.y, region.getMin().z), new Vector3f(
-                region.getMax().x, region.getMax().y,
-                center.z));
-        octant[6] = children[6] != null ? children[6].region : new BoundingBox(center, region.getMax());
-        octant[7] =
-            children[7] != null ? children[7].region : new BoundingBox(new Vector3f(region.getMin().x, center.y, center.z), new Vector3f(
-                center.x, region.getMax().y, region.getMax().z));
-
+        createOctantWithChildren(center, octant);
         if (containsEntity(region, e)) {
             boolean foundChild = false;
             for (int i = 0; i < 8; i++) {
@@ -155,39 +126,42 @@ public class OctTree<T extends PhysicalObject> {
         }
     }
 
+    private void createOctantWithChildren(Vector3f center, BoundingBox[] octant) {
+        octant[0] = children[0] != null ? children[0].region : new BoundingBox(region.getMin(), center);
+        octant[1] = children[1] != null ? children[1].region
+            : new BoundingBox(new Vector3f(center.x, region.getMin().y, region.getMin().z), new Vector3f(region.getMax().x, center.y,
+                center.z));
+        octant[2] = children[2] != null ? children[2].region
+            : new BoundingBox(new Vector3f(center.x, region.getMin().y, center.z), new Vector3f(region.getMax().x, center.y,
+                region.getMax().z));
+        octant[3] = children[3] != null ? children[3].region
+            : new BoundingBox(new Vector3f(region.getMin().x, region.getMin().y, center.z), new Vector3f(center.x, center.y,
+                region.getMax().z));
+        octant[4] = children[4] != null ? children[4].region
+            : new BoundingBox(new Vector3f(region.getMin().x, center.y, region.getMin().z), new Vector3f(center.x, region.getMax().y,
+                center.z));
+        octant[5] =
+            children[5] != null ? children[5].region : new BoundingBox(new Vector3f(center.x, center.y, region.getMin().z), new Vector3f(
+                region.getMax().x, region.getMax().y,
+                center.z));
+        octant[6] = children[6] != null ? children[6].region : new BoundingBox(center, region.getMax());
+        octant[7] =
+            children[7] != null ? children[7].region : new BoundingBox(new Vector3f(region.getMin().x, center.y, center.z), new Vector3f(
+                center.x, region.getMax().y, region.getMax().z));
+    }
+
     private void buildTree() {
         if (entities.size() <= 1) {
             return;
         }
         Vector3f dimension = region.getSize();
-
         if (dimension.x <= 1 && dimension.y <= 1 && dimension.z <= 1) {
             return;
         }
         Vector3f half = new Vector3f(dimension.x / 2.0f, dimension.y / 2.0f, dimension.z / 2.0f);
         Vector3f center = Vector3f.add(region.getMin(), half, null);
-
         BoundingBox[] octant = new BoundingBox[8];
-        octant[0] = new BoundingBox(region.getMin(), center);
-        octant[1] =
-            new BoundingBox(new Vector3f(center.x, region.getMin().y, region.getMin().z), new Vector3f(region.getMax().x, center.y,
-                center.z));
-        octant[2] =
-            new BoundingBox(new Vector3f(center.x, region.getMin().y, center.z), new Vector3f(region.getMax().x, center.y,
-                region.getMax().z));
-        octant[3] =
-            new BoundingBox(new Vector3f(region.getMin().x, region.getMin().y, center.z), new Vector3f(center.x, center.y,
-                region.getMax().z));
-        octant[4] =
-            new BoundingBox(new Vector3f(region.getMin().x, center.y, region.getMin().z), new Vector3f(center.x, region.getMax().y,
-                center.z));
-        octant[5] =
-            new BoundingBox(new Vector3f(center.x, center.y, region.getMin().z), new Vector3f(region.getMax().x, region.getMax().y,
-                center.z));
-        octant[6] = new BoundingBox(center, region.getMax());
-        octant[7] =
-            new BoundingBox(new Vector3f(region.getMin().x, center.y, center.z), new Vector3f(center.x, region.getMax().y,
-                region.getMax().z));
+        createOctant(center, octant);
 
         Map<Integer, List<T>> subEntities = new TreeMap<>();
         for (int i = 0; i < 8; i++) {
@@ -217,6 +191,29 @@ public class OctTree<T extends PhysicalObject> {
             }
         }
         treeBuild = true;
+    }
+
+    private void createOctant(Vector3f center, BoundingBox[] octant) {
+        octant[0] = new BoundingBox(region.getMin(), center);
+        octant[1] =
+            new BoundingBox(new Vector3f(center.x, region.getMin().y, region.getMin().z), new Vector3f(region.getMax().x, center.y,
+                center.z));
+        octant[2] =
+            new BoundingBox(new Vector3f(center.x, region.getMin().y, center.z), new Vector3f(region.getMax().x, center.y,
+                region.getMax().z));
+        octant[3] =
+            new BoundingBox(new Vector3f(region.getMin().x, region.getMin().y, center.z), new Vector3f(center.x, center.y,
+                region.getMax().z));
+        octant[4] =
+            new BoundingBox(new Vector3f(region.getMin().x, center.y, region.getMin().z), new Vector3f(center.x, region.getMax().y,
+                center.z));
+        octant[5] =
+            new BoundingBox(new Vector3f(center.x, center.y, region.getMin().z), new Vector3f(region.getMax().x, region.getMax().y,
+                center.z));
+        octant[6] = new BoundingBox(center, region.getMax());
+        octant[7] =
+            new BoundingBox(new Vector3f(region.getMin().x, center.y, center.z), new Vector3f(center.x, region.getMax().y,
+                region.getMax().z));
     }
 
     private boolean containsEntity(BoundingBox boundingBox, T e) {
@@ -252,7 +249,6 @@ public class OctTree<T extends PhysicalObject> {
         }
         OctTree<T> returnTree = new OctTree<T>(boundingBox, list);
         returnTree.parent = this;
-
         return returnTree;
     }
 
@@ -320,9 +316,7 @@ public class OctTree<T extends PhysicalObject> {
                 } else {
                     break;
                 }
-
             }
-
             entities.remove(e);
             current.insert(e);
         }
@@ -333,13 +327,9 @@ public class OctTree<T extends PhysicalObject> {
                 activeNodes ^= (byte) (1 << index);
             }
         }
-
-        // root node
         if (parent == null) {
             interSectionList = getAllIntersections(new LinkedList<T>());
         }
-
-        // }
     }
 
     public List<T> getIntersectionList() {
@@ -362,7 +352,6 @@ public class OctTree<T extends PhysicalObject> {
             }
         }
         if (entities.size() > 1) {
-
             PriorityQueue<T> tmp = new PriorityQueue<>(entities);
             while (!tmp.isEmpty()) {
                 T current = tmp.remove();
@@ -393,70 +382,12 @@ public class OctTree<T extends PhysicalObject> {
         return intersectionIDs;
     }
 
-    @Override
-    public String toString() {
-        String result = "OcTree node: " + this.hashCode() + " \n";
-        result += "Entities#: " + entities.size() + "\n";
-        result += "Entities: " + entities + "\n";
-        result += "Region: " + region.toString() + "\n";
-        result += "pending entities: " + pendingEntities + "\n";
-
-        result += "treeBuild: " + treeBuild + "\n";
-        // result += "parent: " + parent == null ? parent.hashCode() : "null" + "\n";
-        int count = 0;
-        for (int i = 0; i < 8; i++) {
-            if (children != null && children[i] != null) {
-                count++;
-            }
-        }
-        result += "children count: " + count + "\n";
-        for (int i = 0; i < 8; i++) {
-            if (children != null && children[i] != null) {
-                result += "child " + i + " : " + children[i].hashCode() + "\n";
-                result += children[i];
-            }
-        }
-        return result;
+    public List<T> getEntities() {
+        return entities;
     }
 
-    /**
-     * Draws an image of the current tree to the given graphics.
-     * 
-     * @param treeG to draw to.
-     */
-    public void drawImage(Graphics treeG) {
-        int i = 0;
-        drawLevel(i, treeG, this);
-
+    public BoundingBox getRegion() {
+        return region;
     }
 
-    private void drawLevel(int i, Graphics treeG, OctTree<T> octTree) {
-
-        Vector3f min = octTree.region.getMin();
-        Vector3f size = octTree.region.getSize();
-        treeG.setColor(colorLevel[i % colorLevel.length]);
-        if (i < 10) {
-            treeG.drawRect((int) min.x, (int) min.z, (int) size.x, (int) size.z);
-            for (T e : octTree.entities) {
-
-                Vector3f minBB = Vector3f.add(e.getPosition(), e.getBoundingBox().getMin(), null);
-                Vector3f centerBB = Vector3f.add(e.getPosition(), e.getBoundingBox().getCenter(), null);
-
-                Vector3f sizeBB = e.getBoundingBox().getSize();
-                treeG.setColor(colorLevel[i % colorLevel.length]);
-                treeG.fillRect((int) minBB.x, (int) minBB.z, (int) sizeBB.x, (int) sizeBB.z);
-                treeG.setColor(Color.WHITE);
-                treeG.drawOval((int) (centerBB.x - 2), (int) (centerBB.z - 2) - 3, 4, 4);
-                if (interSectionList.contains(e)) {
-                    treeG.drawRect((int) minBB.x, (int) minBB.z, (int) sizeBB.x, (int) sizeBB.z);
-                }
-
-            }
-        }
-        for (int g = 0; g < 8; g++) {
-            if (octTree.children[g] != null && octTree.children[g] != octTree) {
-                drawLevel(i + 1, treeG, octTree.children[g]);
-            }
-        }
-    }
 }

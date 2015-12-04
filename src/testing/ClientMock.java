@@ -1,7 +1,7 @@
 /*
  * Project SC - 2015
  * 
- *  
+ * 
  */
 package testing;
 
@@ -23,10 +23,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import de.projectsc.core.data.messages.MessageConstants;
-import de.projectsc.server.core.AuthenticatedClient;
-import de.projectsc.server.core.ServerCore;
-import de.projectsc.server.core.messages.NewClientConnectedServerMessage;
-import de.projectsc.server.core.messages.ServerMessage;
+import de.projectsc.core.modes.server.core.AuthenticatedClient;
+import de.projectsc.core.modes.server.core.ServerCore;
+import de.projectsc.core.modes.server.core.messages.NewClientConnectedServerMessage;
+import de.projectsc.core.modes.server.core.messages.ServerMessage;
 
 public class ClientMock {
 
@@ -235,7 +235,7 @@ class AuthendicatedClientMock {
 
     private final LinkedBlockingQueue<ServerMessage> receiveFromClientQueue;
 
-    public AuthendicatedClientMock(String name) {
+    AuthendicatedClientMock(String name) {
         this.id = idCount++;
 
         sendToClientQueue = new LinkedBlockingQueue<ServerMessage>();

@@ -13,10 +13,6 @@ import java.util.Map.Entry;
 
 import org.lwjgl.util.vector.Vector3f;
 
-import de.projectsc.core.components.Component;
-import de.projectsc.core.components.ComponentType;
-import de.projectsc.core.components.impl.BoundingComponent;
-import de.projectsc.core.components.impl.MovingComponent;
 import de.projectsc.core.utils.BoundingBox;
 import de.projectsc.core.utils.PhysicalObject;
 
@@ -47,6 +43,12 @@ public class Entity implements PhysicalObject {
     private final long entityUID;
 
     private boolean highlighted;
+
+    private boolean moved;
+
+    private boolean moveable;
+
+    private BoundingBox boundingBox;
 
     public Entity(long entityTypeId) {
         super();
@@ -105,6 +107,7 @@ public class Entity implements PhysicalObject {
             }
         }
         if (toRemove != null) {
+            toRemove.getValue().remove();
             components.remove(toRemove.getKey());
             List<Component> type = typeMap.get(toRemove.getValue().getType());
             Component removetype = null;
@@ -261,24 +264,21 @@ public class Entity implements PhysicalObject {
 
     @Override
     public boolean isMovable() {
-        return hasComponent(MovingComponent.class);
+        return moveable;
     }
 
     @Override
     public BoundingBox getBoundingBox() {
-        if (hasComponent(BoundingComponent.class)) {
-            return getComponent(BoundingComponent.class).getBox();
-        }
-        return null;
+        return boundingBox;
     }
 
     @Override
     public boolean hasMoved() {
-        if (hasComponent(MovingComponent.class)) {
-            return getComponent(MovingComponent.class).isMoved();
+        return moved;
+    }
 
-        }
-        return false;
+    public void setMoved(boolean value) {
+        moved = value;
     }
 
     public void setSelected(boolean b) {
@@ -295,6 +295,14 @@ public class Entity implements PhysicalObject {
 
     public boolean isHighlighted() {
         return highlighted;
+    }
+
+    public void setMoveable(boolean b) {
+        this.moveable = b;
+    }
+
+    public void setBoundingBox(BoundingBox box) {
+        this.boundingBox = box;
     }
 
 }

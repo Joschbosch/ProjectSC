@@ -5,10 +5,10 @@
  */
 package de.projectsc;
 
-import de.projectsc.client.core.ClientCore;
-import de.projectsc.client.network.ClientNetworkCore;
-import de.projectsc.server.core.ServerCore;
-import de.projectsc.server.network.ServerNetworkCore;
+import de.projectsc.core.modes.client.core.ClientCore;
+import de.projectsc.core.modes.client.network.ClientNetworkCore;
+import de.projectsc.core.modes.server.core.ServerCore;
+import de.projectsc.core.modes.server.network.ServerNetworkCore;
 
 /**
  * Main class.

@@ -29,24 +29,23 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
-import de.projectsc.client.core.data.Scene;
-import de.projectsc.client.gui.models.TexturedModel;
-import de.projectsc.client.gui.objects.Light;
-import de.projectsc.client.gui.render.MasterRenderer;
-import de.projectsc.client.gui.terrain.TerrainModel;
-import de.projectsc.client.gui.text.GUIText;
-import de.projectsc.client.gui.text.TextMaster;
-import de.projectsc.client.gui.tools.MousePicker;
 import de.projectsc.core.CoreConstants;
 import de.projectsc.core.Terrain;
-import de.projectsc.core.components.Component;
-import de.projectsc.core.components.ComponentType;
-import de.projectsc.core.components.impl.BoundingComponent;
-import de.projectsc.core.components.impl.EmittingLightComponent;
-import de.projectsc.core.components.impl.ModelAndTextureComponent;
-import de.projectsc.core.components.impl.MovingComponent;
-import de.projectsc.core.components.impl.ParticleEmitterComponent;
+import de.projectsc.core.entities.Component;
+import de.projectsc.core.entities.ComponentType;
 import de.projectsc.core.entities.Entity;
+import de.projectsc.core.entities.components.physics.MovingComponent;
+import de.projectsc.core.modes.client.gui.Scene;
+import de.projectsc.core.modes.client.gui.TextMaster;
+import de.projectsc.core.modes.client.gui.components.graphical.impl.BoundingComponent;
+import de.projectsc.core.modes.client.gui.components.graphical.impl.EmittingLightComponent;
+import de.projectsc.core.modes.client.gui.components.graphical.impl.ModelAndTextureComponent;
+import de.projectsc.core.modes.client.gui.components.graphical.impl.ParticleEmitterComponent;
+import de.projectsc.core.modes.client.gui.models.TexturedModel;
+import de.projectsc.core.modes.client.gui.objects.Light;
+import de.projectsc.core.modes.client.gui.render.MasterRenderer;
+import de.projectsc.core.modes.client.gui.terrain.TerrainModel;
+import de.projectsc.core.modes.client.gui.tools.MousePicker;
 
 /**
  * Core class for the GUI.
@@ -86,8 +85,6 @@ public class EditorGraphicsCore implements Runnable {
     private final AtomicBoolean doRender = new AtomicBoolean(true);
 
     private final AtomicBoolean moveEntity = new AtomicBoolean(false);
-
-    private GUIText count;
 
     private List<Terrain> terrains;
 
@@ -143,10 +140,10 @@ public class EditorGraphicsCore implements Runnable {
             }
             if (terrains != null) {
                 camera.move(delta);
-                mousePicker.update(terrains);
+                mousePicker.update(terrains, camera.getPosition(), camera.createViewMatrix());
                 if (doRender.get()) {
                     Scene s = new Scene();
-                    s.setTerrain(getTerrainModels(terrains));
+                    s.setTerrain(getTerrainModels());
                     prepareEntities(s);
                     List<Light> l = new LinkedList<>();
                     l.add(sun);
@@ -167,7 +164,7 @@ public class EditorGraphicsCore implements Runnable {
         Display.destroy();
     }
 
-    private List<TerrainModel> getTerrainModels(List<Terrain> terrains) {
+    private List<TerrainModel> getTerrainModels() {
         List<TerrainModel> terrainModels = new LinkedList<>();
         for (Terrain t : terrains) {
             // if (!t.equals(mousePicker.getCurrentTerrain())) {
@@ -224,7 +221,7 @@ public class EditorGraphicsCore implements Runnable {
             }
         }
 
-        mousePicker = new MousePicker(camera, masterRenderer.getProjectionMatrix());
+        mousePicker = new MousePicker(masterRenderer.getProjectionMatrix());
     }
 
     private void moveEntity() {
