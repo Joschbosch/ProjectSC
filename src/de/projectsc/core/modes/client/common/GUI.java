@@ -81,8 +81,14 @@ public interface GUI {
      */
     boolean initState(ClientState state);
 
+    void cleanUpState(ClientState state);
+
     /**
      * @return true, if the GUI is still running
      */
     boolean isRunning();
+
+    void registerView(UIElement element);
+
+    void unregisterView(UIElement element);
 }

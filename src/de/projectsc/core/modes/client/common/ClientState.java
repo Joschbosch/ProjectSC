@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 
 import de.projectsc.core.modes.client.common.messages.ClientMessage;
-import de.projectsc.core.modes.client.common.ui.elements.UIElement;
 
 /**
  * The states for a Client.
@@ -34,11 +33,6 @@ public abstract class ClientState {
     public abstract void loop(long tickTime);
 
     /**
-     * @return all resources that must be loaded in the GUI
-     */
-    public abstract Map<String, List<String>> getGUIObjectsToLoad();
-
-    /**
      * This method returns all UI elements that need to be rendered by the GUI.
      * 
      * @return all ui elements
@@ -48,7 +42,7 @@ public abstract class ClientState {
     /**
      * Initialize the state.
      */
-    public abstract void init();
+    public abstract void init(GUI gui);
 
     /**
      * Handles input that only concerns this state, e.g. a button click.

@@ -6,7 +6,6 @@
 package de.projectsc.core.modes.client.gui;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -21,14 +20,13 @@ import org.lwjgl.util.vector.Vector4f;
 import de.projectsc.core.modes.client.common.ClientState;
 import de.projectsc.core.modes.client.common.GUI;
 import de.projectsc.core.modes.client.common.Snapshot;
-import de.projectsc.core.modes.client.common.StateConstants;
 import de.projectsc.core.modes.client.common.Timer;
+import de.projectsc.core.modes.client.common.UIElement;
 import de.projectsc.core.modes.client.gui.objects.Camera;
 import de.projectsc.core.modes.client.gui.render.MasterRenderer;
 import de.projectsc.core.modes.client.gui.render.UIRenderer;
 import de.projectsc.core.modes.client.gui.render.WaterRenderer;
 import de.projectsc.core.modes.client.gui.terrain.water.WaterFrameBuffers;
-import de.projectsc.core.modes.client.gui.tools.Loader;
 import de.projectsc.core.modes.client.gui.tools.MousePicker;
 
 /**
@@ -61,6 +59,8 @@ public class GUICore implements GUI {
     private MousePicker mousePicker;
 
     private UIRenderer uiRenderer;
+
+    private Map<UIElement, View> registeredViews = new HashMap<>();
 
     public GUICore() {}
 
@@ -97,15 +97,32 @@ public class GUICore implements GUI {
     }
 
     @Override
+    public void registerView(UIElement element) {
+        View view = UIFactory.createView(element);
+        if (view != null) {
+            registeredViews.put(element, view);
+        }
+    }
+
+    @Override
+    public void unregisterView(UIElement element) {
+        registeredViews.remove(element);
+    }
+
+    @Override
     public boolean initState(ClientState state) {
         LOGGER.debug("Initialize state " + state.getClass());
-        load(state.getGUIObjectsToLoad());
+        for (UIElement element : state.getUI()) {
+            registerView(element);
+        }
         return true;
     }
 
-    private void load(Map<String, List<String>> objectsToLoad) {
-        for (String image : objectsToLoad.get(StateConstants.IMAGES)) {
-            Loader.loadTexture(image);
+    @Override
+    public void cleanUpState(ClientState state) {
+        LOGGER.debug("Clean up state " + state.getClass());
+        for (UIElement element : state.getUI()) {
+            unregisterView(element);
         }
     }
 
@@ -147,10 +164,20 @@ public class GUICore implements GUI {
             // waterRenderer.render(waters, camera, elapsedTime);
             // }
             // uiRende rer.render(state.getUI());
+            UI ui = createUI();
+            uiRenderer.render(ui.getUIElements());
             TextMaster.render();
         }
         Display.sync(MAX_FRAME_RATE);
         Display.update();
+    }
+
+    private UI createUI() {
+        UI ui = new UI();
+        for (View v : registeredViews.values()) {
+            v.render(ui);
+        }
+        return ui;
     }
 
     private Scene createScene(Snapshot snapshot) {
@@ -167,18 +194,11 @@ public class GUICore implements GUI {
     public Map<Integer, Integer> readInput() {
         Map<Integer, Integer> keyMap = new HashMap<>();
         while (Keyboard.next()) {
-            if (Keyboard.getEventKey() == Keyboard.KEY_DOWN) {
-                if (Keyboard.getEventKeyState()) {
-                    keyMap.put(Keyboard.KEY_DOWN, 1);
+            for (int i = 0; i < Keyboard.getKeyCount(); i++) {
+                if (i == Keyboard.getEventKey() && Keyboard.getEventKeyState()) {
+                    keyMap.put(i, 1);
                 } else {
-                    keyMap.put(Keyboard.KEY_DOWN, 2);
-                }
-            }
-            if (Keyboard.getEventKey() == Keyboard.KEY_UP) {
-                if (Keyboard.getEventKeyState()) {
-                    keyMap.put(Keyboard.KEY_UP, 1);
-                } else {
-                    keyMap.put(Keyboard.KEY_UP, 2);
+                    keyMap.put(i, 2);
                 }
             }
         }

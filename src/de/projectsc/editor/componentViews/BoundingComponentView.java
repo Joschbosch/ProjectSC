@@ -29,7 +29,7 @@ import org.apache.commons.logging.LogFactory;
 
 import de.projectsc.EntityEditor;
 import de.projectsc.core.CoreConstants;
-import de.projectsc.core.modes.client.gui.components.BoundingComponent;
+import de.projectsc.core.modes.client.gui.components.graphical.impl.BoundingComponent;
 import de.projectsc.editor.EditorGraphicsCore;
 
 /**

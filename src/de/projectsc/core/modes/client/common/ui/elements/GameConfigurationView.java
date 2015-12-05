@@ -6,6 +6,7 @@
 package de.projectsc.core.modes.client.common.ui.elements;
 
 import de.projectsc.core.game.GameConfiguration;
+import de.projectsc.core.modes.client.common.UIElement;
 
 /**
  * 
@@ -18,6 +19,7 @@ public class GameConfigurationView extends UIElement {
     private final GameConfiguration gameConfiguration;
 
     public GameConfigurationView(GameConfiguration gameConfiguration) {
+        super("", -1);
         this.gameConfiguration = gameConfiguration;
     }
 

@@ -21,7 +21,6 @@ import de.projectsc.core.modes.server.core.ServerPlayer;
 import de.projectsc.core.modes.server.core.game.GameContext;
 import de.projectsc.core.modes.server.core.messages.ServerMessage;
 import de.projectsc.core.utils.OctTree;
-import de.projectsc.core.utils.OctTreeUtils;
 
 /**
  * State when the game is started and running. This is the main state for all the game logic.
@@ -116,7 +115,7 @@ public class GameRunningState extends GameState {
         treeG.setColor(Color.BLACK);
         treeG.fillRect(0, 0, tree.getWidth(), tree.getHeight());
         treeG.setColor(Color.RED);
-        OctTreeUtils.drawImage(treeG, collisionTree);
+        // OctTreeUtils.drawImage(treeG, collisionTree);
         return tree;
     }
 

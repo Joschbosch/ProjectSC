@@ -4,27 +4,21 @@
 
 package de.projectsc.core.modes.client.core.states;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import org.lwjgl.input.Keyboard;
-import org.lwjgl.util.vector.Vector2f;
 
 import de.projectsc.core.modes.client.common.ClientState;
-import de.projectsc.core.modes.client.common.StateConstants;
+import de.projectsc.core.modes.client.common.GUI;
+import de.projectsc.core.modes.client.common.UIElement;
 import de.projectsc.core.modes.client.common.messages.ClientMessage;
-import de.projectsc.core.modes.client.common.ui.elements.UIElement;
-import de.projectsc.core.modes.client.gui.TextMaster;
-import de.projectsc.core.modes.client.gui.text.FontType;
-import de.projectsc.core.modes.client.gui.text.GUIText;
-import de.projectsc.core.utils.Font;
-import de.projectsc.core.utils.FontStore;
+import de.projectsc.core.modes.client.common.ui.elements.Console;
+import de.projectsc.core.modes.client.common.ui.elements.Menu;
 
 /**
- * The menu is the state when no game is running. The player can change options, create or join
- * games or do many more things.
+ * The menu is the state when no game is running. The player can change options, create or join games or do many more things.
  * 
  * @author Josch Bosch
  */
@@ -38,94 +32,64 @@ public class MenuState extends ClientState {
 
     private static final int STATE_JOIN_GAME_MENU = 3;
 
-    private FontType menuFont;
+    private int menuState = STATE_LOGIN;
 
-    private GUIText header;
+    private Console console;
 
-    private GUIText item1;
+    private Menu menu;
 
-    private GUIText item2;
-
-    private GUIText item3;
-
-    private int chosen;
-
-    private final int menuState = STATE_LOGIN;
+    private GUI gui;
 
     @Override
-    public void init() {
-        menuFont = FontStore.getFont(Font.CANDARA);
+    public void init(GUI gui) {
+        this.gui = gui;
         initState(STATE_LOGIN);
-
+        console.setVisible(false);
+        gui.initState(this);
     }
 
-    private void initState(int stateLogin) {
-        header = TextMaster.createAndLoadText("Project SC", 5f, menuFont, new Vector2f(0, 0f), 1f, true);
-        item1 = TextMaster.createAndLoadText("Create Game", 2f, menuFont, new Vector2f(0, 0.4f), 1f, true);
-        item2 = TextMaster.createAndLoadText("Join Game", 2f, menuFont, new Vector2f(0, 0.5f), 1f, true);
-        item3 = TextMaster.createAndLoadText("Exit", 2f, menuFont, new Vector2f(0, 0.6f), 1f, true);
-        chosen = 0;
-    }
+    private void initState(int state) {
+        menuState = state;
+        console = new Console();
+        switch (state) {
+        case STATE_LOGIN:
+            menu = new Menu();
+            break;
+        case STATE_MAIN_MENU:
+            // menu.setVisible(false);
+            break;
+        case STATE_CREATE_GAME_MENU:
 
-    @Override
-    public void handleMessage(ClientMessage msg) {
+            break;
+        case STATE_JOIN_GAME_MENU:
 
-    }
-
-    @Override
-    public void loop(long tickTime) {
-        if (chosen == 0) {
-            select(item1);
-            unselect(item2);
-            unselect(item3);
-        } else if (chosen == 1) {
-            select(item2);
-            unselect(item1);
-            unselect(item3);
-        } else if (chosen == 2) {
-            select(item3);
-            unselect(item1);
-            unselect(item2);
+            break;
+        default:
+            break;
         }
     }
 
-    private void unselect(GUIText text) {
-        text.setBorderWidth(0.0f);
-        text.setBorderEdge(0.5f);
-        text.setOutlineColor(1.0f, 0, 0);
-    }
+    @Override
+    public void handleMessage(ClientMessage msg) {}
 
-    private void select(GUIText text) {
-        text.setBorderWidth(0.3f);
-        text.setBorderEdge(0.5f);
-        text.setOutlineColor(1.0f, 0, 0);
+    @Override
+    public void loop(long tickTime) {
+
     }
 
     @Override
-    public Map<String, List<String>> getGUIObjectsToLoad() {
-        Map<String, List<String>> objectToLoad = new HashMap<>();
-        List<String> images = new LinkedList<>();
-        images.add("images/bg.png");
-        objectToLoad.put(StateConstants.IMAGES, images);
-        return objectToLoad;
+    public void handleInput(Map<Integer, Integer> keyMap) {
+        if (keyMap.get(Keyboard.KEY_RETURN) != null && keyMap.get(Keyboard.KEY_RETURN) == 1) {
+            initState(STATE_MAIN_MENU);
+        }
+        console.handleInput(keyMap);
     }
 
     @Override
     public List<UIElement> getUI() {
         List<UIElement> ui = new LinkedList<>();
-        // UITexture bg = new UITexture(Loader.getTextureId("images/bg.png"), new Vector2f(0, 0),
-        // new Vector2f(1.1f, 1));
-        // ui.add(bg);
+        ui.add(console);
+        ui.add(menu);
         return ui;
-    }
-
-    @Override
-    public void handleInput(Map<Integer, Integer> keyMap) {
-        if (keyMap.get(Keyboard.KEY_DOWN) != null && keyMap.get(Keyboard.KEY_DOWN) == 1) {
-            chosen = ++chosen % 3;
-        }
-        if (keyMap.get(Keyboard.KEY_UP) != null && keyMap.get(Keyboard.KEY_UP) == 1) {
-            chosen = --chosen % 3;
-        }
     }
 }

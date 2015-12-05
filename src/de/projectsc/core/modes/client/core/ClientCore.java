@@ -65,8 +65,7 @@ public class ClientCore implements Runnable {
         gameContext = new ClientGameContext(this);
         gameContext.setGUI(gui);
         currentState = new MenuState();
-        currentState.init();
-        gui.initState(currentState);
+        currentState.init(gui);
         LOGGER.debug(String.format("Client started"));
         while (clientRunning) {
             Timer.update();

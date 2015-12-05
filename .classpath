@@ -30,7 +30,6 @@
 	<classpathentry kind="lib" path="lib/jackson-databind-2.2.4.jar"/>
 	<classpathentry kind="lib" path="lib/jackson-core-lgpl-1.9.13.jar"/>
 	<classpathentry kind="lib" path="lib/jackson-mapper-asl-1.9.0.jar"/>
-	<classpathentry kind="lib" path="lib/EasyFlow-1.3.jar" sourcepath="lib/EasyFlow-1.3-sources.jar"/>
 	<classpathentry kind="lib" path="lib/slf4j-simple-1.7.12.jar"/>
 	<classpathentry kind="lib" path="lib/slf4j-api-1.7.12.jar"/>
 	<classpathentry kind="lib" path="lib/guava-18.0.jar"/>
@@ -40,5 +39,6 @@
 	<classpathentry kind="lib" path="lib/kryonet-2.21/kryo-3.0.2.jar"/>
 	<classpathentry kind="lib" path="lib/kryonet-2.21/asm-all-5.0.4.jar"/>
 	<classpathentry kind="lib" path="lib/commons-configuration-1.10.jar"/>
+	<classpathentry kind="lib" path="lib/EasyFlow-1.3.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

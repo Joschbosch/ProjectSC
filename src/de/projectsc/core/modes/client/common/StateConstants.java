@@ -16,6 +16,21 @@ public final class StateConstants {
      */
     public static final String IMAGES = "images";
 
+    /**
+     * Constant.
+     */
+    public static final String LOGIN = "uielement.login";
+
+    /**
+     * Constant.
+     */
+    public static final String MENU = "uielement.menu";
+
+    /**
+     * Constant.
+     */
+    public static final String CONSOLE = "uielement.console";
+
     private StateConstants() {}
 
 }
