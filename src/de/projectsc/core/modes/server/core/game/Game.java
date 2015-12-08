@@ -23,16 +23,10 @@ import de.projectsc.core.data.messages.GameMessageConstants;
 import de.projectsc.core.data.messages.MessageConstants;
 import de.projectsc.core.game.GameAttributes;
 import de.projectsc.core.game.GameConfiguration;
-import de.projectsc.core.modes.server.core.AuthenticatedClient;
 import de.projectsc.core.modes.server.core.ServerCommands;
 import de.projectsc.core.modes.server.core.ServerConstants;
-import de.projectsc.core.modes.server.core.ServerPlayer;
-import de.projectsc.core.modes.server.core.game.states.Events;
-import de.projectsc.core.modes.server.core.game.states.GameRunningState;
-import de.projectsc.core.modes.server.core.game.states.GameState;
-import de.projectsc.core.modes.server.core.game.states.LoadingState;
-import de.projectsc.core.modes.server.core.game.states.LobbyState;
-import de.projectsc.core.modes.server.core.game.states.States;
+import de.projectsc.core.modes.server.core.data.AuthenticatedClient;
+import de.projectsc.core.modes.server.core.game.data.ServerPlayer;
 import de.projectsc.core.modes.server.core.messages.ServerMessage;
 
 /**
@@ -154,6 +148,27 @@ public class Game implements Runnable {
         }
     }
 
+    private void createAndBindFlow() {
+        flow = FlowBuilder.from(States.LOBBY)
+            .transit(FlowBuilder.on(Events.START_GAME_COMMAND).to(States.LOADING)
+                .transit(FlowBuilder.on(Events.FINISHED_LOADING).to(States.RUNNING)
+                    .transit(FlowBuilder.on(Events.GAME_ENDS).finish(States.FINISHED))));
+
+        flow.whenEnter(States.LOBBY, new LobbyState());
+        flow.whenEnter(States.LOADING, new LoadingState());
+        flow.whenEnter(States.RUNNING, new GameRunningState());
+        flow.whenEnter(States.PAUSED, new ContextHandler<GameContext>() {
+
+            @Override
+            public void call(GameContext context) throws Exception {}
+        });
+        flow.whenEnter(States.FINISHED, new ContextHandler<GameContext>() {
+
+            @Override
+            public void call(GameContext context) throws Exception {}
+        });
+    }
+
     private void createPlayerList() {
         String gameList = "\nPlayer in game: \n";
         Map<Long, ServerPlayer> players = gameContext.getPlayers();
@@ -247,31 +262,6 @@ public class Game implements Runnable {
 
     public boolean isFull() {
         return false;
-    }
-
-    private void createAndBindFlow() {
-        flow = FlowBuilder.from(States.LOBBY)
-            .transit(FlowBuilder.on(Events.START_GAME_COMMAND).to(States.LOADING)
-                .transit(FlowBuilder.on(Events.FINISHED_LOADING).to(States.RUNNING)
-                    .transit(FlowBuilder.on(Events.GAME_ENDS).finish(States.FINISHED))));
-
-        flow.whenEnter(States.LOBBY, new LobbyState());
-        flow.whenEnter(States.LOADING, new LoadingState());
-        flow.whenEnter(States.RUNNING, new GameRunningState());
-        flow.whenEnter(States.PAUSED, new ContextHandler<GameContext>() {
-
-            @Override
-            public void call(GameContext context) throws Exception {
-                LOGGER.debug("Entered game state " + context.getState());
-            }
-        });
-        flow.whenEnter(States.FINISHED, new ContextHandler<GameContext>() {
-
-            @Override
-            public void call(GameContext context) throws Exception {
-                LOGGER.debug("Entered game state " + context.getState());
-            }
-        });
     }
 
     /**

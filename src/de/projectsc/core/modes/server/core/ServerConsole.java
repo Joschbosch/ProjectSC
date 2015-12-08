@@ -31,7 +31,7 @@ public class ServerConsole implements Runnable {
     private final BlockingQueue<ServerMessage> coreQueue;
 
     public ServerConsole(BlockingQueue<ServerMessage> coreQueue) {
-        // new Thread(this).start();
+        new Thread(this).start();
         this.coreQueue = coreQueue;
         LOGGER.debug("Console started.");
     }
@@ -48,6 +48,7 @@ public class ServerConsole implements Runnable {
                     String s = bufferRead.readLine();
                     LOGGER.debug("Got console command: " + s);
                     if (s.equals(MessageConstants.SHUTDOWN)) {
+                        coreQueue.offer(new ServerMessage(MessageConstants.SHUTDOWN));
                         shutdown.set(true);
                     } else if (s.equals(ServerCommands.LISTCLIENTS)) {
                         shutdown.set(true);

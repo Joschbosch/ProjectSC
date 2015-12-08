@@ -24,6 +24,8 @@ public class ModelTexture {
 
     private int numberOfRows = 1;
 
+    private int activeTextureIndex;
+
     public ModelTexture(int textureID) {
         super();
         this.textureID = textureID;
@@ -75,5 +77,13 @@ public class ModelTexture {
 
     public void setNumberOfRows(int numberOfRows) {
         this.numberOfRows = numberOfRows;
+    }
+
+    public void setActiveTextureIndex(int textureIndex) {
+        this.activeTextureIndex = textureIndex;
+    }
+
+    public int getActiveTextureIndex() {
+        return activeTextureIndex;
     }
 }

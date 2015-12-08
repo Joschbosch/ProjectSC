@@ -59,9 +59,9 @@ import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import de.projectsc.core.CoreConstants;
-import de.projectsc.core.entities.Component;
-import de.projectsc.core.entities.components.physics.MovingComponent;
-import de.projectsc.core.modes.client.gui.components.graphical.impl.BoundingComponent;
+import de.projectsc.core.data.entities.Component;
+import de.projectsc.core.data.entities.components.physic.BoundingComponent;
+import de.projectsc.core.data.entities.components.physic.MovingComponent;
 import de.projectsc.core.modes.client.gui.components.graphical.impl.EmittingLightComponent;
 import de.projectsc.core.modes.client.gui.components.graphical.impl.ParticleEmitterComponent;
 import de.projectsc.editor.EditorData;

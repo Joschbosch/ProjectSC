@@ -12,14 +12,14 @@ import java.util.concurrent.LinkedBlockingQueue;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import de.projectsc.core.data.Timer;
 import de.projectsc.core.modes.client.common.ClientState;
 import de.projectsc.core.modes.client.common.GUI;
-import de.projectsc.core.modes.client.common.Timer;
 import de.projectsc.core.modes.client.common.data.ClientPlayer;
 import de.projectsc.core.modes.client.common.messages.ClientMessage;
 import de.projectsc.core.modes.client.core.states.MenuState;
 import de.projectsc.core.modes.client.gui.GUICore;
-import de.projectsc.core.modes.server.core.game.states.GameRunningState;
+import de.projectsc.core.modes.server.core.game.GameRunningState;
 
 /**
  * Core class for the client.
@@ -37,8 +37,6 @@ public class ClientCore implements Runnable {
     private BlockingQueue<ClientMessage> networkReceiveQueue;
 
     private ClientState currentState;
-
-    private ClientGameContext gameContext;
 
     private final ClientPlayer player;
 
@@ -62,8 +60,6 @@ public class ClientCore implements Runnable {
         gui = new GUICore();
         gui.initCore();
         clientRunning = true;
-        gameContext = new ClientGameContext(this);
-        gameContext.setGUI(gui);
         currentState = new MenuState();
         currentState.init(gui);
         LOGGER.debug(String.format("Client started"));

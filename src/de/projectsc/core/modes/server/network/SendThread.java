@@ -14,9 +14,14 @@ import org.codehaus.jackson.map.ObjectMapper;
 import com.esotericsoftware.kryonet.Connection;
 
 import de.projectsc.core.data.messages.NetworkMessage;
-import de.projectsc.core.modes.server.core.AuthenticatedClient;
+import de.projectsc.core.modes.server.core.data.AuthenticatedClient;
 import de.projectsc.core.modes.server.core.messages.ServerMessage;
 
+/**
+ * Dirty implementation for testing.
+ * 
+ * @author Josch Bosch
+ */
 public class SendThread implements Runnable {
 
     private static final Log LOGGER = LogFactory.getLog(SendThread.class);

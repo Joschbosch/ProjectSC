@@ -13,10 +13,10 @@ import org.lwjgl.opengl.GL30;
 import org.lwjgl.util.vector.Matrix4f;
 
 import de.projectsc.core.modes.client.gui.models.RawModel;
-import de.projectsc.core.modes.client.gui.objects.Billboard;
 import de.projectsc.core.modes.client.gui.objects.Camera;
+import de.projectsc.core.modes.client.gui.objects.billboards.Billboard;
 import de.projectsc.core.modes.client.gui.shaders.BillboardShader;
-import de.projectsc.core.modes.client.gui.tools.Loader;
+import de.projectsc.core.modes.client.gui.utils.Loader;
 
 /**
  * Renderer for billboards.

@@ -21,9 +21,9 @@ import org.lwjgl.util.vector.Matrix4f;
 
 import de.projectsc.core.modes.client.gui.models.RawModel;
 import de.projectsc.core.modes.client.gui.objects.Camera;
-import de.projectsc.core.modes.client.gui.objects.ParticleEmitter;
+import de.projectsc.core.modes.client.gui.objects.particles.ParticleEmitter;
 import de.projectsc.core.modes.client.gui.shaders.ParticleShader;
-import de.projectsc.core.modes.client.gui.tools.Loader;
+import de.projectsc.core.modes.client.gui.utils.Loader;
 
 /**
  * Renderer for particles.

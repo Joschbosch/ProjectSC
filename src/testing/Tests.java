@@ -8,8 +8,8 @@ package testing;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.projectsc.core.utils.GraphEdge;
-import de.projectsc.core.utils.GraphNode;
+import de.projectsc.core.data.GraphEdge;
+import de.projectsc.core.data.GraphNode;
 
 public class Tests {
 

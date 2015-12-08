@@ -22,10 +22,9 @@ import com.sun.corba.se.impl.protocol.giopmsgheaders.Message;
 
 import de.projectsc.core.data.messages.MessageConstants;
 import de.projectsc.core.data.messages.NetworkMessage;
-import de.projectsc.core.modes.client.common.messages.ClientMessage;
-import de.projectsc.core.modes.server.core.AuthenticatedClient;
 import de.projectsc.core.modes.server.core.ServerCore;
-import de.projectsc.core.modes.server.core.messages.NewClientConnectedServerMessage;
+import de.projectsc.core.modes.server.core.data.AuthenticatedClient;
+import de.projectsc.core.modes.server.core.data.connections.messages.NewClientConnectedServerMessage;
 import de.projectsc.core.modes.server.core.messages.ServerMessage;
 
 /**
@@ -37,15 +36,7 @@ public class ServerNetworkCore {
 
     private static final Log LOGGER = LogFactory.getLog(ServerNetworkCore.class);
 
-    private final boolean running = false;
-
-    private final BlockingQueue<ServerMessage> coreQueue;
-
-    private final ServerCore serverCore;
-
     public ServerNetworkCore(ServerCore serverCore, BlockingQueue<ServerMessage> coreQueue) {
-        this.coreQueue = coreQueue;
-        this.serverCore = serverCore;
         Server server = new Server();
         new Thread(server).start();
         try {
@@ -55,7 +46,6 @@ public class ServerNetworkCore {
         }
         server.addListener(new ClientConnectedListener(coreQueue));
         Kryo kryo = server.getKryo();
-        kryo.register(ClientMessage.class);
         kryo.register(ServerMessage.class);
         kryo.register(Message.class);
         kryo.register(String.class);
@@ -64,6 +54,11 @@ public class ServerNetworkCore {
     }
 }
 
+/**
+ * Dirty implementation for testing.
+ * 
+ * @author Josch Bosch
+ */
 class ClientConnectedListener extends Listener {
 
     private static final Log LOGGER = LogFactory.getLog(ClientConnectedListener.class);

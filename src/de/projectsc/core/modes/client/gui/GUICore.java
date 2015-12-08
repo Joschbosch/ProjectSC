@@ -17,17 +17,23 @@ import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Vector4f;
 
+import de.projectsc.core.data.Snapshot;
+import de.projectsc.core.data.Timer;
 import de.projectsc.core.modes.client.common.ClientState;
 import de.projectsc.core.modes.client.common.GUI;
-import de.projectsc.core.modes.client.common.Snapshot;
-import de.projectsc.core.modes.client.common.Timer;
-import de.projectsc.core.modes.client.common.UIElement;
+import de.projectsc.core.modes.client.common.data.UIElement;
+import de.projectsc.core.modes.client.gui.data.Scene;
+import de.projectsc.core.modes.client.gui.data.UI;
+import de.projectsc.core.modes.client.gui.data.View;
 import de.projectsc.core.modes.client.gui.objects.Camera;
+import de.projectsc.core.modes.client.gui.objects.terrain.water.WaterFrameBuffers;
+import de.projectsc.core.modes.client.gui.objects.text.TextMaster;
+import de.projectsc.core.modes.client.gui.render.FontRenderer;
 import de.projectsc.core.modes.client.gui.render.MasterRenderer;
 import de.projectsc.core.modes.client.gui.render.UIRenderer;
 import de.projectsc.core.modes.client.gui.render.WaterRenderer;
-import de.projectsc.core.modes.client.gui.terrain.water.WaterFrameBuffers;
-import de.projectsc.core.modes.client.gui.tools.MousePicker;
+import de.projectsc.core.modes.client.gui.ui.views.UIFactory;
+import de.projectsc.core.modes.client.gui.utils.MousePicker;
 
 /**
  * Core class for the GUI.
@@ -60,7 +66,9 @@ public class GUICore implements GUI {
 
     private UIRenderer uiRenderer;
 
-    private Map<UIElement, View> registeredViews = new HashMap<>();
+    private final Map<UIElement, View> registeredViews = new HashMap<>();
+
+    private FontRenderer textRenderer;
 
     public GUICore() {}
 
@@ -91,9 +99,18 @@ public class GUICore implements GUI {
         mousePicker = new MousePicker(masterRenderer.getProjectionMatrix());
         LOGGER.debug("Created mouse picker");
         TextMaster.init();
+        textRenderer = new FontRenderer();
         LOGGER.debug("Initialized font rendering");
         running = true;
         return running;
+    }
+
+    @Override
+    public void cleanUpCore() {
+        masterRenderer.dispose();
+        textRenderer.dispose();
+        waterRenderer.dispose();
+        uiRenderer.dispose();
     }
 
     @Override
@@ -166,7 +183,7 @@ public class GUICore implements GUI {
             // uiRende rer.render(state.getUI());
             UI ui = createUI();
             uiRenderer.render(ui.getUIElements());
-            TextMaster.render();
+            textRenderer.render(TextMaster.render());
         }
         Display.sync(MAX_FRAME_RATE);
         Display.update();

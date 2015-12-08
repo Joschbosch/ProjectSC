@@ -8,6 +8,7 @@ package de.projectsc.core.modes.client.common;
 import java.util.List;
 import java.util.Map;
 
+import de.projectsc.core.modes.client.common.data.UIElement;
 import de.projectsc.core.modes.client.common.messages.ClientMessage;
 
 /**
@@ -41,6 +42,8 @@ public abstract class ClientState {
 
     /**
      * Initialize the state.
+     * 
+     * @param gui the {@link GUI} used for this client.
      */
     public abstract void init(GUI gui);
 

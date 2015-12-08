@@ -11,7 +11,7 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
 
-import de.projectsc.core.entities.Entity;
+import de.projectsc.core.data.entities.Entity;
 
 /**
  * Class for moving around in the world.

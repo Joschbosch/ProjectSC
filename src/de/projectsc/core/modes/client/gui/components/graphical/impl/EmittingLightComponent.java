@@ -18,12 +18,12 @@ import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.lwjgl.util.vector.Vector3f;
 
-import de.projectsc.core.entities.ComponentType;
-import de.projectsc.core.entities.Entity;
-import de.projectsc.core.modes.client.gui.Scene;
+import de.projectsc.core.data.entities.ComponentType;
+import de.projectsc.core.data.entities.Entity;
+import de.projectsc.core.data.objects.Light;
+import de.projectsc.core.data.utils.LightSerializationUtils;
 import de.projectsc.core.modes.client.gui.components.GraphicalComponent;
-import de.projectsc.core.modes.client.gui.objects.Light;
-import de.projectsc.core.utils.Serialization;
+import de.projectsc.core.modes.client.gui.data.Scene;
 
 /**
  * Entity component to allow entities having lights.
@@ -132,7 +132,7 @@ public class EmittingLightComponent extends GraphicalComponent {
 
     @Override
     public String serialize() throws JsonGenerationException, JsonMappingException, IOException {
-        Map<String, Map<String, Float[]>> serializedLights = Serialization.createSerializableMap(lights);
+        Map<String, Map<String, Float[]>> serializedLights = LightSerializationUtils.createSerializableMap(lights);
         for (Light l : offsets.keySet()) {
             Map<String, Float[]> values = serializedLights.get(l.getName());
             if (values != null) {

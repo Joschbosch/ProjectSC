@@ -27,9 +27,8 @@ import javax.swing.text.PlainDocument;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import de.projectsc.EntityEditor;
 import de.projectsc.core.CoreConstants;
-import de.projectsc.core.modes.client.gui.components.graphical.impl.BoundingComponent;
+import de.projectsc.core.data.entities.components.physic.BoundingComponent;
 import de.projectsc.editor.EditorGraphicsCore;
 
 /**
@@ -102,7 +101,7 @@ public class BoundingComponentView extends JDialog {
                 JFileChooser chooser = new JFileChooser();
                 FileNameExtensionFilter filter = new FileNameExtensionFilter("Model Files", "obj");
                 try {
-                    File folder = new File(EntityEditor.class.getResource("/" + CoreConstants.SCHEME_DIRECTORY_NAME).toURI());
+                    File folder = new File(BoundingComponentView.class.getResource("/" + CoreConstants.SCHEME_DIRECTORY_NAME).toURI());
                     chooser.setCurrentDirectory(folder);
                 } catch (URISyntaxException e1) {
                     LOGGER.info("Loading box model failed", e1);

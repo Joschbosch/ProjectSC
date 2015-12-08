@@ -13,16 +13,17 @@ import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.util.vector.Matrix4f;
 
+import de.projectsc.core.data.BoundingBox;
 import de.projectsc.core.modes.client.gui.models.RawModel;
 import de.projectsc.core.modes.client.gui.shaders.WireFrameShader;
-import de.projectsc.core.modes.client.gui.tools.Maths;
-import de.projectsc.core.utils.BoundingBox;
+import de.projectsc.core.utils.Maths;
 
 /**
  * This class will render collision boxes onto the screen.
  * 
  * @author Josch Bosch
  */
+// TODO Rework representation of bounding box model
 public class WireFrameRenderer {
 
     private final WireFrameShader shader;
@@ -46,7 +47,8 @@ public class WireFrameRenderer {
             List<BoundingBox> batch = boundingBoxes.get(model);
             for (BoundingBox b : batch) {
                 prepareInstance(b);
-                GL11.glDrawElements(GL11.GL_TRIANGLES, b.getModel().getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
+                // GL11.glDrawElements(GL11.GL_TRIANGLES, b.getModel().getVertexCount(),
+                // GL11.GL_UNSIGNED_INT, 0);
             }
             unbindTexturedModel();
         }

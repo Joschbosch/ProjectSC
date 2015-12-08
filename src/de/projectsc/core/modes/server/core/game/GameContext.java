@@ -9,14 +9,14 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import au.com.ds.ef.StatefulContext;
-import de.projectsc.core.Terrain;
-import de.projectsc.core.TerrainLoader;
-import de.projectsc.core.entities.Entity;
+import de.projectsc.core.data.OctTree;
+import de.projectsc.core.data.entities.Entity;
+import de.projectsc.core.data.entities.components.physic.BoundingComponent;
+import de.projectsc.core.data.loader.TerrainLoader;
+import de.projectsc.core.data.terrain.Terrain;
 import de.projectsc.core.game.GameAttributes;
 import de.projectsc.core.game.GameConfiguration;
-import de.projectsc.core.modes.client.gui.components.graphical.impl.BoundingComponent;
-import de.projectsc.core.modes.server.core.ServerPlayer;
-import de.projectsc.core.utils.OctTree;
+import de.projectsc.core.modes.server.core.game.data.ServerPlayer;
 
 /**
  * Context for all game states.
@@ -35,8 +35,6 @@ public class GameContext extends StatefulContext {
 
     private final String displayName;
 
-    private final Game game;
-
     private final GameConfiguration config;
 
     private boolean loading = false;
@@ -51,13 +49,15 @@ public class GameContext extends StatefulContext {
 
     private Map<Long, Entity> entities;
 
+    private final Game game;
+
     public GameContext(int id, String displayName, ServerPlayer host, Game game) {
         this.gameID = id;
         this.displayName = displayName;
         this.host = host;
+        this.game = game;
         players = new TreeMap<>();
         players.put(this.host.getId(), this.host);
-        this.game = game;
         this.config = new GameConfiguration();
         this.config.setMapName("newDataMap");
         this.config.setPlayerCharacter(this.host.getId(), "person");
@@ -74,26 +74,39 @@ public class GameContext extends StatefulContext {
         terrain = TerrainLoader.loadTerrain(config.getMapName() + ".psc");
         loadingProgress = 50;
 
-        terrain.buildNeighborhood();
+        if (terrain != null) {
+            terrain.buildNeighborhood();
+        }
         loadingProgress = 60;
-
-        terrain.makeStaticObjectsNotWalkable();
+        if (terrain != null) {
+            terrain.makeStaticObjectsNotWalkable();
+        }
         loadingProgress = 70;
 
         loadPlayerAndBots();
-
-        collisionTree = new OctTree<>(terrain.getMapBoundingBox());
-        for (Entity entity : staticEntities.values()) {
-            if (entity.hasComponent(BoundingComponent.class)) {
-                collisionTree.addEntity(entity);
+        if (terrain != null) {
+            collisionTree = new OctTree<>(terrain.getMapBoundingBox());
+            for (Entity entity : staticEntities.values()) {
+                if (entity.hasComponent(BoundingComponent.class)) {
+                    collisionTree.addEntity(entity);
+                }
             }
+            for (Entity entity : entities.values()) {
+                collisionTree.addEntity(entity);
+                // terrain.markEntityPosition(entity, Tile.NOT_WALKABLE);
+            }
+            collisionTree.recalculateTree();
         }
-        for (Entity entity : entities.values()) {
-            collisionTree.addEntity(entity);
-            // terrain.markEntityPosition(entity, Tile.NOT_WALKABLE);
-        }
-        collisionTree.recalculateTree();
         loadingProgress = 100;
+    }
+
+    /**
+     * Change state of the game.
+     * 
+     * @param gameState new state
+     */
+    public void changeState(GameState gameState) {
+        game.changeState(gameState);
     }
 
     private void loadPlayerAndBots() {
@@ -118,10 +131,6 @@ public class GameContext extends StatefulContext {
 
     public void setHost(ServerPlayer serverPlayer) {
         this.host = serverPlayer;
-    }
-
-    public Game getGame() {
-        return game;
     }
 
     /**

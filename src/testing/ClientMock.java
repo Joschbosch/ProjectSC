@@ -23,9 +23,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import de.projectsc.core.data.messages.MessageConstants;
-import de.projectsc.core.modes.server.core.AuthenticatedClient;
 import de.projectsc.core.modes.server.core.ServerCore;
-import de.projectsc.core.modes.server.core.messages.NewClientConnectedServerMessage;
+import de.projectsc.core.modes.server.core.data.AuthenticatedClient;
+import de.projectsc.core.modes.server.core.data.connections.messages.NewClientConnectedServerMessage;
 import de.projectsc.core.modes.server.core.messages.ServerMessage;
 
 public class ClientMock {

@@ -12,7 +12,7 @@ import org.lwjgl.input.Keyboard;
 
 import de.projectsc.core.modes.client.common.ClientState;
 import de.projectsc.core.modes.client.common.GUI;
-import de.projectsc.core.modes.client.common.UIElement;
+import de.projectsc.core.modes.client.common.data.UIElement;
 import de.projectsc.core.modes.client.common.messages.ClientMessage;
 import de.projectsc.core.modes.client.common.ui.elements.Console;
 import de.projectsc.core.modes.client.common.ui.elements.Menu;
@@ -41,11 +41,11 @@ public class MenuState extends ClientState {
     private GUI gui;
 
     @Override
-    public void init(GUI gui) {
-        this.gui = gui;
+    public void init(GUI incGui) {
+        this.gui = incGui;
         initState(STATE_LOGIN);
         console.setVisible(false);
-        gui.initState(this);
+        incGui.initState(this);
     }
 
     private void initState(int state) {

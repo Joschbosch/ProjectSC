@@ -16,15 +16,15 @@ import org.lwjgl.opengl.GL30;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector4f;
 
-import de.projectsc.core.entities.Entity;
-import de.projectsc.core.modes.client.gui.Scene;
+import de.projectsc.core.data.BoundingBox;
+import de.projectsc.core.data.entities.Entity;
+import de.projectsc.core.modes.client.gui.data.Scene;
 import de.projectsc.core.modes.client.gui.models.RawModel;
 import de.projectsc.core.modes.client.gui.models.TexturedModel;
 import de.projectsc.core.modes.client.gui.objects.Camera;
 import de.projectsc.core.modes.client.gui.shaders.EntityShader;
 import de.projectsc.core.modes.client.gui.shaders.TerrainShader;
 import de.projectsc.core.modes.client.gui.shaders.WireFrameShader;
-import de.projectsc.core.utils.BoundingBox;
 
 /**
  * Coordinates rendering of multiple entites.

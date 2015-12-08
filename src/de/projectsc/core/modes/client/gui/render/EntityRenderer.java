@@ -14,13 +14,12 @@ import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.util.vector.Matrix4f;
 
-import de.projectsc.core.entities.Entity;
-import de.projectsc.core.modes.client.gui.components.graphical.impl.ModelAndTextureComponent;
+import de.projectsc.core.data.entities.Entity;
 import de.projectsc.core.modes.client.gui.models.RawModel;
 import de.projectsc.core.modes.client.gui.models.TexturedModel;
 import de.projectsc.core.modes.client.gui.shaders.EntityShader;
 import de.projectsc.core.modes.client.gui.textures.ModelTexture;
-import de.projectsc.core.modes.client.gui.tools.Maths;
+import de.projectsc.core.utils.Maths;
 
 /**
  * This class will get {@link GraphicalEntity} objects to render onto the screen.
@@ -48,9 +47,8 @@ public class EntityRenderer {
             prepareTexturedModel(model);
             List<Entity> batch = entitiesWithModel.get(model);
             for (Entity e : batch) {
-                ModelAndTextureComponent modelComponent = e.getComponent(ModelAndTextureComponent.class);
-                prepareInstance(e, modelComponent);
-                GL11.glDrawElements(GL11.GL_TRIANGLES, modelComponent.getModel().getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
+                prepareInstance(e, model.getTexture());
+                GL11.glDrawElements(GL11.GL_TRIANGLES, model.getRawModel().getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
             }
             unbindTexturedModel();
         }
@@ -81,12 +79,37 @@ public class EntityRenderer {
         MasterRenderer.enableCulling();
     }
 
-    private void prepareInstance(Entity entity, ModelAndTextureComponent modelComponent) {
+    private void prepareInstance(Entity entity, ModelTexture modelTexture) {
         Matrix4f transformationMatrix =
             Maths.createTransformationMatrix(entity.getPosition(), entity.getRotX(), entity.getRotY(), entity.getRotZ(), entity.getScale());
         shader.loadTransformationMatrix(transformationMatrix);
-        shader.loadOffset(modelComponent.getTextureOffsetX(), modelComponent.getTextureOffsetY());
+        shader.loadOffset(getTextureOffsetX(modelTexture), getTextureOffsetY(modelTexture));
         shader.loadSelected(entity.isHighlighted(), entity.isSelected());
 
     }
+
+    /**
+     * Returns the X offset for a texture map.
+     * 
+     * @param modelTexture to get the values from
+     * 
+     * @return position offset of the texture
+     */
+    public float getTextureOffsetX(ModelTexture modelTexture) {
+        int column = modelTexture.getActiveTextureIndex() % modelTexture.getNumberOfRows();
+        return (column / (float) modelTexture.getNumberOfRows());
+    }
+
+    /**
+     * Returns the Y offset for a texture map.
+     * 
+     * @param modelTexture to get the values from
+     * 
+     * @return position offset of the texture
+     */
+    public float getTextureOffsetY(ModelTexture modelTexture) {
+        int row = modelTexture.getActiveTextureIndex() / modelTexture.getNumberOfRows();
+        return (row / (float) modelTexture.getNumberOfRows());
+    }
+
 }

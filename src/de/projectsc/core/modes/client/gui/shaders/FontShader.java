@@ -3,8 +3,8 @@ package de.projectsc.core.modes.client.gui.shaders;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
-import de.projectsc.core.modes.client.gui.text.FontType;
-import de.projectsc.core.modes.client.gui.text.GUIText;
+import de.projectsc.core.modes.client.gui.objects.text.FontType;
+import de.projectsc.core.modes.client.gui.objects.text.GUIText;
 
 /**
  * Shader for text.

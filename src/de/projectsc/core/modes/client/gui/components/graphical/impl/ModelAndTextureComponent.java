@@ -17,16 +17,16 @@ import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import de.projectsc.core.CoreConstants;
-import de.projectsc.core.entities.ComponentType;
-import de.projectsc.core.entities.Entity;
-import de.projectsc.core.modes.client.gui.Scene;
+import de.projectsc.core.data.ModelData;
+import de.projectsc.core.data.OBJFileLoader;
+import de.projectsc.core.data.entities.ComponentType;
+import de.projectsc.core.data.entities.Entity;
 import de.projectsc.core.modes.client.gui.components.GraphicalComponent;
+import de.projectsc.core.modes.client.gui.data.Scene;
 import de.projectsc.core.modes.client.gui.models.RawModel;
 import de.projectsc.core.modes.client.gui.models.TexturedModel;
 import de.projectsc.core.modes.client.gui.textures.ModelTexture;
-import de.projectsc.core.modes.client.gui.tools.Loader;
-import de.projectsc.core.modes.client.gui.tools.ModelData;
-import de.projectsc.core.modes.client.gui.tools.OBJFileLoader;
+import de.projectsc.core.modes.client.gui.utils.Loader;
 
 /**
  * Entity component to add a model and a texture to the entity.
@@ -70,6 +70,7 @@ public class ModelAndTextureComponent extends GraphicalComponent {
     @Override
     public void render(Scene scene) {
         TexturedModel entityModel = getTexturedModel();
+        modelTexture.setActiveTextureIndex(textureIndex);
         List<Entity> batch = scene.getEntities().get(entityModel);
         if (batch != null) {
             batch.add(owner);
@@ -78,26 +79,6 @@ public class ModelAndTextureComponent extends GraphicalComponent {
             newBatch.add(owner);
             scene.getEntities().put(entityModel, newBatch);
         }
-    }
-
-    /**
-     * Returns the X offset for a texture map.
-     * 
-     * @return position
-     */
-    public float getTextureOffsetX() {
-        int column = textureIndex % modelTexture.getNumberOfRows();
-        return (column / (float) modelTexture.getNumberOfRows());
-    }
-
-    /**
-     * Returns the Y offset for a texture map.
-     * 
-     * @return position
-     */
-    public float getTextureOffsetY() {
-        int row = textureIndex / modelTexture.getNumberOfRows();
-        return (row / (float) modelTexture.getNumberOfRows());
     }
 
     /**

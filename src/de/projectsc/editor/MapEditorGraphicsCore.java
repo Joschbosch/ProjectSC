@@ -35,24 +35,23 @@ import org.lwjgl.util.vector.Vector4f;
 
 import com.rits.cloning.Cloner;
 
-import de.projectsc.EntityEditor;
 import de.projectsc.core.CoreConstants;
-import de.projectsc.core.Terrain;
-import de.projectsc.core.entities.Component;
-import de.projectsc.core.entities.ComponentType;
-import de.projectsc.core.entities.Entity;
-import de.projectsc.core.entities.components.physics.MovingComponent;
-import de.projectsc.core.modes.client.gui.Scene;
-import de.projectsc.core.modes.client.gui.components.graphical.impl.BoundingComponent;
+import de.projectsc.core.data.entities.Component;
+import de.projectsc.core.data.entities.ComponentType;
+import de.projectsc.core.data.entities.Entity;
+import de.projectsc.core.data.entities.components.physic.BoundingComponent;
+import de.projectsc.core.data.entities.components.physic.MovingComponent;
+import de.projectsc.core.data.objects.Light;
+import de.projectsc.core.data.terrain.Terrain;
 import de.projectsc.core.modes.client.gui.components.graphical.impl.EmittingLightComponent;
 import de.projectsc.core.modes.client.gui.components.graphical.impl.ModelAndTextureComponent;
 import de.projectsc.core.modes.client.gui.components.graphical.impl.ParticleEmitterComponent;
+import de.projectsc.core.modes.client.gui.data.Scene;
 import de.projectsc.core.modes.client.gui.models.TexturedModel;
 import de.projectsc.core.modes.client.gui.objects.Camera;
-import de.projectsc.core.modes.client.gui.objects.Light;
+import de.projectsc.core.modes.client.gui.objects.terrain.TerrainModel;
 import de.projectsc.core.modes.client.gui.render.MasterRenderer;
-import de.projectsc.core.modes.client.gui.terrain.TerrainModel;
-import de.projectsc.core.modes.client.gui.tools.MousePicker;
+import de.projectsc.core.modes.client.gui.utils.MousePicker;
 
 /**
  * Core class for the GUI.
@@ -101,7 +100,7 @@ public class MapEditorGraphicsCore implements Runnable {
 
     private Entity selectedEntity;
 
-    private List<Terrain> terrains;
+    private List<TerrainModel> terrainModels;
 
     public MapEditorGraphicsCore(Canvas displayParent, int width, int height, BlockingQueue<String> messageQueue) {
         incomingQueue = new LinkedBlockingQueue<>();
@@ -137,7 +136,7 @@ public class MapEditorGraphicsCore implements Runnable {
 
     private void loadEntitySchemas() {
         try {
-            File folder = new File(EntityEditor.class.getResource(SLASHED_MODEL_DIR).toURI());
+            File folder = new File(MapEditorGraphicsCore.class.getResource(SLASHED_MODEL_DIR).toURI());
             for (File schemaDir : folder.listFiles()) {
                 if (schemaDir.getName().matches(CoreConstants.SCHEME_DIRECTORY_PREFIX + "\\d{5}")) {
                     ObjectMapper mapper = new ObjectMapper();
@@ -220,8 +219,8 @@ public class MapEditorGraphicsCore implements Runnable {
             readMessages();
 
             camera.move(delta);
-            if (terrains != null) {
-                mousePicker.update(terrains, camera.getPosition(), camera.createViewMatrix());
+            if (terrainModels != null) {
+                mousePicker.update(getTerrains(), camera.getPosition(), camera.createViewMatrix());
                 readInput();
                 for (ComponentType type : ComponentType.values()) {
                     for (Entity e : entities) {
@@ -251,7 +250,7 @@ public class MapEditorGraphicsCore implements Runnable {
                 }
                 if (doRender.get()) {
                     Scene s = new Scene();
-                    s.setTerrain(getTerrainModels());
+                    s.setTerrains(terrainModels);
                     prepareEntities(s);
                     masterRenderer.renderScene(s, camera, delta, new Vector4f(0, 1, 0, 100000));
                 }
@@ -269,12 +268,12 @@ public class MapEditorGraphicsCore implements Runnable {
         Display.destroy();
     }
 
-    private List<TerrainModel> getTerrainModels() {
-        List<TerrainModel> terrainModels = new LinkedList<>();
-        for (Terrain t : terrains) {
-            terrainModels.add(t.getModel());
+    private List<Terrain> getTerrains() {
+        List<Terrain> terrain = new LinkedList<>();
+        for (TerrainModel models : terrainModels) {
+            terrain.add(models.getTerrain());
         }
-        return terrainModels;
+        return terrain;
     }
 
     private void prepareEntities(Scene s) {
@@ -378,12 +377,13 @@ public class MapEditorGraphicsCore implements Runnable {
 
     private void createTerrain(int k, int l, String parsed) {
         String texture = "terrain/grass.png";
-        terrains = new LinkedList<>();
+        terrainModels = new LinkedList<>();
         for (int i = -1; i < 2; i++) {
             for (int j = -1; j < 2; j++) {
                 Terrain terrain =
-                    new Terrain(-0.5f * i, -0.5f * j, texture, texture, texture, texture);
-                terrains.add(terrain);
+                    new Terrain(i, j, texture, texture, texture, texture);
+                TerrainModel model = new TerrainModel(terrain);
+                terrainModels.add(model);
             }
         }
 

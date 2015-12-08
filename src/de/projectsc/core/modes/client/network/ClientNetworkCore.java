@@ -22,7 +22,6 @@ import com.sun.corba.se.impl.protocol.giopmsgheaders.Message;
 import de.projectsc.core.data.messages.MessageConstants;
 import de.projectsc.core.data.messages.NetworkMessage;
 import de.projectsc.core.modes.client.common.messages.ClientMessage;
-import de.projectsc.core.modes.server.core.messages.ServerMessage;
 
 /**
  * Core class for client network communication.
@@ -94,7 +93,6 @@ public class ClientNetworkCore implements Runnable {
             client.connect(5000, "localhost", 54555, 54777);
             Kryo kryo = client.getKryo();
             kryo.register(ClientMessage.class);
-            kryo.register(ServerMessage.class);
             kryo.register(Message.class);
             kryo.register(String.class);
             kryo.register(Object[].class);

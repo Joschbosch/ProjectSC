@@ -12,7 +12,7 @@ import java.util.Map;
 import org.lwjgl.input.Keyboard;
 
 import de.projectsc.core.modes.client.common.StateConstants;
-import de.projectsc.core.modes.client.common.UIElement;
+import de.projectsc.core.modes.client.common.data.UIElement;
 
 /**
  * Chat implementation for ui.

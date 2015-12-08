@@ -27,7 +27,6 @@ public class Main {
      * @param args command line parameters
      */
     public static void main(String[] args) {
-        // ClientCore core = new ClientCore();
         if (args.length > 0 && args[0] != null && args[0].equals("server")) {
             ServerCore serverCore = new ServerCore();
             new ServerNetworkCore(serverCore, serverCore.getReceiveQueue());

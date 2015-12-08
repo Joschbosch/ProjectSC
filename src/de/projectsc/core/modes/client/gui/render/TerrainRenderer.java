@@ -16,10 +16,10 @@ import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.core.modes.client.gui.models.RawModel;
+import de.projectsc.core.modes.client.gui.objects.terrain.TerrainModel;
 import de.projectsc.core.modes.client.gui.shaders.TerrainShader;
-import de.projectsc.core.modes.client.gui.terrain.TerrainModel;
 import de.projectsc.core.modes.client.gui.textures.TerrainTexturePack;
-import de.projectsc.core.modes.client.gui.tools.Maths;
+import de.projectsc.core.utils.Maths;
 
 /**
  * Render terrain data with own shader.

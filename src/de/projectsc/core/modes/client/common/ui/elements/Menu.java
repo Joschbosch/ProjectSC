@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 
+ * Copyright (C) 2015
  */
 
 package de.projectsc.core.modes.client.common.ui.elements;
@@ -8,8 +8,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.projectsc.core.modes.client.common.StateConstants;
-import de.projectsc.core.modes.client.common.UIElement;
+import de.projectsc.core.modes.client.common.data.UIElement;
 
+/**
+ * Menu element in the main menu.
+ * 
+ * @author Josch Bosch
+ */
 public class Menu extends UIElement {
 
     private List<String> menuItems = new ArrayList<>();

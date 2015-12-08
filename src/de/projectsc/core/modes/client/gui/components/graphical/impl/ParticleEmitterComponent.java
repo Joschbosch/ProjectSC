@@ -15,12 +15,12 @@ import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.lwjgl.util.vector.Vector3f;
 
-import de.projectsc.core.entities.ComponentType;
-import de.projectsc.core.entities.Entity;
-import de.projectsc.core.modes.client.gui.Scene;
+import de.projectsc.core.data.entities.ComponentType;
+import de.projectsc.core.data.entities.Entity;
 import de.projectsc.core.modes.client.gui.components.GraphicalComponent;
-import de.projectsc.core.modes.client.gui.objects.BasicParticleConfiguration;
-import de.projectsc.core.modes.client.gui.objects.ParticleEmitter;
+import de.projectsc.core.modes.client.gui.data.Scene;
+import de.projectsc.core.modes.client.gui.objects.particles.BasicParticleConfiguration;
+import de.projectsc.core.modes.client.gui.objects.particles.ParticleEmitter;
 
 /**
  * Component for adding particle emitter.

@@ -4,10 +4,15 @@
 
 package de.projectsc.core.modes.client.gui.components;
 
-import de.projectsc.core.entities.Component;
-import de.projectsc.core.entities.Entity;
-import de.projectsc.core.modes.client.gui.Scene;
+import de.projectsc.core.data.entities.Component;
+import de.projectsc.core.data.entities.Entity;
+import de.projectsc.core.modes.client.gui.data.Scene;
 
+/**
+ * A component that has a graphical representation.
+ * 
+ * @author Josch Bosch
+ */
 public abstract class GraphicalComponent extends Component {
 
     public GraphicalComponent(String newName, Entity owner) {

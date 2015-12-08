@@ -7,6 +7,9 @@ package de.projectsc.core.modes.client.common;
 
 import java.util.Map;
 
+import de.projectsc.core.data.Snapshot;
+import de.projectsc.core.modes.client.common.data.UIElement;
+
 /**
  * Interface for GUI implementations.
  * 
@@ -81,6 +84,11 @@ public interface GUI {
      */
     boolean initState(ClientState state);
 
+    /**
+     * Clean up the current state.
+     * 
+     * @param state to clean up
+     */
     void cleanUpState(ClientState state);
 
     /**
@@ -88,7 +96,22 @@ public interface GUI {
      */
     boolean isRunning();
 
+    /**
+     * Register a new view for an UIElement.
+     * 
+     * @param element to register a view
+     */
     void registerView(UIElement element);
 
+    /**
+     * Unregister view for the given element.
+     * 
+     * @param element to unregister
+     */
     void unregisterView(UIElement element);
+
+    /**
+     * Clean up everything after program is done.
+     */
+    void cleanUpCore();
 }

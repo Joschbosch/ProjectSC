@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 
+ * Copyright (C) 2015
  */
 
 package de.projectsc.core.modes.client.gui.ui.views;
@@ -9,25 +9,30 @@ import java.util.List;
 
 import org.lwjgl.util.vector.Vector2f;
 
-import de.projectsc.core.modes.client.common.UIElement;
+import de.projectsc.core.modes.client.common.data.UIElement;
 import de.projectsc.core.modes.client.common.ui.elements.Menu;
-import de.projectsc.core.modes.client.gui.TextMaster;
-import de.projectsc.core.modes.client.gui.UI;
-import de.projectsc.core.modes.client.gui.View;
-import de.projectsc.core.modes.client.gui.text.FontType;
-import de.projectsc.core.modes.client.gui.text.GUIText;
-import de.projectsc.core.utils.Font;
-import de.projectsc.core.utils.FontStore;
+import de.projectsc.core.modes.client.gui.data.UI;
+import de.projectsc.core.modes.client.gui.data.View;
+import de.projectsc.core.modes.client.gui.objects.text.Font;
+import de.projectsc.core.modes.client.gui.objects.text.FontStore;
+import de.projectsc.core.modes.client.gui.objects.text.FontType;
+import de.projectsc.core.modes.client.gui.objects.text.GUIText;
+import de.projectsc.core.modes.client.gui.objects.text.TextMaster;
 
+/**
+ * GUI implementation gor the menu.
+ * 
+ * @author Josch Bosch
+ */
 public class MenuView extends View {
 
-    private Menu menuBox;
+    private final Menu menuBox;
 
-    private List<GUIText> lastText = new LinkedList<>();
+    private final List<GUIText> lastText = new LinkedList<>();
 
-    private FontType font;
+    private final FontType font;
 
-    private float fontSize = 2f;
+    private final float fontSize = 2f;
 
     public MenuView(UIElement element) {
         super(element);

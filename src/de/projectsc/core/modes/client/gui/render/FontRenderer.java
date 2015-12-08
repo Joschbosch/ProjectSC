@@ -8,9 +8,9 @@ import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 
+import de.projectsc.core.modes.client.gui.objects.text.FontType;
+import de.projectsc.core.modes.client.gui.objects.text.GUIText;
 import de.projectsc.core.modes.client.gui.shaders.FontShader;
-import de.projectsc.core.modes.client.gui.text.FontType;
-import de.projectsc.core.modes.client.gui.text.GUIText;
 
 /**
  * Renderer for all text things in the game.
@@ -73,7 +73,7 @@ public class FontRenderer {
     /**
      * Dispose.
      */
-    public void cleanUp() {
+    public void dispose() {
         shader.dispose();
     }
 

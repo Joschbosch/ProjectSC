@@ -15,9 +15,9 @@ import org.lwjgl.util.vector.Matrix4f;
 
 import de.projectsc.core.modes.client.gui.models.RawModel;
 import de.projectsc.core.modes.client.gui.shaders.UIShader;
-import de.projectsc.core.modes.client.gui.tools.Loader;
-import de.projectsc.core.modes.client.gui.tools.Maths;
-import de.projectsc.core.modes.client.gui.ui.UITexture;
+import de.projectsc.core.modes.client.gui.textures.UITexture;
+import de.projectsc.core.modes.client.gui.utils.Loader;
+import de.projectsc.core.utils.Maths;
 
 /**
  * Renderer class for all UI elements.

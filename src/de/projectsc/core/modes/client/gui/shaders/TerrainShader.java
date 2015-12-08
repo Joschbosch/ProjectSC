@@ -13,8 +13,8 @@ import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
+import de.projectsc.core.data.objects.Light;
 import de.projectsc.core.modes.client.gui.objects.Camera;
-import de.projectsc.core.modes.client.gui.objects.Light;
 
 /**
  * Shader only for the Terrain.

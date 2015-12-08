@@ -6,7 +6,7 @@
 package de.projectsc.core.modes.client.common.ui.elements;
 
 import de.projectsc.core.game.GameConfiguration;
-import de.projectsc.core.modes.client.common.UIElement;
+import de.projectsc.core.modes.client.common.data.UIElement;
 
 /**
  * 

@@ -14,8 +14,8 @@ import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
+import de.projectsc.core.data.objects.Light;
 import de.projectsc.core.modes.client.gui.objects.Camera;
-import de.projectsc.core.modes.client.gui.objects.Light;
 
 /**
  * A shader program that does not much.

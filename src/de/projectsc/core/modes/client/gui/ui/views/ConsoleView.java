@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 
+ * Copyright (C) 2015
  */
 
 package de.projectsc.core.modes.client.gui.ui.views;
@@ -9,18 +9,23 @@ import java.util.List;
 
 import org.lwjgl.util.vector.Vector2f;
 
-import de.projectsc.core.modes.client.common.UIElement;
+import de.projectsc.core.modes.client.common.data.UIElement;
 import de.projectsc.core.modes.client.common.ui.elements.Console;
-import de.projectsc.core.modes.client.gui.TextMaster;
-import de.projectsc.core.modes.client.gui.UI;
-import de.projectsc.core.modes.client.gui.View;
-import de.projectsc.core.modes.client.gui.text.FontType;
-import de.projectsc.core.modes.client.gui.text.GUIText;
-import de.projectsc.core.modes.client.gui.tools.Loader;
-import de.projectsc.core.modes.client.gui.ui.UITexture;
-import de.projectsc.core.utils.Font;
-import de.projectsc.core.utils.FontStore;
+import de.projectsc.core.modes.client.gui.data.UI;
+import de.projectsc.core.modes.client.gui.data.View;
+import de.projectsc.core.modes.client.gui.objects.text.Font;
+import de.projectsc.core.modes.client.gui.objects.text.FontStore;
+import de.projectsc.core.modes.client.gui.objects.text.FontType;
+import de.projectsc.core.modes.client.gui.objects.text.GUIText;
+import de.projectsc.core.modes.client.gui.objects.text.TextMaster;
+import de.projectsc.core.modes.client.gui.textures.UITexture;
+import de.projectsc.core.modes.client.gui.utils.Loader;
 
+/**
+ * GUI implementation for the console.
+ * 
+ * @author Sascha Zur
+ */
 public class ConsoleView extends View {
 
     private static final Vector2f SIZE = new Vector2f(1.5f, 0.5f);
@@ -29,19 +34,19 @@ public class ConsoleView extends View {
 
     private static final int MAXIMAL_LINES = 20;
 
-    private Console console;
+    private final Console console;
 
-    private float fontSize = 0.7f;
+    private final float fontSize = 0.7f;
 
-    private FontType font;
+    private final FontType font;
 
-    private Vector2f position;
+    private final Vector2f position;
 
-    private UITexture bg;
+    private final UITexture bg;
 
-    private List<GUIText> lastText = new LinkedList<>();
+    private final List<GUIText> lastText = new LinkedList<>();
 
-    private float linePadding = 0.018f;
+    private final float linePadding = 0.018f;
 
     public ConsoleView(UIElement element) {
         super(element);

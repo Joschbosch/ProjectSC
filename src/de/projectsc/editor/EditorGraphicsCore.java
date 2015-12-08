@@ -30,22 +30,22 @@ import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
 import de.projectsc.core.CoreConstants;
-import de.projectsc.core.Terrain;
-import de.projectsc.core.entities.Component;
-import de.projectsc.core.entities.ComponentType;
-import de.projectsc.core.entities.Entity;
-import de.projectsc.core.entities.components.physics.MovingComponent;
-import de.projectsc.core.modes.client.gui.Scene;
-import de.projectsc.core.modes.client.gui.TextMaster;
-import de.projectsc.core.modes.client.gui.components.graphical.impl.BoundingComponent;
+import de.projectsc.core.data.entities.Component;
+import de.projectsc.core.data.entities.ComponentType;
+import de.projectsc.core.data.entities.Entity;
+import de.projectsc.core.data.entities.components.physic.BoundingComponent;
+import de.projectsc.core.data.entities.components.physic.MovingComponent;
+import de.projectsc.core.data.objects.Light;
+import de.projectsc.core.data.terrain.Terrain;
 import de.projectsc.core.modes.client.gui.components.graphical.impl.EmittingLightComponent;
 import de.projectsc.core.modes.client.gui.components.graphical.impl.ModelAndTextureComponent;
 import de.projectsc.core.modes.client.gui.components.graphical.impl.ParticleEmitterComponent;
+import de.projectsc.core.modes.client.gui.data.Scene;
 import de.projectsc.core.modes.client.gui.models.TexturedModel;
-import de.projectsc.core.modes.client.gui.objects.Light;
+import de.projectsc.core.modes.client.gui.objects.terrain.TerrainModel;
+import de.projectsc.core.modes.client.gui.objects.text.TextMaster;
 import de.projectsc.core.modes.client.gui.render.MasterRenderer;
-import de.projectsc.core.modes.client.gui.terrain.TerrainModel;
-import de.projectsc.core.modes.client.gui.tools.MousePicker;
+import de.projectsc.core.modes.client.gui.utils.MousePicker;
 
 /**
  * Core class for the GUI.
@@ -86,7 +86,7 @@ public class EditorGraphicsCore implements Runnable {
 
     private final AtomicBoolean moveEntity = new AtomicBoolean(false);
 
-    private List<Terrain> terrains;
+    private List<TerrainModel> terrainModels;
 
     public EditorGraphicsCore(Canvas displayParent, int width, int height, BlockingQueue<String> messageQueue) {
         incomingQueue = new LinkedBlockingQueue<>();
@@ -138,12 +138,12 @@ public class EditorGraphicsCore implements Runnable {
                     e.update(type);
                 }
             }
-            if (terrains != null) {
+            if (terrainModels != null) {
                 camera.move(delta);
-                mousePicker.update(terrains, camera.getPosition(), camera.createViewMatrix());
+                mousePicker.update(getTerrains(), camera.getPosition(), camera.createViewMatrix());
                 if (doRender.get()) {
                     Scene s = new Scene();
-                    s.setTerrain(getTerrainModels());
+                    s.setTerrains(terrainModels);
                     prepareEntities(s);
                     List<Light> l = new LinkedList<>();
                     l.add(sun);
@@ -164,14 +164,12 @@ public class EditorGraphicsCore implements Runnable {
         Display.destroy();
     }
 
-    private List<TerrainModel> getTerrainModels() {
-        List<TerrainModel> terrainModels = new LinkedList<>();
-        for (Terrain t : terrains) {
-            // if (!t.equals(mousePicker.getCurrentTerrain())) {
-            terrainModels.add(t.getModel());
-            // }
+    private List<Terrain> getTerrains() {
+        List<Terrain> terrain = new LinkedList<>();
+        for (TerrainModel models : terrainModels) {
+            terrain.add(models.getTerrain());
         }
-        return terrainModels;
+        return terrain;
     }
 
     private void prepareEntities(Scene s) {
@@ -212,12 +210,13 @@ public class EditorGraphicsCore implements Runnable {
 
     private void createTerrain() {
         String texture = "terrain/grass.png";
-        terrains = new LinkedList<>();
+        terrainModels = new LinkedList<>();
         for (int i = -5; i < 5; i++) {
             for (int j = -5; j < 5; j++) {
                 Terrain terrain =
                     new Terrain(i, j, texture, texture, texture, texture);
-                terrains.add(terrain);
+                TerrainModel model = new TerrainModel(terrain);
+                terrainModels.add(model);
             }
         }
 

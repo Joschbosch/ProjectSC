@@ -17,8 +17,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import de.projectsc.core.data.messages.MessageConstants;
+import de.projectsc.core.modes.server.core.data.AuthenticatedClient;
+import de.projectsc.core.modes.server.core.data.connections.messages.NewClientConnectedServerMessage;
 import de.projectsc.core.modes.server.core.game.Game;
-import de.projectsc.core.modes.server.core.messages.NewClientConnectedServerMessage;
 import de.projectsc.core.modes.server.core.messages.ServerMessage;
 
 /**
@@ -46,10 +47,6 @@ public class ServerCore implements Runnable {
         receiveQueue = new LinkedBlockingQueue<>();
         clientsInMainLobby = new TreeMap<>();
         games = new TreeMap<>();
-    }
-
-    protected void createConsole() {
-
     }
 
     @Override
