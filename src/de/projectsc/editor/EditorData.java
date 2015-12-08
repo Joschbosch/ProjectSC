@@ -9,7 +9,7 @@ import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.projectsc.core.modes.client.gui.components.graphical.impl.ModelAndTextureComponent;
+import de.projectsc.core.modes.client.gui.components.ModelAndTextureComponent;
 
 /**
  * Data store for the editor and the necessary {@link ModelAndTextureComponent}.

@@ -3,7 +3,7 @@
  * 
  * 
  */
-package de.projectsc.core.data.entities;
+package de.projectsc.core.entities;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,19 +26,18 @@ import de.projectsc.core.data.Event;
  */
 public abstract class Component {
 
-    protected String componentName;
+    protected String componentId;
 
     protected ComponentType type;
 
     protected ObjectMapper mapper = new ObjectMapper();
 
-    protected Entity owner;
-
     protected List<String> requiredComponents = new LinkedList<>();
 
-    public Component(String newName, Entity owner) {
-        this.componentName = newName;
-        this.owner = owner;
+    private long owner;
+
+    public void setID(String id) {
+        this.componentId = id;
     }
 
     /**
@@ -46,7 +45,7 @@ public abstract class Component {
      * 
      * @param ownerEntity entity that has this component.
      */
-    public abstract void update(Entity ownerEntity);
+    public abstract void update(long ownerEntity);
 
     /**
      * @return true, if the component has all attributes to be saved.
@@ -84,7 +83,7 @@ public abstract class Component {
     }
 
     public String getComponentName() {
-        return componentName;
+        return componentId;
     }
 
     /**
@@ -97,6 +96,14 @@ public abstract class Component {
 
     public void processEvent(Event e) {
 
+    }
+
+    public long getOwner() {
+        return owner;
+    }
+
+    public void setOwner(long owner) {
+        this.owner = owner;
     }
 
 }

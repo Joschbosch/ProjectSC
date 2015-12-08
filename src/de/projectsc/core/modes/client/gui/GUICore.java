@@ -17,11 +17,13 @@ import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Vector4f;
 
+import de.projectsc.core.ComponentRegistry;
 import de.projectsc.core.data.Snapshot;
 import de.projectsc.core.data.Timer;
 import de.projectsc.core.modes.client.common.ClientState;
 import de.projectsc.core.modes.client.common.GUI;
 import de.projectsc.core.modes.client.common.data.UIElement;
+import de.projectsc.core.modes.client.gui.components.GraphicalComponentImplementation;
 import de.projectsc.core.modes.client.gui.data.Scene;
 import de.projectsc.core.modes.client.gui.data.UI;
 import de.projectsc.core.modes.client.gui.data.View;
@@ -66,9 +68,11 @@ public class GUICore implements GUI {
 
     private UIRenderer uiRenderer;
 
-    private final Map<UIElement, View> registeredViews = new HashMap<>();
+    private Map<UIElement, View> registeredViews = new HashMap<>();
 
-    private FontRenderer textRenderer;
+    private FontRenderer fontRenderer;
+
+    private RenderingSystem renderingSystem;
 
     public GUICore() {}
 
@@ -99,18 +103,19 @@ public class GUICore implements GUI {
         mousePicker = new MousePicker(masterRenderer.getProjectionMatrix());
         LOGGER.debug("Created mouse picker");
         TextMaster.init();
-        textRenderer = new FontRenderer();
+        fontRenderer = new FontRenderer();
         LOGGER.debug("Initialized font rendering");
+        loadGUIComponents();
+        renderingSystem = new RenderingSystem();
+        LOGGER.debug("GUI components loaded.");
         running = true;
         return running;
     }
 
-    @Override
-    public void cleanUpCore() {
-        masterRenderer.dispose();
-        textRenderer.dispose();
-        waterRenderer.dispose();
-        uiRenderer.dispose();
+    private void loadGUIComponents() {
+        for (GraphicalComponentImplementation it : GraphicalComponentImplementation.values()) {
+            ComponentRegistry.registerComponent(it.getName(), it.getClazz());
+        }
     }
 
     @Override
@@ -174,16 +179,17 @@ public class GUICore implements GUI {
             // waterfbo.unbindCurrentFrameBuffer();
             // }
             // mousePicker.update();
-            Scene scene = createScene(snapshot);
+            Scene scene = renderingSystem.createScene();
             masterRenderer.renderScene(scene, camera, Timer.getDelta(), new Vector4f(0,
                 1, 0, CLIPPING_PLANE_NOT_RENDERING));
             // if (waters != null && waters.size() > 0) {
             // waterRenderer.render(waters, camera, elapsedTime);
             // }
-            // uiRende rer.render(state.getUI());
             UI ui = createUI();
-            uiRenderer.render(ui.getUIElements());
-            textRenderer.render(TextMaster.render());
+            uiRenderer.render(ui.getUIElements(UI.BEFORE_TEXT));
+            fontRenderer.render(TextMaster.render(), 0);
+            uiRenderer.render(ui.getUIElements(UI.AFTER_TEXT));
+            fontRenderer.render(TextMaster.render(), 1);
         }
         Display.sync(MAX_FRAME_RATE);
         Display.update();
@@ -217,6 +223,12 @@ public class GUICore implements GUI {
                 } else {
                     keyMap.put(i, 2);
                 }
+            }
+            if (Keyboard.getEventKey() == Keyboard.KEY_DOWN && Keyboard.getEventKeyState()) {
+                keyMap.put(Keyboard.KEY_DOWN, 1);
+            }
+            if (Keyboard.getEventKey() == Keyboard.KEY_UP && Keyboard.getEventKeyState()) {
+                keyMap.put(Keyboard.KEY_UP, 1);
             }
         }
         return keyMap;
@@ -257,6 +269,11 @@ public class GUICore implements GUI {
     @Override
     public void terminate() {
         // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void cleanUpCore() {
 
     }
 

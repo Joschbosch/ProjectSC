@@ -21,6 +21,7 @@ import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -58,17 +59,13 @@ import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 
+import de.projectsc.core.ComponentRegistry;
 import de.projectsc.core.CoreConstants;
-import de.projectsc.core.data.entities.Component;
-import de.projectsc.core.data.entities.components.physic.BoundingComponent;
-import de.projectsc.core.data.entities.components.physic.MovingComponent;
-import de.projectsc.core.modes.client.gui.components.graphical.impl.EmittingLightComponent;
-import de.projectsc.core.modes.client.gui.components.graphical.impl.ParticleEmitterComponent;
+import de.projectsc.core.EntityManager;
+import de.projectsc.core.entities.Component;
+import de.projectsc.core.entities.components.ComponentListItem;
 import de.projectsc.editor.EditorData;
 import de.projectsc.editor.EditorGraphicsCore;
-import de.projectsc.editor.componentViews.BoundingComponentView;
-import de.projectsc.editor.componentViews.EmittingLightComponentView;
-import de.projectsc.editor.componentViews.MovingComponentView;
 
 /**
  * Entity editor.
@@ -152,8 +149,7 @@ public class EntityEditor extends JFrame {
 
     private JComboBox<String> componentCombo;
 
-    private final String[] componentNames =
-        { EmittingLightComponent.NAME, MovingComponent.NAME, BoundingComponent.NAME, ParticleEmitterComponent.NAME };
+    private Set<String> componentNames;
 
     private JList<String> componentList;
 
@@ -162,6 +158,7 @@ public class EntityEditor extends JFrame {
      */
     public EntityEditor() {
         data = new EditorData();
+        loadComponents();
         createContent();
         try {
             File folder = new File(EntityEditor.class.getResource(SLASHED_MODEL_DIR).toURI());
@@ -176,6 +173,12 @@ public class EntityEditor extends JFrame {
             LOGGER.error("Could not read model data.");
         }
         updateEditor(data);
+    }
+
+    private void loadComponents() {
+        for (ComponentListItem it : ComponentListItem.values()) {
+            ComponentRegistry.registerComponent(it.getName(), it.getClazz());
+        }
     }
 
     private void updateEditor(EditorData d) {
@@ -276,6 +279,7 @@ public class EntityEditor extends JFrame {
         displayParent.requestFocus();
         displayParent.setIgnoreRepaint(true);
         previewPanel.add(displayParent);
+
     }
 
     private void createComponentPanel() {
@@ -285,6 +289,7 @@ public class EntityEditor extends JFrame {
         contentPane.add(componentPanel);
         componentPanel.setLayout(null);
 
+        componentNames = ComponentRegistry.getRegisteredComponents();
         componentList = new JList<String>();
         componentList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         componentList.setValueIsAdjusting(true);
@@ -317,25 +322,25 @@ public class EntityEditor extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (componentList.getSelectedValue() != null && !componentList.getSelectedValue().isEmpty()) {
-                    if (componentList.getSelectedValue().equals(EmittingLightComponent.NAME)) {
-                        EmittingLightComponent component = (EmittingLightComponent) editor3dCore.getComponent(EmittingLightComponent.NAME);
-                        EmittingLightComponentView dialog =
-                            new EmittingLightComponentView(component, editor3dCore.getCurrentEntity());
-                        dialog.setSize(800, 600);
-                        dialog.setVisible(true);
-                    } else if (componentList.getSelectedValue().equals(MovingComponent.NAME)) {
-                        MovingComponent component = (MovingComponent) editor3dCore.getComponent(MovingComponent.NAME);
-                        MovingComponentView dialog =
-                            new MovingComponentView(component, editor3dCore.getCurrentEntity());
-                        dialog.setSize(450, 130);
-                        dialog.setVisible(true);
-                    } else if (componentList.getSelectedValue().equals(BoundingComponent.NAME)) {
-                        BoundingComponent component = (BoundingComponent) editor3dCore.getComponent(BoundingComponent.NAME);
-                        BoundingComponentView dialog =
-                            new BoundingComponentView(component, editor3dCore);
-                        dialog.setSize(450, 130);
-                        dialog.setVisible(true);
-                    }
+                    // if (componentList.getSelectedValue().equals(EmittingLightComponent.NAME)) {
+                    // EmittingLightComponent component = (EmittingLightComponent) editor3dCore.getComponent(EmittingLightComponent.NAME);
+                    // EmittingLightComponentView dialog =
+                    // new EmittingLightComponentView(component, editor3dCore.getCurrentEntity());
+                    // dialog.setSize(800, 600);
+                    // dialog.setVisible(true);
+                    // } else if (componentList.getSelectedValue().equals(MovingComponent.NAME)) {
+                    // MovingComponent component = (MovingComponent) editor3dCore.getComponent(MovingComponent.NAME);
+                    // MovingComponentView dialog =
+                    // new MovingComponentView(component, editor3dCore.getCurrentEntity());
+                    // dialog.setSize(450, 130);
+                    // dialog.setVisible(true);
+                    // } else if (componentList.getSelectedValue().equals(BoundingComponent.NAME)) {
+                    // BoundingComponent component = (BoundingComponent) editor3dCore.getComponent(BoundingComponent.NAME);
+                    // BoundingComponentView dialog =
+                    // new BoundingComponentView(component, editor3dCore);
+                    // dialog.setSize(450, 130);
+                    // dialog.setVisible(true);
+                    // }
                 }
             }
         });
@@ -682,13 +687,13 @@ public class EntityEditor extends JFrame {
                     if (data.getTextureFile() != null && !data.getTextureFile().equals(new File(targetFolder, TEXTURE_PNG))) {
                         FileUtils.copyFile(data.getTextureFile(), new File(targetFolder, TEXTURE_PNG));
                     }
-                    if (editor3dCore.getCurrentEntity().hasComponent(BoundingComponent.class)
-                        && editor3dCore.getCurrentEntity().getComponent(BoundingComponent.class).isValidForSaving()
-                        && !editor3dCore.getCurrentEntity().getComponent(BoundingComponent.class).getBoxFile()
-                            .equals(new File(targetFolder, BOXFILE_NAME))) {
-                        FileUtils.copyFile(editor3dCore.getCurrentEntity().getComponent(BoundingComponent.class).getBoxFile(), new File(
-                            targetFolder, BOXFILE_NAME));
-                    }
+                    // if (editor3dCore.getCurrentEntity().hasComponent(BoundingComponent.class)
+                    // && editor3dCore.getCurrentEntity().getComponent(BoundingComponent.class).isValidForSaving()
+                    // && !editor3dCore.getCurrentEntity().getComponent(BoundingComponent.class).getBoxFile()
+                    // .equals(new File(targetFolder, BOXFILE_NAME))) {
+                    // FileUtils.copyFile(editor3dCore.getCurrentEntity().getComponent(BoundingComponent.class).getBoxFile(), new File(
+                    // targetFolder, BOXFILE_NAME));
+                    // }
                     File nameFile = new File(targetFolder, FilenameUtils.removeExtension(data.getModelFile().getName()));
                     nameFile.createNewFile();
                     Map<String, Object> serialization = new HashMap<>();
@@ -699,10 +704,9 @@ public class EntityEditor extends JFrame {
 
                     serialization.put("scale", data.getScale());
                     Map<String, String> components = new HashMap<>();
-                    for (String component : data.getComponentsAdded()) {
-                        Component c = editor3dCore.getComponent(component);
+                    for (Component c : EntityManager.getAllComponents(editor3dCore.getCurrentEntity()).values()) {
                         if (c.isValidForSaving()) {
-                            components.put(component, c.serialize());
+                            components.put(c.getComponentName(), c.serialize());
                         }
                     }
                     serialization.put(COMPONENTS, components);
@@ -746,7 +750,7 @@ public class EntityEditor extends JFrame {
                         data.setScale((float) tree.get("scale").getDoubleValue());
                         if (new File(chosen, MODEL_OBJ).exists()) {
                             data.setModelFile(new File(chosen, MODEL_OBJ));
-                            editor3dCore.createNewEntity(data.getId());
+                            editor3dCore.createNewEntity();
                             editor3dCore.triggerLoadModel();
                         }
                         if (new File(chosen, TEXTURE_PNG).exists()) {
@@ -758,12 +762,8 @@ public class EntityEditor extends JFrame {
                         while (componentNamesIterator.hasNext()) {
                             String name = componentNamesIterator.next();
                             editor3dCore.addComponent(name);
-                            Component c = editor3dCore.getComponent(name);
-                            if (!(c instanceof BoundingComponent)) {
-                                c.deserialize(tree.get(COMPONENTS).get(name), chosen);
-                            } else {
-                                editor3dCore.triggerLoadBoundingBox();
-                            }
+                            Component c = EntityManager.getComponent(editor3dCore.getCurrentEntity(), name);
+                            c.deserialize(tree.get(COMPONENTS).get(name), chosen);
                             data.getComponentsAdded().add(name);
                         }
                     } catch (IOException e1) {
@@ -782,8 +782,7 @@ public class EntityEditor extends JFrame {
     }
 
     /**
-     * Once the Canvas is created its add notify method will call this method to start the LWJGL
-     * Display and game loop in another thread.
+     * Once the Canvas is created its add notify method will call this method to start the LWJGL Display and game loop in another thread.
      */
     public void startLWJGL() {
         messageQueue = new LinkedBlockingQueue<String>();
@@ -794,8 +793,8 @@ public class EntityEditor extends JFrame {
     }
 
     /**
-     * Tell game loop to stop running, after which the LWJGL Display will be destoryed. The main
-     * thread will wait for the Display.destroy() to complete
+     * Tell game loop to stop running, after which the LWJGL Display will be destoryed. The main thread will wait for the Display.destroy()
+     * to complete
      */
     private void stopLWJGL() {
         try {

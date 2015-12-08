@@ -3,11 +3,11 @@
  * 
  * 
  */
-package de.projectsc.core.data.entities;
+package de.projectsc.core.entities;
 
 /**
  * 
- * Types for the components, detemines loop order.
+ * Types for the components, determines loop order.
  * 
  * @author Josch Bosch
  */

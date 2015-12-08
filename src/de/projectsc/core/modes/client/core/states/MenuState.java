@@ -41,11 +41,11 @@ public class MenuState extends ClientState {
     private GUI gui;
 
     @Override
-    public void init(GUI incGui) {
-        this.gui = incGui;
+    public void init(GUI gui) {
+        this.gui = gui;
         initState(STATE_LOGIN);
         console.setVisible(false);
-        incGui.initState(this);
+        gui.initState(this);
     }
 
     private void initState(int state) {
@@ -83,6 +83,7 @@ public class MenuState extends ClientState {
             initState(STATE_MAIN_MENU);
         }
         console.handleInput(keyMap);
+        menu.handleInput(keyMap);
     }
 
     @Override

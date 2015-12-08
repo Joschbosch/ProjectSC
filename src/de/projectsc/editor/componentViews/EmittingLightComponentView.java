@@ -22,9 +22,9 @@ import javax.swing.table.TableModel;
 
 import org.lwjgl.util.vector.Vector3f;
 
-import de.projectsc.core.data.entities.Entity;
 import de.projectsc.core.data.objects.Light;
-import de.projectsc.core.modes.client.gui.components.graphical.impl.EmittingLightComponent;
+import de.projectsc.core.entities.Entity;
+import de.projectsc.core.modes.client.gui.components.graphical.EmittingLightComponent;
 
 /**
  * Editor view for the {@link EmittingLightComponent}.
@@ -155,7 +155,7 @@ public class EmittingLightComponentView extends JDialog {
                 try {
                     Light light = readAndCreateLight();
                     if (light != null) {
-                        component.addLight(entity, light);
+                        component.addLight(light, entity.getPosition());
                     }
                 } catch (NumberFormatException e1) {
 
@@ -176,7 +176,7 @@ public class EmittingLightComponentView extends JDialog {
                     removeSelectedLight(component);
                     Light l = readAndCreateLight();
                     if (l != null) {
-                        component.addLight(entity, l);
+                        component.addLight(l, entity.getPosition());
                     }
                 }
             }

@@ -28,7 +28,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import de.projectsc.core.CoreConstants;
-import de.projectsc.core.data.entities.components.physic.BoundingComponent;
+import de.projectsc.core.entities.components.physic.BoundingComponent;
 import de.projectsc.editor.EditorGraphicsCore;
 
 /**

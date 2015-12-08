@@ -6,21 +6,13 @@
 
 package de.projectsc.core.modes.client.gui.render;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector4f;
 
-import de.projectsc.core.data.BoundingBox;
-import de.projectsc.core.data.entities.Entity;
 import de.projectsc.core.modes.client.gui.data.Scene;
-import de.projectsc.core.modes.client.gui.models.RawModel;
-import de.projectsc.core.modes.client.gui.models.TexturedModel;
 import de.projectsc.core.modes.client.gui.objects.Camera;
 import de.projectsc.core.modes.client.gui.shaders.EntityShader;
 import de.projectsc.core.modes.client.gui.shaders.TerrainShader;
@@ -117,8 +109,7 @@ public class MasterRenderer {
      * @param elapsedTime since last frame
      * @param clipPlane to clip the world
      */
-    public void renderScene(Scene scene,
-        Camera camera, long elapsedTime, Vector4f clipPlane) {
+    public void renderScene(Scene scene, Camera camera, long elapsedTime, Vector4f clipPlane) {
         billboardRenderer.setCamera(camera);
         particleRenderer.setCamera(camera);
         render(scene, camera, elapsedTime, clipPlane);
@@ -145,7 +136,7 @@ public class MasterRenderer {
         if (showWireFrames) {
             collisionBoxShader.start();
             collisionBoxShader.loadViewMatrix(camera);
-            collisionBoxRenderer.render(getBoundingBoxes(scene.getEntities()));
+            // collisionBoxRenderer.render(getBoundingBoxes(scene.getEntities()));
             collisionBoxShader.stop();
         }
         terrainShader.start();
@@ -158,10 +149,6 @@ public class MasterRenderer {
         skyboxRenderer.render(elapsedTime, camera, SKY_R, SKY_G, SKY_B);
         billboardRenderer.render(scene.getBillboards());
         particleRenderer.render(scene.getParticles());
-    }
-
-    private Map<RawModel, List<BoundingBox>> getBoundingBoxes(Map<TexturedModel, List<Entity>> entities) {
-        return new HashMap<>();
     }
 
     /**

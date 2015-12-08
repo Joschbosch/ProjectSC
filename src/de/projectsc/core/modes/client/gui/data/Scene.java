@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 
 import de.projectsc.core.data.BoundingBox;
-import de.projectsc.core.data.entities.Entity;
 import de.projectsc.core.data.objects.Light;
 import de.projectsc.core.modes.client.gui.models.RawModel;
 import de.projectsc.core.modes.client.gui.models.TexturedModel;
@@ -19,8 +18,8 @@ import de.projectsc.core.modes.client.gui.objects.particles.ParticleEmitter;
 import de.projectsc.core.modes.client.gui.objects.terrain.TerrainModel;
 
 /**
- * The scene contains all elemets, that need to be rendered by the GUI. It will collect all
- * neccessary information from all entities and the world itself.
+ * The scene contains all elemets, that need to be rendered by the GUI. It will collect all neccessary information from all entities and the
+ * world itself.
  * 
  * @author Josch Bosch
  */
@@ -28,7 +27,7 @@ public class Scene {
 
     private List<TerrainModel> terrains;
 
-    private Map<TexturedModel, List<Entity>> entities;
+    private Map<TexturedModel, List<RenderEntity>> entities;
 
     private List<Light> lights;
 
@@ -51,7 +50,7 @@ public class Scene {
         return terrains;
     }
 
-    public Map<TexturedModel, List<Entity>> getEntities() {
+    public Map<TexturedModel, List<RenderEntity>> getEntities() {
         return entities;
     }
 
@@ -75,7 +74,7 @@ public class Scene {
         this.terrains = terrains;
     }
 
-    public void setEntities(Map<TexturedModel, List<Entity>> entities) {
+    public void setEntities(Map<TexturedModel, List<RenderEntity>> entities) {
         this.entities = entities;
     }
 

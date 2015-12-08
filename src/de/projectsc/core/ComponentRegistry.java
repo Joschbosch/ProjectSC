@@ -6,11 +6,12 @@ package de.projectsc.core;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import de.projectsc.core.data.entities.Component;
+import de.projectsc.core.entities.Component;
 
 public class ComponentRegistry {
 
@@ -40,5 +41,9 @@ public class ComponentRegistry {
             LOGGER.debug("Component " + name + " is not registered.");
         }
         return null;
+    }
+
+    public static Set<String> getRegisteredComponents() {
+        return registeredComponents.keySet();
     }
 }

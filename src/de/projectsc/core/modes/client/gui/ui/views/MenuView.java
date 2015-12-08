@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015
+ * Copyright (C) 2015 
  */
 
 package de.projectsc.core.modes.client.gui.ui.views;
@@ -18,40 +18,47 @@ import de.projectsc.core.modes.client.gui.objects.text.FontStore;
 import de.projectsc.core.modes.client.gui.objects.text.FontType;
 import de.projectsc.core.modes.client.gui.objects.text.GUIText;
 import de.projectsc.core.modes.client.gui.objects.text.TextMaster;
+import de.projectsc.core.modes.client.gui.textures.UITexture;
+import de.projectsc.core.modes.client.gui.utils.Loader;
 
-/**
- * GUI implementation gor the menu.
- * 
- * @author Josch Bosch
- */
 public class MenuView extends View {
 
-    private final Menu menuBox;
+    private Menu menu;
 
-    private final List<GUIText> lastText = new LinkedList<>();
+    private List<GUIText> lastText = new LinkedList<>();
 
-    private final FontType font;
+    private FontType font;
 
-    private final float fontSize = 2f;
+    private float fontSize = 2f;
+
+    private UITexture bg;
 
     public MenuView(UIElement element) {
         super(element);
-        this.menuBox = (Menu) element;
+        this.menu = (Menu) element;
         this.font = FontStore.getFont(Font.CANDARA);
+        bg = new UITexture(Loader.loadTexture(menu.getBackground()), new Vector2f(0f, 0f), new Vector2f(0.5f, 0.5f));
     }
 
     @Override
     public void render(UI ui) {
-        List<String> items = menuBox.getMenuItems();
+        List<String> items = menu.getMenuItems();
+        ui.addElement(bg, 0);
         for (GUIText lines : lastText) {
             TextMaster.removeText(lines);
         }
         int index = 0;
         for (String item : items) {
-            GUIText menuItemText = new GUIText(item, fontSize, font, getPosition(index++), 1.0f, true);
-            menuItemText.setColour(1, 1, 1);
+            GUIText menuItemText = new GUIText(item, fontSize, font, getPosition(index), 1.0f, true);
+            menuItemText.setColour(1, 0, 0);
+            if (index++ == menu.getChosenItem()) {
+                menuItemText.setBorderWidth(0.5f);
+                menuItemText.setOutlineColor(0, 0, 0);
+            }
             TextMaster.loadText(menuItemText);
+            lastText.add(menuItemText);
         }
+        TextMaster.createAndLoadText("(0,0)", fontSize, font, new Vector2f(0.0f, 0.0f), 1.0f, false);
     }
 
     private Vector2f getPosition(int i) {

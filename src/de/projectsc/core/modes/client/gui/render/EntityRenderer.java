@@ -14,7 +14,7 @@ import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.util.vector.Matrix4f;
 
-import de.projectsc.core.data.entities.Entity;
+import de.projectsc.core.modes.client.gui.data.RenderEntity;
 import de.projectsc.core.modes.client.gui.models.RawModel;
 import de.projectsc.core.modes.client.gui.models.TexturedModel;
 import de.projectsc.core.modes.client.gui.shaders.EntityShader;
@@ -42,11 +42,11 @@ public class EntityRenderer {
      * 
      * @param entitiesWithModel to render.
      */
-    public void render(Map<TexturedModel, List<Entity>> entitiesWithModel) {
+    public void render(Map<TexturedModel, List<RenderEntity>> entitiesWithModel) {
         for (TexturedModel model : entitiesWithModel.keySet()) {
             prepareTexturedModel(model);
-            List<Entity> batch = entitiesWithModel.get(model);
-            for (Entity e : batch) {
+            List<RenderEntity> batch = entitiesWithModel.get(model);
+            for (RenderEntity e : batch) {
                 prepareInstance(e, model.getTexture());
                 GL11.glDrawElements(GL11.GL_TRIANGLES, model.getRawModel().getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
             }
@@ -79,12 +79,13 @@ public class EntityRenderer {
         MasterRenderer.enableCulling();
     }
 
-    private void prepareInstance(Entity entity, ModelTexture modelTexture) {
+    private void prepareInstance(RenderEntity entity, ModelTexture modelTexture) {
         Matrix4f transformationMatrix =
-            Maths.createTransformationMatrix(entity.getPosition(), entity.getRotX(), entity.getRotY(), entity.getRotZ(), entity.getScale());
+            Maths.createTransformationMatrix(entity.getPosition(), entity.getRotation().x, entity.getRotation().x, entity.getRotation().x,
+                entity.getScale());
         shader.loadTransformationMatrix(transformationMatrix);
         shader.loadOffset(getTextureOffsetX(modelTexture), getTextureOffsetY(modelTexture));
-        shader.loadSelected(entity.isHighlighted(), entity.isSelected());
+        shader.loadSelected(false, false);
 
     }
 

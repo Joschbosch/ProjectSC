@@ -67,15 +67,6 @@ public final class TextMaster {
     }
 
     /**
-     * Return the texts to render.
-     * 
-     * @return map of texts to render
-     */
-    public static Map<FontType, List<GUIText>> render() {
-        return texts;
-    }
-
-    /**
      * Remove a text from the screen.
      * 
      * @param text to remove
@@ -86,5 +77,19 @@ public final class TextMaster {
         if (textBatch.isEmpty()) {
             texts.remove(textBatch);
         }
+    }
+
+    /**
+     * Clean up everything.
+     */
+    public static void cleanUp() {}
+
+    /**
+     * Render the texts.
+     * 
+     * @return
+     */
+    public static Map<FontType, List<GUIText>> render() {
+        return texts;
     }
 }

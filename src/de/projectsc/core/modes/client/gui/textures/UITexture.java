@@ -23,7 +23,7 @@ public class UITexture {
     public UITexture(int texture, Vector2f position, Vector2f scale) {
         super();
         this.texture = texture;
-        this.position = position;
+        this.position = Vector2f.add(position, new Vector2f(-0.5f, 0.5f), null);
         this.scale = scale;
     }
 

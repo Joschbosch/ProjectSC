@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015
+ * Copyright (C) 2015 
  */
 
 package de.projectsc.core.modes.client.gui.ui.views;
@@ -11,11 +11,6 @@ import de.projectsc.core.modes.client.common.StateConstants;
 import de.projectsc.core.modes.client.common.data.UIElement;
 import de.projectsc.core.modes.client.gui.data.View;
 
-/**
- * Create a view for the given UI element.
- * 
- * @author Josch Bosch
- */
 public final class UIFactory {
 
     private static final Log LOGGER = LogFactory.getLog(UIFactory.class);
@@ -24,12 +19,6 @@ public final class UIFactory {
 
     }
 
-    /**
-     * Creates the view for an element.
-     * 
-     * @param element to create view for
-     * @return the new view
-     */
     public static View createView(UIElement element) {
         switch (element.getUiViewId()) {
         case StateConstants.CONSOLE:

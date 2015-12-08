@@ -4,8 +4,9 @@
 
 package de.projectsc.core.modes.client.gui.components;
 
-import de.projectsc.core.data.entities.Component;
-import de.projectsc.core.data.entities.Entity;
+import org.lwjgl.util.vector.Vector3f;
+
+import de.projectsc.core.entities.Component;
 import de.projectsc.core.modes.client.gui.data.Scene;
 
 /**
@@ -15,8 +16,13 @@ import de.projectsc.core.modes.client.gui.data.Scene;
  */
 public abstract class GraphicalComponent extends Component {
 
-    public GraphicalComponent(String newName, Entity owner) {
-        super(newName, owner);
+    private Vector3f entityPosition;
+
+    private Vector3f entityRotation;
+
+    public void setNewPosition(Vector3f entityPosition, Vector3f entityRotation) {
+        this.setEntityPosition(entityPosition);
+        this.setEntityRotation(entityRotation);
     }
 
     /**
@@ -25,4 +31,20 @@ public abstract class GraphicalComponent extends Component {
      * @param scene for positions
      */
     public abstract void render(Scene scene);
+
+    public Vector3f getEntityPosition() {
+        return entityPosition;
+    }
+
+    public void setEntityPosition(Vector3f entityPosition) {
+        this.entityPosition = entityPosition;
+    }
+
+    public Vector3f getEntityRotation() {
+        return entityRotation;
+    }
+
+    public void setEntityRotation(Vector3f entityRotation) {
+        this.entityRotation = entityRotation;
+    }
 }

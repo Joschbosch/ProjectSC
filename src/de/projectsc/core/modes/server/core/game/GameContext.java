@@ -9,11 +9,9 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import au.com.ds.ef.StatefulContext;
-import de.projectsc.core.data.OctTree;
-import de.projectsc.core.data.entities.Entity;
-import de.projectsc.core.data.entities.components.physic.BoundingComponent;
 import de.projectsc.core.data.loader.TerrainLoader;
 import de.projectsc.core.data.terrain.Terrain;
+import de.projectsc.core.entities.Entity;
 import de.projectsc.core.game.GameAttributes;
 import de.projectsc.core.game.GameConfiguration;
 import de.projectsc.core.modes.server.core.game.data.ServerPlayer;
@@ -44,8 +42,6 @@ public class GameContext extends StatefulContext {
     private Terrain terrain;
 
     private Map<Integer, Entity> staticEntities;
-
-    private OctTree<Entity> collisionTree;
 
     private Map<Long, Entity> entities;
 
@@ -85,17 +81,6 @@ public class GameContext extends StatefulContext {
 
         loadPlayerAndBots();
         if (terrain != null) {
-            collisionTree = new OctTree<>(terrain.getMapBoundingBox());
-            for (Entity entity : staticEntities.values()) {
-                if (entity.hasComponent(BoundingComponent.class)) {
-                    collisionTree.addEntity(entity);
-                }
-            }
-            for (Entity entity : entities.values()) {
-                collisionTree.addEntity(entity);
-                // terrain.markEntityPosition(entity, Tile.NOT_WALKABLE);
-            }
-            collisionTree.recalculateTree();
         }
         loadingProgress = 100;
     }
@@ -166,10 +151,6 @@ public class GameContext extends StatefulContext {
 
     public Map<Integer, Entity> getStaticEntities() {
         return staticEntities;
-    }
-
-    public OctTree<Entity> getCollisionTree() {
-        return collisionTree;
     }
 
     public Map<Long, Entity> getEntities() {
