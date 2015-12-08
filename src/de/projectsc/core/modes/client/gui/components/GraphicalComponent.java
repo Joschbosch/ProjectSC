@@ -4,8 +4,7 @@
 
 package de.projectsc.core.modes.client.gui.components;
 
-import de.projectsc.core.data.entities.Component;
-import de.projectsc.core.data.entities.Entity;
+import de.projectsc.core.entities.Component;
 import de.projectsc.core.modes.client.gui.data.Scene;
 
 /**
@@ -15,14 +14,12 @@ import de.projectsc.core.modes.client.gui.data.Scene;
  */
 public abstract class GraphicalComponent extends Component {
 
-    public GraphicalComponent(String newName, Entity owner) {
-        super(newName, owner);
-    }
-
     /**
      * Adds everything for rendering.
      * 
+     * @param entity to render
      * @param scene for positions
      */
-    public abstract void render(Scene scene);
+    public abstract void render(long entity, Scene scene);
+
 }

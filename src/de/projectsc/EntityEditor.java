@@ -18,9 +18,10 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -51,24 +52,20 @@ import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 
+import de.projectsc.core.ComponentRegistry;
 import de.projectsc.core.CoreConstants;
-import de.projectsc.core.data.entities.Component;
-import de.projectsc.core.data.entities.components.physic.BoundingComponent;
-import de.projectsc.core.data.entities.components.physic.MovingComponent;
-import de.projectsc.core.modes.client.gui.components.graphical.impl.EmittingLightComponent;
-import de.projectsc.core.modes.client.gui.components.graphical.impl.ParticleEmitterComponent;
+import de.projectsc.core.EntityManager;
+import de.projectsc.core.entities.Component;
+import de.projectsc.core.entities.components.ComponentListItem;
+import de.projectsc.editor.ComponentView;
+import de.projectsc.editor.ComponentViewType;
 import de.projectsc.editor.EditorData;
 import de.projectsc.editor.EditorGraphicsCore;
-import de.projectsc.editor.componentViews.BoundingComponentView;
-import de.projectsc.editor.componentViews.EmittingLightComponentView;
-import de.projectsc.editor.componentViews.MovingComponentView;
 
 /**
  * Entity editor.
@@ -85,12 +82,6 @@ public class EntityEditor extends JFrame {
     private static final String COULD_NOT_SET_CURRENT_DIRECTORY = "Could not set current directory.";
 
     private static final String ENTITY_ENT = CoreConstants.ENTITY_FILENAME;
-
-    private static final String TEXTURE_PNG = CoreConstants.TEXTURE_FILENAME;
-
-    private static final String MODEL_OBJ = CoreConstants.MODEL_FILENAME;
-
-    private static final String BOXFILE_NAME = CoreConstants.BOX_FILENAME;
 
     private static final String COMPONENTS = "components";
 
@@ -152,30 +143,50 @@ public class EntityEditor extends JFrame {
 
     private JComboBox<String> componentCombo;
 
-    private final String[] componentNames =
-        { EmittingLightComponent.NAME, MovingComponent.NAME, BoundingComponent.NAME, ParticleEmitterComponent.NAME };
+    private Set<String> componentNames;
 
     private JList<String> componentList;
+
+    private JLabel warningsLabel;
+
+    private JTextField nameText;
+
+    private JCheckBox renderSkybox;
 
     /**
      * Create the frame.
      */
     public EntityEditor() {
         data = new EditorData();
+        loadComponents();
         createContent();
+        getNextFreeID();
+        updateEditor(data);
+    }
+
+    private void getNextFreeID() {
         try {
-            File folder = new File(EntityEditor.class.getResource(SLASHED_MODEL_DIR).toURI());
-            for (int i = 0; i < 10000; i++) {
-                File f = new File(folder, CoreConstants.SCHEME_DIRECTORY_PREFIX + (MINIMUM_ID + i));
-                if (!f.exists()) {
-                    data.setId(MINIMUM_ID + i);
-                    break;
+            data.setId(MINIMUM_ID);
+            URL resource = EntityEditor.class.getResource(SLASHED_MODEL_DIR);
+            if (resource != null) {
+                File folder = new File(resource.toURI());
+                for (int i = 0; i < 10000; i++) {
+                    File f = new File(folder, CoreConstants.SCHEME_DIRECTORY_PREFIX + (MINIMUM_ID + i));
+                    if (!f.exists()) {
+                        data.setId(MINIMUM_ID + i);
+                        break;
+                    }
                 }
             }
         } catch (URISyntaxException e) {
             LOGGER.error("Could not read model data.");
         }
-        updateEditor(data);
+    }
+
+    private void loadComponents() {
+        for (ComponentListItem it : ComponentListItem.values()) {
+            ComponentRegistry.registerComponent(it.getName(), it.getClazz());
+        }
     }
 
     private void updateEditor(EditorData d) {
@@ -191,6 +202,7 @@ public class EntityEditor extends JFrame {
         textureNameLabel.setText(textureName);
 
         idTextfield.setText(String.valueOf(d.getId()));
+        nameText.setText(String.valueOf(d.getName()));
 
         numColumSpinner.setValue(d.getNumColums());
         scaleSlider.setValue((int) (d.getScale() * 10));
@@ -200,10 +212,11 @@ public class EntityEditor extends JFrame {
         transparentCheckbox.setSelected(d.isTransparent());
         cycleCheckbox.setSelected(d.isCycleTextures());
         moveEntityCheckBox.setSelected(d.isMoveEntity());
+        renderSkybox.setSelected(d.getRenderSkybox());
         fakelightCheckbox.setSelected(d.isFakeLighting());
         rotateCheckbox.setSelected(d.isRotateCamera());
         lightPositionCheckBox.setSelected(d.isLightAtCameraPostion());
-
+        fillComponentComboAndList();
     }
 
     /**
@@ -224,7 +237,7 @@ public class EntityEditor extends JFrame {
 
     private void createContent() {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setBounds(100, 100, 1024, 768);
+        setBounds(100, 100, 1024, 805);
 
         this.addWindowListener(new WindowAdapter() {
 
@@ -243,9 +256,9 @@ public class EntityEditor extends JFrame {
 
         createMainSettings();
 
-        createPreviewOptions();
-
         createComponentPanel();
+
+        createPreviewOptions();
 
         JPanel previewPanel = new JPanel();
         previewPanel.setLayout(new BorderLayout(0, 0));
@@ -276,6 +289,10 @@ public class EntityEditor extends JFrame {
         displayParent.requestFocus();
         displayParent.setIgnoreRepaint(true);
         previewPanel.add(displayParent);
+
+        warningsLabel = new JLabel("New label");
+        warningsLabel.setBounds(10, 720, 739, 14);
+        contentPane.add(warningsLabel);
     }
 
     private void createComponentPanel() {
@@ -285,6 +302,7 @@ public class EntityEditor extends JFrame {
         contentPane.add(componentPanel);
         componentPanel.setLayout(null);
 
+        componentNames = ComponentRegistry.getRegisteredComponents();
         componentList = new JList<String>();
         componentList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         componentList.setValueIsAdjusting(true);
@@ -299,11 +317,10 @@ public class EntityEditor extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 if (componentCombo.getSelectedItem() != null) {
                     String component = (String) componentCombo.getSelectedItem();
-                    if (!component.isEmpty()) {
-                        data.getComponentsAdded().add(component);
-                    }
-                    fillComponentComboAndList();
                     editor3dCore.addComponent(component);
+                    fillComponentComboAndList();
+                    warningsLabel.setText("Added component " + component);
+
                 }
             }
         });
@@ -316,25 +333,24 @@ public class EntityEditor extends JFrame {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (componentList.getSelectedValue() != null && !componentList.getSelectedValue().isEmpty()) {
-                    if (componentList.getSelectedValue().equals(EmittingLightComponent.NAME)) {
-                        EmittingLightComponent component = (EmittingLightComponent) editor3dCore.getComponent(EmittingLightComponent.NAME);
-                        EmittingLightComponentView dialog =
-                            new EmittingLightComponentView(component, editor3dCore.getCurrentEntity());
-                        dialog.setSize(800, 600);
-                        dialog.setVisible(true);
-                    } else if (componentList.getSelectedValue().equals(MovingComponent.NAME)) {
-                        MovingComponent component = (MovingComponent) editor3dCore.getComponent(MovingComponent.NAME);
-                        MovingComponentView dialog =
-                            new MovingComponentView(component, editor3dCore.getCurrentEntity());
-                        dialog.setSize(450, 130);
-                        dialog.setVisible(true);
-                    } else if (componentList.getSelectedValue().equals(BoundingComponent.NAME)) {
-                        BoundingComponent component = (BoundingComponent) editor3dCore.getComponent(BoundingComponent.NAME);
-                        BoundingComponentView dialog =
-                            new BoundingComponentView(component, editor3dCore);
-                        dialog.setSize(450, 130);
-                        dialog.setVisible(true);
+                String selectedValue = componentList.getSelectedValue();
+                if (selectedValue != null && !selectedValue.isEmpty()) {
+                    boolean viewOpened = false;
+                    for (ComponentViewType v : ComponentViewType.values()) {
+                        if (v.getComponentName().equals(selectedValue)) {
+                            try {
+                                viewOpened = true;
+                                warningsLabel.setText("");
+                                ComponentView dialog = v.getComponentClass().newInstance();
+                                dialog.setEntity(editor3dCore.getCurrentEntity());
+                                dialog.setVisible(true);
+                            } catch (InstantiationException | IllegalAccessException e1) {
+                                e1.printStackTrace();
+                            }
+                        }
+                    }
+                    if (!viewOpened) {
+                        warningsLabel.setText("There is no view available for " + selectedValue);
                     }
                 }
             }
@@ -349,7 +365,6 @@ public class EntityEditor extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 if (componentList.getSelectedValue() != null) {
                     String component = componentList.getSelectedValue();
-                    data.getComponentsAdded().remove(component);
                     editor3dCore.removeComponent(component);
                 }
                 fillComponentComboAndList();
@@ -362,9 +377,13 @@ public class EntityEditor extends JFrame {
         componentCombo.setBounds(10, 34, 305, 20);
         fillComponentComboAndList();
         componentPanel.add(componentCombo);
+        repaint();
     }
 
     private void fillComponentComboAndList() {
+        if (data != null && editor3dCore != null && editor3dCore.getCurrentEntity() != -1) {
+            data.setComponentsAdded(EntityManager.getAllComponents(editor3dCore.getCurrentEntity()).keySet());
+        }
         componentCombo.removeAllItems();
         componentList.removeAll();
         for (String componentName : componentNames) {
@@ -437,6 +456,20 @@ public class EntityEditor extends JFrame {
             }
         });
         previewOptionsPanel.add(moveEntityCheckBox);
+
+        renderSkybox = new JCheckBox("Skybox");
+        renderSkybox.setBounds(6, 124, 142, 23);
+        renderSkybox.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                data.setRenderSkybox(renderSkybox.isSelected());
+                if (editor3dCore != null) {
+                    editor3dCore.setRenderSkybox(renderSkybox.isSelected());
+                }
+            }
+        });
+        previewOptionsPanel.add(renderSkybox);
     }
 
     private void createMainSettings() {
@@ -457,6 +490,17 @@ public class EntityEditor extends JFrame {
         mainSettingsPanel.add(idTextfield);
         idTextfield.setColumns(10);
         idTextfield.setDocument(new IDDocument());
+
+        JLabel nameLabel = new JLabel("Name");
+        nameLabel.setFont(new Font(FONT, Font.BOLD, 16));
+        nameLabel.setBounds(10, 38, 50, 14);
+        mainSettingsPanel.add(nameLabel);
+
+        nameText = new JTextField();
+        nameText.setBounds(10, 58, 100, 20);
+        nameText.setText("");
+        mainSettingsPanel.add(nameText);
+        nameText.setColumns(10);
 
         modelPanel(mainSettingsPanel);
 
@@ -612,8 +656,8 @@ public class EntityEditor extends JFrame {
                     modelNameLabel.setText(chosen.getName().substring(0, chosen.getName().lastIndexOf(DOT)));
                     data.setModelFile(chosen);
                     editor3dCore.triggerLoadModel();
-                    if (data.getTextureFile() != null) {
-                        editor3dCore.updateTexture();
+                    if (data.getTextureFile() != null && data.getTextureFile().exists()) {
+                        editor3dCore.triggerUpdateTexture();
                     }
                     editor3dCore.updateData();
                 }
@@ -671,46 +715,32 @@ public class EntityEditor extends JFrame {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                File folder;
+                File schemaRootDirectory = null;
                 try {
-                    folder = new File(EntityEditor.class.getResource(SLASHED_MODEL_DIR).toURI());
-                    File targetFolder = new File(folder, CoreConstants.SCHEME_DIRECTORY_PREFIX + Integer.parseInt(idTextfield.getText()));
-                    targetFolder.mkdirs();
-                    if (data.getModelFile() != null && !data.getModelFile().equals(new File(targetFolder, MODEL_OBJ))) {
-                        FileUtils.copyFile(data.getModelFile(), new File(targetFolder, MODEL_OBJ));
+                    schemaRootDirectory = new File(EntityEditor.class.getResource(SLASHED_MODEL_DIR).toURI());
+                    File schemaFolder =
+                        new File(schemaRootDirectory, CoreConstants.SCHEME_DIRECTORY_PREFIX + Integer.parseInt(idTextfield.getText()));
+                    schemaFolder.mkdirs();
+                    if (data.getModelFile() != null) {
+                        File nameFile = new File(schemaFolder, FilenameUtils.removeExtension(data.getModelFile().getName()));
+                        nameFile.createNewFile();
                     }
-                    if (data.getTextureFile() != null && !data.getTextureFile().equals(new File(targetFolder, TEXTURE_PNG))) {
-                        FileUtils.copyFile(data.getTextureFile(), new File(targetFolder, TEXTURE_PNG));
-                    }
-                    if (editor3dCore.getCurrentEntity().hasComponent(BoundingComponent.class)
-                        && editor3dCore.getCurrentEntity().getComponent(BoundingComponent.class).isValidForSaving()
-                        && !editor3dCore.getCurrentEntity().getComponent(BoundingComponent.class).getBoxFile()
-                            .equals(new File(targetFolder, BOXFILE_NAME))) {
-                        FileUtils.copyFile(editor3dCore.getCurrentEntity().getComponent(BoundingComponent.class).getBoxFile(), new File(
-                            targetFolder, BOXFILE_NAME));
-                    }
-                    File nameFile = new File(targetFolder, FilenameUtils.removeExtension(data.getModelFile().getName()));
-                    nameFile.createNewFile();
-                    Map<String, Object> serialization = new HashMap<>();
-                    serialization.put("numColumns", data.getNumColums());
-                    serialization.put("reflectivity", data.getReflectivity());
-                    serialization.put("shineDamper", data.getShineDamper());
-                    serialization.put("fakeLighting", data.isFakeLighting());
-
-                    serialization.put("scale", data.getScale());
-                    Map<String, String> components = new HashMap<>();
-                    for (String component : data.getComponentsAdded()) {
-                        Component c = editor3dCore.getComponent(component);
+                    Map<String, Object> componentsSerialization = new HashMap<>();
+                    for (Component c : EntityManager.getAllComponents(editor3dCore.getCurrentEntity()).values()) {
                         if (c.isValidForSaving()) {
-                            components.put(component, c.serialize());
+                            componentsSerialization.put(c.getComponentName(), c.serialize(schemaFolder));
                         }
                     }
-                    serialization.put(COMPONENTS, components);
+                    Map<String, Object> complete = new HashMap<>();
+                    complete.put("schemaId", data.getId());
+                    complete.put("schemaName", data.getName());
+                    complete.put(COMPONENTS, componentsSerialization);
                     ObjectMapper mapper = new ObjectMapper();
-                    mapper.writeValue(new File(targetFolder, ENTITY_ENT), serialization);
+                    mapper.writeValue(new File(schemaFolder, ENTITY_ENT), complete);
                 } catch (URISyntaxException | IOException e1) {
                     LOGGER.error("Could not write EntitySchema: ", e1);
                 }
+                warningsLabel.setText("Saved entity to " + schemaRootDirectory.getAbsolutePath());
             }
 
         });
@@ -730,51 +760,20 @@ public class EntityEditor extends JFrame {
                     LOGGER.info(COULD_NOT_SET_CURRENT_DIRECTORY);
                 }
                 chooser.showOpenDialog(null);
-                File chosen = chooser.getSelectedFile();
-                if (chosen != null && chosen.getName().matches(CoreConstants.SCHEME_DIRECTORY_PREFIX + "\\d{5}")
-                    && new File(chosen, ENTITY_ENT).exists()) {
-                    editor3dCore.doRender(false);
+                File schemaDirectory = chooser.getSelectedFile();
+                if (schemaDirectory != null && schemaDirectory.getName().matches(CoreConstants.SCHEME_DIRECTORY_PREFIX + "\\d{5}")
+                    && new File(schemaDirectory, ENTITY_ENT).exists()) {
                     data = new EditorData();
                     editor3dCore.setEditorData(data);
-                    ObjectMapper mapper = new ObjectMapper();
+                    editor3dCore.triggerDeserialze(schemaDirectory);
                     try {
-                        JsonNode tree = mapper.readTree(new File(chosen, ENTITY_ENT));
-                        data.setId(Integer.parseInt(chosen.getName().substring(1)));
-                        data.setNumColums(tree.get("numColumns").getIntValue());
-                        data.setReflectivity((float) tree.get("reflectivity").getDoubleValue());
-                        data.setShineDamper((float) tree.get("shineDamper").getDoubleValue());
-                        data.setScale((float) tree.get("scale").getDoubleValue());
-                        if (new File(chosen, MODEL_OBJ).exists()) {
-                            data.setModelFile(new File(chosen, MODEL_OBJ));
-                            editor3dCore.createNewEntity(data.getId());
-                            editor3dCore.triggerLoadModel();
-                        }
-                        if (new File(chosen, TEXTURE_PNG).exists()) {
-                            data.setTextureFile(new File(chosen, TEXTURE_PNG));
-                            editor3dCore.triggerUpdateTexture();
-                            updateTexturePreview(data.getTextureFile());
-                        }
-                        Iterator<String> componentNamesIterator = tree.get(COMPONENTS).getFieldNames();
-                        while (componentNamesIterator.hasNext()) {
-                            String name = componentNamesIterator.next();
-                            editor3dCore.addComponent(name);
-                            Component c = editor3dCore.getComponent(name);
-                            if (!(c instanceof BoundingComponent)) {
-                                c.deserialize(tree.get(COMPONENTS).get(name), chosen);
-                            } else {
-                                editor3dCore.triggerLoadBoundingBox();
-                            }
-                            data.getComponentsAdded().add(name);
-                        }
-                    } catch (IOException e1) {
-                        LOGGER.error("Could not read entity file in path " + chosen);
-
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e1) {
+                        LOGGER.error(e1.getStackTrace());
                     }
                     updateEditor(data);
                     fillComponentComboAndList();
-                    editor3dCore.updateData();
-                    editor3dCore.doRender(true);
-
+                    warningsLabel.setText("Loaded schema from " + schemaDirectory.getAbsolutePath());
                 }
             }
         });
@@ -782,8 +781,7 @@ public class EntityEditor extends JFrame {
     }
 
     /**
-     * Once the Canvas is created its add notify method will call this method to start the LWJGL
-     * Display and game loop in another thread.
+     * Once the Canvas is created its add notify method will call this method to start the LWJGL Display and game loop in another thread.
      */
     public void startLWJGL() {
         messageQueue = new LinkedBlockingQueue<String>();
@@ -794,8 +792,8 @@ public class EntityEditor extends JFrame {
     }
 
     /**
-     * Tell game loop to stop running, after which the LWJGL Display will be destoryed. The main
-     * thread will wait for the Display.destroy() to complete
+     * Tell game loop to stop running, after which the LWJGL Display will be destoryed. The main thread will wait for the Display.destroy()
+     * to complete
      */
     private void stopLWJGL() {
         try {
@@ -868,10 +866,13 @@ public class EntityEditor extends JFrame {
         String text = idTextfield.getText();
         int id = Integer.parseInt(text);
         try {
-            File folder = new File(EntityEditor.class.getResource(SLASHED_MODEL_DIR).toURI());
-            File folder2 = new File(folder, CoreConstants.SCHEME_DIRECTORY_PREFIX + id);
-            if (folder2.exists()) {
-                isvalid = false;
+            URL resource = EntityEditor.class.getResource(SLASHED_MODEL_DIR);
+            if (resource != null) {
+                File folder = new File(resource.toURI());
+                File folder2 = new File(folder, CoreConstants.SCHEME_DIRECTORY_PREFIX + id);
+                if (folder2.exists()) {
+                    isvalid = false;
+                }
             }
         } catch (URISyntaxException e) {
             LOGGER.error("Could not load folder with id " + id);

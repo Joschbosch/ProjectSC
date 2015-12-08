@@ -43,8 +43,8 @@ public class TerrainModel {
     public TerrainModel(Terrain terrain) {
         this.terrain = terrain;
         this.tiles = terrain.getTerrain();
-        this.xCoord = terrain.getWorldPositionX() * Terrain.TERRAIN_CHUNK_SIZE * Terrain.TERRAIN_TILE_SIZE;
-        this.zCoord = terrain.getWorldPositionZ() * Terrain.TERRAIN_CHUNK_SIZE * Terrain.TERRAIN_TILE_SIZE;
+        this.xCoord = terrain.getWorldPositionX();
+        this.zCoord = terrain.getWorldPositionZ();
         TerrainTexture backgroundTex = new TerrainTexture(Loader.loadTexture(terrain.getBGTexture()));
         TerrainTexture rTex = new TerrainTexture(Loader.loadTexture(terrain.getRTexture()));
         TerrainTexture gTex = new TerrainTexture(Loader.loadTexture(terrain.getGTexture()));

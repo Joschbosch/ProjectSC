@@ -12,7 +12,9 @@ import java.util.concurrent.LinkedBlockingQueue;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import de.projectsc.core.ComponentRegistry;
 import de.projectsc.core.data.Timer;
+import de.projectsc.core.entities.components.ComponentListItem;
 import de.projectsc.core.modes.client.common.ClientState;
 import de.projectsc.core.modes.client.common.GUI;
 import de.projectsc.core.modes.client.common.data.ClientPlayer;
@@ -20,6 +22,7 @@ import de.projectsc.core.modes.client.common.messages.ClientMessage;
 import de.projectsc.core.modes.client.core.states.MenuState;
 import de.projectsc.core.modes.client.gui.GUICore;
 import de.projectsc.core.modes.server.core.game.GameRunningState;
+import de.projectsc.core.systems.SystemMaster;
 
 /**
  * Core class for the client.
@@ -46,6 +49,8 @@ public class ClientCore implements Runnable {
 
     private GUI gui;
 
+    private SystemMaster systemMaster;
+
     public ClientCore() {
         networkSendQueue = new LinkedBlockingQueue<>();
         networkReceiveQueue = new LinkedBlockingQueue<>();
@@ -57,6 +62,8 @@ public class ClientCore implements Runnable {
     public void run() {
         LOGGER.debug("Starting core ... ");
         Timer.init();
+        loadComponents();
+        loadSystems();
         gui = new GUICore();
         gui.initCore();
         clientRunning = true;
@@ -94,6 +101,17 @@ public class ClientCore implements Runnable {
         }
         LOGGER.debug(String.format("Client terminated"));
 
+    }
+
+    private void loadSystems() {
+        systemMaster = new SystemMaster();
+        systemMaster.initialize();
+    }
+
+    private void loadComponents() {
+        for (ComponentListItem c : ComponentListItem.values()) {
+            ComponentRegistry.registerComponent(c.getName(), c.getClazz());
+        }
     }
 
     private void readServerMessages() {

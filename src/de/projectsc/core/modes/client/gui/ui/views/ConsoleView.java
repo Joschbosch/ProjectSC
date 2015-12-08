@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015
+ * Copyright (C) 2015 
  */
 
 package de.projectsc.core.modes.client.gui.ui.views;
@@ -21,32 +21,27 @@ import de.projectsc.core.modes.client.gui.objects.text.TextMaster;
 import de.projectsc.core.modes.client.gui.textures.UITexture;
 import de.projectsc.core.modes.client.gui.utils.Loader;
 
-/**
- * GUI implementation for the console.
- * 
- * @author Sascha Zur
- */
 public class ConsoleView extends View {
 
-    private static final Vector2f SIZE = new Vector2f(1.5f, 0.5f);
+    private static final Vector2f SIZE = new Vector2f(2f, 0.5f);
 
-    private static final Vector2f POSITION = new Vector2f(-0.5f, 0.5f);
+    private static final Vector2f POSITION = new Vector2f(0f, 0f);
 
     private static final int MAXIMAL_LINES = 20;
 
-    private final Console console;
+    private Console console;
 
-    private final float fontSize = 0.7f;
+    private float fontSize = 0.7f;
 
-    private final FontType font;
+    private FontType font;
 
-    private final Vector2f position;
+    private Vector2f position;
 
-    private final UITexture bg;
+    private UITexture bg;
 
-    private final List<GUIText> lastText = new LinkedList<>();
+    private List<GUIText> lastText = new LinkedList<>();
 
-    private final float linePadding = 0.018f;
+    private float linePadding = 0.018f;
 
     public ConsoleView(UIElement element) {
         super(element);
@@ -75,14 +70,16 @@ public class ConsoleView extends View {
                 GUIText newLine = TextMaster.createAndLoadText(lines.get(i), fontSize, font, linePosition, 1.0f, false);
                 lastText.add(newLine);
                 newLine.setColour(1, 1, 1);
+                newLine.setRenderOrder(1);
             }
             Vector2f linePosition = new Vector2f(position);
             linePosition.y = position.y + SIZE.y - linePadding - 0.001f;
-            GUIText commandPromt =
+            GUIText commandPrompt =
                 TextMaster.createAndLoadText("> " + console.getCurrentInput() + "_", fontSize, font, linePosition, 1.0f, false);
-            commandPromt.setColour(1, 1, 1);
-            lastText.add(commandPromt);
-            ui.addElement(bg);
+            commandPrompt.setColour(1, 1, 1);
+            lastText.add(commandPrompt);
+            commandPrompt.setRenderOrder(1);
+            ui.addElement(bg, UI.AFTER_TEXT);
         }
 
     }

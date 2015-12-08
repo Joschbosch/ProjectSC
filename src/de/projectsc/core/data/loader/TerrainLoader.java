@@ -28,10 +28,10 @@ import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.core.data.Tile;
-import de.projectsc.core.data.entities.Entity;
 import de.projectsc.core.data.objects.Light;
 import de.projectsc.core.data.terrain.Terrain;
 import de.projectsc.core.data.utils.LightSerializationUtils;
+import de.projectsc.core.entities.Entity;
 
 /**
  * Loader for a terrain map with its static lights and objects.
@@ -127,7 +127,7 @@ public final class TerrainLoader {
                     float yRot = rotationValues[1];
                     Vector3f rotation = new Vector3f(rotationValues[0], yRot, rotationValues[2]);
 
-                    staticObjects.put(objectNode.get(ID).asInt(), new Entity(10000));
+                    // staticObjects.put(objectNode.get(ID).asInt(), new Entity(10000));
                 }
             }
             return null;

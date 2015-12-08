@@ -6,21 +6,13 @@
 
 package de.projectsc.core.modes.client.gui.render;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector4f;
 
-import de.projectsc.core.data.BoundingBox;
-import de.projectsc.core.data.entities.Entity;
 import de.projectsc.core.modes.client.gui.data.Scene;
-import de.projectsc.core.modes.client.gui.models.RawModel;
-import de.projectsc.core.modes.client.gui.models.TexturedModel;
 import de.projectsc.core.modes.client.gui.objects.Camera;
 import de.projectsc.core.modes.client.gui.shaders.EntityShader;
 import de.projectsc.core.modes.client.gui.shaders.TerrainShader;
@@ -103,8 +95,12 @@ public class MasterRenderer {
     /**
      * Prepare rendering for every frame.
      */
-    public void prepare() {
-        GL11.glClearColor(SKY_R, SKY_G, SKY_B, 1);
+    public void prepare(Scene scene) {
+        if (scene.getSkyColor() == null) {
+            GL11.glClearColor(SKY_R, SKY_G, SKY_B, 1);
+        } else {
+            GL11.glClearColor(scene.getSkyColor().x, scene.getSkyColor().y, scene.getSkyColor().z, 1);
+        }
         GL11.glEnable(GL11.GL_DEPTH_TEST);
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
     }
@@ -117,8 +113,7 @@ public class MasterRenderer {
      * @param elapsedTime since last frame
      * @param clipPlane to clip the world
      */
-    public void renderScene(Scene scene,
-        Camera camera, long elapsedTime, Vector4f clipPlane) {
+    public void renderScene(Scene scene, Camera camera, long elapsedTime, Vector4f clipPlane) {
         billboardRenderer.setCamera(camera);
         particleRenderer.setCamera(camera);
         render(scene, camera, elapsedTime, clipPlane);
@@ -134,34 +129,44 @@ public class MasterRenderer {
      */
     public void render(Scene scene, Camera camera, long elapsedTime,
         Vector4f clipPlane) {
-        prepare();
+        prepare(scene);
         entityShader.start();
         entityShader.loadClipPlane(clipPlane);
-        entityShader.loadSkyColor(SKY_R, SKY_G, SKY_B);
+        if (scene.getSkyColor() == null) {
+            entityShader.loadSkyColor(SKY_R, SKY_G, SKY_B);
+        } else {
+            entityShader.loadSkyColor(scene.getSkyColor().x, scene.getSkyColor().y, scene.getSkyColor().z);
+        }
         entityShader.loadLights(scene.getLights());
         entityShader.loadViewMatrix(camera);
-        entityRenderer.render(scene.getEntities());
+        entityRenderer.render(scene.getModels(), scene.getPositions(), scene.getRotations(), scene.getScales());
         entityShader.stop();
-        if (showWireFrames) {
+        if (scene.isWireframeEnable()) {
             collisionBoxShader.start();
             collisionBoxShader.loadViewMatrix(camera);
-            collisionBoxRenderer.render(getBoundingBoxes(scene.getEntities()));
+            // collisionBoxRenderer.render(getBoundingBoxes(scene.getEntities()));
             collisionBoxShader.stop();
         }
         terrainShader.start();
         terrainShader.loadClipPlane(clipPlane);
-        terrainShader.loadSkyColor(SKY_R, SKY_G, SKY_B);
+        if (scene.getSkyColor() == null) {
+            terrainShader.loadSkyColor(SKY_R, SKY_G, SKY_B);
+        } else {
+            terrainShader.loadSkyColor(scene.getSkyColor().x, scene.getSkyColor().y, scene.getSkyColor().z);
+        }
         terrainShader.loadLights(scene.getLights());
         terrainShader.loadViewMatrix(camera);
-        terrainRenderer.render(scene.getTerrain());
+        terrainRenderer.render(scene.getTerrains());
         terrainShader.stop();
-        skyboxRenderer.render(elapsedTime, camera, SKY_R, SKY_G, SKY_B);
+        if (scene.renderSkyBox()) {
+            if (scene.getFogColor() == null) {
+                skyboxRenderer.render(elapsedTime, camera, SKY_R, SKY_G, SKY_B);
+            } else {
+                skyboxRenderer.render(elapsedTime, camera, scene.getFogColor().x, scene.getFogColor().y, scene.getFogColor().z);
+            }
+        }
         billboardRenderer.render(scene.getBillboards());
         particleRenderer.render(scene.getParticles());
-    }
-
-    private Map<RawModel, List<BoundingBox>> getBoundingBoxes(Map<TexturedModel, List<Entity>> entities) {
-        return new HashMap<>();
     }
 
     /**
@@ -171,6 +176,7 @@ public class MasterRenderer {
         GL11.glDisable(GL30.GL_CLIP_DISTANCE0);
         entityShader.dispose();
         terrainShader.dispose();
+        collisionBoxShader.dispose();
     }
 
     /**

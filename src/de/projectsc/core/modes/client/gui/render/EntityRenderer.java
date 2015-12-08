@@ -13,8 +13,8 @@ import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.util.vector.Matrix4f;
+import org.lwjgl.util.vector.Vector3f;
 
-import de.projectsc.core.data.entities.Entity;
 import de.projectsc.core.modes.client.gui.models.RawModel;
 import de.projectsc.core.modes.client.gui.models.TexturedModel;
 import de.projectsc.core.modes.client.gui.shaders.EntityShader;
@@ -42,13 +42,16 @@ public class EntityRenderer {
      * 
      * @param entitiesWithModel to render.
      */
-    public void render(Map<TexturedModel, List<Entity>> entitiesWithModel) {
+    public void render(Map<TexturedModel, List<Long>> entitiesWithModel,
+        Map<Long, Vector3f> position, Map<Long, Vector3f> rotations, Map<Long, Float> scales) {
         for (TexturedModel model : entitiesWithModel.keySet()) {
             prepareTexturedModel(model);
-            List<Entity> batch = entitiesWithModel.get(model);
-            for (Entity e : batch) {
-                prepareInstance(e, model.getTexture());
-                GL11.glDrawElements(GL11.GL_TRIANGLES, model.getRawModel().getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
+            List<Long> batch = entitiesWithModel.get(model);
+            for (Long e : batch) {
+                if (position.get(e) != null && rotations.get(e) != null && scales.get(e) != null) {
+                    prepareInstance(model.getTexture(), position.get(e), rotations.get(e), scales.get(e));
+                    GL11.glDrawElements(GL11.GL_TRIANGLES, model.getRawModel().getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
+                }
             }
             unbindTexturedModel();
         }
@@ -79,12 +82,12 @@ public class EntityRenderer {
         MasterRenderer.enableCulling();
     }
 
-    private void prepareInstance(Entity entity, ModelTexture modelTexture) {
+    private void prepareInstance(ModelTexture modelTexture, Vector3f position, Vector3f rotation, Float scale) {
         Matrix4f transformationMatrix =
-            Maths.createTransformationMatrix(entity.getPosition(), entity.getRotX(), entity.getRotY(), entity.getRotZ(), entity.getScale());
+            Maths.createTransformationMatrix(position, rotation.x, rotation.y, rotation.z, scale);
         shader.loadTransformationMatrix(transformationMatrix);
         shader.loadOffset(getTextureOffsetX(modelTexture), getTextureOffsetY(modelTexture));
-        shader.loadSelected(entity.isHighlighted(), entity.isSelected());
+        shader.loadSelected(false, false);
 
     }
 

@@ -23,7 +23,9 @@ public class UITexture {
     public UITexture(int texture, Vector2f position, Vector2f scale) {
         super();
         this.texture = texture;
+        System.out.println(position);
         this.position = position;
+        System.out.println(position);
         this.scale = scale;
     }
 

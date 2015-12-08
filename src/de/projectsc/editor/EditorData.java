@@ -6,10 +6,10 @@
 package de.projectsc.editor;
 
 import java.io.File;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
-import de.projectsc.core.modes.client.gui.components.graphical.impl.ModelAndTextureComponent;
+import de.projectsc.core.modes.client.gui.components.ModelAndTextureComponent;
 
 /**
  * Data store for the editor and the necessary {@link ModelAndTextureComponent}.
@@ -36,7 +36,7 @@ public class EditorData {
 
     private int numColums = 1;
 
-    private List<String> componentsAdded = new LinkedList<>();
+    private Set<String> componentsAdded = new HashSet<>();
 
     private boolean rotateCamera = false;
 
@@ -45,6 +45,10 @@ public class EditorData {
     private boolean lightAtCamera = true;
 
     private boolean entityMoving = false;
+
+    private String name = "EntitySchema0";
+
+    private boolean renderSkybox = true;
 
     public EditorData() {
         modelFile = null;
@@ -123,11 +127,11 @@ public class EditorData {
         this.numColums = numColums;
     }
 
-    public List<String> getComponentsAdded() {
+    public Set<String> getComponentsAdded() {
         return componentsAdded;
     }
 
-    public void setComponentsAdded(List<String> componentsAdded) {
+    public void setComponentsAdded(Set<String> componentsAdded) {
         this.componentsAdded = componentsAdded;
     }
 
@@ -161,5 +165,21 @@ public class EditorData {
 
     public void setEntityMoving(boolean value) {
         entityMoving = value;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setRenderSkybox(boolean selected) {
+        this.renderSkybox = selected;
+    }
+
+    public boolean getRenderSkybox() {
+        return renderSkybox;
     }
 }

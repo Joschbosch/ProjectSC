@@ -13,8 +13,6 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import de.projectsc.core.data.OctTree;
-import de.projectsc.core.data.entities.Entity;
 import de.projectsc.core.data.messages.GameMessageConstants;
 import de.projectsc.core.data.terrain.Terrain;
 import de.projectsc.core.modes.server.core.game.data.ServerPlayer;
@@ -34,8 +32,6 @@ public class GameRunningState extends GameState {
 
     private static final Log LOGGER = LogFactory.getLog(LoadingState.class);
 
-    private OctTree<Entity> collisionTree;
-
     private Terrain terrain;
 
     private long gameTick = 0;
@@ -44,7 +40,6 @@ public class GameRunningState extends GameState {
     public void call(GameContext context) throws Exception {
         LOGGER.debug("Entered game state " + context.getState());
         this.context = context;
-        this.collisionTree = context.getCollisionTree();
         this.terrain = context.getTerrain();
         sendMessageToAllPlayers(new ServerMessage(GameMessageConstants.BEGIN_GAME));
         context.changeState(this);
@@ -53,9 +48,6 @@ public class GameRunningState extends GameState {
     @Override
     public void loop() {
         gameTick++;
-        if (collisionTree != null) {
-            collisionTree.update();
-        }
         if (gameTick % 5 == 0) {
             new Thread(new Runnable() {
 

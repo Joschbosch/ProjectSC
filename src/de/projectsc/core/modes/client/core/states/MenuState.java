@@ -83,6 +83,7 @@ public class MenuState extends ClientState {
             initState(STATE_MAIN_MENU);
         }
         console.handleInput(keyMap);
+        menu.handleInput(keyMap);
     }
 
     @Override

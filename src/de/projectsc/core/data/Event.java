@@ -6,13 +6,20 @@ package de.projectsc.core.data;
 
 public class Event {
 
-    private String id;
+    private String eventId;
 
-    public Event(String id) {
+    private long entityId;
 
+    public Event(String eventId, long entityID) {
+        this.eventId = eventId;
+        this.entityId = entityID;
     }
 
-    public String getID() {
-        return id;
+    public String getEventID() {
+        return eventId;
+    }
+
+    public long getEntityId() {
+        return entityId;
     }
 }

@@ -30,13 +30,15 @@ public class FontRenderer {
      * 
      * @param texts to render
      */
-    public void render(Map<FontType, List<GUIText>> texts) {
+    public void render(Map<FontType, List<GUIText>> texts, int order) {
         prepare();
         for (FontType font : texts.keySet()) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0);
             GL11.glBindTexture(GL11.GL_TEXTURE_2D, font.getTextureAtlas());
             for (GUIText text : texts.get(font)) {
-                renderText(text);
+                if (text.getRenderOrder() == order) {
+                    renderText(text);
+                }
             }
         }
         endRendering();
@@ -73,7 +75,7 @@ public class FontRenderer {
     /**
      * Dispose.
      */
-    public void dispose() {
+    public void cleanUp() {
         shader.dispose();
     }
 

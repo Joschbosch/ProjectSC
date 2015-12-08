@@ -40,9 +40,9 @@ public final class LightSerializationUtils {
      * @param lightsToSerialize list
      * @return map ready to serialize
      */
-    public static Map<String, Map<String, Float[]>> createSerializableMap(List<Light> lightsToSerialize) {
+    public static Map<String, Object> createSerializableMap(List<Light> lightsToSerialize) {
 
-        Map<String, Map<String, Float[]>> lights = new HashMap<>();
+        Map<String, Object> lights = new HashMap<>();
         for (Light l : lightsToSerialize) {
             Map<String, Float[]> light = new HashMap<>();
             light.put(ATTENUATION, new Float[] { l.getAttenuation().x, l.getAttenuation().y, l.getAttenuation().z });

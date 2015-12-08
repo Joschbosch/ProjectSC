@@ -11,7 +11,6 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTable;
@@ -22,16 +21,20 @@ import javax.swing.table.TableModel;
 
 import org.lwjgl.util.vector.Vector3f;
 
-import de.projectsc.core.data.entities.Entity;
+import de.projectsc.core.EntityManager;
+import de.projectsc.core.EventManager;
 import de.projectsc.core.data.objects.Light;
-import de.projectsc.core.modes.client.gui.components.graphical.impl.EmittingLightComponent;
+import de.projectsc.core.entities.Component;
+import de.projectsc.core.events.CreateNewLightEvent;
+import de.projectsc.core.modes.client.gui.components.EmittingLightComponent;
+import de.projectsc.editor.ComponentView;
 
 /**
  * Editor view for the {@link EmittingLightComponent}.
  * 
  * @author Josch Bosch
  */
-public class EmittingLightComponentView extends JDialog {
+public class EmittingLightComponentView extends ComponentView {
 
     private static final long serialVersionUID = -3903795685651739513L;
 
@@ -57,10 +60,9 @@ public class EmittingLightComponentView extends JDialog {
 
     private final JTextField attenuation3Text;
 
-    private final EmittingLightComponent component;
+    private EmittingLightComponent component;
 
-    public EmittingLightComponentView(EmittingLightComponent component, Entity entity) {
-        this.component = component;
+    public EmittingLightComponentView() {
         setTitle("Emitting Light Component");
         getContentPane().setLayout(null);
 
@@ -155,7 +157,8 @@ public class EmittingLightComponentView extends JDialog {
                 try {
                     Light light = readAndCreateLight();
                     if (light != null) {
-                        component.addLight(entity, light);
+                        CreateNewLightEvent ev = new CreateNewLightEvent(entity, light, null);
+                        EventManager.fireEvent(ev);
                     }
                 } catch (NumberFormatException e1) {
 
@@ -176,7 +179,8 @@ public class EmittingLightComponentView extends JDialog {
                     removeSelectedLight(component);
                     Light l = readAndCreateLight();
                     if (l != null) {
-                        component.addLight(entity, l);
+                        CreateNewLightEvent ev = new CreateNewLightEvent(entity, l, null);
+                        EventManager.fireEvent(ev);
                     }
                 }
             }
@@ -271,5 +275,28 @@ public class EmittingLightComponentView extends JDialog {
             };
             lightsTable.setModel(dataModel);
         }
+    }
+
+    @Override
+    public void setVisible(boolean b) {
+        super.setVisible(b);
+        this.component = (EmittingLightComponent) getAssociatedComponent();
+        fillTable();
+    }
+
+    @Override
+    protected Component getAssociatedComponent() {
+        return EntityManager.getComponent(entity, EmittingLightComponent.class);
+
+    }
+
+    @Override
+    protected int getInitialHeight() {
+        return 600;
+    }
+
+    @Override
+    protected int getInitialWidth() {
+        return 800;
     }
 }
