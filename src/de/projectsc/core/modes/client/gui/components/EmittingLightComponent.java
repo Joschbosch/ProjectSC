@@ -175,4 +175,5 @@ public class EmittingLightComponent extends GraphicalComponent {
             offsets.put(l, readVector((Map<String, List<Double>>) serialized.get(lightName), "offset"));
         }
     }
+
 }

@@ -519,8 +519,7 @@ public class EntityEditor extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 JFileChooser chooser = new JFileChooser();
                 try {
-                    File folder = new File(EntityEditor.class.getResource(SLASHED_MODEL_DIR).toURI());
-                    chooser.setCurrentDirectory(folder);
+                    setStartingDir(chooser);
                 } catch (URISyntaxException e1) {
                     LOGGER.info(COULD_NOT_SET_CURRENT_DIRECTORY);
                 }
@@ -536,6 +535,17 @@ public class EntityEditor extends JFrame {
                         editor3dCore.triggerUpdateTexture();
                     }
                     editor3dCore.updateData();
+                }
+            }
+
+            private void setStartingDir(JFileChooser chooser) throws URISyntaxException {
+                URL resource = EntityEditor.class.getResource(SLASHED_MODEL_DIR);
+                if (resource != null) {
+                    File folder = new File(resource.toURI());
+                    chooser.setCurrentDirectory(folder);
+                } else {
+                    File folder = new File(EntityEditor.class.getResource("").toURI());
+                    chooser.setCurrentDirectory(folder);
                 }
             }
 
@@ -644,8 +654,14 @@ public class EntityEditor extends JFrame {
                 JFileChooser chooser = new JFileChooser();
                 FileNameExtensionFilter filter = new FileNameExtensionFilter("Model Files", "obj");
                 try {
-                    File folder = new File(EntityEditor.class.getResource(SLASHED_MODEL_DIR).toURI());
-                    chooser.setCurrentDirectory(folder);
+                    URL resource = EntityEditor.class.getResource(SLASHED_MODEL_DIR);
+                    if (resource != null) {
+                        File folder = new File(resource.toURI());
+                        chooser.setCurrentDirectory(folder);
+                    } else {
+                        File folder = new File(EntityEditor.class.getResource("").toURI());
+                        chooser.setCurrentDirectory(folder);
+                    }
                 } catch (URISyntaxException e1) {
                     LOGGER.info(COULD_NOT_SET_CURRENT_DIRECTORY);
                 }
@@ -754,8 +770,14 @@ public class EntityEditor extends JFrame {
                 JFileChooser chooser = new JFileChooser();
                 chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                 try {
-                    File folder = new File(EntityEditor.class.getResource(SLASHED_MODEL_DIR).toURI());
-                    chooser.setCurrentDirectory(folder);
+                    URL resource = EntityEditor.class.getResource(SLASHED_MODEL_DIR);
+                    if (resource != null) {
+                        File folder = new File(resource.toURI());
+                        chooser.setCurrentDirectory(folder);
+                    } else {
+                        File folder = new File(EntityEditor.class.getResource("").toURI());
+                        chooser.setCurrentDirectory(folder);
+                    }
                 } catch (URISyntaxException e1) {
                     LOGGER.info(COULD_NOT_SET_CURRENT_DIRECTORY);
                 }
