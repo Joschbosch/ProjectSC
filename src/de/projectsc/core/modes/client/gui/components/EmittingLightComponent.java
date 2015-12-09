@@ -47,7 +47,11 @@ public class EmittingLightComponent extends GraphicalComponent {
      */
     public void updateLightPositionToEntity(long owner, Vector3f position) {
         for (Light l : lights) {
-            l.setPosition(new Vector3f(position));
+            Vector3f currentPosition = new Vector3f(position);
+            currentPosition.x += offsets.get(l).getX();
+            currentPosition.y += offsets.get(l).getY();
+            currentPosition.z += offsets.get(l).getZ();
+            l.setPosition(currentPosition);
         }
     }
 

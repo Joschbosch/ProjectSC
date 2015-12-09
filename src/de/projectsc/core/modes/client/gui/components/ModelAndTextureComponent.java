@@ -241,4 +241,16 @@ public class ModelAndTextureComponent extends GraphicalComponent {
         return model != null;
     }
 
+    public float getScale() {
+        return scale;
+    }
+
+    public float getReflectivity() {
+        if (modelTexture != null) {
+            return modelTexture.getReflectivity();
+        } else {
+            return 1;
+        }
+    }
+
 }

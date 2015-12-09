@@ -27,7 +27,11 @@ import de.projectsc.core.data.Event;
  */
 public abstract class Component {
 
+    private static long uidCount = 0;
+
     protected String componentId;
+
+    protected long uid;
 
     protected ComponentType type;
 
@@ -38,6 +42,10 @@ public abstract class Component {
     protected List<String> requiredBy = new LinkedList<>();
 
     private long owner;
+
+    public Component() {
+        this.uid = uidCount++;
+    }
 
     public void setID(String id) {
         this.componentId = id;
@@ -128,6 +136,10 @@ public abstract class Component {
     public String getComponentName() {
         return componentId;
 
+    }
+
+    public long getUid() {
+        return uid;
     }
 
 }

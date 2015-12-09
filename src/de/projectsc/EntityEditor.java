@@ -789,15 +789,17 @@ public class EntityEditor extends JFrame {
                     editor3dCore.setEditorData(data);
                     editor3dCore.triggerDeserialze(schemaDirectory);
                     try {
-                        Thread.sleep(1000);
+                        Thread.sleep(500);
                     } catch (InterruptedException e1) {
                         LOGGER.error(e1.getStackTrace());
+
                     }
                     updateEditor(data);
                     fillComponentComboAndList();
                     warningsLabel.setText("Loaded schema from " + schemaDirectory.getAbsolutePath());
                 }
             }
+
         });
         menueFile.add(menueItemLoad);
     }

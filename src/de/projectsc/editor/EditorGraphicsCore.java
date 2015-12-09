@@ -32,7 +32,6 @@ import de.projectsc.core.CoreConstants;
 import de.projectsc.core.EntityManager;
 import de.projectsc.core.EventManager;
 import de.projectsc.core.data.Timer;
-import de.projectsc.core.data.objects.Light;
 import de.projectsc.core.data.terrain.Terrain;
 import de.projectsc.core.entities.Component;
 import de.projectsc.core.entities.EntityState;
@@ -43,7 +42,6 @@ import de.projectsc.core.events.ChangePositionEvent;
 import de.projectsc.core.events.NewModelOrTextureEvent;
 import de.projectsc.core.events.RotateEvent;
 import de.projectsc.core.modes.client.gui.RenderingSystem;
-import de.projectsc.core.modes.client.gui.components.EmittingLightComponent;
 import de.projectsc.core.modes.client.gui.components.GraphicalComponentImplementation;
 import de.projectsc.core.modes.client.gui.components.ModelAndTextureComponent;
 import de.projectsc.core.modes.client.gui.data.Scene;
@@ -175,12 +173,12 @@ public class EditorGraphicsCore implements Runnable {
         sun = EntityManager.createNewEntity();
         EventManager.fireEvent(new ChangePositionEvent(new Vector3f(0.0f, 100.0f, 100.0f), sun));
         EventManager.fireEvent(new RotateEvent(new Vector3f(0, 0, 0), sun));
-        EmittingLightComponent lightComponent =
-            (EmittingLightComponent) EntityManager.addComponentToEntity(sun,
-                GraphicalComponentImplementation.EMMITING_LIGHT_COMPONENT.getName());
-        PositionComponent position = (PositionComponent) EntityManager.getComponent(sun, PositionComponent.class);
-        Light light = new Light(new Vector3f(position.getPosition()), new Vector3f(1.0f, 1.0f, 1.0f), "sun");
-        lightComponent.addLight(sun, new Vector3f(position.getPosition()), light);
+        // EmittingLightComponent lightComponent =
+        // (EmittingLightComponent) EntityManager.addComponentToEntity(sun,
+        // GraphicalComponentImplementation.EMMITING_LIGHT_COMPONENT.getName());
+        // PositionComponent position = (PositionComponent) EntityManager.getComponent(sun, PositionComponent.class);
+        // Light light = new Light(new Vector3f(position.getPosition()), new Vector3f(1.0f, 1.0f, 1.0f), "sun");
+        // lightComponent.addLight(sun, new Vector3f(position.getPosition()), light);
     }
 
     private void createTerrain() {
