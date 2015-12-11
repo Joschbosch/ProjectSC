@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 
+ * Copyright (C) 2015
  */
 
 package de.projectsc.core.events.movement;
@@ -8,13 +8,21 @@ import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.core.data.Event;
 
+/**
+ * Changes the position of the entity.
+ * 
+ * @author Josch Bosch
+ */
 public class ChangePositionEvent extends Event {
 
+    /**
+     * ID.
+     */
     public static final String ID = "ChangePositionEvent";
 
     private boolean isRelative = false;
 
-    private Vector3f newPosition;
+    private final Vector3f newPosition;
 
     public ChangePositionEvent(Vector3f newPosition, long entityId) {
         super(ID, entityId);

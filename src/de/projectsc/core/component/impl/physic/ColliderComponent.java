@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 
+ * Copyright (C) 2015
  */
 
 package de.projectsc.core.component.impl.physic;
@@ -9,8 +9,19 @@ import java.util.Map;
 
 import de.projectsc.core.component.ComponentType;
 
+/**
+ * When this component is attached to an entity, it will be able to collide with the world or being
+ * able to be selected.
+ *
+ * It has different modules that represent different collision boxes.
+ *
+ * @author Josch Bosch
+ */
 public class ColliderComponent extends PhysicsComponent {
 
+    /**
+     * ID.
+     */
     public static final String NAME = "Collider Component";
 
     public ColliderComponent() {

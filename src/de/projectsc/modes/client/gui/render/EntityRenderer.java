@@ -41,6 +41,9 @@ public class EntityRenderer {
      * Renders all textured models without switching vaos to often.
      * 
      * @param entitiesWithModel to render.
+     * @param position to render.
+     * @param rotations to render.
+     * @param scales to render.
      */
     public void render(Map<TexturedModel, List<Long>> entitiesWithModel,
         Map<Long, Vector3f> position, Map<Long, Vector3f> rotations, Map<Long, Vector3f> scales) {

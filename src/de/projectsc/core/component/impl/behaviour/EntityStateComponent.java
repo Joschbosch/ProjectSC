@@ -8,12 +8,20 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
+import de.projectsc.core.component.ComponentType;
 import de.projectsc.core.component.DefaultComponent;
 import de.projectsc.core.entities.states.EntityState;
-import de.projectsc.core.component.ComponentType;
 
+/**
+ * Component that represents the state of an entity.
+ * 
+ * @author Josch Bosch
+ */
 public class EntityStateComponent extends DefaultComponent {
 
+    /**
+     * ID.
+     */
     public static final String NAME = "Entity State Component";
 
     private EntityState state = EntityState.STANDING;
@@ -50,6 +58,11 @@ public class EntityStateComponent extends DefaultComponent {
         return true;
     }
 
+    /**
+     * changes the state.
+     * 
+     * @param newState to change to
+     */
     public void changeState(EntityState newState) {
         setState(newState);
     }
@@ -58,9 +71,13 @@ public class EntityStateComponent extends DefaultComponent {
         return state;
     }
 
-    public EntityState setState(EntityState state) {
-        this.state = state;
-        return state;
+    /**
+     * @param newState to set
+     * @return the new state.
+     */
+    public EntityState setState(EntityState newState) {
+        this.state = newState;
+        return newState;
     }
 
     public boolean isMoved() {

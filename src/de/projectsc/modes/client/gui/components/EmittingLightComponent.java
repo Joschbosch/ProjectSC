@@ -15,8 +15,8 @@ import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.core.component.ComponentType;
 import de.projectsc.core.data.Scene;
-import de.projectsc.core.data.WireFrame;
 import de.projectsc.core.data.objects.Light;
+import de.projectsc.core.data.physics.WireFrame;
 import de.projectsc.core.data.utils.LightSerializationUtils;
 import de.projectsc.modes.client.gui.data.GUIScene;
 

@@ -13,15 +13,15 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import de.projectsc.core.component.impl.ComponentListItem;
-import de.projectsc.core.data.Timer;
+import de.projectsc.core.data.utils.Timer;
 import de.projectsc.core.manager.ComponentManager;
 import de.projectsc.core.systems.physics.PhysicsSystem;
-import de.projectsc.modes.client.common.ClientState;
-import de.projectsc.modes.client.common.GUI;
-import de.projectsc.modes.client.common.data.ClientPlayer;
-import de.projectsc.modes.client.common.messages.ClientMessage;
+import de.projectsc.modes.client.core.data.ClientPlayer;
 import de.projectsc.modes.client.core.states.MenuState;
 import de.projectsc.modes.client.gui.GUICore;
+import de.projectsc.modes.client.interfaces.ClientState;
+import de.projectsc.modes.client.interfaces.GUI;
+import de.projectsc.modes.client.messages.ClientMessage;
 import de.projectsc.modes.server.core.game.GameRunningState;
 
 /**
@@ -41,6 +41,7 @@ public class ClientCore implements Runnable {
 
     private ClientState currentState;
 
+    @SuppressWarnings("unused")
     private final ClientPlayer player;
 
     private boolean clientRunning;
@@ -76,19 +77,16 @@ public class ClientCore implements Runnable {
             if (currentState != null) {
                 Map<Integer, Integer> keyMap = gui.readInput();
                 currentState.handleInput(keyMap);
-                long lag = Timer.getLag();
-                while (lag >= TICK_TIME) {
+                while (Timer.getLag() >= TICK_TIME) {
+                    physicsSystem.update(TICK_TIME);
                     currentState.loop(TICK_TIME);
-                    lag -= TICK_TIME;
+                    Timer.setLag(Timer.getLag() - TICK_TIME);
                 }
                 currentState.loop(Timer.getLag());
                 gui.render(currentState, null);
             }
             long timeNeeded = System.currentTimeMillis() - Timer.getSnapshotTime();
             long sleepTime = Math.max((GameRunningState.GAME_TICK_TIME - timeNeeded), 0L);
-            // LOGGER.debug(
-            // String.format("Game %d needed %d ms for current tick, will sleep : %d",
-            // 1, timeNeeded, sleepTime));
             try {
                 Thread.sleep(sleepTime);
             } catch (InterruptedException e) {

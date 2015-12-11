@@ -12,9 +12,9 @@ import java.util.List;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
-import de.projectsc.core.data.BoundingBox;
-import de.projectsc.core.data.GraphEdge;
-import de.projectsc.core.data.Tile;
+import de.projectsc.core.data.graph.GraphEdge;
+import de.projectsc.core.data.physics.BoundingBox;
+import de.projectsc.core.data.physics.Tile;
 import de.projectsc.core.utils.Maths;
 
 /**

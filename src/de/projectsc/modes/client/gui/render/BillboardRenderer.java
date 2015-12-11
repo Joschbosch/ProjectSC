@@ -55,7 +55,6 @@ public class BillboardRenderer {
     public void render(List<Billboard> billboards) {
 
         shader.start();
-        // GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_LINE);
         GL30.glBindVertexArray(quad.getVaoID());
         GL20.glEnableVertexAttribArray(0);
         GL11.glEnable(GL11.GL_BLEND);

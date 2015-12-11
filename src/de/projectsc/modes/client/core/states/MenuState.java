@@ -10,19 +10,20 @@ import java.util.Map;
 
 import org.lwjgl.input.Keyboard;
 
-import de.projectsc.modes.client.common.ClientState;
-import de.projectsc.modes.client.common.GUI;
-import de.projectsc.modes.client.common.data.UIElement;
-import de.projectsc.modes.client.common.messages.ClientMessage;
-import de.projectsc.modes.client.common.ui.elements.Console;
-import de.projectsc.modes.client.common.ui.elements.Menu;
+import de.projectsc.modes.client.interfaces.ClientState;
+import de.projectsc.modes.client.interfaces.GUI;
+import de.projectsc.modes.client.messages.ClientMessage;
+import de.projectsc.modes.client.ui.BasicUIElement;
+import de.projectsc.modes.client.ui.elements.Console;
+import de.projectsc.modes.client.ui.elements.Menu;
 
 /**
- * The menu is the state when no game is running. The player can change options, create or join games or do many more things.
+ * The menu is the state when no game is running. The player can change options, create or join
+ * games or do many more things.
  * 
  * @author Josch Bosch
  */
-public class MenuState extends ClientState {
+public class MenuState implements ClientState {
 
     private static final int STATE_LOGIN = 0;
 
@@ -32,12 +33,14 @@ public class MenuState extends ClientState {
 
     private static final int STATE_JOIN_GAME_MENU = 3;
 
+    @SuppressWarnings("unused")
     private int menuState = STATE_LOGIN;
 
     private Console console;
 
     private Menu menu;
 
+    @SuppressWarnings("unused")
     private GUI gui;
 
     @Override
@@ -87,8 +90,8 @@ public class MenuState extends ClientState {
     }
 
     @Override
-    public List<UIElement> getUI() {
-        List<UIElement> ui = new LinkedList<>();
+    public List<BasicUIElement> getUI() {
+        List<BasicUIElement> ui = new LinkedList<>();
         ui.add(console);
         ui.add(menu);
         return ui;

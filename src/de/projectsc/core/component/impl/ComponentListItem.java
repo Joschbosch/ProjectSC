@@ -9,9 +9,23 @@ import de.projectsc.core.component.impl.behaviour.EntityStateComponent;
 import de.projectsc.core.component.impl.physic.MeshComponent;
 import de.projectsc.core.component.impl.physic.VelocityComponent;
 
+/**
+ * These are all (non GUI) components that are known in the engine.
+ *
+ * @author Josch Bosch
+ */
 public enum ComponentListItem {
+    /**
+     * Component for movement.
+     */
     VELOCITY_COMPONENT(VelocityComponent.NAME, VelocityComponent.class),
+    /**
+     * Represents the state of an entity.
+     */
     ENTITY_STATE_COMPONENT(EntityStateComponent.NAME, EntityStateComponent.class),
+    /**
+     * The mesh of a component (which might not be used only in the GUI).
+     */
     MESH_COMPONENT(MeshComponent.NAME, MeshComponent.class);
 
     private String name;

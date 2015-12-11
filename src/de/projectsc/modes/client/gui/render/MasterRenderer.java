@@ -51,13 +51,11 @@ public class MasterRenderer {
 
     private final BillboardRenderer billboardRenderer;
 
-    private final WireFrameShader collisionBoxShader;
+    private final WireFrameShader wireframeShader;
 
     private final WireFrameRenderer collisionBoxRenderer;
 
     private final ParticleRenderer particleRenderer;
-
-    private final boolean showWireFrames = true;
 
     public MasterRenderer() {
         enableCulling();
@@ -65,35 +63,20 @@ public class MasterRenderer {
         createProjectionMatrix();
         entityShader = new EntityShader();
         entityRenderer = new EntityRenderer(entityShader, projectionMatrix);
-        collisionBoxShader = new WireFrameShader();
-        collisionBoxRenderer = new WireFrameRenderer(collisionBoxShader, projectionMatrix);
+        wireframeShader = new WireFrameShader();
+        collisionBoxRenderer = new WireFrameRenderer(wireframeShader, projectionMatrix);
         terrainShader = new TerrainShader();
         terrainRenderer = new TerrainRenderer(terrainShader, projectionMatrix);
         billboardRenderer = new BillboardRenderer(projectionMatrix);
         skyboxRenderer = new SkyboxRenderer(projectionMatrix);
         particleRenderer = new ParticleRenderer(projectionMatrix);
-        // billboard = new Billboard(loader);
-        // billboard.setPosition(new Vector3f(0.0f, 10.0f, 0.0f));
-        // billboard.setSize(new Vector2f(2.0f, 2.0f));
-        // try {
-        // billboard.setImageFile(new
-        // File(MasterRenderer.class.getResource("/graphics/lamp.png").toURI()));
-        // } catch (URISyntaxException e) {
-        // System.err.println("Could not load file");
-        // }
-        // particleEmitterRainbow =
-        // new ParticleEmitter(new Vector3f(10, 10, 0), "particleTexture2.png", 1.0f, true,
-        // new BasicParticleConfiguration());
-        // particleEmitterRainbow.setGlowy(true);
-        // particleEmitterRainbow.setNumberOfParticles(1000);
-        // particleEmitterFire =
-        // new ParticleEmitter(new Vector3f(10, 10, 0), "particleAtlas.png", 8.0f, false,
-        // new BasicParticleConfiguration());
 
     }
 
     /**
      * Prepare rendering for every frame.
+     * 
+     * @param scene to prepare
      */
     public void prepare(GUIScene scene) {
         if (scene.getSkyColor() == null) {
@@ -142,10 +125,10 @@ public class MasterRenderer {
         entityRenderer.render(scene.getModels(), scene.getPositions(), scene.getRotations(), scene.getScales());
         entityShader.stop();
         if (scene.isWireframeEnable()) {
-            collisionBoxShader.start();
-            collisionBoxShader.loadViewMatrix(camera);
+            wireframeShader.start();
+            wireframeShader.loadViewMatrix(camera);
             collisionBoxRenderer.render(scene.getWireFrames());
-            collisionBoxShader.stop();
+            wireframeShader.stop();
         }
         terrainShader.start();
         terrainShader.loadClipPlane(clipPlane);
@@ -176,7 +159,7 @@ public class MasterRenderer {
         GL11.glDisable(GL30.GL_CLIP_DISTANCE0);
         entityShader.dispose();
         terrainShader.dispose();
-        collisionBoxShader.dispose();
+        wireframeShader.dispose();
     }
 
     /**

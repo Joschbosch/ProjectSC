@@ -4,6 +4,11 @@
 
 package de.projectsc.modes.server.core.data.statistics;
 
+/**
+ * Data of the current player.
+ * 
+ * @author Josch Bosch
+ */
 public class PlayerStatistics {
 
     private int gamesPlayed = 0;

@@ -9,10 +9,10 @@ import java.util.Set;
 
 import de.projectsc.core.component.DefaultComponent;
 import de.projectsc.core.data.Event;
-import de.projectsc.core.data.Transform;
-import de.projectsc.core.events.CreateNewLightEvent;
-import de.projectsc.core.events.RemoveLightEvent;
+import de.projectsc.core.data.physics.Transform;
 import de.projectsc.core.events.movement.NewPositionEvent;
+import de.projectsc.core.events.objects.CreateNewLightEvent;
+import de.projectsc.core.events.objects.RemoveLightEvent;
 import de.projectsc.core.interfaces.Component;
 import de.projectsc.core.manager.EntityManager;
 import de.projectsc.core.manager.EventManager;
@@ -24,6 +24,11 @@ import de.projectsc.modes.client.gui.data.GUIScene;
 import de.projectsc.modes.client.gui.events.ChangeMeshRendererParameterEvent;
 import de.projectsc.modes.client.gui.events.NewTextureEvent;
 
+/**
+ * System for rendering everything.
+ * 
+ * @author Josch Bosch
+ */
 public class RenderingSystem extends DefaultSystem {
 
     private static final String NAME = "Rendering System";
@@ -75,7 +80,7 @@ public class RenderingSystem extends DefaultSystem {
     }
 
     @Override
-    public void update() {
+    public void update(long tick) {
         Set<Long> entities = EntityManager.getAllEntites();
         for (Long entity : entities) {
             if (hasComponent(entity, EmittingLightComponent.class)) {
@@ -94,6 +99,12 @@ public class RenderingSystem extends DefaultSystem {
     private boolean hasComponent(Long entity, Class<? extends DefaultComponent> clazz) {
         return EntityManager.hasComponent(entity, clazz);
     }
+
+    /**
+     * Creates the scene that will be rendered afterwards.
+     * 
+     * @return scene to render
+     */
 
     public GUIScene createScene() {
         Set<Long> entities = EntityManager.getAllEntites();

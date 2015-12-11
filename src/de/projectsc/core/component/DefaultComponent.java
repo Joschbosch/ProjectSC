@@ -69,6 +69,7 @@ public abstract class DefaultComponent implements Component {
     /**
      * @return true, if the component has all attributes to be saved.
      */
+    @Override
     public abstract boolean isValidForSaving();
 
     /**
@@ -78,6 +79,7 @@ public abstract class DefaultComponent implements Component {
      * @throws JsonMappingException e
      * @throws IOException e
      */
+    @Override
     public abstract Map<String, Object> serialize(File savingLocation);
 
     /**
@@ -87,8 +89,14 @@ public abstract class DefaultComponent implements Component {
      * @throws JsonProcessingException e
      * @throws IOException e
      */
+    @Override
     public abstract void deserialize(Map<String, Object> serialized, File loadingLocation);
 
+    /**
+     * Default handle event .
+     * 
+     * @param e to handle
+     */
     public void handleEvent(Event e) {
 
     }
@@ -101,10 +109,6 @@ public abstract class DefaultComponent implements Component {
 
     }
 
-    public void processEvent(Event e) {
-
-    }
-
     public long getOwner() {
         return owner;
     }
@@ -113,18 +117,22 @@ public abstract class DefaultComponent implements Component {
         this.owner = owner;
     }
 
+    @Override
     public List<String> getRequiredComponents() {
         return requiredComponents;
     }
 
+    @Override
     public void addRequiredByComponent(String componentName) {
         requiredBy.add(componentName);
     }
 
+    @Override
     public void removeRequiredByComponent(String componentName) {
         requiredBy.remove(componentName);
     }
 
+    @Override
     public List<String> getRequiredBy() {
         return requiredBy;
     }
@@ -137,6 +145,7 @@ public abstract class DefaultComponent implements Component {
         this.type = type;
     }
 
+    @Override
     public String getComponentName() {
         return componentId;
 
@@ -150,10 +159,12 @@ public abstract class DefaultComponent implements Component {
         return isActive;
     }
 
-    public void setActive(boolean isActive) {
-        this.isActive = isActive;
+    @Override
+    public void setActive(boolean active) {
+        this.isActive = active;
     }
 
+    @Override
     public void addDebugMode(Scene scene) {
 
     }

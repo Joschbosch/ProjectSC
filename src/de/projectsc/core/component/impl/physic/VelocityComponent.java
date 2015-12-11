@@ -12,10 +12,18 @@ import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.core.component.ComponentType;
 import de.projectsc.core.component.impl.behaviour.EntityStateComponent;
-import de.projectsc.core.data.Timer;
+import de.projectsc.core.data.utils.Timer;
 
+/**
+ * Component that handles the movement of an entity.
+ * 
+ * @author Josch Bosch
+ */
 public class VelocityComponent extends PhysicsComponent {
 
+    /**
+     * ID.
+     */
     public static final String NAME = "Velocity Component";
 
     private float acceleration = 10000f; // instant maximum speed
@@ -39,6 +47,11 @@ public class VelocityComponent extends PhysicsComponent {
 
     }
 
+    /**
+     * Update velocity.
+     * 
+     * @param rotation of the entity.
+     */
     public void updateVelocity(Vector3f rotation) {
         currentSpeed += acceleration * Timer.getDelta();
         if (currentSpeed >= maximumSpeed) {

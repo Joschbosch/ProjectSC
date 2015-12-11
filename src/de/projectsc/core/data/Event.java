@@ -4,11 +4,16 @@
 
 package de.projectsc.core.data;
 
+/**
+ * Basic class of all events in the program.
+ * 
+ * @author Josch Bosch
+ */
 public class Event {
 
-    private String eventId;
+    private final String eventId;
 
-    private long entityId;
+    private final long entityId;
 
     public Event(String eventId, long entityID) {
         this.eventId = eventId;

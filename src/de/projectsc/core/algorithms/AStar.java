@@ -12,8 +12,8 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 
-import de.projectsc.core.data.GraphEdge;
-import de.projectsc.core.data.GraphNode;
+import de.projectsc.core.data.graph.GraphEdge;
+import de.projectsc.core.data.graph.GraphNode;
 
 /**
  * Algorithm to calculate the shortest distance between two nodes.

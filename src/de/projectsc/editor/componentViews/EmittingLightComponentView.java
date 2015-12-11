@@ -22,7 +22,7 @@ import javax.swing.table.TableModel;
 import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.core.data.objects.Light;
-import de.projectsc.core.events.CreateNewLightEvent;
+import de.projectsc.core.events.objects.CreateNewLightEvent;
 import de.projectsc.core.interfaces.Component;
 import de.projectsc.core.manager.EntityManager;
 import de.projectsc.core.manager.EventManager;

@@ -31,7 +31,7 @@ public class WaterRenderer {
 
     private static final float TIME_SCALE = 1000.0f;
 
-    private static final String DUDV_MAP = "terrain/waterDUDV.png";
+    private static final String DUDV_MAP = "water/waterDUDV.png";
 
     private static final float WAVE_SPEED = 0.03f;
 

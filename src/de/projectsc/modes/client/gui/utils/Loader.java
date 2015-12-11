@@ -35,6 +35,7 @@ import org.newdawn.slick.opengl.TextureLoader;
 
 import de.matthiasmann.twl.utils.PNGDecoder;
 import de.matthiasmann.twl.utils.PNGDecoder.Format;
+import de.projectsc.modes.client.gui.GUIConstants;
 import de.projectsc.modes.client.gui.models.RawModel;
 import de.projectsc.modes.client.gui.textures.TextureData;
 
@@ -158,7 +159,7 @@ public final class Loader {
         if (textureMap.containsKey(filename)) {
             return textureMap.get(filename);
         } else {
-            int textureID = loadTexture(Loader.class.getResourceAsStream("/graphics/" + filename), "PNG");
+            int textureID = loadTexture(Loader.class.getResourceAsStream(GUIConstants.TEXTURE_ROOT + filename), "PNG");
             textureMap.put(filename, textureID);
             return textureID;
         }
@@ -271,7 +272,7 @@ public final class Loader {
         GL11.glBindTexture(GL13.GL_TEXTURE_CUBE_MAP, texID);
 
         for (int i = 0; i < textureFiles.length; i++) {
-            TextureData data = decodeTextureFile("/graphics/" + textureFiles[i] + ".png");
+            TextureData data = decodeTextureFile(GUIConstants.TEXTURE_ROOT + textureFiles[i] + ".png");
             GL11.glTexImage2D(GL13.GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL11.GL_RGBA, data.getWidth(), data.getHeight(), 0, GL11.GL_RGBA,
                 GL11.GL_UNSIGNED_BYTE,
                 data.getBuffer());

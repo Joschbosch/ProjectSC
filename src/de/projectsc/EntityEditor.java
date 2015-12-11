@@ -510,46 +510,7 @@ public class EntityEditor extends JFrame {
         mainSettingsPanel.add(texturePanel);
         texturePanel.setLayout(null);
 
-        loadTextureButton = new JButton("Load Texture");
-        loadTextureButton.setFont(new Font(FONT, Font.PLAIN, 9));
-        loadTextureButton.setBounds(10, 21, 97, 23);
-        loadTextureButton.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JFileChooser chooser = new JFileChooser();
-                try {
-                    setStartingDir(chooser);
-                } catch (URISyntaxException e1) {
-                    LOGGER.info(COULD_NOT_SET_CURRENT_DIRECTORY);
-                }
-
-                FileNameExtensionFilter filter = new FileNameExtensionFilter("PNG Files", "png");
-                chooser.setFileFilter(filter);
-                chooser.showOpenDialog(null);
-                File chosen = chooser.getSelectedFile();
-                if (chosen != null && chosen.exists()) {
-                    data.setTextureFile(chosen);
-                    updateTexturePreview(chosen);
-                    if (data.getModelFile() != null) {
-                        editor3dCore.triggerUpdateTexture();
-                    }
-                    editor3dCore.updateData();
-                }
-            }
-
-            private void setStartingDir(JFileChooser chooser) throws URISyntaxException {
-                URL resource = EntityEditor.class.getResource(SLASHED_MODEL_DIR);
-                if (resource != null) {
-                    File folder = new File(resource.toURI());
-                    chooser.setCurrentDirectory(folder);
-                } else {
-                    File folder = new File(EntityEditor.class.getResource("").toURI());
-                    chooser.setCurrentDirectory(folder);
-                }
-            }
-
-        });
+        addLoadTexture();
         texturePanel.add(loadTextureButton);
 
         textureNameLabel = new JLabel("Texture Name");
@@ -628,6 +589,49 @@ public class EntityEditor extends JFrame {
             }
         });
         texturePanel.add(numColumSpinner);
+    }
+
+    private void addLoadTexture() {
+        loadTextureButton = new JButton("Load Texture");
+        loadTextureButton.setFont(new Font(FONT, Font.PLAIN, 9));
+        loadTextureButton.setBounds(10, 21, 97, 23);
+        loadTextureButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFileChooser chooser = new JFileChooser();
+                try {
+                    setStartingDir(chooser);
+                } catch (URISyntaxException e1) {
+                    LOGGER.info(COULD_NOT_SET_CURRENT_DIRECTORY);
+                }
+
+                FileNameExtensionFilter filter = new FileNameExtensionFilter("PNG Files", "png");
+                chooser.setFileFilter(filter);
+                chooser.showOpenDialog(null);
+                File chosen = chooser.getSelectedFile();
+                if (chosen != null && chosen.exists()) {
+                    data.setTextureFile(chosen);
+                    updateTexturePreview(chosen);
+                    if (data.getModelFile() != null) {
+                        editor3dCore.triggerUpdateTexture();
+                    }
+                    editor3dCore.updateData();
+                }
+            }
+
+            private void setStartingDir(JFileChooser chooser) throws URISyntaxException {
+                URL resource = EntityEditor.class.getResource(SLASHED_MODEL_DIR);
+                if (resource != null) {
+                    File folder = new File(resource.toURI());
+                    chooser.setCurrentDirectory(folder);
+                } else {
+                    File folder = new File(EntityEditor.class.getResource("").toURI());
+                    chooser.setCurrentDirectory(folder);
+                }
+            }
+
+        });
     }
 
     private void updateTexturePreview(File chosen) {

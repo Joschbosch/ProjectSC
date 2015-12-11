@@ -8,8 +8,16 @@ import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.core.data.Event;
 
+/**
+ * Event if a new position was set.
+ * 
+ * @author Josch Bosch
+ */
 public class NewPositionEvent extends Event {
 
+    /**
+     * ID.
+     */
     public static final String ID = "NewPositionEvent";
 
     private final Vector3f newPosition;

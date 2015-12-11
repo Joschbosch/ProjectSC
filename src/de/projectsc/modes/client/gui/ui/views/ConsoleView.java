@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 
+ * Copyright (C) 2015
  */
 
 package de.projectsc.modes.client.gui.ui.views;
@@ -9,8 +9,6 @@ import java.util.List;
 
 import org.lwjgl.util.vector.Vector2f;
 
-import de.projectsc.modes.client.common.data.UIElement;
-import de.projectsc.modes.client.common.ui.elements.Console;
 import de.projectsc.modes.client.gui.data.UI;
 import de.projectsc.modes.client.gui.data.View;
 import de.projectsc.modes.client.gui.objects.text.Font;
@@ -20,7 +18,14 @@ import de.projectsc.modes.client.gui.objects.text.GUIText;
 import de.projectsc.modes.client.gui.objects.text.TextMaster;
 import de.projectsc.modes.client.gui.textures.UITexture;
 import de.projectsc.modes.client.gui.utils.Loader;
+import de.projectsc.modes.client.ui.BasicUIElement;
+import de.projectsc.modes.client.ui.elements.Console;
 
+/**
+ * View for the {@link Console}.
+ * 
+ * @author Josch Bosch
+ */
 public class ConsoleView extends View {
 
     private static final Vector2f SIZE = new Vector2f(2f, 0.5f);
@@ -29,21 +34,21 @@ public class ConsoleView extends View {
 
     private static final int MAXIMAL_LINES = 20;
 
-    private Console console;
+    private final Console console;
 
-    private float fontSize = 0.7f;
+    private final float fontSize = 0.7f;
 
-    private FontType font;
+    private final FontType font;
 
-    private Vector2f position;
+    private final Vector2f position;
 
-    private UITexture bg;
+    private final UITexture bg;
 
-    private List<GUIText> lastText = new LinkedList<>();
+    private final List<GUIText> lastText = new LinkedList<>();
 
-    private float linePadding = 0.018f;
+    private final float linePadding = 0.018f;
 
-    public ConsoleView(UIElement element) {
+    public ConsoleView(BasicUIElement element) {
         super(element);
         console = (Console) element;
         this.font = FontStore.getFont(Font.CANDARA);

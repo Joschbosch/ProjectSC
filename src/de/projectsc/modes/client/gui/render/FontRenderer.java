@@ -19,7 +19,7 @@ import de.projectsc.modes.client.gui.shaders.FontShader;
  */
 public class FontRenderer {
 
-    private FontShader shader;
+    private final FontShader shader;
 
     public FontRenderer() {
         shader = new FontShader();
@@ -29,6 +29,7 @@ public class FontRenderer {
      * Render all texts given.
      * 
      * @param texts to render
+     * @param order to render
      */
     public void render(Map<FontType, List<GUIText>> texts, int order) {
         prepare();

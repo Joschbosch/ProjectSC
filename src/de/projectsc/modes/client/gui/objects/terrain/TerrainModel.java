@@ -9,7 +9,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.lwjgl.util.vector.Vector3f;
 
-import de.projectsc.core.data.Tile;
+import de.projectsc.core.data.physics.Tile;
 import de.projectsc.core.terrain.Terrain;
 import de.projectsc.core.terrain.TerrainLoader;
 import de.projectsc.modes.client.gui.models.RawModel;

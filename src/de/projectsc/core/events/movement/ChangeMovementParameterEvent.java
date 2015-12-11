@@ -1,13 +1,21 @@
 /*
- * Copyright (C) 2015 
+ * Copyright (C) 2015
  */
 
 package de.projectsc.core.events.movement;
 
 import de.projectsc.core.data.Event;
 
+/**
+ * Changes the parameters used for movement.
+ * 
+ * @author Josch Bosch
+ */
 public class ChangeMovementParameterEvent extends Event {
 
+    /**
+     * ID.
+     */
     public static final String ID = "ChangeVelocityEvent";
 
     private float acceleration = Float.NEGATIVE_INFINITY;

@@ -21,7 +21,7 @@ import com.sun.corba.se.impl.protocol.giopmsgheaders.Message;
 
 import de.projectsc.core.messages.MessageConstants;
 import de.projectsc.core.messages.NetworkMessage;
-import de.projectsc.modes.client.common.messages.ClientMessage;
+import de.projectsc.modes.client.messages.ClientMessage;
 
 /**
  * Core class for client network communication.

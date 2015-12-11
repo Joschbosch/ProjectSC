@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 
+ * Copyright (C) 2015
  */
 
 package de.projectsc.core.events.movement;
@@ -8,8 +8,16 @@ import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.core.data.Event;
 
+/**
+ * Changes the scale of an entity.
+ * 
+ * @author Josch Bosch
+ */
 public class ChangeScaleEvent extends Event {
 
+    /**
+     * ID.
+     */
     public static final String ID = "ChangeScaleEvent";
 
     private final Vector3f newScale;

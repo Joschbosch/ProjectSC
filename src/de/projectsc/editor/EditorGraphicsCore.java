@@ -29,21 +29,22 @@ import org.lwjgl.util.vector.Vector4f;
 
 import de.projectsc.core.CoreConstants;
 import de.projectsc.core.component.impl.physic.TransformComponent;
-import de.projectsc.core.data.Timer;
-import de.projectsc.core.data.Transform;
 import de.projectsc.core.data.objects.Light;
+import de.projectsc.core.data.physics.Transform;
+import de.projectsc.core.data.utils.Timer;
 import de.projectsc.core.entities.states.EntityState;
-import de.projectsc.core.events.ChangeEntityStateEvent;
-import de.projectsc.core.events.NewMeshEvent;
+import de.projectsc.core.events.entities.ChangeEntityStateEvent;
 import de.projectsc.core.events.movement.ChangePositionEvent;
-import de.projectsc.core.events.movement.ChangeScaleEvent;
 import de.projectsc.core.events.movement.ChangeRotationEvent;
+import de.projectsc.core.events.movement.ChangeScaleEvent;
+import de.projectsc.core.events.objects.NewMeshEvent;
 import de.projectsc.core.interfaces.Component;
 import de.projectsc.core.manager.ComponentManager;
 import de.projectsc.core.manager.EntityManager;
 import de.projectsc.core.manager.EventManager;
 import de.projectsc.core.systems.physics.PhysicsSystem;
 import de.projectsc.core.terrain.Terrain;
+import de.projectsc.modes.client.gui.GUIConstants;
 import de.projectsc.modes.client.gui.RenderingSystem;
 import de.projectsc.modes.client.gui.components.EmittingLightComponent;
 import de.projectsc.modes.client.gui.components.GraphicalComponentImplementation;
@@ -148,8 +149,8 @@ public class EditorGraphicsCore implements Runnable {
                     EventManager.fireEvent(new ChangePositionEvent(camera.getPosition(), sun));
                 }
             }
-            physicsSystem.update();
-            renderSystem.update();
+            physicsSystem.update(Timer.getDelta());
+            renderSystem.update(Timer.getDelta());
             timer = cycleTextures(timer, Timer.getDelta());
             mousePicker.update(getTerrains(), camera.getPosition(), camera.createViewMatrix());
             if (doRender.get()) {
@@ -265,7 +266,7 @@ public class EditorGraphicsCore implements Runnable {
         try {
             EventManager.fireEvent(new NewMeshEvent(entity, editorData.getModelFile()));
             EventManager.fireEvent(new NewTextureEvent(entity,
-                new File(EditorGraphicsCore.class.getResource(CoreConstants.GRAPHICS_DIRECTORY_NAME + "/white.png").toURI())));
+                new File(EditorGraphicsCore.class.getResource(GUIConstants.BASIC_TEXTURE_WHITE).toURI())));
         } catch (URISyntaxException e) {
             LOGGER.error(e);
         }

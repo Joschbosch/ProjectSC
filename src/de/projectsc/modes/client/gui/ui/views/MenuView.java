@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 
+ * Copyright (C) 2015
  */
 
 package de.projectsc.modes.client.gui.ui.views;
@@ -9,8 +9,6 @@ import java.util.List;
 
 import org.lwjgl.util.vector.Vector2f;
 
-import de.projectsc.modes.client.common.data.UIElement;
-import de.projectsc.modes.client.common.ui.elements.Menu;
 import de.projectsc.modes.client.gui.data.UI;
 import de.projectsc.modes.client.gui.data.View;
 import de.projectsc.modes.client.gui.objects.text.Font;
@@ -20,20 +18,27 @@ import de.projectsc.modes.client.gui.objects.text.GUIText;
 import de.projectsc.modes.client.gui.objects.text.TextMaster;
 import de.projectsc.modes.client.gui.textures.UITexture;
 import de.projectsc.modes.client.gui.utils.Loader;
+import de.projectsc.modes.client.ui.BasicUIElement;
+import de.projectsc.modes.client.ui.elements.Menu;
 
+/**
+ * The graphical representation of the {@link Menu}.
+ * 
+ * @author Josch Bosch
+ */
 public class MenuView extends View {
 
-    private Menu menu;
+    private final Menu menu;
 
-    private List<GUIText> lastText = new LinkedList<>();
+    private final List<GUIText> lastText = new LinkedList<>();
 
-    private FontType font;
+    private final FontType font;
 
-    private float fontSize = 2f;
+    private final float fontSize = 2f;
 
-    private UITexture bg;
+    private final UITexture bg;
 
-    public MenuView(UIElement element) {
+    public MenuView(BasicUIElement element) {
         super(element);
         this.menu = (Menu) element;
         this.font = FontStore.getFont(Font.CANDARA);
@@ -58,7 +63,8 @@ public class MenuView extends View {
             TextMaster.loadText(menuItemText);
             lastText.add(menuItemText);
         }
-        // TextMaster.createAndLoadText("(0,0)", fontSize, font, new Vector2f(0.0f, 0.0f), 1.0f, false);
+        // TextMaster.createAndLoadText("(0,0)", fontSize, font, new Vector2f(0.0f, 0.0f), 1.0f,
+        // false);
     }
 
     private Vector2f getPosition(int i) {

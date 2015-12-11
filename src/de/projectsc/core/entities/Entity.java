@@ -5,7 +5,7 @@
  */
 package de.projectsc.core.entities;
 
-import de.projectsc.core.data.Transform;
+import de.projectsc.core.data.physics.Transform;
 
 /**
  * All game objects in the game are entities. All entities have components, that define their role

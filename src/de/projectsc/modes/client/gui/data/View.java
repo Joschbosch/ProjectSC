@@ -4,7 +4,7 @@
 
 package de.projectsc.modes.client.gui.data;
 
-import de.projectsc.modes.client.common.data.UIElement;
+import de.projectsc.modes.client.ui.BasicUIElement;
 
 /**
  * This is the parent class for all UI element representations in the GUI.
@@ -13,9 +13,9 @@ import de.projectsc.modes.client.common.data.UIElement;
  */
 public abstract class View {
 
-    protected UIElement element;
+    protected BasicUIElement element;
 
-    public View(UIElement element) {
+    public View(BasicUIElement element) {
         this.element = element;
     }
 

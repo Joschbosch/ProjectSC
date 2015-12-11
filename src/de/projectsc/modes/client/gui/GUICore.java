@@ -17,12 +17,9 @@ import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Vector4f;
 
-import de.projectsc.core.data.Snapshot;
-import de.projectsc.core.data.Timer;
+import de.projectsc.core.data.structure.Snapshot;
+import de.projectsc.core.data.utils.Timer;
 import de.projectsc.core.manager.ComponentManager;
-import de.projectsc.modes.client.common.ClientState;
-import de.projectsc.modes.client.common.GUI;
-import de.projectsc.modes.client.common.data.UIElement;
 import de.projectsc.modes.client.gui.components.GraphicalComponentImplementation;
 import de.projectsc.modes.client.gui.data.GUIScene;
 import de.projectsc.modes.client.gui.data.UI;
@@ -36,6 +33,9 @@ import de.projectsc.modes.client.gui.render.UIRenderer;
 import de.projectsc.modes.client.gui.render.WaterRenderer;
 import de.projectsc.modes.client.gui.ui.views.UIFactory;
 import de.projectsc.modes.client.gui.utils.MousePicker;
+import de.projectsc.modes.client.interfaces.ClientState;
+import de.projectsc.modes.client.interfaces.GUI;
+import de.projectsc.modes.client.ui.BasicUIElement;
 
 /**
  * Core class for the GUI.
@@ -64,11 +64,13 @@ public class GUICore implements GUI {
 
     private Camera camera;
 
+    @SuppressWarnings("unused")
+
     private MousePicker mousePicker;
 
     private UIRenderer uiRenderer;
 
-    private Map<UIElement, View> registeredViews = new HashMap<>();
+    private final Map<BasicUIElement, View> registeredViews = new HashMap<>();
 
     private FontRenderer fontRenderer;
 
@@ -119,7 +121,7 @@ public class GUICore implements GUI {
     }
 
     @Override
-    public void registerView(UIElement element) {
+    public void registerView(BasicUIElement element) {
         View view = UIFactory.createView(element);
         if (view != null) {
             registeredViews.put(element, view);
@@ -127,14 +129,14 @@ public class GUICore implements GUI {
     }
 
     @Override
-    public void unregisterView(UIElement element) {
+    public void unregisterView(BasicUIElement element) {
         registeredViews.remove(element);
     }
 
     @Override
     public boolean initState(ClientState state) {
         LOGGER.debug("Initialize state " + state.getClass());
-        for (UIElement element : state.getUI()) {
+        for (BasicUIElement element : state.getUI()) {
             registerView(element);
         }
         return true;
@@ -143,7 +145,7 @@ public class GUICore implements GUI {
     @Override
     public void cleanUpState(ClientState state) {
         LOGGER.debug("Clean up state " + state.getClass());
-        for (UIElement element : state.getUI()) {
+        for (BasicUIElement element : state.getUI()) {
             unregisterView(element);
         }
     }
@@ -178,7 +180,7 @@ public class GUICore implements GUI {
             //
             // waterfbo.unbindCurrentFrameBuffer();
             // }
-            // mousePicker.update();
+            // mousePicker.update(null, null, null);
             GUIScene scene = renderingSystem.createScene();
             masterRenderer.renderScene(scene, camera, Timer.getDelta(), new Vector4f(0,
                 1, 0, CLIPPING_PLANE_NOT_RENDERING));
@@ -201,11 +203,6 @@ public class GUICore implements GUI {
             v.render(ui);
         }
         return ui;
-    }
-
-    private GUIScene createScene(Snapshot snapshot) {
-        GUIScene scene = new GUIScene();
-        return scene;
     }
 
     @Override

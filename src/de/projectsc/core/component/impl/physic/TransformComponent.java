@@ -11,11 +11,19 @@ import java.util.Map;
 import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.core.component.ComponentType;
-import de.projectsc.core.data.Transform;
+import de.projectsc.core.data.physics.Transform;
 import de.projectsc.core.manager.EntityManager;
 
+/**
+ * This component manages the {@link transform} of an entity. It can not be removed.
+ * 
+ * @author Josch Bosch
+ */
 public class TransformComponent extends PhysicsComponent {
 
+    /**
+     * ID.
+     */
     public static final String NAME = "Transform Component";
 
     private Transform transform = null;
@@ -32,6 +40,13 @@ public class TransformComponent extends PhysicsComponent {
         }
     }
 
+    /**
+     * Update to a new position determined by the given velocity.
+     * 
+     * @param entity to change the position
+     * @param velocity to change
+     * @param rotation of the entity
+     */
     public void updatePosition(long entity, Vector3f velocity, Vector3f rotation) {
         Vector3f.add(transform.getPosition(), velocity, transform.getPosition());
         Vector3f.add(transform.getRotation(), rotation, transform.getRotation());
@@ -66,6 +81,9 @@ public class TransformComponent extends PhysicsComponent {
         return transform.getPosition();
     }
 
+    /**
+     * @param position to set
+     */
     public void setPosition(Vector3f position) {
         transform.getPosition().set(position);
     }
@@ -74,6 +92,9 @@ public class TransformComponent extends PhysicsComponent {
         return transform.getRotation();
     }
 
+    /**
+     * @param rotation to set
+     */
     public void setRotation(Vector3f rotation) {
         transform.getRotation().set(rotation);
     }
@@ -82,6 +103,9 @@ public class TransformComponent extends PhysicsComponent {
         return transform.getScale();
     }
 
+    /**
+     * @param scale to set
+     */
     public void setScale(Vector3f scale) {
         transform.getScale().set(scale);
     }

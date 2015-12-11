@@ -4,18 +4,18 @@
 
 package de.projectsc.core.systems;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import de.projectsc.core.data.Event;
 import de.projectsc.core.interfaces.Component;
 import de.projectsc.core.interfaces.EngineSystem;
 import de.projectsc.core.manager.EntityManager;
 import de.projectsc.core.manager.EventManager;
 
+/**
+ * A default imlementation of the {@link EngineSystem}. Should be used by all systems.
+ * 
+ * @author Josch Bosch
+ */
 public abstract class DefaultSystem implements EngineSystem {
-
-    private static final Log LOGGER = LogFactory.getLog(DefaultSystem.class);
 
     private static long idCount = 0;
 
@@ -28,15 +28,15 @@ public abstract class DefaultSystem implements EngineSystem {
         this.name = name;
     }
 
+    @Override
     public abstract void processEvent(Event e);
 
-    public abstract void update();
-
+    @Override
     public String getName() {
         return name;
     }
 
-    public long getuID() {
+    public long getUID() {
         return uID;
     }
 

@@ -7,6 +7,13 @@ package de.projectsc.core.data;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.projectsc.core.data.physics.WireFrame;
+
+/**
+ * Describes the scene without any gui objects.
+ *
+ * @author Josch Bosch
+ */
 public class Scene {
 
     private boolean wireframeEnabled = true;
@@ -31,8 +38,8 @@ public class Scene {
         return isDebugMode;
     }
 
-    public void setDebugMode(boolean isDebugMode) {
-        this.isDebugMode = isDebugMode;
+    public void setDebugMode(boolean debugMode) {
+        this.isDebugMode = debugMode;
     }
 
     public List<WireFrame> getWireFrames() {

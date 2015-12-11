@@ -1,24 +1,32 @@
 /*
- * Copyright (C) 2015 
+ * Copyright (C) 2015
  */
 
 package de.projectsc.modes.client.gui.events;
 
 import de.projectsc.core.data.Event;
 
+/**
+ * Changes the mesh renderer parameters.
+ * 
+ * @author Josch Bosch
+ */
 public class ChangeMeshRendererParameterEvent extends Event {
 
+    /**
+     * ID.
+     */
     public static final String ID = "ChangeMeshRendererParameterEvent";
 
-    private boolean fakeLightning;
+    private final boolean fakeLightning;
 
-    private boolean transparent;
+    private final boolean transparent;
 
-    private float reflectivity;
+    private final float reflectivity;
 
-    private float shineDamper;
+    private final float shineDamper;
 
-    private int numColums;
+    private final int numColums;
 
     public ChangeMeshRendererParameterEvent(long entityID, boolean fakeLightning, boolean transparent, float reflectivity,
         float shineDamper, int numColums) {

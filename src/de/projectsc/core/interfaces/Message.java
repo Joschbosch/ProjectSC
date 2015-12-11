@@ -4,9 +4,20 @@
 
 package de.projectsc.core.interfaces;
 
+/**
+ * Interface for all kinds of messages.
+ * 
+ * @author Joshc Bosch
+ */
 public interface Message {
 
-    public Object[] getData();
+    /**
+     * @return attached data
+     */
+    Object[] getData();
 
-    public String getMessage();
+    /**
+     * @return the message
+     */
+    String getMessage();
 }

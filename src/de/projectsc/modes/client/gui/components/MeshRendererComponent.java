@@ -20,8 +20,9 @@ import org.apache.commons.logging.LogFactory;
 import de.projectsc.core.CoreConstants;
 import de.projectsc.core.component.ComponentType;
 import de.projectsc.core.component.impl.physic.MeshComponent;
-import de.projectsc.core.data.ModelData;
+import de.projectsc.core.data.physics.ModelData;
 import de.projectsc.core.manager.EntityManager;
+import de.projectsc.modes.client.gui.GUIConstants;
 import de.projectsc.modes.client.gui.data.GUIScene;
 import de.projectsc.modes.client.gui.models.RawModel;
 import de.projectsc.modes.client.gui.models.TexturedModel;
@@ -59,7 +60,7 @@ public class MeshRendererComponent extends GraphicalComponent {
         textureIndex = 0;
         requiredComponents.add(MeshComponent.NAME);
         try {
-            textureFile = new File(MeshRendererComponent.class.getResource("/graphics/white.png").toURI());
+            textureFile = new File(MeshRendererComponent.class.getResource(GUIConstants.BASIC_TEXTURE_WHITE).toURI());
         } catch (URISyntaxException e) {
             LOGGER.error("Could not load default texture file: ", e);
         }
@@ -228,6 +229,10 @@ public class MeshRendererComponent extends GraphicalComponent {
         return model != null;
     }
 
+    /**
+     * 
+     * @return reflectivity, if a texture is attached.
+     */
     public float getReflectivity() {
         if (modelTexture != null) {
             return modelTexture.getReflectivity();

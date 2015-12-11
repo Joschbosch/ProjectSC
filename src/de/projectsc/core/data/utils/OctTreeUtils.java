@@ -9,8 +9,8 @@ import java.awt.Graphics;
 
 import org.lwjgl.util.vector.Vector3f;
 
-import de.projectsc.core.data.OctTree;
-import de.projectsc.core.data.PhysicalObject;
+import de.projectsc.core.data.physics.PhysicalObject;
+import de.projectsc.core.data.structure.OctTree;
 
 /**
  * Some fine methods for OctTrees.

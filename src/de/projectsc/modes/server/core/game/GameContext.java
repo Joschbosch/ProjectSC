@@ -80,8 +80,6 @@ public class GameContext extends StatefulContext {
         loadingProgress = 70;
 
         loadPlayerAndBots();
-        if (terrain != null) {
-        }
         loadingProgress = 100;
     }
 
