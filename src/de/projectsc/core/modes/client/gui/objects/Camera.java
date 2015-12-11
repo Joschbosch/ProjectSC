@@ -12,7 +12,6 @@ import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.core.EntityManager;
-import de.projectsc.core.entities.components.physic.PositionComponent;
 
 /**
  * Class for moving around in the world.
@@ -269,7 +268,7 @@ public class Camera {
             centeringPoint = newCenterPoint;
             bound = false;
         } else {
-            centeringPoint = ((PositionComponent) EntityManager.getComponent(entity, PositionComponent.NAME)).getPosition();
+            centeringPoint = EntityManager.getEntity(entity).getTransform().getPosition();
             bound = true;
         }
     }

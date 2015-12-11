@@ -2,7 +2,9 @@
  * Copyright (C) 2015 
  */
 
-package de.projectsc.core.data.events;
+package de.projectsc.core.events;
+
+import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.core.data.Event;
 
@@ -10,14 +12,14 @@ public class ChangeScaleEvent extends Event {
 
     public static final String ID = "ChangeScaleEvent";
 
-    private final float newScale;
+    private final Vector3f newScale;
 
-    public ChangeScaleEvent(long entityID, float newScale) {
+    public ChangeScaleEvent(long entityID, Vector3f newScale) {
         super(ID, entityID);
         this.newScale = newScale;
     }
 
-    public float getNewScale() {
+    public Vector3f getNewScale() {
         return newScale;
     }
 

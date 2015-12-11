@@ -7,23 +7,21 @@ package de.projectsc.core.modes.client.gui;
 import java.util.Map;
 import java.util.Set;
 
-import org.lwjgl.util.vector.Vector3f;
-
 import de.projectsc.core.EngineSystem;
 import de.projectsc.core.EntityManager;
 import de.projectsc.core.EventManager;
 import de.projectsc.core.data.Event;
 import de.projectsc.core.entities.Component;
-import de.projectsc.core.entities.components.physic.PositionComponent;
-import de.projectsc.core.events.ChangeModelParameterEvent;
+import de.projectsc.core.entities.TransformComponent;
+import de.projectsc.core.events.ChangeMeshRendererParameterEvent;
 import de.projectsc.core.events.CreateNewLightEvent;
 import de.projectsc.core.events.MoveEvent;
-import de.projectsc.core.events.NewModelOrTextureEvent;
 import de.projectsc.core.events.NewPositionEvent;
+import de.projectsc.core.events.NewTextureEvent;
 import de.projectsc.core.events.RemoveLightEvent;
 import de.projectsc.core.modes.client.gui.components.EmittingLightComponent;
 import de.projectsc.core.modes.client.gui.components.GraphicalComponent;
-import de.projectsc.core.modes.client.gui.components.ModelAndTextureComponent;
+import de.projectsc.core.modes.client.gui.components.MeshRendererComponent;
 import de.projectsc.core.modes.client.gui.data.Scene;
 
 public class RenderingSystem extends EngineSystem {
@@ -33,9 +31,9 @@ public class RenderingSystem extends EngineSystem {
     public RenderingSystem() {
         super(NAME);
         EventManager.registerForEvent(NewPositionEvent.class, this);
-        EventManager.registerForEvent(ChangeModelParameterEvent.class, this);
+        EventManager.registerForEvent(ChangeMeshRendererParameterEvent.class, this);
         EventManager.registerForEvent(MoveEvent.class, this);
-        EventManager.registerForEvent(NewModelOrTextureEvent.class, this);
+        EventManager.registerForEvent(NewTextureEvent.class, this);
         EventManager.registerForEvent(CreateNewLightEvent.class, this);
         EventManager.registerForEvent(RemoveLightEvent.class, this);
 
@@ -43,24 +41,19 @@ public class RenderingSystem extends EngineSystem {
 
     @Override
     public void processEvent(Event e) {
-        if (EntityManager.hasComponent(e.getEntityId(), ModelAndTextureComponent.class)) {
-            ModelAndTextureComponent c =
-                ((ModelAndTextureComponent) EntityManager.getComponent(e.getEntityId(), ModelAndTextureComponent.NAME));
-            if (e instanceof ChangeModelParameterEvent) {
-                ChangeModelParameterEvent ev = (ChangeModelParameterEvent) e;
-                c.setScale(ev.getNewScale());
+        if (EntityManager.hasComponent(e.getEntityId(), MeshRendererComponent.class)) {
+            MeshRendererComponent c =
+                ((MeshRendererComponent) EntityManager.getComponent(e.getEntityId(), MeshRendererComponent.NAME));
+            if (e instanceof ChangeMeshRendererParameterEvent) {
+                ChangeMeshRendererParameterEvent ev = (ChangeMeshRendererParameterEvent) e;
                 c.setFakeLighting(ev.isFakeLightning());
                 c.setIsTransparent(ev.isTransparent());
                 c.setNumberOfRows(ev.getNumColums());
                 c.setReflectivity(ev.getReflectivity());
                 c.setShineDamper(ev.getShineDamper());
-            } else if (e instanceof NewModelOrTextureEvent) {
-                NewModelOrTextureEvent event = (NewModelOrTextureEvent) e;
-                if (event.getModelFile() != null && event.getTextureFile() != null) {
-                    c.loadModel(event.getModelFile(), event.getTextureFile());
-                } else if (event.getModelFile() != null) {
-                    c.loadModel(event.getModelFile(), null);
-                } else {
+            } else if (e instanceof NewTextureEvent) {
+                NewTextureEvent event = (NewTextureEvent) e;
+                if (event.getTextureFile() != null) {
                     c.loadAndApplyTexture(event.getTextureFile());
                 }
             }
@@ -71,15 +64,10 @@ public class RenderingSystem extends EngineSystem {
                 getComponent(e.getEntityId(), EmittingLightComponent.class).addLight(createNewLightEvent.getEntityId(),
                     createNewLightEvent.getPosition(), createNewLightEvent.getLight());
             } else {
-                if (hasComponent(e.getEntityId(), PositionComponent.class)) {
-                    PositionComponent pos = getComponent(e.getEntityId(), PositionComponent.class);
-                    getComponent(e.getEntityId(), EmittingLightComponent.class).addLight(createNewLightEvent.getEntityId(),
-                        pos.getPosition(), createNewLightEvent.getLight());
-                } else {
-                    System.out.println("3");
-                    getComponent(e.getEntityId(), EmittingLightComponent.class).addLight(createNewLightEvent.getEntityId(),
-                        new Vector3f(0, 0, 0), createNewLightEvent.getLight());
-                }
+
+                TransformComponent pos = EntityManager.getEntity(e.getEntityId()).getTransform();
+                getComponent(e.getEntityId(), EmittingLightComponent.class).addLight(createNewLightEvent.getEntityId(),
+                    pos.getPosition(), createNewLightEvent.getLight());
             }
         }
         if (e instanceof RemoveLightEvent && hasComponent(e.getEntityId(), EmittingLightComponent.class)) {
@@ -91,13 +79,15 @@ public class RenderingSystem extends EngineSystem {
     public void update() {
         Set<Long> entities = EntityManager.getAllEntites();
         for (Long entity : entities) {
-            if (hasComponent(entity, EmittingLightComponent.class)
-                && hasComponent(entity, PositionComponent.class)) {
+            if (hasComponent(entity, EmittingLightComponent.class)) {
                 EmittingLightComponent c = getComponent(entity, EmittingLightComponent.class);
-                PositionComponent pos = getComponent(entity, PositionComponent.class);
+                TransformComponent pos = EntityManager.getEntity(entity).getTransform();
                 if (c != null && pos != null) {
                     c.updateLightPositionToEntity(entity, pos.getPosition());
                 }
+            }
+            if (hasComponent(entity, MeshRendererComponent.class)) {
+                getComponent(entity, MeshRendererComponent.class).update(entity);
             }
         }
     }
@@ -116,12 +106,12 @@ public class RenderingSystem extends EngineSystem {
                     GraphicalComponent gc = (GraphicalComponent) c;
                     gc.render(entity, scene);
                 }
-                if (c instanceof PositionComponent) {
-                    PositionComponent pc = (PositionComponent) c;
-                    scene.getPositions().put(entity, pc.getPosition());
-                    scene.getRotations().put(entity, pc.getRotation());
-                }
+                c.addDebugMode(scene);
             }
+            TransformComponent pc = EntityManager.getEntity(entity).getTransform();
+            scene.getPositions().put(entity, pc.getPosition());
+            scene.getRotations().put(entity, pc.getRotation());
+            scene.getScales().put(entity, pc.getScale());
         }
         return scene;
     }

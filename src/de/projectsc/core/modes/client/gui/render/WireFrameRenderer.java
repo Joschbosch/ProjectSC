@@ -5,17 +5,23 @@
  */
 package de.projectsc.core.modes.client.gui.render;
 
+import java.io.File;
+import java.net.URISyntaxException;
 import java.util.List;
-import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.util.vector.Matrix4f;
 
-import de.projectsc.core.data.BoundingBox;
+import de.projectsc.core.data.ModelData;
+import de.projectsc.core.data.OBJFileLoader;
+import de.projectsc.core.modes.client.gui.data.WireFrame;
 import de.projectsc.core.modes.client.gui.models.RawModel;
 import de.projectsc.core.modes.client.gui.shaders.WireFrameShader;
+import de.projectsc.core.modes.client.gui.utils.Loader;
 import de.projectsc.core.utils.Maths;
 
 /**
@@ -26,10 +32,21 @@ import de.projectsc.core.utils.Maths;
 // TODO Rework representation of bounding box model
 public class WireFrameRenderer {
 
+    private static final Log LOGGER = LogFactory.getLog(WireFrameRenderer.class);
+
     private final WireFrameShader shader;
+
+    private RawModel sphere = null;
 
     public WireFrameRenderer(WireFrameShader shader, Matrix4f projectionMatrix) {
         this.shader = shader;
+        try {
+            ModelData data = OBJFileLoader.loadOBJ(new File(WireFrameRenderer.class.getResource("/meshes/sphere.obj").toURI()));
+            sphere = Loader.loadToVAO(data.getVertices(), data.getTextureCoords(), data.getNormals(), data.getIndices());
+        } catch (URISyntaxException e) {
+            LOGGER.error("Could not load sphere model: ", e);
+        }
+
         shader.start();
         shader.loadProjectionMatrix(projectionMatrix);
         shader.stop();
@@ -38,20 +55,20 @@ public class WireFrameRenderer {
     /**
      * Renders all textured models without switching vaos to often.
      * 
-     * @param boundingBoxes to render.
+     * @param wireFrames to render.
      */
-    public void render(Map<RawModel, List<BoundingBox>> boundingBoxes) {
+    public void render(List<WireFrame> wireFrames) {
         GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_LINE);
-        for (RawModel model : boundingBoxes.keySet()) {
-            prepareModel(model);
-            List<BoundingBox> batch = boundingBoxes.get(model);
-            for (BoundingBox b : batch) {
-                prepareInstance(b);
-                // GL11.glDrawElements(GL11.GL_TRIANGLES, b.getModel().getVertexCount(),
-                // GL11.GL_UNSIGNED_INT, 0);
+        prepareModel(sphere);
+        for (WireFrame wireframe : wireFrames) {
+            if (WireFrame.SPHERE.equals(wireframe.getModelType())) {
+                prepareInstance(wireframe);
+                GL11.glDrawElements(GL11.GL_TRIANGLES, sphere.getVertexCount(),
+                    GL11.GL_UNSIGNED_INT, 0);
             }
-            unbindTexturedModel();
+
         }
+        unbindTexturedModel();
         GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_FILL);
     }
 
@@ -65,9 +82,10 @@ public class WireFrameRenderer {
         GL30.glBindVertexArray(0);
     }
 
-    private void prepareInstance(BoundingBox b) {
+    private void prepareInstance(WireFrame wireframe) {
         Matrix4f transformationMatrix =
-            Maths.createTransformationMatrix(b.getPosition(), b.getRotation().x, b.getRotation().y, b.getRotation().z, b.getScale());
+            Maths.createTransformationMatrix(wireframe.getPosition(), wireframe.getRotation().x, wireframe.getRotation().y,
+                wireframe.getRotation().z, wireframe.getScale());
         shader.loadTransformationMatrix(transformationMatrix);
     }
 }

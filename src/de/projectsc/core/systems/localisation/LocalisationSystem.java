@@ -12,7 +12,7 @@ import de.projectsc.core.EngineSystem;
 import de.projectsc.core.EntityManager;
 import de.projectsc.core.EventManager;
 import de.projectsc.core.data.Event;
-import de.projectsc.core.entities.components.physic.PositionComponent;
+import de.projectsc.core.entities.TransformComponent;
 import de.projectsc.core.systems.localisation.events.ChangePositionEvent;
 import de.projectsc.core.systems.localisation.events.MoveEvent;
 import de.projectsc.core.systems.localisation.events.NewPositionEvent;
@@ -33,7 +33,7 @@ public class LocalisationSystem extends EngineSystem {
 
     @Override
     public void processEvent(Event e) {
-        PositionComponent posComp = (PositionComponent) EntityManager.getComponent(e.getEntityId(), PositionComponent.NAME);
+        TransformComponent posComp = (TransformComponent) EntityManager.getComponent(e.getEntityId(), TransformComponent.NAME);
         if (e instanceof ChangePositionEvent) {
             handlePositionEvent((ChangePositionEvent) e, posComp);
         } else if (e instanceof RotateEvent) {
@@ -41,7 +41,7 @@ public class LocalisationSystem extends EngineSystem {
         }
     }
 
-    private void handleRotateEvent(RotateEvent e, PositionComponent posComp) {
+    private void handleRotateEvent(RotateEvent e, TransformComponent posComp) {
         if (e.isRelative()) {
             Vector3f.add(posComp.getRotation(), e.getNewRotation(), posComp.getRotation());
         } else if (posComp.getRotation() == null) {
@@ -52,7 +52,7 @@ public class LocalisationSystem extends EngineSystem {
         EventManager.fireEvent(new NewPositionEvent(e.getEntityId(), posComp.getPosition(), posComp.getRotation()));
     }
 
-    private void handlePositionEvent(ChangePositionEvent e, PositionComponent posComp) {
+    private void handlePositionEvent(ChangePositionEvent e, TransformComponent posComp) {
         if (e.isRelative()) {
             Vector3f.add(posComp.getRotation(), e.getNewPosition(), posComp.getPosition());
         } else {

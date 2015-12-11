@@ -43,7 +43,7 @@ public class EntityRenderer {
      * @param entitiesWithModel to render.
      */
     public void render(Map<TexturedModel, List<Long>> entitiesWithModel,
-        Map<Long, Vector3f> position, Map<Long, Vector3f> rotations, Map<Long, Float> scales) {
+        Map<Long, Vector3f> position, Map<Long, Vector3f> rotations, Map<Long, Vector3f> scales) {
         for (TexturedModel model : entitiesWithModel.keySet()) {
             prepareTexturedModel(model);
             List<Long> batch = entitiesWithModel.get(model);
@@ -82,7 +82,7 @@ public class EntityRenderer {
         MasterRenderer.enableCulling();
     }
 
-    private void prepareInstance(ModelTexture modelTexture, Vector3f position, Vector3f rotation, Float scale) {
+    private void prepareInstance(ModelTexture modelTexture, Vector3f position, Vector3f rotation, Vector3f scale) {
         Matrix4f transformationMatrix =
             Maths.createTransformationMatrix(position, rotation.x, rotation.y, rotation.z, scale);
         shader.loadTransformationMatrix(transformationMatrix);

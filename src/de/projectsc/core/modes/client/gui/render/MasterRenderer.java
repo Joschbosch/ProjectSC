@@ -144,7 +144,7 @@ public class MasterRenderer {
         if (scene.isWireframeEnable()) {
             collisionBoxShader.start();
             collisionBoxShader.loadViewMatrix(camera);
-            // collisionBoxRenderer.render(getBoundingBoxes(scene.getEntities()));
+            collisionBoxRenderer.render(scene.getWireFrames());
             collisionBoxShader.stop();
         }
         terrainShader.start();

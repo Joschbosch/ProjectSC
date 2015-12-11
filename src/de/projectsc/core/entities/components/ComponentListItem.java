@@ -6,14 +6,13 @@ package de.projectsc.core.entities.components;
 
 import de.projectsc.core.entities.Component;
 import de.projectsc.core.entities.components.physic.EntityStateComponent;
-import de.projectsc.core.entities.components.physic.PositionComponent;
+import de.projectsc.core.entities.components.physic.MeshComponent;
 import de.projectsc.core.entities.components.physic.VelocityComponent;
 
 public enum ComponentListItem {
-
-    POSITION_COMPONENT(PositionComponent.NAME, PositionComponent.class),
     VELOCITY_COMPONENT(VelocityComponent.NAME, VelocityComponent.class),
-    ENTITY_STATE_COMPONENT(EntityStateComponent.NAME, EntityStateComponent.class);
+    ENTITY_STATE_COMPONENT(EntityStateComponent.NAME, EntityStateComponent.class),
+    MESH_COMPONENT(MeshComponent.NAME, MeshComponent.class);
 
     private String name;
 

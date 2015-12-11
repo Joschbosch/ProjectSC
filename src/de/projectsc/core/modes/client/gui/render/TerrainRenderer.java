@@ -47,8 +47,11 @@ public class TerrainRenderer {
         for (TerrainModel terrain : terrains) {
             prepareTerrain(terrain);
             loadModelMatrix(terrain);
+            GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_FILL);
             GL11.glDrawElements(GL11.GL_TRIANGLES, terrain.getModel().getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
             unbindTexturedModel();
+            GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_FILL);
+
         }
     }
 
@@ -86,7 +89,7 @@ public class TerrainRenderer {
 
     private void loadModelMatrix(TerrainModel terrain) {
         Matrix4f transformationMatrix =
-            Maths.createTransformationMatrix(new Vector3f(terrain.getX(), 0.0f, terrain.getZ()), 0, 0, 0, 1);
+            Maths.createTransformationMatrix(new Vector3f(terrain.getX(), 0.0f, terrain.getZ()), 0, 0, 0, new Vector3f(1, 1, 1));
         shader.loadTransformationMatrix(transformationMatrix);
     }
 }

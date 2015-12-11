@@ -17,6 +17,7 @@ import de.projectsc.core.data.objects.Light;
 import de.projectsc.core.data.utils.LightSerializationUtils;
 import de.projectsc.core.entities.ComponentType;
 import de.projectsc.core.modes.client.gui.data.Scene;
+import de.projectsc.core.modes.client.gui.data.WireFrame;
 
 /**
  * Entity component to allow entities having lights.
@@ -58,6 +59,14 @@ public class EmittingLightComponent extends GraphicalComponent {
     @Override
     public void render(long entity, Scene scene) {
         scene.getLights().addAll(getLights());
+    }
+
+    @Override
+    public void addDebugMode(Scene scene) {
+        for (Light l : lights) {
+            WireFrame w = new WireFrame(WireFrame.SPHERE, l.getPosition(), new Vector3f(0, 0, 0), new Vector3f(1, 1, 1));
+            scene.getWireFrames().add(w);
+        }
     }
 
     /**

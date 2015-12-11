@@ -185,7 +185,10 @@ public final class OBJFileLoader {
                 furthestPoint = currentVertex.getLength();
             }
             Vector3f position = currentVertex.getPosition();
-            Vector2f textureCoord = textures.get(currentVertex.getTextureIndex());
+            Vector2f textureCoord = new Vector2f(0, 0);
+            if (textures != null && textures.size() > 0) {
+                textureCoord = textures.get(currentVertex.getTextureIndex());
+            }
             Vector3f normalVector = normals.get(currentVertex.getNormalIndex());
             verticesArray[i * 3] = position.x;
             verticesArray[i * 3 + 1] = position.y;

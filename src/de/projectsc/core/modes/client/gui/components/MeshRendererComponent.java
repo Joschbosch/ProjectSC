@@ -7,6 +7,7 @@ package de.projectsc.core.modes.client.gui.components;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,9 +18,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import de.projectsc.core.CoreConstants;
+import de.projectsc.core.EntityManager;
 import de.projectsc.core.data.ModelData;
-import de.projectsc.core.data.OBJFileLoader;
 import de.projectsc.core.entities.ComponentType;
+import de.projectsc.core.entities.components.physic.MeshComponent;
 import de.projectsc.core.modes.client.gui.data.Scene;
 import de.projectsc.core.modes.client.gui.models.RawModel;
 import de.projectsc.core.modes.client.gui.models.TexturedModel;
@@ -32,16 +34,14 @@ import de.projectsc.core.modes.client.gui.utils.Loader;
  * @author Josch Bosch
  * 
  */
-public class ModelAndTextureComponent extends GraphicalComponent {
+public class MeshRendererComponent extends GraphicalComponent {
 
     /**
      * Name.
      */
-    public static final String NAME = "Model and Texture Component";
+    public static final String NAME = "Mesh Renderer Component";
 
-    private static final Log LOGGER = LogFactory.getLog(ModelAndTextureComponent.class);
-
-    private File modelFile;
+    private static final Log LOGGER = LogFactory.getLog(MeshRendererComponent.class);
 
     private File textureFile;
 
@@ -51,66 +51,65 @@ public class ModelAndTextureComponent extends GraphicalComponent {
 
     private int textureIndex = 0;
 
-    private float scale = 1.0f;
+    private TexturedModel texturedModel;
 
-    public ModelAndTextureComponent() {
+    public MeshRendererComponent() {
         setID(NAME);
         setType(ComponentType.GRAPHICS);
         textureIndex = 0;
+        requiredComponents.add(MeshComponent.NAME);
+        try {
+            textureFile = new File(MeshRendererComponent.class.getResource("/graphics/white.png").toURI());
+        } catch (URISyntaxException e) {
+            LOGGER.error("Could not load default texture file: ", e);
+        }
     }
 
     @Override
     public void update(long owner) {
-
+        if (model == null && EntityManager.hasComponent(owner, MeshComponent.class)) {
+            ModelData mesh = ((MeshComponent) EntityManager.getComponent(owner, MeshComponent.class)).getModel();
+            if (mesh != null) {
+                loadModel(mesh);
+            }
+        }
+        if (modelTexture == null && textureFile != null) {
+            loadAndApplyTexture(textureFile);
+        }
+        if (texturedModel == null) {
+            texturedModel = getTexturedModel();
+        }
     }
 
     @Override
     public void render(long entity, Scene scene) {
-        TexturedModel entityModel = getTexturedModel();
-        if (entityModel.getRawModel() != null) {
+        TexturedModel m = getTexturedModel();
+        if (m != null && m.getRawModel() != null && m.getTexture() != null) {
             if (modelTexture != null) {
                 modelTexture.setActiveTextureIndex(textureIndex);
             }
-            List<Long> batch = scene.getModels().get(entityModel);
+            List<Long> batch = scene.getModels().get(m);
             if (batch != null) {
                 batch.add(entity);
             } else {
                 List<Long> newBatch = new ArrayList<>();
                 newBatch.add(entity);
-                scene.getModels().put(entityModel, newBatch);
+                scene.getModels().put(m, newBatch);
             }
         }
-        scene.getScales().put(entity, scale);
     }
 
     /**
      * Load model and texture from given files.
      * 
-     * @param incModelFile model file
-     * @param incTextureFile texture image
+     * @param data of the mesh
      */
-    public void loadModel(File incModelFile, File incTextureFile) {
-        if (incModelFile != null) {
-            this.modelFile = incModelFile;
-            ModelData data = OBJFileLoader.loadOBJ(incModelFile);
-            model = Loader.loadToVAO(data.getVertices(), data.getTextureCoords(), data.getNormals(), data.getIndices());
-            if (incTextureFile != null) {
-                this.textureFile = incTextureFile;
-                loadAndApplyTexture(incTextureFile);
-            }
-        }
+    public void loadModel(ModelData data) {
+        model = Loader.loadToVAO(data.getVertices(), data.getTextureCoords(), data.getNormals(), data.getIndices());
     }
 
     @Override
     public Map<String, Object> serialize(File savingLocation) {
-        File savedModelFile = new File(savingLocation, CoreConstants.MODEL_FILENAME);
-        if (modelFile != null && modelFile.exists() && !savedModelFile.exists()) {
-            try {
-                FileUtils.copyFile(modelFile, savedModelFile);
-            } catch (IOException e) {
-                LOGGER.error("Could not save model file: " + e.getMessage());
-            }
-        }
         File savedTextureFile = new File(savingLocation, CoreConstants.TEXTURE_FILENAME);
         if (textureFile != null && textureFile.exists() && !savedTextureFile.exists()) {
             try {
@@ -123,29 +122,17 @@ public class ModelAndTextureComponent extends GraphicalComponent {
         serialized.put("numColumns", modelTexture.getNumberOfRows());
         serialized.put("reflectivity", modelTexture.getReflectivity());
         serialized.put("shineDamper", modelTexture.getShineDamper());
-        serialized.put("scale", scale);
         return serialized;
     }
 
     @Override
     public void deserialize(Map<String, Object> serialized, File loadingLocation) {
-        if (new File(loadingLocation, CoreConstants.MODEL_FILENAME).exists()) {
-            modelFile = new File(loadingLocation, CoreConstants.MODEL_FILENAME);
-        }
         if (new File(loadingLocation, CoreConstants.TEXTURE_FILENAME).exists()) {
             textureFile = new File(loadingLocation, CoreConstants.TEXTURE_FILENAME);
-        }
-        if (modelFile != null) {
-            loadModel(modelFile, textureFile);
         }
         setNumberOfRows((int) serialized.get("numColumns"));
         setReflectivity((float) (double) serialized.get("reflectivity"));
         setShineDamper((float) (double) serialized.get("shineDamper"));
-        setScale((float) (double) serialized.get("scale"));
-    }
-
-    public void setScale(float scale) {
-        this.scale = scale;
     }
 
     /**
@@ -239,10 +226,6 @@ public class ModelAndTextureComponent extends GraphicalComponent {
     @Override
     public boolean isValidForSaving() {
         return model != null;
-    }
-
-    public float getScale() {
-        return scale;
     }
 
     public float getReflectivity() {

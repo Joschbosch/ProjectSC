@@ -9,10 +9,10 @@ import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
-import de.projectsc.core.modes.client.gui.components.ModelAndTextureComponent;
+import de.projectsc.core.modes.client.gui.components.MeshRendererComponent;
 
 /**
- * Data store for the editor and the necessary {@link ModelAndTextureComponent}.
+ * Data store for the editor and the necessary {@link MeshRendererComponent}.
  * 
  * @author Josch Bosch
  */

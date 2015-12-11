@@ -86,8 +86,6 @@ public class Terrain {
         this.rTexture = rTexture;
         this.gTexture = gTexture;
         this.bTexture = bTexture;
-        // this.model = new TerrainModel(x, z, tiles, this, bgTexture, rTexture, gTexture,
-        // bTexture);
     }
 
     private BoundingBox calculateMapBox() {
@@ -203,7 +201,7 @@ public class Terrain {
             answer =
                 Maths.barryCentric(new Vector3f(0, getHeightOfTerrain(gridX, gridZ) * Terrain.HEIGHT_TILE_SIZE, 0), new Vector3f(1,
                     getHeightOfTerrain(gridX + 1, gridZ) * Terrain.HEIGHT_TILE_SIZE, 0), new Vector3f(0,
-                        getHeightOfTerrain(gridX, gridZ + 1) * Terrain.HEIGHT_TILE_SIZE, 1),
+                    getHeightOfTerrain(gridX, gridZ + 1) * Terrain.HEIGHT_TILE_SIZE, 1),
                     new Vector2f(xCoordPlayer, zCoordPlayer));
         } else {
             answer = Maths.barryCentric(new Vector3f(1, getHeightOfTerrain(gridX + 1, gridZ) * Terrain.HEIGHT_TILE_SIZE, 0),

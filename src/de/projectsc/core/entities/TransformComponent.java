@@ -2,7 +2,7 @@
  * Copyright (C) 2015 
  */
 
-package de.projectsc.core.entities.components.physic;
+package de.projectsc.core.entities;
 
 import java.io.File;
 import java.util.HashMap;
@@ -10,18 +10,20 @@ import java.util.Map;
 
 import org.lwjgl.util.vector.Vector3f;
 
-import de.projectsc.core.entities.ComponentType;
+import de.projectsc.core.entities.components.physic.PhysicsComponent;
 import de.projectsc.core.events.NewPositionEvent;
 
-public class PositionComponent extends PhysicsComponent {
+public class TransformComponent extends PhysicsComponent {
 
-    public static final String NAME = "Position Component";
+    public static final String NAME = "Transform Component";
 
     private Vector3f position = new Vector3f(0, 0, 0);
 
     private Vector3f rotation = new Vector3f(0, 0, 0);
 
-    public PositionComponent() {
+    private Vector3f scale = new Vector3f(1, 1, 1);
+
+    public TransformComponent() {
         setID(NAME);
         setType(ComponentType.PHYSICS);
     }
@@ -46,19 +48,14 @@ public class PositionComponent extends PhysicsComponent {
         serialized.put("rotationX", rotation.x);
         serialized.put("rotationY", rotation.y);
         serialized.put("rotationZ", rotation.z);
+        serialized.put("scaleX", scale.x);
+        serialized.put("scaleY", scale.y);
+        serialized.put("scaleZ", scale.z);
         return serialized;
     }
 
     @Override
     public void deserialize(Map<String, Object> serialized, File loadingLocation) {
-        position = new Vector3f();
-        rotation = new Vector3f();
-        position.x = (float) (double) serialized.get("positionX");
-        position.y = (float) (double) serialized.get("positionY");
-        position.z = (float) (double) serialized.get("positionZ");
-        position.x = (float) (double) serialized.get("rotationX");
-        rotation.y = (float) (double) serialized.get("rotationY");
-        rotation.z = (float) (double) serialized.get("rotationZ");
 
     }
 
@@ -81,6 +78,14 @@ public class PositionComponent extends PhysicsComponent {
 
     public void setRotation(Vector3f rotation) {
         this.rotation = rotation;
+    }
+
+    public Vector3f getScale() {
+        return scale;
+    }
+
+    public void setScale(Vector3f scale) {
+        this.scale = scale;
     }
 
 }

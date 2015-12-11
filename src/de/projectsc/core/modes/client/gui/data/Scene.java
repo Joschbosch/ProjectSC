@@ -31,7 +31,7 @@ public class Scene {
 
     private Map<TexturedModel, List<Long>> models;
 
-    private Map<Long, Float> scales;
+    private Map<Long, Vector3f> scales;
 
     private Map<Long, Vector3f> positions;
 
@@ -49,9 +49,13 @@ public class Scene {
 
     private Vector3f fogColor = null;
 
-    private boolean wireframeEnabled = false;
+    private boolean wireframeEnabled = true;
 
     private Vector3f skyColor = null;
+
+    private boolean isDebugMode = true;
+
+    private List<WireFrame> wireFrames = null;
 
     public Scene() {
         terrains = new LinkedList<>();
@@ -63,6 +67,7 @@ public class Scene {
         scales = new HashMap<>();
         rotations = new HashMap<>();
         positions = new HashMap<>();
+        wireFrames = new LinkedList<>();
     }
 
     public List<TerrainModel> getTerrains() {
@@ -113,11 +118,11 @@ public class Scene {
         this.boundingBoxModels = boundingBoxModels;
     }
 
-    public Map<Long, Float> getScales() {
+    public Map<Long, Vector3f> getScales() {
         return scales;
     }
 
-    public void setScales(Map<Long, Float> scale) {
+    public void setScales(Map<Long, Vector3f> scale) {
         this.scales = scale;
     }
 
@@ -172,5 +177,17 @@ public class Scene {
 
     public void setSkyColor(Vector3f skyColor) {
         this.skyColor = skyColor;
+    }
+
+    public boolean isDebugMode() {
+        return isDebugMode;
+    }
+
+    public void setDebugMode(boolean isDebugMode) {
+        this.isDebugMode = isDebugMode;
+    }
+
+    public List<WireFrame> getWireFrames() {
+        return wireFrames;
     }
 }

@@ -17,7 +17,7 @@ public enum GraphicalComponentImplementation {
     /**
      * 
      */
-    MODEL_AND_TEXTURE_COMPONENT(ModelAndTextureComponent.NAME, ModelAndTextureComponent.class);
+    MODEL_AND_TEXTURE_COMPONENT(MeshRendererComponent.NAME, MeshRendererComponent.class);
 
     private String name;
 

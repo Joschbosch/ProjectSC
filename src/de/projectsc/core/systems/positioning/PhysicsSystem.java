@@ -13,14 +13,17 @@ import de.projectsc.core.EntityManager;
 import de.projectsc.core.EventManager;
 import de.projectsc.core.data.Event;
 import de.projectsc.core.entities.EntityState;
+import de.projectsc.core.entities.TransformComponent;
 import de.projectsc.core.entities.components.physic.EntityStateComponent;
-import de.projectsc.core.entities.components.physic.PositionComponent;
+import de.projectsc.core.entities.components.physic.MeshComponent;
 import de.projectsc.core.entities.components.physic.VelocityComponent;
 import de.projectsc.core.events.ChangeEntityStateEvent;
 import de.projectsc.core.events.ChangeMovementParameterEvent;
 import de.projectsc.core.events.ChangePositionEvent;
+import de.projectsc.core.events.ChangeScaleEvent;
 import de.projectsc.core.events.MoveEvent;
 import de.projectsc.core.events.NewEntityCreatedEvent;
+import de.projectsc.core.events.NewMeshEvent;
 import de.projectsc.core.events.NewPositionEvent;
 import de.projectsc.core.events.RotateEvent;
 
@@ -37,33 +40,36 @@ public class PhysicsSystem extends EngineSystem {
 
     public PhysicsSystem() {
         super(PhysicsSystem.NAME);
-        EventManager.registerForEvent(ChangePositionEvent.class, this);
+        EventManager.registerForEvent(NewEntityCreatedEvent.class, this);
         EventManager.registerForEvent(RotateEvent.class, this);
         EventManager.registerForEvent(MoveEvent.class, this);
+        EventManager.registerForEvent(ChangePositionEvent.class, this);
         EventManager.registerForEvent(ChangeEntityStateEvent.class, this);
-        EventManager.registerForEvent(NewEntityCreatedEvent.class, this);
         EventManager.registerForEvent(ChangeMovementParameterEvent.class, this);
+        EventManager.registerForEvent(ChangeScaleEvent.class, this);
+        EventManager.registerForEvent(NewMeshEvent.class, this);
 
     }
 
     @Override
     public void update() {
         for (long entity : EntityManager.getAllEntites()) {
-            EntityState entityState = getComponent(entity, EntityStateComponent.class).getState();
-            if (entityState == EntityState.MOVING) {
-                if (EntityManager.hasComponent(entity, VelocityComponent.class)
-                    && EntityManager.hasComponent(entity, PositionComponent.class)) {
-                    VelocityComponent velocityComp = getComponent(entity, VelocityComponent.class);
-                    PositionComponent positionComp = getComponent(entity, PositionComponent.class);
-                    velocityComp.updateVelocity(positionComp.getRotation());
-                    Vector3f velocity = velocityComp.getVelocity();
-                    Vector3f rotationDelta = velocityComp.getRotationDelta();
-                    positionComp.updatePosition(entity, velocity, rotationDelta);
-                }
-            } else if (entityState == EntityState.STANDING) {
-                if (EntityManager.hasComponent(entity, VelocityComponent.class)) {
-                    VelocityComponent velocityComp = getComponent(entity, VelocityComponent.class);
-                    velocityComp.setCurrentSpeed(0f);
+            if (EntityManager.hasComponent(entity, EntityStateComponent.class)) {
+                EntityState entityState = getComponent(entity, EntityStateComponent.class).getState();
+                if (entityState == EntityState.MOVING) {
+                    if (EntityManager.hasComponent(entity, VelocityComponent.class)) {
+                        VelocityComponent velocityComp = getComponent(entity, VelocityComponent.class);
+                        TransformComponent transform = EntityManager.getEntity(entity).getTransform();
+                        velocityComp.updateVelocity(transform.getRotation());
+                        Vector3f velocity = velocityComp.getVelocity();
+                        Vector3f rotationDelta = velocityComp.getRotationDelta();
+                        transform.updatePosition(entity, velocity, rotationDelta);
+                    }
+                } else if (entityState == EntityState.STANDING) {
+                    if (EntityManager.hasComponent(entity, VelocityComponent.class)) {
+                        VelocityComponent velocityComp = getComponent(entity, VelocityComponent.class);
+                        velocityComp.setCurrentSpeed(0f);
+                    }
                 }
             }
         }
@@ -71,18 +77,22 @@ public class PhysicsSystem extends EngineSystem {
 
     @Override
     public void processEvent(Event e) {
-        PositionComponent posComp = getComponent(e.getEntityId(), PositionComponent.class);
+        TransformComponent posComp = EntityManager.getEntity(e.getEntityId()).getTransform();
         if (e instanceof ChangePositionEvent && posComp != null) {
             handlePositionEvent((ChangePositionEvent) e, posComp);
         } else if (e instanceof RotateEvent && posComp != null) {
             handleRotateEvent((RotateEvent) e, posComp);
+        } else if (e instanceof ChangeScaleEvent && posComp != null) {
+            handleScaleEvent((ChangeScaleEvent) e, posComp);
         } else if (e instanceof ChangeMovementParameterEvent) {
             handleVelocityChangeEvent((ChangeMovementParameterEvent) e, getComponent(e.getEntityId(), VelocityComponent.class));
         } else if (e instanceof ChangeEntityStateEvent) {
             handleChangeEntityStateEvent((ChangeEntityStateEvent) e);
         } else if (e instanceof NewEntityCreatedEvent) {
-            EntityManager.addComponentToEntity(e.getEntityId(), PositionComponent.NAME);
             EntityManager.addComponentToEntity(e.getEntityId(), EntityStateComponent.NAME);
+        } else if (e instanceof NewMeshEvent) {
+            ((MeshComponent) EntityManager.getComponent(e.getEntityId(), MeshComponent.class)).changeMesh(((NewMeshEvent) e)
+                .getNewMeshFile());
         }
     }
 
@@ -107,7 +117,15 @@ public class PhysicsSystem extends EngineSystem {
         }
     }
 
-    private void handleRotateEvent(RotateEvent e, PositionComponent posComp) {
+    private void handleScaleEvent(ChangeScaleEvent e, TransformComponent posComp) {
+        if (posComp.getScale() == null) {
+            posComp.setScale(e.getNewScale());
+        } else {
+            posComp.getScale().set(e.getNewScale());
+        }
+    }
+
+    private void handleRotateEvent(RotateEvent e, TransformComponent posComp) {
         if (e.isRelative()) {
             Vector3f.add(posComp.getRotation(), e.getNewRotation(), posComp.getRotation());
         } else if (posComp.getRotation() == null) {
@@ -118,7 +136,7 @@ public class PhysicsSystem extends EngineSystem {
         fireEvent(new NewPositionEvent(e.getEntityId(), posComp.getPosition(), posComp.getRotation()));
     }
 
-    private void handlePositionEvent(ChangePositionEvent e, PositionComponent posComp) {
+    private void handlePositionEvent(ChangePositionEvent e, TransformComponent posComp) {
         if (e.isRelative()) {
             Vector3f.add(posComp.getPosition(), e.getNewPosition(), posComp.getPosition());
         } else {

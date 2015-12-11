@@ -26,7 +26,7 @@ public class BoundingBox {
 
     private Vector3f rotation;
 
-    private float scale;
+    private Vector3f scale;
 
     /**
      * Minimum and maximum value for all axis.
@@ -103,7 +103,7 @@ public class BoundingBox {
         }
     }
 
-    public float getScale() {
+    public Vector3f getScale() {
         return scale;
     }
 
@@ -112,10 +112,14 @@ public class BoundingBox {
      * 
      * @param scale to set
      */
-    public void setScale(float scale) {
+    public void setScale(Vector3f scale) {
         this.scale = scale;
-        min = (Vector3f) min.scale(scale);
-        max = (Vector3f) max.scale(scale);
+        min.x = min.x * scale.x;
+        min.y = min.y * scale.y;
+        min.z = min.z * scale.z;
+        max.x = max.x * scale.x;
+        max.y = max.y * scale.y;
+        max.z = max.z * scale.z;
         center = Vector3f.add(min, max, null);
         center.scale(1.0f / 2.0f);
     }

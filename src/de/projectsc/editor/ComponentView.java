@@ -33,5 +33,11 @@ public abstract class ComponentView extends JDialog {
         this.entity = entity;
     }
 
+    @Override
+    public void setVisible(boolean b) {
+        super.setVisible(b);
+        getAssociatedComponent().setActive(b);
+    }
+
     protected abstract Component getAssociatedComponent();
 }

@@ -31,7 +31,6 @@ public class VelocityComponent extends PhysicsComponent {
         setID(NAME);
         setType(ComponentType.PREPHYSICS);
         this.requiredComponents.add(EntityStateComponent.NAME);
-        this.requiredComponents.add(PositionComponent.NAME);
     }
 
     @Override

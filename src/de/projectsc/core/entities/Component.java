@@ -18,6 +18,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 
 import de.projectsc.core.EventManager;
 import de.projectsc.core.data.Event;
+import de.projectsc.core.modes.client.gui.data.Scene;
 
 /**
  * 
@@ -42,6 +43,8 @@ public abstract class Component {
     protected List<String> requiredBy = new LinkedList<>();
 
     private long owner;
+
+    private boolean isActive = false;
 
     public Component() {
         this.uid = uidCount++;
@@ -142,4 +145,15 @@ public abstract class Component {
         return uid;
     }
 
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean isActive) {
+        this.isActive = isActive;
+    }
+
+    public void addDebugMode(Scene scene) {
+
+    }
 }
