@@ -24,12 +24,12 @@ import javax.swing.JPanel;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import de.projectsc.core.data.messages.MessageConstants;
 import de.projectsc.core.game.GameConfiguration;
-import de.projectsc.core.modes.client.common.messages.ClientMessage;
-import de.projectsc.core.modes.client.core.ClientCore;
-import de.projectsc.core.modes.client.network.ClientNetworkCore;
-import de.projectsc.core.modes.server.core.messages.ServerMessage;
+import de.projectsc.core.messages.MessageConstants;
+import de.projectsc.modes.client.common.messages.ClientMessage;
+import de.projectsc.modes.client.core.ClientCore;
+import de.projectsc.modes.client.network.ClientNetworkCore;
+import de.projectsc.modes.server.core.messages.ServerMessage;
 
 public class ServerMock {
 

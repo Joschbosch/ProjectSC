@@ -57,15 +57,15 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.map.ObjectMapper;
 
-import de.projectsc.core.ComponentRegistry;
 import de.projectsc.core.CoreConstants;
-import de.projectsc.core.EntityManager;
-import de.projectsc.core.entities.Component;
-import de.projectsc.core.entities.components.ComponentListItem;
+import de.projectsc.core.component.impl.ComponentListItem;
+import de.projectsc.core.interfaces.Component;
+import de.projectsc.core.manager.ComponentManager;
+import de.projectsc.core.manager.EntityManager;
 import de.projectsc.editor.ComponentView;
-import de.projectsc.editor.ComponentViewType;
 import de.projectsc.editor.EditorData;
 import de.projectsc.editor.EditorGraphicsCore;
+import de.projectsc.editor.componentViews.ComponentViewType;
 
 /**
  * Entity editor.
@@ -185,7 +185,7 @@ public class EntityEditor extends JFrame {
 
     private void loadComponents() {
         for (ComponentListItem it : ComponentListItem.values()) {
-            ComponentRegistry.registerComponent(it.getName(), it.getClazz());
+            ComponentManager.registerComponent(it.getName(), it.getClazz());
         }
     }
 
@@ -302,7 +302,7 @@ public class EntityEditor extends JFrame {
         contentPane.add(componentPanel);
         componentPanel.setLayout(null);
 
-        componentNames = ComponentRegistry.getRegisteredComponents();
+        componentNames = ComponentManager.getRegisteredComponents();
         componentList = new JList<String>();
         componentList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         componentList.setValueIsAdjusting(true);
@@ -805,7 +805,8 @@ public class EntityEditor extends JFrame {
     }
 
     /**
-     * Once the Canvas is created its add notify method will call this method to start the LWJGL Display and game loop in another thread.
+     * Once the Canvas is created its add notify method will call this method to start the LWJGL
+     * Display and game loop in another thread.
      */
     public void startLWJGL() {
         messageQueue = new LinkedBlockingQueue<String>();
@@ -816,8 +817,8 @@ public class EntityEditor extends JFrame {
     }
 
     /**
-     * Tell game loop to stop running, after which the LWJGL Display will be destoryed. The main thread will wait for the Display.destroy()
-     * to complete
+     * Tell game loop to stop running, after which the LWJGL Display will be destoryed. The main
+     * thread will wait for the Display.destroy() to complete
      */
     private void stopLWJGL() {
         try {

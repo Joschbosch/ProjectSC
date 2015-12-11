@@ -5,7 +5,7 @@
 package de.projectsc.core.events;
 
 import de.projectsc.core.data.Event;
-import de.projectsc.core.entities.EntityState;
+import de.projectsc.core.entities.states.EntityState;
 
 public class ChangeEntityStateEvent extends Event {
 

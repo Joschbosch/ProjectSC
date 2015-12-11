@@ -27,33 +27,34 @@ import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
-import de.projectsc.core.ComponentRegistry;
 import de.projectsc.core.CoreConstants;
-import de.projectsc.core.EntityManager;
-import de.projectsc.core.EventManager;
+import de.projectsc.core.component.impl.physic.TransformComponent;
 import de.projectsc.core.data.Timer;
+import de.projectsc.core.data.Transform;
 import de.projectsc.core.data.objects.Light;
-import de.projectsc.core.data.terrain.Terrain;
-import de.projectsc.core.entities.Component;
-import de.projectsc.core.entities.EntityState;
-import de.projectsc.core.entities.TransformComponent;
+import de.projectsc.core.entities.states.EntityState;
 import de.projectsc.core.events.ChangeEntityStateEvent;
-import de.projectsc.core.events.ChangeMeshRendererParameterEvent;
-import de.projectsc.core.events.ChangePositionEvent;
-import de.projectsc.core.events.ChangeScaleEvent;
 import de.projectsc.core.events.NewMeshEvent;
-import de.projectsc.core.events.NewTextureEvent;
-import de.projectsc.core.events.RotateEvent;
-import de.projectsc.core.modes.client.gui.RenderingSystem;
-import de.projectsc.core.modes.client.gui.components.EmittingLightComponent;
-import de.projectsc.core.modes.client.gui.components.GraphicalComponentImplementation;
-import de.projectsc.core.modes.client.gui.components.MeshRendererComponent;
-import de.projectsc.core.modes.client.gui.data.Scene;
-import de.projectsc.core.modes.client.gui.objects.terrain.TerrainModel;
-import de.projectsc.core.modes.client.gui.objects.text.TextMaster;
-import de.projectsc.core.modes.client.gui.render.MasterRenderer;
-import de.projectsc.core.modes.client.gui.utils.MousePicker;
-import de.projectsc.core.systems.SystemMaster;
+import de.projectsc.core.events.movement.ChangePositionEvent;
+import de.projectsc.core.events.movement.ChangeScaleEvent;
+import de.projectsc.core.events.movement.ChangeRotationEvent;
+import de.projectsc.core.interfaces.Component;
+import de.projectsc.core.manager.ComponentManager;
+import de.projectsc.core.manager.EntityManager;
+import de.projectsc.core.manager.EventManager;
+import de.projectsc.core.systems.physics.PhysicsSystem;
+import de.projectsc.core.terrain.Terrain;
+import de.projectsc.modes.client.gui.RenderingSystem;
+import de.projectsc.modes.client.gui.components.EmittingLightComponent;
+import de.projectsc.modes.client.gui.components.GraphicalComponentImplementation;
+import de.projectsc.modes.client.gui.components.MeshRendererComponent;
+import de.projectsc.modes.client.gui.data.GUIScene;
+import de.projectsc.modes.client.gui.events.ChangeMeshRendererParameterEvent;
+import de.projectsc.modes.client.gui.events.NewTextureEvent;
+import de.projectsc.modes.client.gui.objects.terrain.TerrainModel;
+import de.projectsc.modes.client.gui.objects.text.TextMaster;
+import de.projectsc.modes.client.gui.render.MasterRenderer;
+import de.projectsc.modes.client.gui.utils.MousePicker;
 
 /**
  * Core class for the GUI.
@@ -90,11 +91,11 @@ public class EditorGraphicsCore implements Runnable {
 
     private List<TerrainModel> terrainModels;
 
-    private SystemMaster systemMaster;
-
     private RenderingSystem renderSystem;
 
     private boolean renderSkybox = true;
+
+    private PhysicsSystem physicsSystem;
 
     public EditorGraphicsCore(Canvas displayParent, int width, int height, BlockingQueue<String> messageQueue) {
         incomingQueue = new LinkedBlockingQueue<>();
@@ -120,8 +121,7 @@ public class EditorGraphicsCore implements Runnable {
         renderSystem = new RenderingSystem();
         TextMaster.init();
         camera = new EditorCamera();
-        systemMaster = new SystemMaster();
-        systemMaster.initialize();
+        physicsSystem = new PhysicsSystem();
         createNewEntity();
         masterRenderer = new MasterRenderer();
         createSun();
@@ -131,7 +131,7 @@ public class EditorGraphicsCore implements Runnable {
 
     private void loadGUIComponents() {
         for (GraphicalComponentImplementation it : GraphicalComponentImplementation.values()) {
-            ComponentRegistry.registerComponent(it.getName(), it.getClazz());
+            ComponentManager.registerComponent(it.getName(), it.getClazz());
         }
     }
 
@@ -148,13 +148,12 @@ public class EditorGraphicsCore implements Runnable {
                     EventManager.fireEvent(new ChangePositionEvent(camera.getPosition(), sun));
                 }
             }
-            systemMaster.update();
+            physicsSystem.update();
             renderSystem.update();
             timer = cycleTextures(timer, Timer.getDelta());
-            camera.move(Timer.getDelta());
             mousePicker.update(getTerrains(), camera.getPosition(), camera.createViewMatrix());
             if (doRender.get()) {
-                Scene s = renderSystem.createScene();
+                GUIScene s = renderSystem.createScene();
                 s.setTerrains(terrainModels);
                 s.setRenderSkybox(renderSkybox);
                 masterRenderer.renderScene(s, camera, Timer.getDelta(), new Vector4f(0, 100000000, 0, 100000000));
@@ -176,11 +175,11 @@ public class EditorGraphicsCore implements Runnable {
     private void createSun() {
         sun = EntityManager.createNewEntity();
         EventManager.fireEvent(new ChangePositionEvent(new Vector3f(0.0f, 100.0f, 100.0f), sun));
-        EventManager.fireEvent(new RotateEvent(new Vector3f(0, 0, 0), sun));
+        EventManager.fireEvent(new ChangeRotationEvent(new Vector3f(0, 0, 0), sun));
         EmittingLightComponent lightComponent =
             (EmittingLightComponent) EntityManager.addComponentToEntity(sun,
                 GraphicalComponentImplementation.EMMITING_LIGHT_COMPONENT.getName());
-        TransformComponent position = EntityManager.getEntity(sun).getTransform();
+        Transform position = EntityManager.getEntity(sun).getTransform();
         Light light = new Light(new Vector3f(position.getPosition()), new Vector3f(1.0f, 1.0f, 1.0f), "sun");
         lightComponent.addLight(sun, new Vector3f(position.getPosition()), light);
     }
@@ -305,7 +304,7 @@ public class EditorGraphicsCore implements Runnable {
                 java.util.Map<String, Object> serialized =
                     mapper.readValue(tree.get("components").get(name), new HashMap<String, Object>().getClass());
                 if (name.equals(TransformComponent.class)) {
-                    TransformComponent t = EntityManager.getEntity(getCurrentEntity()).getTransform();
+                    Transform t = EntityManager.getEntity(getCurrentEntity()).getTransform();
                     Vector3f position = new Vector3f();
                     Vector3f rotation = new Vector3f();
                     Vector3f scale = new Vector3f();

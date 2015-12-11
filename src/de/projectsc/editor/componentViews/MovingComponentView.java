@@ -11,11 +11,11 @@ import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import de.projectsc.core.EntityManager;
-import de.projectsc.core.EventManager;
-import de.projectsc.core.entities.Component;
-import de.projectsc.core.entities.components.physic.VelocityComponent;
-import de.projectsc.core.events.ChangeMovementParameterEvent;
+import de.projectsc.core.component.impl.physic.VelocityComponent;
+import de.projectsc.core.events.movement.ChangeMovementParameterEvent;
+import de.projectsc.core.interfaces.Component;
+import de.projectsc.core.manager.EntityManager;
+import de.projectsc.core.manager.EventManager;
 import de.projectsc.editor.ComponentView;
 
 /**
@@ -29,13 +29,13 @@ public class MovingComponentView extends ComponentView {
 
     private VelocityComponent component;
 
-    private JSlider movementSlider;
+    private final JSlider movementSlider;
 
-    private JLabel movementLabel;
+    private final JLabel movementLabel;
 
-    private JSlider accelerationSlider;
+    private final JSlider accelerationSlider;
 
-    private JLabel accelerationLabel;
+    private final JLabel accelerationLabel;
 
     public MovingComponentView() {
         setTitle("Velocity Component");

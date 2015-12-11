@@ -21,13 +21,13 @@ import javax.swing.table.TableModel;
 
 import org.lwjgl.util.vector.Vector3f;
 
-import de.projectsc.core.EntityManager;
-import de.projectsc.core.EventManager;
 import de.projectsc.core.data.objects.Light;
-import de.projectsc.core.entities.Component;
 import de.projectsc.core.events.CreateNewLightEvent;
-import de.projectsc.core.modes.client.gui.components.EmittingLightComponent;
+import de.projectsc.core.interfaces.Component;
+import de.projectsc.core.manager.EntityManager;
+import de.projectsc.core.manager.EventManager;
 import de.projectsc.editor.ComponentView;
+import de.projectsc.modes.client.gui.components.EmittingLightComponent;
 
 /**
  * Editor view for the {@link EmittingLightComponent}.

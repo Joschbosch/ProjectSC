@@ -7,7 +7,7 @@ package de.projectsc.editor;
 
 import org.lwjgl.util.vector.Vector3f;
 
-import de.projectsc.core.modes.client.gui.objects.Camera;
+import de.projectsc.modes.client.gui.objects.Camera;
 
 /**
  * A camera object especially for the editor.

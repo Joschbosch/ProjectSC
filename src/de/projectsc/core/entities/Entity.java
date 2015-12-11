@@ -5,8 +5,11 @@
  */
 package de.projectsc.core.entities;
 
+import de.projectsc.core.data.Transform;
+
 /**
- * All game objects in the game are entities. All entities have components, that define their role and behavior.
+ * All game objects in the game are entities. All entities have components, that define their role
+ * and behavior.
  * 
  * @author Josch Bosch
  */
@@ -20,14 +23,14 @@ public class Entity {
 
     private String tag;
 
-    private TransformComponent transform;
+    private final Transform transform;
 
     public Entity() {
         entityUID = idCount++;
-        transform = new TransformComponent();
+        transform = new Transform();
     }
 
-    public TransformComponent getTransform() {
+    public Transform getTransform() {
         return transform;
     }
 

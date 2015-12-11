@@ -1,12 +1,12 @@
 /*
- * Copyright (C) 2015 
+ * Copyright (C) 2015
  */
 
 package de.projectsc.editor;
 
 import javax.swing.JDialog;
 
-import de.projectsc.core.entities.Component;
+import de.projectsc.core.interfaces.Component;
 
 /**
  * 
