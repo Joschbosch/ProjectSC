@@ -60,7 +60,9 @@ public class MeshRendererComponent extends GraphicalComponent {
         textureIndex = 0;
         requiredComponents.add(MeshComponent.NAME);
         try {
-            textureFile = new File(MeshRendererComponent.class.getResource(GUIConstants.BASIC_TEXTURE_WHITE).toURI());
+            textureFile =
+                new File(MeshRendererComponent.class.getResource(GUIConstants.TEXTURE_ROOT + GUIConstants.BASIC_TEXTURE_WHITE)
+                    .toURI());
         } catch (URISyntaxException e) {
             LOGGER.error("Could not load default texture file: ", e);
         }

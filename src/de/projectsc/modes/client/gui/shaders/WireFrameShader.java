@@ -7,6 +7,7 @@ package de.projectsc.modes.client.gui.shaders;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.lwjgl.util.vector.Matrix4f;
+import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.modes.client.gui.objects.Camera;
 
@@ -30,6 +31,8 @@ public class WireFrameShader extends Shader {
 
     private int locationTransformationMatrix;
 
+    private int locationColor;
+
     public WireFrameShader() {
         super(VERTEX_FILE, FRAGMENT_FILE);
         LOGGER.debug("WireFrame shader loaded.");
@@ -45,6 +48,7 @@ public class WireFrameShader extends Shader {
         locationTransformationMatrix = super.getUniformLocation("transformationMatrix");
         locationProjectionMatrix = super.getUniformLocation("projectionMatrix");
         locationViewMatrix = super.getUniformLocation("viewMatrix");
+        locationColor = super.getUniformLocation("color");
     }
 
     /**
@@ -70,5 +74,9 @@ public class WireFrameShader extends Shader {
      */
     public void loadTransformationMatrix(Matrix4f transformationMatrix) {
         super.loadMatrix(locationTransformationMatrix, transformationMatrix);
+    }
+
+    public void loadColor(Vector3f color) {
+        super.loadVector(locationColor, color);
     }
 }

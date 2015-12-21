@@ -6,7 +6,9 @@ package de.projectsc.core.component.impl;
 
 import de.projectsc.core.component.DefaultComponent;
 import de.projectsc.core.component.impl.behaviour.EntityStateComponent;
+import de.projectsc.core.component.impl.physic.ColliderComponent;
 import de.projectsc.core.component.impl.physic.MeshComponent;
+import de.projectsc.core.component.impl.physic.TransformComponent;
 import de.projectsc.core.component.impl.physic.VelocityComponent;
 
 /**
@@ -26,7 +28,15 @@ public enum ComponentListItem {
     /**
      * The mesh of a component (which might not be used only in the GUI).
      */
-    MESH_COMPONENT(MeshComponent.NAME, MeshComponent.class);
+    MESH_COMPONENT(MeshComponent.NAME, MeshComponent.class),
+    /**
+     * 
+     */
+    COLLIDER_COMPONENT(ColliderComponent.NAME, ColliderComponent.class),
+    /**
+     *
+     */
+    TRANSFORM_COMPONENT(TransformComponent.NAME, TransformComponent.class);
 
     private String name;
 

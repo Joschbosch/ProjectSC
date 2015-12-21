@@ -55,8 +55,6 @@ public class MasterRenderer {
 
     private final WireFrameRenderer collisionBoxRenderer;
 
-    private final ParticleRenderer particleRenderer;
-
     public MasterRenderer() {
         enableCulling();
         GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
@@ -69,7 +67,6 @@ public class MasterRenderer {
         terrainRenderer = new TerrainRenderer(terrainShader, projectionMatrix);
         billboardRenderer = new BillboardRenderer(projectionMatrix);
         skyboxRenderer = new SkyboxRenderer(projectionMatrix);
-        particleRenderer = new ParticleRenderer(projectionMatrix);
 
     }
 
@@ -98,7 +95,6 @@ public class MasterRenderer {
      */
     public void renderScene(GUIScene scene, Camera camera, long elapsedTime, Vector4f clipPlane) {
         billboardRenderer.setCamera(camera);
-        particleRenderer.setCamera(camera);
         render(scene, camera, elapsedTime, clipPlane);
     }
 
@@ -149,7 +145,6 @@ public class MasterRenderer {
             }
         }
         billboardRenderer.render(scene.getBillboards());
-        particleRenderer.render(scene.getParticles());
     }
 
     /**

@@ -1,163 +1,100 @@
-/*
- * Copyright (C) 2015
- */
-
 package de.projectsc.modes.client.gui.render;
 
-import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
-import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
-import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
-import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
-import org.lwjgl.opengl.GL31;
-import org.lwjgl.opengl.GL33;
 import org.lwjgl.util.vector.Matrix4f;
+import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.modes.client.gui.models.RawModel;
-import de.projectsc.modes.client.gui.objects.Camera;
-import de.projectsc.modes.client.gui.objects.particles.ParticleEmitter;
+import de.projectsc.modes.client.gui.objects.particles.Particle;
+import de.projectsc.modes.client.gui.objects.particles.ParticleTexture;
 import de.projectsc.modes.client.gui.shaders.ParticleShader;
 import de.projectsc.modes.client.gui.utils.Loader;
 
-/**
- * Renderer for particles.
- * 
- * @author Josch Bosch
- */
 public class ParticleRenderer {
 
-    private final ParticleShader shader;
+    private static final float[] VERTICES = {
+        -0.5f, 0.5f,
+        -0.5f, -0.5f,
+        0.5f, 0.5f,
+        0.5f, -0.5f };
 
-    private final RawModel quad;
+    private RawModel quad;
 
-    private final Matrix4f projectionMatrix;
-
-    private Camera camera;
-
-    private final FloatBuffer positionAndSizeBuffer;
-
-    private final int positionVBOId;
-
-    private final ByteBuffer colorBuffer;
-
-    private final int colorVBOId;
-
-    private FloatBuffer uvBuffer;
-
-    private int uvVBOId;
+    private ParticleShader shader;
 
     public ParticleRenderer(Matrix4f projectionMatrix) {
-        this.projectionMatrix = projectionMatrix;
-
+        quad = Loader.loadToVAO(VERTICES, 2);
         shader = new ParticleShader();
-        float[] vertices = {
-            -0.5f, -0.5f, 0,
-            0.5f, -0.5f, 0,
-            -0.5f, 0.5f, 0,
-            0.5f, 0.5f, 0 };
-        quad = Loader.loadToVAO(vertices, 3);
-
-        positionAndSizeBuffer = BufferUtils.createFloatBuffer(ParticleEmitter.MAX_PARTICLES_PER_SOURCE * 4);
-        positionVBOId = Loader.createStreamVBO(positionAndSizeBuffer);
-
-        colorBuffer = BufferUtils.createByteBuffer(ParticleEmitter.MAX_PARTICLES_PER_SOURCE * 4);
-        colorVBOId = Loader.createStreamVBO(colorBuffer);
-
-        uvBuffer = BufferUtils.createFloatBuffer(ParticleEmitter.MAX_PARTICLES_PER_SOURCE * 2);
-        uvVBOId = Loader.createStreamVBO(uvBuffer);
+        shader.start();
+        shader.loadProjectionMatrix(projectionMatrix);
+        shader.stop();
     }
 
-    /**
-     * Render all particles.
-     * 
-     * @param emitters list of emitters to render
-     */
-    public void render(List<ParticleEmitter> emitters) {
-        // GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_LINE);
-
-        GL11.glEnable(GL11.GL_BLEND);
-        GL11.glDisable(GL11.GL_DEPTH_TEST);
-        shader.start();
-        shader.loadPositionAttributes(camera.createViewMatrix(), projectionMatrix);
-        GL30.glBindVertexArray(quad.getVaoID());
-        GL20.glEnableVertexAttribArray(0);
-        GL20.glEnableVertexAttribArray(1);
-        GL20.glEnableVertexAttribArray(2);
-        GL20.glEnableVertexAttribArray(3);
-
-        Collections.sort(emitters);
-        for (ParticleEmitter emitter : emitters) {
-            updateBuffer(emitter);
-            if (emitter.isGlowy()) {
+    public void render(Map<ParticleTexture, List<Particle>> particles, Matrix4f viewMatrix) {
+        prepare();
+        for (ParticleTexture texture : particles.keySet()) {
+            GL13.glActiveTexture(GL13.GL_TEXTURE0);
+            GL11.glBindTexture(GL11.GL_TEXTURE_2D, texture.getTextureID());
+            if (texture.isAdditiveBlending()) {
                 GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
             } else {
                 GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
             }
-
-            GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, positionVBOId);
-            GL20.glVertexAttribPointer(1, 4, GL11.GL_FLOAT, false, 0, 0);
-
-            GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, colorVBOId);
-            GL20.glVertexAttribPointer(2, 4, GL11.GL_UNSIGNED_BYTE, true, 0, 0);
-
-            GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, uvVBOId);
-            GL20.glVertexAttribPointer(3, 2, GL11.GL_FLOAT, false, 0, 0);
-
-            GL33.glVertexAttribDivisor(0, 0);
-            GL33.glVertexAttribDivisor(1, 1);
-            GL33.glVertexAttribDivisor(2, 1);
-            GL33.glVertexAttribDivisor(3, 1);
-
-            GL13.glActiveTexture(GL13.GL_TEXTURE0);
-            GL11.glBindTexture(GL11.GL_TEXTURE_2D, emitter.getTextureAtlas());
-            shader.loadTexture(0);
-            shader.loaderNumberOfRows(emitter.getNumberOfRows());
-            GL31.glDrawArraysInstanced(GL11.GL_TRIANGLE_STRIP, 0, 4, emitter.getParticleCount());
+            for (Particle particle : particles.get(texture)) {
+                updateModelViewMatrix(particle.getPosition(), particle.getRotation(), particle.getScale(), viewMatrix);
+                shader.loadTextureCoordinates(particle.getTexOffset1(), particle.getTexOffset2(), texture.getNumberOfRows(),
+                    particle.getBlendFactor());
+                GL11.glDrawArrays(GL11.GL_TRIANGLE_STRIP, 0, quad.getVertexCount());
+            }
         }
-        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
-        GL20.glDisableVertexAttribArray(0);
-        GL20.glDisableVertexAttribArray(1);
-        GL20.glDisableVertexAttribArray(2);
-        GL20.glDisableVertexAttribArray(3);
-        GL30.glBindVertexArray(0);
+        finishRendering();
+    }
+
+    private void updateModelViewMatrix(Vector3f position, Vector3f rotation, Vector3f scale, Matrix4f viewMatrix) {
+        Matrix4f modelMatrix = new Matrix4f();
+        Matrix4f.translate(position, modelMatrix, modelMatrix);
+        modelMatrix.m00 = viewMatrix.m00;
+        modelMatrix.m01 = viewMatrix.m10;
+        modelMatrix.m02 = viewMatrix.m20;
+        modelMatrix.m10 = viewMatrix.m01;
+        modelMatrix.m11 = viewMatrix.m11;
+        modelMatrix.m12 = viewMatrix.m21;
+        modelMatrix.m20 = viewMatrix.m02;
+        modelMatrix.m21 = viewMatrix.m12;
+        modelMatrix.m22 = viewMatrix.m22;
+        Matrix4f.rotate((float) Math.toRadians(rotation.x), new Vector3f(1, 0, 0), modelMatrix, modelMatrix);
+        Matrix4f.rotate((float) Math.toRadians(rotation.y), new Vector3f(0, 1, 0), modelMatrix, modelMatrix);
+        Matrix4f.rotate((float) Math.toRadians(rotation.z), new Vector3f(0, 0, 1), modelMatrix, modelMatrix);
+        Matrix4f.scale(scale, modelMatrix, modelMatrix);
+        Matrix4f modelViewMatrix = Matrix4f.mul(viewMatrix, modelMatrix, null);
+        shader.loadModelViewMatrix(modelViewMatrix);
+    }
+
+    private void prepare() {
+        shader.start();
+        GL30.glBindVertexArray(quad.getVaoID());
+        GL20.glEnableVertexAttribArray(0);
+        GL11.glEnable(GL11.GL_BLEND);
+        GL11.glDepthMask(false);
+
+    }
+
+    public void dispose() {
+        shader.dispose();
+    }
+
+    private void finishRendering() {
+        GL11.glDepthMask(true);
         GL11.glDisable(GL11.GL_BLEND);
-        GL11.glEnable(GL11.GL_DEPTH_TEST);
+        GL20.glDisableVertexAttribArray(0);
+        GL30.glBindVertexArray(0);
         shader.stop();
     }
 
-    private void updateBuffer(ParticleEmitter p) {
-        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, positionVBOId);
-        positionAndSizeBuffer.clear();
-        positionAndSizeBuffer.put(p.getPositionBuffer());
-        positionAndSizeBuffer.flip();
-        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, positionAndSizeBuffer, GL15.GL_STREAM_DRAW);
-        GL15.glBufferSubData(GL15.GL_ARRAY_BUFFER, 0, positionAndSizeBuffer);
-        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
-
-        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, colorVBOId);
-        colorBuffer.clear();
-        colorBuffer.put(p.getColorBuffer());
-        colorBuffer.flip();
-        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, colorBuffer, GL15.GL_STREAM_DRAW);
-        GL15.glBufferSubData(GL15.GL_ARRAY_BUFFER, 0, colorBuffer);
-        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
-
-        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, uvVBOId);
-        uvBuffer.clear();
-        uvBuffer.put(p.getLifetimeBuffer());
-        uvBuffer.flip();
-        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, uvBuffer, GL15.GL_STREAM_DRAW);
-        GL15.glBufferSubData(GL15.GL_ARRAY_BUFFER, 0, uvBuffer);
-        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
-    }
-
-    public void setCamera(Camera camera) {
-        this.camera = camera;
-    }
 }

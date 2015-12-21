@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.lwjgl.util.vector.Vector2f;
 
+import de.projectsc.modes.client.gui.GUIConstants;
 import de.projectsc.modes.client.gui.data.UI;
 import de.projectsc.modes.client.gui.data.View;
 import de.projectsc.modes.client.gui.objects.text.Font;
@@ -53,7 +54,7 @@ public class ConsoleView extends View {
         console = (Console) element;
         this.font = FontStore.getFont(Font.CANDARA);
         this.position = new Vector2f(0, 0);
-        bg = new UITexture(Loader.loadTexture("black.png"), POSITION, SIZE);
+        bg = new UITexture(Loader.loadTexture(GUIConstants.BASIC_TEXTURE_BLACK), POSITION, SIZE);
     }
 
     @Override

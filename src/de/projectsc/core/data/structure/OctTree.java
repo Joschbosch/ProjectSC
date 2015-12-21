@@ -8,14 +8,17 @@ package de.projectsc.core.data.structure;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.TreeMap;
 
 import org.lwjgl.util.vector.Vector3f;
 
-import de.projectsc.core.data.physics.BoundingBox;
-import de.projectsc.core.data.physics.PhysicalObject;
+import de.projectsc.core.component.impl.physic.ColliderComponent;
+import de.projectsc.core.component.impl.physic.VelocityComponent;
+import de.projectsc.core.data.physics.AxisAlignedBoundingBox;
+import de.projectsc.core.data.physics.Transform;
+import de.projectsc.core.entities.Entity;
+import de.projectsc.core.manager.EntityManager;
 
 /**
  * Data structure for finding collisions of {@link PhysicalObject}s.
@@ -23,7 +26,7 @@ import de.projectsc.core.data.physics.PhysicalObject;
  * @param <T> extends {@link PhysicalObject}
  * @author Josch Bosch
  */
-public class OctTree<T extends PhysicalObject> {
+public class OctTree<T extends Entity> {
 
     private static final int MAXIMUM_LIFESPAN = 64;
 
@@ -43,7 +46,7 @@ public class OctTree<T extends PhysicalObject> {
 
     private boolean treeBuild = false;
 
-    private final BoundingBox region;
+    private final AxisAlignedBoundingBox region;
 
     private OctTree<T> parent;
 
@@ -56,13 +59,13 @@ public class OctTree<T extends PhysicalObject> {
     private byte activeNodes = 0;
 
     @SuppressWarnings("unchecked")
-    public OctTree(BoundingBox region) {
+    public OctTree(AxisAlignedBoundingBox region) {
         this.region = region;
         children = new OctTree[8];
     }
 
     @SuppressWarnings("unchecked")
-    private OctTree(BoundingBox region, List<T> entities) {
+    private OctTree(AxisAlignedBoundingBox region, List<T> entities) {
         this.region = region;
         this.entities = entities;
         children = new OctTree[8];
@@ -97,19 +100,19 @@ public class OctTree<T extends PhysicalObject> {
     }
 
     private void insert(T e) {
-        if (entities.size() <= 1 && activeNodes == 0) {
+        if (entities.size() < 1 && activeNodes == 0) {
             entities.add(e);
             return;
         }
-        Vector3f dimension = region.getSize();
-        if (dimension.x <= 1 && dimension.y <= 1 && dimension.z <= 1) {
-            entities.add(e);
-            return;
-        }
-        Vector3f half = new Vector3f(dimension.x / 2.0f, dimension.y / 2.0f, dimension.z / 2.0f);
-        Vector3f center = Vector3f.add(region.getMin(), half, null);
 
-        BoundingBox[] octant = new BoundingBox[8];
+        Vector3f dimension = region.getSize();
+        if (dimension.x <= 0.5 && dimension.y <= 0.5 && dimension.z <= 0.5) {
+            entities.add(e);
+            return;
+        }
+        Vector3f center = region.getCenter();
+
+        AxisAlignedBoundingBox[] octant = new AxisAlignedBoundingBox[8];
         createOctantWithChildren(center, octant);
         if (containsEntity(region, e)) {
             boolean foundChild = false;
@@ -135,28 +138,34 @@ public class OctTree<T extends PhysicalObject> {
         }
     }
 
-    private void createOctantWithChildren(Vector3f center, BoundingBox[] octant) {
-        octant[0] = children[0] != null ? children[0].region : new BoundingBox(region.getMin(), center);
-        octant[1] = children[1] != null ? children[1].region
-            : new BoundingBox(new Vector3f(center.x, region.getMin().y, region.getMin().z), new Vector3f(region.getMax().x, center.y,
-                center.z));
+    private void createOctantWithChildren(Vector3f center, AxisAlignedBoundingBox[] octant) {
+        octant[0] = children[0] != null ? children[0].region : new AxisAlignedBoundingBox(region.getMin(), center);
+        octant[1] =
+            children[1] != null ? children[1].region
+                : new AxisAlignedBoundingBox(new Vector3f(center.x, region.getMin().y, region.getMin().z), new Vector3f(region.getMax().x,
+                    center.y,
+                    center.z));
         octant[2] = children[2] != null ? children[2].region
-            : new BoundingBox(new Vector3f(center.x, region.getMin().y, center.z), new Vector3f(region.getMax().x, center.y,
+            : new AxisAlignedBoundingBox(new Vector3f(center.x, region.getMin().y, center.z), new Vector3f(region.getMax().x, center.y,
                 region.getMax().z));
         octant[3] = children[3] != null ? children[3].region
-            : new BoundingBox(new Vector3f(region.getMin().x, region.getMin().y, center.z), new Vector3f(center.x, center.y,
+            : new AxisAlignedBoundingBox(new Vector3f(region.getMin().x, region.getMin().y, center.z), new Vector3f(center.x, center.y,
                 region.getMax().z));
-        octant[4] = children[4] != null ? children[4].region
-            : new BoundingBox(new Vector3f(region.getMin().x, center.y, region.getMin().z), new Vector3f(center.x, region.getMax().y,
-                center.z));
+        octant[4] =
+            children[4] != null ? children[4].region
+                : new AxisAlignedBoundingBox(new Vector3f(region.getMin().x, center.y, region.getMin().z), new Vector3f(center.x,
+                    region.getMax().y,
+                    center.z));
         octant[5] =
-            children[5] != null ? children[5].region : new BoundingBox(new Vector3f(center.x, center.y, region.getMin().z), new Vector3f(
-                region.getMax().x, region.getMax().y,
-                center.z));
-        octant[6] = children[6] != null ? children[6].region : new BoundingBox(center, region.getMax());
+            children[5] != null ? children[5].region : new AxisAlignedBoundingBox(new Vector3f(center.x, center.y, region.getMin().z),
+                new Vector3f(
+                    region.getMax().x, region.getMax().y,
+                    center.z));
+        octant[6] = children[6] != null ? children[6].region : new AxisAlignedBoundingBox(center, region.getMax());
         octant[7] =
-            children[7] != null ? children[7].region : new BoundingBox(new Vector3f(region.getMin().x, center.y, center.z), new Vector3f(
-                center.x, region.getMax().y, region.getMax().z));
+            children[7] != null ? children[7].region : new AxisAlignedBoundingBox(new Vector3f(region.getMin().x, center.y, center.z),
+                new Vector3f(
+                    center.x, region.getMax().y, region.getMax().z));
     }
 
     private void buildTree() {
@@ -164,14 +173,14 @@ public class OctTree<T extends PhysicalObject> {
             return;
         }
         Vector3f dimension = region.getSize();
-        if (dimension.x <= 1 && dimension.y <= 1 && dimension.z <= 1) {
+        if (dimension.x <= 0.5f && dimension.y <= 0.5f && dimension.z <= 0.5) {
             return;
         }
+
         Vector3f half = new Vector3f(dimension.x / 2.0f, dimension.y / 2.0f, dimension.z / 2.0f);
         Vector3f center = Vector3f.add(region.getMin(), half, null);
-        BoundingBox[] octant = new BoundingBox[8];
+        AxisAlignedBoundingBox[] octant = new AxisAlignedBoundingBox[8];
         createOctant(center, octant);
-
         Map<Integer, List<T>> subEntities = new TreeMap<>();
         for (int i = 0; i < 8; i++) {
             subEntities.put(i, new LinkedList<>());
@@ -202,32 +211,37 @@ public class OctTree<T extends PhysicalObject> {
         treeBuild = true;
     }
 
-    private void createOctant(Vector3f center, BoundingBox[] octant) {
-        octant[0] = new BoundingBox(region.getMin(), center);
+    private void createOctant(Vector3f center, AxisAlignedBoundingBox[] octant) {
+        octant[0] = new AxisAlignedBoundingBox(region.getMin(), center);
         octant[1] =
-            new BoundingBox(new Vector3f(center.x, region.getMin().y, region.getMin().z), new Vector3f(region.getMax().x, center.y,
+            new AxisAlignedBoundingBox(new Vector3f(center.x, region.getMin().y, region.getMin().z), new Vector3f(region.getMax().x,
+                center.y,
                 center.z));
         octant[2] =
-            new BoundingBox(new Vector3f(center.x, region.getMin().y, center.z), new Vector3f(region.getMax().x, center.y,
+            new AxisAlignedBoundingBox(new Vector3f(center.x, region.getMin().y, center.z), new Vector3f(region.getMax().x, center.y,
                 region.getMax().z));
         octant[3] =
-            new BoundingBox(new Vector3f(region.getMin().x, region.getMin().y, center.z), new Vector3f(center.x, center.y,
+            new AxisAlignedBoundingBox(new Vector3f(region.getMin().x, region.getMin().y, center.z), new Vector3f(center.x, center.y,
                 region.getMax().z));
         octant[4] =
-            new BoundingBox(new Vector3f(region.getMin().x, center.y, region.getMin().z), new Vector3f(center.x, region.getMax().y,
+            new AxisAlignedBoundingBox(new Vector3f(region.getMin().x, center.y, region.getMin().z), new Vector3f(center.x,
+                region.getMax().y,
                 center.z));
         octant[5] =
-            new BoundingBox(new Vector3f(center.x, center.y, region.getMin().z), new Vector3f(region.getMax().x, region.getMax().y,
+            new AxisAlignedBoundingBox(new Vector3f(center.x, center.y, region.getMin().z), new Vector3f(region.getMax().x,
+                region.getMax().y,
                 center.z));
-        octant[6] = new BoundingBox(center, region.getMax());
+        octant[6] = new AxisAlignedBoundingBox(center, region.getMax());
         octant[7] =
-            new BoundingBox(new Vector3f(region.getMin().x, center.y, center.z), new Vector3f(center.x, region.getMax().y,
+            new AxisAlignedBoundingBox(new Vector3f(region.getMin().x, center.y, center.z), new Vector3f(center.x, region.getMax().y,
                 region.getMax().z));
     }
 
-    private boolean containsEntity(BoundingBox boundingBox, T e) {
-        Vector3f minBB = Vector3f.add(e.getPosition(), e.getBoundingBox().getMin(), null);
-        Vector3f maxBB = Vector3f.add(e.getPosition(), e.getBoundingBox().getMax(), null);
+    private boolean containsEntity(AxisAlignedBoundingBox boundingBox, T e) {
+        Transform t = e.getTransform();
+        AxisAlignedBoundingBox aabb = ((ColliderComponent) EntityManager.getComponent(e.getID(), ColliderComponent.class)).getAABB();
+        Vector3f minBB = Vector3f.add(t.getPosition(), aabb.getMin(), null);
+        Vector3f maxBB = Vector3f.add(t.getPosition(), aabb.getMax(), null);
         if (minBB.x <= boundingBox.getMax().x && minBB.x >= boundingBox.getMin().x
             && minBB.y <= boundingBox.getMax().y && minBB.y >= boundingBox.getMin().y
             && minBB.z <= boundingBox.getMax().z && minBB.z >= boundingBox.getMin().z
@@ -240,10 +254,15 @@ public class OctTree<T extends PhysicalObject> {
     }
 
     private boolean boundingBoxesColliding(T a, T b) {
-        Vector3f aMax = Vector3f.add(a.getPosition(), a.getBoundingBox().getMax(), null);
-        Vector3f aMin = Vector3f.add(a.getPosition(), a.getBoundingBox().getMin(), null);
-        Vector3f bMax = Vector3f.add(b.getPosition(), b.getBoundingBox().getMax(), null);
-        Vector3f bMin = Vector3f.add(b.getPosition(), b.getBoundingBox().getMin(), null);
+        Transform aT = a.getTransform();
+        Transform bT = b.getTransform();
+        AxisAlignedBoundingBox aabbA = ((ColliderComponent) EntityManager.getComponent(a.getID(), ColliderComponent.class)).getAABB();
+        AxisAlignedBoundingBox aabbB = ((ColliderComponent) EntityManager.getComponent(b.getID(), ColliderComponent.class)).getAABB();
+
+        Vector3f aMax = Vector3f.add(aT.getPosition(), aabbA.getMax(), null);
+        Vector3f aMin = Vector3f.add(aT.getPosition(), aabbA.getMin(), null);
+        Vector3f bMax = Vector3f.add(bT.getPosition(), aabbB.getMax(), null);
+        Vector3f bMin = Vector3f.add(bT.getPosition(), aabbB.getMin(), null);
         return (aMax.x > bMin.x
             && aMin.x < bMax.x
             && aMax.y > bMin.y
@@ -252,7 +271,7 @@ public class OctTree<T extends PhysicalObject> {
             && aMin.z < bMax.z);
     }
 
-    private OctTree<T> createNewNode(BoundingBox boundingBox, List<T> list) {
+    private OctTree<T> createNewNode(AxisAlignedBoundingBox boundingBox, List<T> list) {
         if (list.isEmpty()) {
             return null;
         }
@@ -263,7 +282,7 @@ public class OctTree<T extends PhysicalObject> {
 
     private boolean hasChildren() {
         for (int i = 0; i < 8; i++) {
-            if (children[i] != null) {
+            if (children[i] != null && children[i].entities.size() > 0) {
                 return true;
             }
         }
@@ -273,7 +292,7 @@ public class OctTree<T extends PhysicalObject> {
     /**
      * Update tree after moving the objects.
      */
-    public void update() {
+    public void update(List<T> moved) {
         // if (treeBuild) {
         if (entities.size() == 0) {
             if (!hasChildren()) {
@@ -292,32 +311,25 @@ public class OctTree<T extends PhysicalObject> {
             }
         }
 
-        List<T> movedObjects = new LinkedList<>();
-        for (T e : entities) {
-            if (e.isMovable() && e.hasMoved()) {
-                movedObjects.add(e);
-            }
-        }
-
         int listSize = entities.size();
         List<T> remove = new LinkedList<>();
         for (int i = 0; i < listSize; i++) {
             if (entities.get(i) == null) {
-                if (movedObjects.contains(entities.get(i))) {
-                    movedObjects.remove(entities.get(i));
+                if (moved.contains(entities.get(i))) {
+                    moved.remove(entities.get(i));
                 }
                 remove.add(entities.get(i));
             }
         }
         for (T e : remove) {
-            movedObjects.remove(e);
+            moved.remove(e);
         }
         for (int i = 0; i < 8; i++) {
             if (children[i] != null) {
-                children[i].update();
+                children[i].update(moved);
             }
         }
-        for (T e : movedObjects) {
+        for (T e : moved) {
             OctTree<T> current = this;
             while (!containsEntity(current.region, e)) {
                 if (current.parent != null) {
@@ -349,28 +361,37 @@ public class OctTree<T extends PhysicalObject> {
         List<T> intersectionIDs = new LinkedList<>();
         for (T parentEntity : parentEntities) {
             for (T entity : entities) {
-                if (parentEntity.getBoundingBox() != null
-                    && entity.getBoundingBox() != null && boundingBoxesColliding(parentEntity, entity)) {
-                    if (parentEntity.isMovable()) {
+                AxisAlignedBoundingBox parentAABB =
+                    ((ColliderComponent) EntityManager.getComponent(parentEntity.getID(), ColliderComponent.class)).getAABB();
+                AxisAlignedBoundingBox entityAABB =
+                    ((ColliderComponent) EntityManager.getComponent(entity.getID(), ColliderComponent.class)).getAABB();
+                if (parentAABB != null
+                    && entityAABB != null && boundingBoxesColliding(parentEntity, entity)) {
+                    if (EntityManager.hasComponent(parentEntity.getID(), VelocityComponent.class)) {
                         intersectionIDs.add(parentEntity);
                     }
-                    if (entity.isMovable()) {
+                    if (EntityManager.hasComponent(entity.getID(), VelocityComponent.class)) {
                         intersectionIDs.add(entity);
                     }
                 }
             }
         }
         if (entities.size() > 1) {
-            PriorityQueue<T> tmp = new PriorityQueue<>(entities);
+            Queue<T> tmp = new LinkedList<>(entities);
             while (!tmp.isEmpty()) {
                 T current = tmp.remove();
                 for (T e : entities) {
-                    if (e.isMovable() || current.isMovable()) {
-                        if (current.getBoundingBox() != null && (e.getBoundingBox() != null && boundingBoxesColliding(current, e))) {
-                            if (e.isMovable()) {
+                    if (EntityManager.hasComponent(e.getID(), VelocityComponent.class)
+                        || EntityManager.hasComponent(current.getID(), VelocityComponent.class)) {
+                        AxisAlignedBoundingBox entityAABB =
+                            ((ColliderComponent) EntityManager.getComponent(e.getID(), ColliderComponent.class)).getAABB();
+                        AxisAlignedBoundingBox currentAABB =
+                            ((ColliderComponent) EntityManager.getComponent(current.getID(), ColliderComponent.class)).getAABB();
+                        if (currentAABB != null && (entityAABB != null && boundingBoxesColliding(current, e))) {
+                            if (EntityManager.hasComponent(e.getID(), VelocityComponent.class)) {
                                 intersectionIDs.add(e);
                             }
-                            if (current.isMovable()) {
+                            if (EntityManager.hasComponent(current.getID(), VelocityComponent.class)) {
                                 intersectionIDs.add(current);
                             }
                         }
@@ -378,7 +399,7 @@ public class OctTree<T extends PhysicalObject> {
                 }
             }
             for (T e : entities) {
-                if (e.isMovable()) {
+                if (EntityManager.hasComponent(e.getID(), VelocityComponent.class)) {
                     parentEntities.add(e);
                 }
             }
@@ -395,8 +416,34 @@ public class OctTree<T extends PhysicalObject> {
         return entities;
     }
 
-    public BoundingBox getRegion() {
+    public AxisAlignedBoundingBox getRegion() {
         return region;
     }
 
+    public void removeEntity(Entity entity) {
+        entities.remove(entity);
+        buildTree();
+    }
+
+    @Override
+    public String toString() {
+        int count = entities.size();
+        for (int i = 0; i < 8; i++) {
+            if (children[i] != null) {
+                count += Integer.parseInt(children[i].toString());
+            }
+        }
+        return "" + count;
+    }
+
+    public List<AxisAlignedBoundingBox> getBoxes() {
+        List<AxisAlignedBoundingBox> boxes = new LinkedList<AxisAlignedBoundingBox>();
+        boxes.add(region);
+        for (int i = 0; i < 8; i++) {
+            if (children[i] != null) {
+                boxes.addAll(children[i].getBoxes());
+            }
+        }
+        return boxes;
+    }
 }

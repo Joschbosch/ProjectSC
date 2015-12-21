@@ -15,12 +15,11 @@ import de.projectsc.core.data.Scene;
 import de.projectsc.core.data.objects.Light;
 import de.projectsc.modes.client.gui.models.TexturedModel;
 import de.projectsc.modes.client.gui.objects.billboards.Billboard;
-import de.projectsc.modes.client.gui.objects.particles.ParticleEmitter;
 import de.projectsc.modes.client.gui.objects.terrain.TerrainModel;
 
 /**
- * The scene contains all elemets, that need to be rendered by the GUI. It will collect all
- * neccessary information from all entities and the world itself.
+ * The scene contains all elemets, that need to be rendered by the GUI. It will collect all neccessary information from all entities and the
+ * world itself.
  * 
  * @author Josch Bosch
  */
@@ -38,8 +37,6 @@ public class GUIScene extends Scene {
 
     private List<Light> lights;
 
-    private List<ParticleEmitter> particles;
-
     private List<Billboard> billboards;
 
     private boolean renderSkybox = true;
@@ -53,7 +50,6 @@ public class GUIScene extends Scene {
         terrains = new LinkedList<>();
         models = new HashMap<>();
         lights = new LinkedList<>();
-        particles = new LinkedList<>();
         billboards = new LinkedList<>();
         scales = new HashMap<>();
         rotations = new HashMap<>();
@@ -77,10 +73,6 @@ public class GUIScene extends Scene {
         return billboards;
     }
 
-    public List<ParticleEmitter> getParticles() {
-        return particles;
-    }
-
     public void setTerrains(List<TerrainModel> terrains) {
         this.terrains = terrains;
     }
@@ -91,10 +83,6 @@ public class GUIScene extends Scene {
 
     public void setLights(List<Light> lights) {
         this.lights = lights;
-    }
-
-    public void setParticles(List<ParticleEmitter> particles) {
-        this.particles = particles;
     }
 
     public void setBillboards(List<Billboard> billboards) {

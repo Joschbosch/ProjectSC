@@ -1,55 +1,25 @@
-#version 330 core
+#version 140
 
-layout(location = 0) in vec3 squareVertices;
-layout(location = 1) in vec4 xyzs; 
-layout(location = 2) in vec4 color; 
-layout(location = 3) in vec2 uvCoords; 
+in vec2 position;
 
-out vec2 UV;
-out vec4 particlecolor;
+out vec2 textureCoords1;
+out vec2 textureCoords2;
+out float blend;
 
-uniform vec3 cameraRightWorldspace;
-uniform vec3 cameraUpWorldspace;
-uniform mat4 modelViewProjectionMatrix; 
-uniform float numberOfRows;
-void main()
-{
-	float particleSize = xyzs.w; // because we encoded it this way.
-	vec3 particleCenter_wordspace = xyzs.xyz;
-	
-	vec3 vertexPosition_worldspace = 
-		particleCenter_wordspace
-		+ cameraRightWorldspace * squareVertices.x * particleSize
-		+ cameraUpWorldspace * squareVertices.y *particleSize;
+uniform mat4 projectionMatrix;
+uniform mat4 modelViewMatrix;
 
-	// Output position of the vertex
-	gl_Position = modelViewProjectionMatrix * vec4(vertexPosition_worldspace, 1.0f);
-	
-	float stages = pow(numberOfRows, 2);
-    float timePerStage = (uvCoords.x / stages);
-    float index = stages - floor(uvCoords.y/ timePerStage);
-    float column = mod(index, numberOfRows);
-    float xCoord0 = column / numberOfRows;
-    float row =  floor(index / numberOfRows);
-    float yCoord0 = row / numberOfRows;
-    float size = 1.0 / numberOfRows;
-	
-	if (squareVertices.x == -0.5f && squareVertices.y == -0.5f){
-		UV.x = xCoord0;
-		UV.y = yCoord0 + size;
-	}
-	if (squareVertices.x == 0.5f && squareVertices.y == -0.5f) {
-		UV.x = xCoord0 + size;
-		UV.y = yCoord0 + size;
-	}
-	if (squareVertices.x == -0.5f && squareVertices.y == 0.5f) {
-		UV.x = xCoord0;
-		UV.y = yCoord0;
-	}
-	if (squareVertices.x == 0.5f && squareVertices.y == 0.5f) {
-		UV.x = xCoord0 + size;
-		UV.y = yCoord0;
-	}
-	particlecolor  = color;		
-	
+uniform vec2 texOffset1;
+uniform vec2 texOffset2;
+uniform vec2 texCoordInfo;
+
+void main(void){
+	vec2 textureCoords = position + vec2(0.5, 0.5);
+	textureCoords.y = 1.0 - textureCoords.y;
+	textureCoords /= texCoordInfo.x;
+	textureCoords1 = textureCoords + texOffset1;
+	textureCoords2 = textureCoords + texOffset2;
+	blend = texCoordInfo.y;
+	gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 0.0, 1.0);
+
 }

@@ -4,15 +4,27 @@
 
 package de.projectsc.core.systems.physics;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.core.component.impl.behaviour.EntityStateComponent;
+import de.projectsc.core.component.impl.physic.ColliderComponent;
 import de.projectsc.core.component.impl.physic.MeshComponent;
+import de.projectsc.core.component.impl.physic.PhysicsComponent;
 import de.projectsc.core.component.impl.physic.TransformComponent;
 import de.projectsc.core.component.impl.physic.VelocityComponent;
 import de.projectsc.core.data.Event;
+import de.projectsc.core.data.Scene;
+import de.projectsc.core.data.physics.AxisAlignedBoundingBox;
 import de.projectsc.core.data.physics.Transform;
+import de.projectsc.core.data.physics.WireFrame;
+import de.projectsc.core.data.structure.OctTree;
+import de.projectsc.core.entities.Entity;
 import de.projectsc.core.entities.states.EntityState;
+import de.projectsc.core.events.components.ComponentAddedEvent;
+import de.projectsc.core.events.components.ComponentRemovedEvent;
 import de.projectsc.core.events.entities.ChangeEntityStateEvent;
 import de.projectsc.core.events.entities.NewEntityCreatedEvent;
 import de.projectsc.core.events.movement.ChangeMovementParameterEvent;
@@ -21,6 +33,7 @@ import de.projectsc.core.events.movement.ChangeRotationEvent;
 import de.projectsc.core.events.movement.ChangeScaleEvent;
 import de.projectsc.core.events.movement.NewPositionEvent;
 import de.projectsc.core.events.objects.NewMeshEvent;
+import de.projectsc.core.interfaces.Component;
 import de.projectsc.core.manager.EntityManager;
 import de.projectsc.core.manager.EventManager;
 import de.projectsc.core.systems.DefaultSystem;
@@ -34,6 +47,8 @@ public class PhysicsSystem extends DefaultSystem {
 
     private static final String NAME = "Physics System";
 
+    private OctTree<Entity> octree;
+
     public PhysicsSystem() {
         super(PhysicsSystem.NAME);
         EventManager.registerForEvent(NewEntityCreatedEvent.class, this);
@@ -43,22 +58,34 @@ public class PhysicsSystem extends DefaultSystem {
         EventManager.registerForEvent(ChangeMovementParameterEvent.class, this);
         EventManager.registerForEvent(ChangeScaleEvent.class, this);
         EventManager.registerForEvent(NewMeshEvent.class, this);
+        EventManager.registerForEvent(ComponentAddedEvent.class, this);
+        EventManager.registerForEvent(ComponentRemovedEvent.class, this);
+
+        octree = new OctTree<Entity>(new AxisAlignedBoundingBox(new Vector3f(-500, -500, -500), new Vector3f(500, 500, 500)));
 
     }
 
     @Override
     public void update(long tick) {
+        List<Entity> movedEntities = new LinkedList<>();
         for (long entity : EntityManager.getAllEntites()) {
+            for (Component c : EntityManager.getAllComponents(entity).values()) {
+                if (c instanceof PhysicsComponent) {
+                    ((PhysicsComponent) c).update(entity);
+                }
+            }
             if (EntityManager.hasComponent(entity, EntityStateComponent.class)) {
                 EntityState entityState = getComponent(entity, EntityStateComponent.class).getState();
                 if (entityState == EntityState.MOVING) {
                     if (EntityManager.hasComponent(entity, VelocityComponent.class)) {
                         VelocityComponent velocityComp = getComponent(entity, VelocityComponent.class);
-                        TransformComponent transform = (TransformComponent) EntityManager.getComponent(entity, TransformComponent.class);
-                        velocityComp.updateVelocity(transform.getRotation());
+                        TransformComponent transformComp =
+                            (TransformComponent) EntityManager.getComponent(entity, TransformComponent.class);
+                        velocityComp.updateVelocity(transformComp.getRotation());
                         Vector3f velocity = velocityComp.getVelocity();
                         Vector3f rotationDelta = velocityComp.getRotationDelta();
-                        transform.updatePosition(entity, velocity, rotationDelta);
+                        transformComp.updatePosition(entity, velocity, rotationDelta);
+                        movedEntities.add(EntityManager.getEntity(entity));
                     }
                 } else if (entityState == EntityState.STANDING) {
                     if (EntityManager.hasComponent(entity, VelocityComponent.class)) {
@@ -68,6 +95,7 @@ public class PhysicsSystem extends DefaultSystem {
                 }
             }
         }
+        octree.update(movedEntities);
     }
 
     @Override
@@ -85,6 +113,19 @@ public class PhysicsSystem extends DefaultSystem {
             handleChangeEntityStateEvent((ChangeEntityStateEvent) e);
         } else if (e instanceof NewEntityCreatedEvent) {
             EntityManager.addComponentToEntity(e.getEntityId(), EntityStateComponent.NAME);
+        } else if (e instanceof ComponentAddedEvent) {
+            Component c = ((ComponentAddedEvent) e).getComponent();
+            if (c instanceof ColliderComponent) {
+                ((ColliderComponent) c).update(e.getEntityId());
+                octree.addEntity(EntityManager.getEntity(e.getEntityId()));
+                octree.recalculateTree();
+            }
+        } else if (e instanceof ComponentRemovedEvent) {
+            Component c = ((ComponentRemovedEvent) e).getComponent();
+            if (c instanceof ColliderComponent) {
+                octree.removeEntity(EntityManager.getEntity(e.getEntityId()));
+                octree.recalculateTree();
+            }
         } else if (e instanceof NewMeshEvent) {
             ((MeshComponent) EntityManager.getComponent(e.getEntityId(), MeshComponent.class)).changeMesh(((NewMeshEvent) e)
                 .getNewMeshFile());
@@ -144,6 +185,33 @@ public class PhysicsSystem extends DefaultSystem {
             }
         }
         fireEvent(new NewPositionEvent(e.getEntityId(), transform.getPosition(), transform.getRotation(), transform.getScale()));
+    }
+
+    public void debug(Scene s) {
+        List<AxisAlignedBoundingBox> boxes = octree.getBoxes();
+        for (AxisAlignedBoundingBox box : boxes) {
+            Vector3f size = new Vector3f(box.getSize());
+            size.scale(0.5f);
+            Vector3f position = new Vector3f(box.getCenter());
+            position.y = position.y - size.y;
+            WireFrame wf = new WireFrame(WireFrame.CUBE, position, new Vector3f(), box.getSize());
+            wf.setColor(new Vector3f(0.0f, 1f, 0));
+            s.getWireFrames().add(wf);
+        }
+
+        for (long entity : EntityManager.getAllEntites()) {
+            for (Component c : EntityManager.getAllComponents(entity).values()) {
+                if (c instanceof ColliderComponent) {
+                    AxisAlignedBoundingBox box = ((ColliderComponent) c).getAABB();
+                    WireFrame wf =
+                        new WireFrame(WireFrame.CUBE, EntityManager.getEntity(entity).getTransform().getPosition(), new Vector3f(),
+                            box.getSize());
+                    wf.setColor(new Vector3f(1.0f, 0, 0));
+                    s.getWireFrames().add(wf);
+                }
+            }
+        }
+
     }
 
 }

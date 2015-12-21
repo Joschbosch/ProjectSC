@@ -28,6 +28,7 @@ import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
 import de.projectsc.core.CoreConstants;
+import de.projectsc.core.component.impl.physic.ColliderComponent;
 import de.projectsc.core.component.impl.physic.TransformComponent;
 import de.projectsc.core.data.objects.Light;
 import de.projectsc.core.data.physics.Transform;
@@ -52,9 +53,13 @@ import de.projectsc.modes.client.gui.components.MeshRendererComponent;
 import de.projectsc.modes.client.gui.data.GUIScene;
 import de.projectsc.modes.client.gui.events.ChangeMeshRendererParameterEvent;
 import de.projectsc.modes.client.gui.events.NewTextureEvent;
+import de.projectsc.modes.client.gui.objects.particles.ParticleMaster;
+import de.projectsc.modes.client.gui.objects.particles.ParticleSystem;
+import de.projectsc.modes.client.gui.objects.particles.ParticleTexture;
 import de.projectsc.modes.client.gui.objects.terrain.TerrainModel;
 import de.projectsc.modes.client.gui.objects.text.TextMaster;
 import de.projectsc.modes.client.gui.render.MasterRenderer;
+import de.projectsc.modes.client.gui.utils.Loader;
 import de.projectsc.modes.client.gui.utils.MousePicker;
 
 /**
@@ -125,6 +130,7 @@ public class EditorGraphicsCore implements Runnable {
         physicsSystem = new PhysicsSystem();
         createNewEntity();
         masterRenderer = new MasterRenderer();
+        ParticleMaster.init(masterRenderer.getProjectionMatrix());
         createSun();
         createTerrain();
         gameLoop();
@@ -139,10 +145,18 @@ public class EditorGraphicsCore implements Runnable {
     protected void gameLoop() {
         Timer.init();
         int timer = 1500;
+        ParticleTexture texture = new ParticleTexture(Loader.loadTexture("particles/smoke.png"), 4);
+        ParticleSystem pps = new ParticleSystem(new Vector3f(0, 20, 0), 500, 1, -0.1f, 2, 1, true, texture);
+        pps.randomizeRotation();
+        pps.setDirection(new Vector3f(0, 1, 0), 0.1f);
+        pps.setLifeError(0.1f);
+        pps.setSpeedError(0.4f);
+        pps.setScaleError(0.8f);
         while (running) {
             Timer.update();
             readMessages();
             camera.move(Timer.getDelta());
+            ParticleMaster.update(camera.getPosition());
             if (editorData.isLightAtCameraPostion()) {
                 if (!EntityManager.getEntity(entity).getTransform().getPosition().equals(
                     camera.getPosition())) {
@@ -155,9 +169,12 @@ public class EditorGraphicsCore implements Runnable {
             mousePicker.update(getTerrains(), camera.getPosition(), camera.createViewMatrix());
             if (doRender.get()) {
                 GUIScene s = renderSystem.createScene();
+                physicsSystem.debug(s);
                 s.setTerrains(terrainModels);
                 s.setRenderSkybox(renderSkybox);
                 masterRenderer.renderScene(s, camera, Timer.getDelta(), new Vector4f(0, 100000000, 0, 100000000));
+                ParticleMaster.render(camera.createViewMatrix());
+
             }
             Display.sync(60);
             Display.update();
@@ -183,6 +200,7 @@ public class EditorGraphicsCore implements Runnable {
         Transform position = EntityManager.getEntity(sun).getTransform();
         Light light = new Light(new Vector3f(position.getPosition()), new Vector3f(1.0f, 1.0f, 1.0f), "sun");
         lightComponent.addLight(sun, new Vector3f(position.getPosition()), light);
+        EntityManager.addComponentToEntity(sun, ColliderComponent.NAME);
     }
 
     private void createTerrain() {
@@ -266,7 +284,7 @@ public class EditorGraphicsCore implements Runnable {
         try {
             EventManager.fireEvent(new NewMeshEvent(entity, editorData.getModelFile()));
             EventManager.fireEvent(new NewTextureEvent(entity,
-                new File(EditorGraphicsCore.class.getResource(GUIConstants.BASIC_TEXTURE_WHITE).toURI())));
+                new File(EditorGraphicsCore.class.getResource(GUIConstants.TEXTURE_ROOT + GUIConstants.BASIC_TEXTURE_WHITE).toURI())));
         } catch (URISyntaxException e) {
             LOGGER.error(e);
         }

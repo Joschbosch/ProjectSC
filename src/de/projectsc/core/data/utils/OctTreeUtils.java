@@ -9,8 +9,8 @@ import java.awt.Graphics;
 
 import org.lwjgl.util.vector.Vector3f;
 
-import de.projectsc.core.data.physics.PhysicalObject;
 import de.projectsc.core.data.structure.OctTree;
+import de.projectsc.core.entities.Entity;
 
 /**
  * Some fine methods for OctTrees.
@@ -33,29 +33,29 @@ public final class OctTreeUtils {
      */
     public static void drawImage(Graphics treeG, OctTree<?> tree) {
         int i = 0;
-        drawLevel(i, treeG, tree);
+        // drawLevel(i, treeG, tree);
 
     }
 
-    private static void drawLevel(int i, Graphics treeG, OctTree<?> octTree) {
+    private static void drawLevel(int i, Graphics treeG, OctTree<Entity> octTree) {
         Vector3f min = octTree.getRegion().getMin();
         Vector3f size = octTree.getRegion().getSize();
         treeG.setColor(COLOR_LEVEL[i % COLOR_LEVEL.length]);
         if (i < 10) {
             treeG.drawRect((int) min.x, (int) min.z, (int) size.x, (int) size.z);
-            for (PhysicalObject e : octTree.entities) {
-
-                Vector3f minBB = Vector3f.add(e.getPosition(), e.getBoundingBox().getMin(), null);
-                Vector3f centerBB = Vector3f.add(e.getPosition(), e.getBoundingBox().getCenter(), null);
-
-                Vector3f sizeBB = e.getBoundingBox().getSize();
-                treeG.setColor(COLOR_LEVEL[i % COLOR_LEVEL.length]);
-                treeG.fillRect((int) minBB.x, (int) minBB.z, (int) sizeBB.x, (int) sizeBB.z);
-                treeG.setColor(Color.WHITE);
-                treeG.drawOval((int) (centerBB.x - 2), (int) (centerBB.z - 2) - 3, 4, 4);
-                if (octTree.getIntersectionList().contains(e)) {
-                    treeG.drawRect((int) minBB.x, (int) minBB.z, (int) sizeBB.x, (int) sizeBB.z);
-                }
+            for (Entity e : octTree.entities) {
+                //
+                // Vector3f minBB = Vector3f.add(e.getPosition(), e.getBoundingBox().getMin(), null);
+                // Vector3f centerBB = Vector3f.add(e.getPosition(), e.getBoundingBox().getCenter(), null);
+                //
+                // Vector3f sizeBB = e.getBoundingBox().getSize();
+                // treeG.setColor(COLOR_LEVEL[i % COLOR_LEVEL.length]);
+                // treeG.fillRect((int) minBB.x, (int) minBB.z, (int) sizeBB.x, (int) sizeBB.z);
+                // treeG.setColor(Color.WHITE);
+                // treeG.drawOval((int) (centerBB.x - 2), (int) (centerBB.z - 2) - 3, 4, 4);
+                // if (octTree.getIntersectionList().contains(e)) {
+                // treeG.drawRect((int) minBB.x, (int) minBB.z, (int) sizeBB.x, (int) sizeBB.z);
+                // }
 
             }
         }

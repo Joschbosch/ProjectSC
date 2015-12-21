@@ -1,83 +1,54 @@
-/*
- * Project SC - 2015
- * 
- * 
- */
-
 package de.projectsc.modes.client.gui.shaders;
 
 import org.lwjgl.util.vector.Matrix4f;
-import org.lwjgl.util.vector.Vector3f;
+import org.lwjgl.util.vector.Vector2f;
 
-/**
- * Shader for Particle effects.
- * 
- * @author Josch Bosch
- */
 public class ParticleShader extends Shader {
 
     private static final String VERTEX_FILE = "particleShader.vert";
 
     private static final String FRAGMENT_FILE = "particleShader.frag";
 
-    private int locationCameraRightWorldspace;
+    private int locationModelViewMatrix;
 
-    private int locationCameraUpWorldspace;
+    private int locationProjectionMatrix;
 
-    private int locationModelViewProjectionMatrix;
+    private int locationTexOffset1;
 
-    private int locationTexture;
+    private int locationTexOffset2;
 
-    private int locationNumberOfRows;
+    private int locationTexCoordInfo;
 
     public ParticleShader() {
         super(VERTEX_FILE, FRAGMENT_FILE);
     }
 
-    /**
-     * Loads the transformation matrix to the shader.
-     * 
-     * @param matrix transformation matrix
-     * @param proMatrix projection matrix
-     */
-    public void loadPositionAttributes(Matrix4f matrix, Matrix4f proMatrix) {
-        super.loadVector(locationCameraRightWorldspace, new Vector3f(matrix.m00, matrix.m10, matrix.m20));
-        super.loadVector(locationCameraUpWorldspace, new Vector3f(matrix.m01, matrix.m11, matrix.m21));
-        super.loadMatrix(locationModelViewProjectionMatrix, Matrix4f.mul(proMatrix, matrix, null));
-    }
-
-    /**
-     * Load up texture for particles.
-     * 
-     * @param textureID to load
-     */
-    public void loadTexture(int textureID) {
-        super.loadInt(locationTexture, textureID);
-    }
-
     @Override
     protected void getAllUniformLocations() {
-        locationCameraRightWorldspace = super.getUniformLocation("cameraRightWorldspace");
-        locationCameraUpWorldspace = super.getUniformLocation("cameraUpWorldspace");
-        locationModelViewProjectionMatrix = super.getUniformLocation("modelViewProjectionMatrix");
-        locationTexture = super.getUniformLocation("myTextureSampler");
-        locationNumberOfRows = super.getUniformLocation("numberOfRows");
-
+        locationModelViewMatrix = super.getUniformLocation("modelViewMatrix");
+        locationProjectionMatrix = super.getUniformLocation("projectionMatrix");
+        locationTexOffset1 = super.getUniformLocation("texOffset1");
+        locationTexOffset2 = super.getUniformLocation("texOffset2");
+        locationTexCoordInfo = super.getUniformLocation("texCoordInfo");
     }
 
     @Override
     protected void bindAttributes() {
-        super.bindAttribute(0, "squareVertices;");
-        super.bindAttribute(1, "xyzs");
-        super.bindAttribute(2, "color");
-        super.bindAttribute(3, "uvCoords");
+        super.bindAttribute(0, "position");
     }
 
-    /**
-     * @param numberOfRows in the texture file
-     */
-    public void loaderNumberOfRows(float numberOfRows) {
-        super.loadFloat(locationNumberOfRows, numberOfRows);
+    public void loadTextureCoordinates(Vector2f offset1, Vector2f offset2, float numberOfRows, float blendFactor) {
+        super.loadVector(locationTexOffset1, offset1);
+        super.loadVector(locationTexOffset2, offset2);
+        super.loadVector(locationTexCoordInfo, new Vector2f(numberOfRows, blendFactor));
+    }
+
+    public void loadModelViewMatrix(Matrix4f modelView) {
+        super.loadMatrix(locationModelViewMatrix, modelView);
+    }
+
+    public void loadProjectionMatrix(Matrix4f projectionMatrix) {
+        super.loadMatrix(locationProjectionMatrix, projectionMatrix);
     }
 
 }

@@ -1,11 +1,10 @@
-/*
- * Copyright (C) 2015
- */
-
 package de.projectsc.modes.client.gui.objects.particles;
 
+import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
-import org.lwjgl.util.vector.Vector4f;
+
+import de.projectsc.core.data.utils.Timer;
+import de.projectsc.modes.client.gui.GUIConstants;
 
 /**
  * One particle.
@@ -16,132 +15,111 @@ public class Particle implements Comparable<Particle> {
 
     private Vector3f position;
 
-    private float size;
+    private Vector3f velocity;
 
-    private Vector3f direction;
+    private Vector3f rotation;
 
-    private final Vector4f color;
+    private Vector3f scale;
 
-    private float angle;
+    private float gravityEffect;
 
-    private float weight;
+    private float lifeLength;
 
-    private float lifetime;
+    private float elapsedTime = 0;
 
-    private float cameradistance;
+    private ParticleTexture texture;
 
-    private float startLifeTime;
+    private Vector2f texOffset1 = new Vector2f();
 
-    public Particle() {
-        position = new Vector3f(0, 0, 0);
-        color = new Vector4f(0, 0, 0, 0);
+    private Vector2f texOffset2 = new Vector2f();
+
+    private float blendFactor = 0;
+
+    private float distance;
+
+    public Particle(ParticleTexture texture, Vector3f position, Vector3f velocity, Vector3f rotation, Vector3f scale, float gravityEffect,
+        float lifeLength) {
+        this.texture = texture;
+        this.position = position;
+        this.velocity = velocity;
+        this.gravityEffect = gravityEffect;
+        this.lifeLength = lifeLength;
+        this.rotation = rotation;
+        this.scale = scale;
+        ParticleMaster.addParticle(this);
+    }
+
+    public boolean update(Vector3f camPosition) {
+        float delta = Timer.getDelta() / 1000.0f;
+        velocity.y += GUIConstants.GRAVITY.y * gravityEffect * delta;
+        Vector3f change = new Vector3f(velocity);
+        change.scale(delta);
+        Vector3f.add(change, position, position);
+        distance = Vector3f.sub(camPosition, position, null).lengthSquared();
+        updateTextureCoordInfo();
+        elapsedTime += delta;
+        return elapsedTime < lifeLength;
     }
 
     @Override
     public int compareTo(Particle arg0) {
-        float dist = (this.cameradistance - arg0.getCameradistance());
+        float dist = (this.distance - arg0.getDistance());
         if (dist > 0 && dist <= 1) {
             return -1;
         } else if (dist < 0 && dist >= -1) {
             return 1;
         } else {
-            return (int) -(this.cameradistance - arg0.getCameradistance());
+            return (int) -(this.distance - arg0.getDistance());
         }
+    }
+
+    private void updateTextureCoordInfo() {
+        float lifeFactor = elapsedTime / lifeLength;
+        int stageCount = texture.getNumberOfRows() * texture.getNumberOfRows();
+        float atlasPrograssion = lifeFactor * stageCount;
+        int index1 = (int) Math.floor(atlasPrograssion);
+        int index2 = index1 < stageCount - 1 ? index1 + 1 : index1;
+        this.blendFactor = atlasPrograssion % 1;
+        setTextureOffset(texOffset1, index1);
+        setTextureOffset(texOffset2, index2);
+    }
+
+    private void setTextureOffset(Vector2f offset, int index) {
+        int column = index % texture.getNumberOfRows();
+        int row = index / texture.getNumberOfRows();
+        offset.x = (float) column / texture.getNumberOfRows();
+        offset.y = (float) row / texture.getNumberOfRows();
     }
 
     public Vector3f getPosition() {
         return position;
     }
 
-    /**
-     * @param position new position
-     */
-    public void setPosition(Vector3f position) {
-        if (this.position == null) {
-            this.position = new Vector3f(0, 0, 0);
-        }
-        this.position.x = position.x;
-        this.position.y = position.y;
-        this.position.z = position.z;
+    public Vector3f getRotation() {
+        return rotation;
     }
 
-    public Vector3f getDirection() {
-        return direction;
+    public Vector3f getScale() {
+        return scale;
     }
 
-    /**
-     * @param speed to set.
-     */
-    public void setDirection(Vector3f speed) {
-        if (this.direction != null) {
-            this.direction.x = speed.x;
-            this.direction.y = speed.y;
-            this.direction.z = speed.z;
-        } else {
-            this.direction = speed;
-        }
+    public ParticleTexture getTexture() {
+        return texture;
     }
 
-    public Vector4f getColor() {
-        return color;
+    public Vector2f getTexOffset1() {
+        return texOffset1;
     }
 
-    /**
-     * 
-     * @param color new color
-     */
-    public void setColor(Vector4f color) {
-        this.color.x = color.x;
-        this.color.y = color.y;
-        this.color.z = color.z;
-        this.color.w = color.w;
+    public Vector2f getTexOffset2() {
+        return texOffset2;
     }
 
-    public float getSize() {
-        return size;
+    public float getBlendFactor() {
+        return blendFactor;
     }
 
-    public void setSize(float size) {
-        this.size = size;
-    }
-
-    public float getAngle() {
-        return angle;
-    }
-
-    public void setAngle(float angle) {
-        this.angle = angle;
-    }
-
-    public float getWeight() {
-        return weight;
-    }
-
-    public void setWeight(float weight) {
-        this.weight = weight;
-    }
-
-    public float getLifetime() {
-        return lifetime;
-    }
-
-    public void setLifetime(float lifetime) {
-        this.lifetime = lifetime;
-    }
-
-    public float getCameradistance() {
-        return cameradistance;
-    }
-
-    public void setCameradistance(float cameradistance) {
-        this.cameradistance = cameradistance;
-    }
-
-    public float getStartLifeTime() {
-        return startLifeTime;
-    }
-
-    public void setStartLifeTime(float startLifeTime) {
-        this.startLifeTime = startLifeTime;
+    public float getDistance() {
+        return distance;
     }
 }

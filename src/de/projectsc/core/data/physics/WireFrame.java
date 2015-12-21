@@ -21,6 +21,11 @@ public class WireFrame {
     /**
      * Wireframe type.
      */
+    public static final String CUBE = "Cube";
+
+    /**
+     * Wireframe type.
+     */
     public static final String MESH = "Mesh";
 
     private String modelType = "";
@@ -30,6 +35,10 @@ public class WireFrame {
     private final Vector3f rotation;
 
     private final Vector3f scale;
+
+    private final float lineWidth = 2;
+
+    private Vector3f color = new Vector3f(0, 0, 1);
 
     public WireFrame(String type, Vector3f position, Vector3f rotation, Vector3f scale) {
         this.modelType = type;
@@ -52,5 +61,17 @@ public class WireFrame {
 
     public Vector3f getScale() {
         return scale;
+    }
+
+    public float getLineWidth() {
+        return lineWidth;
+    }
+
+    public Vector3f getColor() {
+        return color;
+    }
+
+    public void setColor(Vector3f color) {
+        this.color = color;
     }
 }

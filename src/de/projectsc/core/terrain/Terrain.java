@@ -13,7 +13,7 @@ import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.core.data.graph.GraphEdge;
-import de.projectsc.core.data.physics.BoundingBox;
+import de.projectsc.core.data.physics.AxisAlignedBoundingBox;
 import de.projectsc.core.data.physics.Tile;
 import de.projectsc.core.utils.Maths;
 
@@ -47,7 +47,7 @@ public class Terrain {
 
     private final Tile[][] tiles;
 
-    private BoundingBox mapBox;
+    private AxisAlignedBoundingBox mapBox;
 
     private float worldPositionXMax;
 
@@ -88,11 +88,11 @@ public class Terrain {
         this.bTexture = bTexture;
     }
 
-    private BoundingBox calculateMapBox() {
+    private AxisAlignedBoundingBox calculateMapBox() {
         Vector3f minimum = new Vector3f(0, 0, 0);
         Vector3f maximum =
             new Vector3f(mapSize * Terrain.TERRAIN_TILE_SIZE, mapSize * Terrain.TERRAIN_TILE_SIZE, mapSize * Terrain.TERRAIN_TILE_SIZE);
-        return new BoundingBox(minimum, maximum);
+        return new AxisAlignedBoundingBox(minimum, maximum);
     }
 
     /**
@@ -268,11 +268,11 @@ public class Terrain {
         return tiles;
     }
 
-    public BoundingBox getMapBoundingBox() {
+    public AxisAlignedBoundingBox getMapBoundingBox() {
         return mapBox;
     }
 
-    public void setMapBox(BoundingBox mapBox) {
+    public void setMapBox(AxisAlignedBoundingBox mapBox) {
         this.mapBox = mapBox;
     }
 

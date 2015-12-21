@@ -12,13 +12,16 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import de.projectsc.core.component.impl.physic.TransformComponent;
 import de.projectsc.core.entities.Entity;
+import de.projectsc.core.events.components.ComponentAddedEvent;
+import de.projectsc.core.events.components.ComponentRemovedEvent;
 import de.projectsc.core.events.entities.NewEntityCreatedEvent;
 import de.projectsc.core.interfaces.Component;
 
 /**
- * This is the core class for using {@link Entity}(ies). All entities are created by this class and
- * are stored here. Also, all components that the entities have are in this class.
+ * This is the core class for using {@link Entity}(ies). All entities are created by this class and are stored here. Also, all components
+ * that the entities have are in this class.
  * 
  * @author Josch Bosch
  */
@@ -42,14 +45,15 @@ public final class EntityManager {
     public static long createNewEntity() {
         Entity e = new Entity();
         ENTITIES.put(e.getID(), e);
+        addComponentToEntity(e.getID(), TransformComponent.NAME);
         EventManager.fireEvent(new NewEntityCreatedEvent(e.getID()));
         LOGGER.debug("Created new entity " + e.getID());
         return e.getID();
     }
 
     /**
-     * Adds a new component with the given name to the given entity. Also, all required components
-     * by the given component will be added if not already there.
+     * Adds a new component with the given name to the given entity. Also, all required components by the given component will be added if
+     * not already there.
      * 
      * @param id of the entity to add the component
      * @param componentName of the component to add
@@ -76,14 +80,15 @@ public final class EntityManager {
                     reqCom.addRequiredByComponent(componentName);
                 }
             }
+            EventManager.fireEvent(new ComponentAddedEvent(id, c));
             return c;
         }
         return null;
     }
 
     /**
-     * Removes the given component name from the given entity. This will only work, if there is no
-     * more component that requires the component to delete.
+     * Removes the given component name from the given entity. This will only work, if there is no more component that requires the
+     * component to delete.
      * 
      * @param id of the entity
      * @param componentName to remove
@@ -101,6 +106,7 @@ public final class EntityManager {
                     }
                 }
                 LOGGER.debug("Removed component " + componentName + " from entity " + id);
+                EventManager.fireEvent(new ComponentRemovedEvent(id, toRemove));
             } else {
                 LOGGER.debug("Did not remove component " + componentName + " because it is required by following components: "
                     + toRemove.getRequiredBy());

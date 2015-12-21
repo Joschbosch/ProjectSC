@@ -40,7 +40,6 @@ public class RenderingSystem extends DefaultSystem {
         EventManager.registerForEvent(NewTextureEvent.class, this);
         EventManager.registerForEvent(CreateNewLightEvent.class, this);
         EventManager.registerForEvent(RemoveLightEvent.class, this);
-
     }
 
     @Override
@@ -83,6 +82,11 @@ public class RenderingSystem extends DefaultSystem {
     public void update(long tick) {
         Set<Long> entities = EntityManager.getAllEntites();
         for (Long entity : entities) {
+            for (Component comp : EntityManager.getAllComponents(entity).values()) {
+                if (comp instanceof GraphicalComponent) {
+                    ((GraphicalComponent) comp).update(entity);
+                }
+            }
             if (hasComponent(entity, EmittingLightComponent.class)) {
                 EmittingLightComponent c = getComponent(entity, EmittingLightComponent.class);
                 Transform pos = EntityManager.getEntity(entity).getTransform();
@@ -93,6 +97,7 @@ public class RenderingSystem extends DefaultSystem {
             if (hasComponent(entity, MeshRendererComponent.class)) {
                 getComponent(entity, MeshRendererComponent.class).update(entity);
             }
+
         }
     }
 

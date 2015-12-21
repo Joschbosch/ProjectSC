@@ -25,6 +25,7 @@ import de.projectsc.modes.client.gui.data.GUIScene;
 import de.projectsc.modes.client.gui.data.UI;
 import de.projectsc.modes.client.gui.data.View;
 import de.projectsc.modes.client.gui.objects.Camera;
+import de.projectsc.modes.client.gui.objects.particles.ParticleMaster;
 import de.projectsc.modes.client.gui.objects.terrain.water.WaterFrameBuffers;
 import de.projectsc.modes.client.gui.objects.text.TextMaster;
 import de.projectsc.modes.client.gui.render.FontRenderer;
@@ -65,7 +66,6 @@ public class GUICore implements GUI {
     private Camera camera;
 
     @SuppressWarnings("unused")
-
     private MousePicker mousePicker;
 
     private UIRenderer uiRenderer;
@@ -107,6 +107,8 @@ public class GUICore implements GUI {
         TextMaster.init();
         fontRenderer = new FontRenderer();
         LOGGER.debug("Initialized font rendering");
+        ParticleMaster.init(masterRenderer.getProjectionMatrix());
+        LOGGER.debug("Initialized particle system");
         loadGUIComponents();
         renderingSystem = new RenderingSystem();
         LOGGER.debug("GUI components loaded.");
@@ -157,8 +159,9 @@ public class GUICore implements GUI {
             running = false;
         }
         if (state != null) {
-            camera.move(Timer.getDelta());
 
+            camera.move(Timer.getDelta());
+            ParticleMaster.update(camera.getPosition());
             // if (waters != null && waters.size() > 0) {
             // waterfbo.bindReflectionFrameBuffer();
             //
@@ -187,6 +190,7 @@ public class GUICore implements GUI {
             // if (waters != null && waters.size() > 0) {
             // waterRenderer.render(waters, camera, elapsedTime);
             // }
+            ParticleMaster.render(camera.createViewMatrix());
             UI ui = createUI();
             uiRenderer.render(ui.getUIElements(UI.BEFORE_TEXT));
             fontRenderer.render(TextMaster.render(), 0);
@@ -272,6 +276,8 @@ public class GUICore implements GUI {
         uiRenderer.dispose();
         waterRenderer.dispose();
         waterfbo.dispose();
+        TextMaster.cleanUp();
+        ParticleMaster.dispose();
     }
 
 }

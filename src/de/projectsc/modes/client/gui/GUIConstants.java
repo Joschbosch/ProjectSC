@@ -4,6 +4,8 @@
 
 package de.projectsc.modes.client.gui;
 
+import org.lwjgl.util.vector.Vector3f;
+
 /**
  * Constants for the GUI part.
  * 
@@ -29,12 +31,12 @@ public final class GUIConstants {
     /**
      * Constant.
      */
-    public static final String BASIC_TEXTURE_WHITE = TEXTURE_ROOT + BASIC_TEXTURE_ROOT + "white.png";
+    public static final String BASIC_TEXTURE_WHITE = BASIC_TEXTURE_ROOT + "white.png";
 
     /**
      * Constant.
      */
-    public static final String BASIC_TEXTURE_BLACK = TEXTURE_ROOT + BASIC_TEXTURE_ROOT + "black.png";
+    public static final String BASIC_TEXTURE_BLACK = BASIC_TEXTURE_ROOT + "black.png";
 
     /**
      * Constant.
@@ -44,12 +46,17 @@ public final class GUIConstants {
     /**
      * Constant.
      */
-    public static final String BASIC_MESH_PRIMITIVES_ROOT = "primitives/";
+    public static final String BASIC_MESH_PRIMITIVES_ROOT = BASIC_MESH_ROOT + "primitives/";
 
     /**
      * Constant.
      */
-    public static final String BASIC_MESH_PRIMITIVES_SPHERE = BASIC_MESH_ROOT + BASIC_MESH_PRIMITIVES_ROOT + "sphere.obj";
+    public static final String BASIC_MESH_PRIMITIVES_SPHERE = BASIC_MESH_PRIMITIVES_ROOT + "sphere.obj";
+
+    /**
+     * Standard gravity.
+     */
+    public static final Vector3f GRAVITY = new Vector3f(0.0f, -50f, 0.0f);
 
     private GUIConstants() {
 
