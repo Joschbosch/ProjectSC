@@ -5,7 +5,7 @@
  */
 package de.projectsc.modes.server.core.game.data;
 
-import de.projectsc.core.entities.Entity;
+import de.projectsc.core.interfaces.Entity;
 import de.projectsc.modes.server.core.data.AuthenticatedClient;
 
 /**

@@ -2,7 +2,7 @@
  * Copyright (C) 2015
  */
 
-package de.projectsc.modes.client.gui;
+package de.projectsc.modes.client.gui.utils;
 
 import org.lwjgl.util.vector.Vector3f;
 

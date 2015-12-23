@@ -21,6 +21,8 @@ import de.projectsc.core.data.utils.Timer;
 import de.projectsc.core.game.GameAttributes;
 import de.projectsc.core.game.GameConfiguration;
 import de.projectsc.core.manager.ComponentManager;
+import de.projectsc.core.manager.EntityManager;
+import de.projectsc.core.manager.EventManager;
 import de.projectsc.core.messages.GameMessageConstants;
 import de.projectsc.core.messages.MessageConstants;
 import de.projectsc.core.systems.physics.PhysicsSystem;
@@ -64,9 +66,18 @@ public class Game implements Runnable {
 
     private PhysicsSystem physicsSystem;
 
+    private ComponentManager componentManager;
+
+    private EntityManager entityManager;
+
+    private EventManager eventManager;
+
     public Game(AuthenticatedClient host, BlockingQueue<ServerMessage> coreQueue) {
         this.coreQueue = coreQueue;
         this.gameContext = new GameContext(idCounter++, host.getDisplayName() + "'s game", new ServerPlayer(host), this);
+        this.componentManager = new ComponentManager();
+        this.eventManager = new EventManager();
+        this.entityManager = new EntityManager(componentManager, eventManager);
         LOGGER.debug(String.format("Created new game: %s (Host: %s, game id: %d)", gameContext.getDisplayName(), host.getDisplayName(),
             gameContext.getGameID()));
         new Thread(this).start();
@@ -118,7 +129,7 @@ public class Game implements Runnable {
 
                 @Override
                 public void run() {
-                    physicsSystem = new PhysicsSystem();
+                    physicsSystem = new PhysicsSystem(entityManager, eventManager);
                     loadComponents();
                     gameContext.loadData();
                 }
@@ -144,7 +155,7 @@ public class Game implements Runnable {
 
     private void loadComponents() {
         for (ComponentListItem it : ComponentListItem.values()) {
-            ComponentManager.registerComponent(it.getName(), it.getClazz());
+            componentManager.registerComponent(it.getName(), it.getClazz());
         }
     }
 

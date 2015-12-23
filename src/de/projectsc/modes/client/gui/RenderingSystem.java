@@ -33,20 +33,20 @@ public class RenderingSystem extends DefaultSystem {
 
     private static final String NAME = "Rendering System";
 
-    public RenderingSystem() {
-        super(NAME);
-        EventManager.registerForEvent(NewPositionEvent.class, this);
-        EventManager.registerForEvent(ChangeMeshRendererParameterEvent.class, this);
-        EventManager.registerForEvent(NewTextureEvent.class, this);
-        EventManager.registerForEvent(CreateNewLightEvent.class, this);
-        EventManager.registerForEvent(RemoveLightEvent.class, this);
+    public RenderingSystem(EntityManager entityManager, EventManager eventManager) {
+        super(NAME, entityManager, eventManager);
+        eventManager.registerForEvent(NewPositionEvent.class, this);
+        eventManager.registerForEvent(ChangeMeshRendererParameterEvent.class, this);
+        eventManager.registerForEvent(NewTextureEvent.class, this);
+        eventManager.registerForEvent(CreateNewLightEvent.class, this);
+        eventManager.registerForEvent(RemoveLightEvent.class, this);
     }
 
     @Override
     public void processEvent(Event e) {
-        if (EntityManager.hasComponent(e.getEntityId(), MeshRendererComponent.class)) {
+        if (entityManager.hasComponent(e.getEntityId(), MeshRendererComponent.class)) {
             MeshRendererComponent c =
-                ((MeshRendererComponent) EntityManager.getComponent(e.getEntityId(), MeshRendererComponent.NAME));
+                ((MeshRendererComponent) entityManager.getComponent(e.getEntityId(), MeshRendererComponent.NAME));
             if (e instanceof ChangeMeshRendererParameterEvent) {
                 ChangeMeshRendererParameterEvent ev = (ChangeMeshRendererParameterEvent) e;
                 c.setFakeLighting(ev.isFakeLightning());
@@ -68,7 +68,7 @@ public class RenderingSystem extends DefaultSystem {
                     createNewLightEvent.getPosition(), createNewLightEvent.getLight());
             } else {
 
-                Transform pos = EntityManager.getEntity(e.getEntityId()).getTransform();
+                Transform pos = entityManager.getEntity(e.getEntityId()).getTransform();
                 getComponent(e.getEntityId(), EmittingLightComponent.class).addLight(createNewLightEvent.getEntityId(),
                     pos.getPosition(), createNewLightEvent.getLight());
             }
@@ -80,29 +80,29 @@ public class RenderingSystem extends DefaultSystem {
 
     @Override
     public void update(long tick) {
-        Set<Long> entities = EntityManager.getAllEntites();
+        Set<Long> entities = entityManager.getAllEntites();
         for (Long entity : entities) {
-            for (Component comp : EntityManager.getAllComponents(entity).values()) {
+            for (Component comp : entityManager.getAllComponents(entity).values()) {
                 if (comp instanceof GraphicalComponent) {
-                    ((GraphicalComponent) comp).update(entity);
+                    ((GraphicalComponent) comp).update();
                 }
             }
             if (hasComponent(entity, EmittingLightComponent.class)) {
                 EmittingLightComponent c = getComponent(entity, EmittingLightComponent.class);
-                Transform pos = EntityManager.getEntity(entity).getTransform();
+                Transform pos = entityManager.getEntity(entity).getTransform();
                 if (c != null && pos != null) {
                     c.updateLightPositionToEntity(entity, pos.getPosition());
                 }
             }
             if (hasComponent(entity, MeshRendererComponent.class)) {
-                getComponent(entity, MeshRendererComponent.class).update(entity);
+                getComponent(entity, MeshRendererComponent.class).update();
             }
 
         }
     }
 
     private boolean hasComponent(Long entity, Class<? extends DefaultComponent> clazz) {
-        return EntityManager.hasComponent(entity, clazz);
+        return entityManager.hasComponent(entity, clazz);
     }
 
     /**
@@ -112,18 +112,18 @@ public class RenderingSystem extends DefaultSystem {
      */
 
     public GUIScene createScene() {
-        Set<Long> entities = EntityManager.getAllEntites();
+        Set<Long> entities = entityManager.getAllEntites();
         GUIScene scene = new GUIScene();
         for (Long entity : entities) {
-            Map<String, Component> allComponents = EntityManager.getAllComponents(entity);
+            Map<String, Component> allComponents = entityManager.getAllComponents(entity);
             for (Component c : allComponents.values()) {
                 if (c instanceof GraphicalComponent) {
                     GraphicalComponent gc = (GraphicalComponent) c;
                     gc.render(entity, scene);
                 }
-                c.addSceneInformation(entity, scene);
+                c.addSceneInformation(scene);
             }
-            Transform pc = EntityManager.getEntity(entity).getTransform();
+            Transform pc = entityManager.getEntity(entity).getTransform();
             scene.getPositions().put(entity, pc.getPosition());
             scene.getRotations().put(entity, pc.getRotation());
             scene.getScales().put(entity, pc.getScale());

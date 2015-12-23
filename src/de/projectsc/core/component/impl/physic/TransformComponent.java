@@ -12,7 +12,6 @@ import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.core.component.ComponentType;
 import de.projectsc.core.data.physics.Transform;
-import de.projectsc.core.manager.EntityManager;
 
 /**
  * This component manages the {@link transform} of an entity. It can not be removed.
@@ -34,8 +33,10 @@ public class TransformComponent extends PhysicsComponent {
     }
 
     @Override
-    public void update(long ownerEntity) {
-        transform = EntityManager.getEntity(ownerEntity).getTransform();
+    public void update() {
+        if (owner != null) {
+            transform = owner.getTransform();
+        }
     }
 
     /**

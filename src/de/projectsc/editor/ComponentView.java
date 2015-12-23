@@ -7,6 +7,8 @@ package de.projectsc.editor;
 import javax.swing.JDialog;
 
 import de.projectsc.core.interfaces.Component;
+import de.projectsc.core.interfaces.Entity;
+import de.projectsc.core.manager.EventManager;
 
 /**
  * 
@@ -19,7 +21,9 @@ public abstract class ComponentView extends JDialog {
      */
     private static final long serialVersionUID = 1L;
 
-    protected long entity;
+    protected Entity entity;
+
+    protected EventManager eventManager;
 
     public ComponentView() {
         setSize(getInitialWidth(), getInitialHeight());
@@ -29,8 +33,12 @@ public abstract class ComponentView extends JDialog {
 
     protected abstract int getInitialWidth();
 
-    public void setEntity(long entity) {
+    public void setEntity(Entity entity) {
         this.entity = entity;
+    }
+
+    public void setEventManager(EventManager eventManager) {
+        this.eventManager = eventManager;
     }
 
     @Override

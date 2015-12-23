@@ -35,7 +35,6 @@ import org.newdawn.slick.opengl.TextureLoader;
 
 import de.matthiasmann.twl.utils.PNGDecoder;
 import de.matthiasmann.twl.utils.PNGDecoder.Format;
-import de.projectsc.modes.client.gui.GUIConstants;
 import de.projectsc.modes.client.gui.models.RawModel;
 import de.projectsc.modes.client.gui.textures.TextureData;
 

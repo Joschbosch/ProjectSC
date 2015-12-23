@@ -21,12 +21,11 @@ import de.projectsc.core.CoreConstants;
 import de.projectsc.core.component.ComponentType;
 import de.projectsc.core.component.impl.physic.MeshComponent;
 import de.projectsc.core.data.physics.ModelData;
-import de.projectsc.core.manager.EntityManager;
-import de.projectsc.modes.client.gui.GUIConstants;
 import de.projectsc.modes.client.gui.data.GUIScene;
 import de.projectsc.modes.client.gui.models.RawModel;
 import de.projectsc.modes.client.gui.models.TexturedModel;
 import de.projectsc.modes.client.gui.textures.ModelTexture;
+import de.projectsc.modes.client.gui.utils.GUIConstants;
 import de.projectsc.modes.client.gui.utils.Loader;
 
 /**
@@ -69,9 +68,9 @@ public class MeshRendererComponent extends GraphicalComponent {
     }
 
     @Override
-    public void update(long owner) {
-        if (model == null && EntityManager.hasComponent(owner, MeshComponent.class)) {
-            ModelData mesh = ((MeshComponent) EntityManager.getComponent(owner, MeshComponent.class)).getModel();
+    public void update() {
+        if (owner != null && model == null && owner.hasComponent(MeshComponent.class)) {
+            ModelData mesh = ((MeshComponent) owner.getComponent(MeshComponent.class)).getModel();
             if (mesh != null) {
                 loadModel(mesh);
             }

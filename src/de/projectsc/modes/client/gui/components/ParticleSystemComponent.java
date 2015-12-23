@@ -17,7 +17,6 @@ import org.lwjgl.util.vector.Vector3f;
 import de.projectsc.core.component.ComponentType;
 import de.projectsc.core.data.Scene;
 import de.projectsc.core.data.physics.WireFrame;
-import de.projectsc.core.manager.EntityManager;
 import de.projectsc.modes.client.gui.data.GUIScene;
 import de.projectsc.modes.client.gui.objects.particles.ParticleSystem;
 import de.projectsc.modes.client.gui.objects.particles.ParticleTexture;
@@ -48,19 +47,18 @@ public class ParticleSystemComponent extends GraphicalComponent {
     }
 
     @Override
-    public void update(long ownerEntity) {
+    public void update() {
         if (particleSystems.size() == 0) {
             addNewParticleSystem();
         }
         for (ParticleSystem s : particleSystems) {
-            if (offsets.get(s.getId()) != null && EntityManager.getEntity(ownerEntity).getTransform() != null) {
+            if (offsets.get(s.getId()) != null && owner.getTransform() != null) {
                 Vector3f position =
-                    Vector3f.add(EntityManager.getEntity(ownerEntity).getTransform().getPosition(), offsets.get(s.getId()), null);
+                    Vector3f.add(owner.getTransform().getPosition(), offsets.get(s.getId()), null);
                 s.setSystemCenter(position);
                 s.generateParticles();
             }
         }
-
     }
 
     @Override
@@ -79,7 +77,7 @@ public class ParticleSystemComponent extends GraphicalComponent {
     }
 
     @Override
-    public void addSceneInformation(Long e, Scene scene) {
+    public void addSceneInformation(Scene scene) {
         for (ParticleSystem s : particleSystems) {
             WireFrame w = new WireFrame(WireFrame.SPHERE, s.getSystemCenter(), new Vector3f(0, 0, 0), new Vector3f(1, 1, 1));
             scene.getWireFrames().add(w);

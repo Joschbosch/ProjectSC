@@ -6,13 +6,16 @@
 package de.projectsc.core.entities;
 
 import de.projectsc.core.data.physics.Transform;
+import de.projectsc.core.interfaces.Component;
+import de.projectsc.core.interfaces.Entity;
+import de.projectsc.core.manager.EntityManager;
 
 /**
  * All game objects in the game are entities. All entities have components, that define their role and behavior.
  * 
  * @author Josch Bosch
  */
-public class Entity {
+public class EntityImpl implements Entity {
 
     private static int idCount = 1000;
 
@@ -24,19 +27,35 @@ public class Entity {
 
     private final Transform transform;
 
-    public Entity() {
+    private EntityManager entityManager;
+
+    public EntityImpl(EntityManager entityManager) {
         entityUID = idCount++;
         transform = new Transform();
+        this.entityManager = entityManager;
     }
 
+    @Override
+    public boolean hasComponent(Class<? extends Component> clazz) {
+        return entityManager.hasComponent(entityUID, clazz);
+    }
+
+    @Override
+    public Component getComponent(Class<? extends Component> clazz) {
+        return entityManager.getComponent(entityUID, clazz);
+    }
+
+    @Override
     public Transform getTransform() {
         return transform;
     }
 
+    @Override
     public long getEntityTypeId() {
         return entityTypeID;
     }
 
+    @Override
     public long getID() {
         return entityUID;
     }
@@ -54,7 +73,9 @@ public class Entity {
         return String.valueOf(entityUID);
     }
 
-    public void setEntityTypeId(Long id) {
+    @Override
+    public void setEntityTypeId(long id) {
         this.entityTypeID = id;
     }
+
 }

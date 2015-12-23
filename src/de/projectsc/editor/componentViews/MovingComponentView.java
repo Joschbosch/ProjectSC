@@ -14,8 +14,6 @@ import javax.swing.event.ChangeListener;
 import de.projectsc.core.component.impl.physic.VelocityComponent;
 import de.projectsc.core.events.movement.ChangeMovementParameterEvent;
 import de.projectsc.core.interfaces.Component;
-import de.projectsc.core.manager.EntityManager;
-import de.projectsc.core.manager.EventManager;
 import de.projectsc.editor.ComponentView;
 
 /**
@@ -62,9 +60,9 @@ public class MovingComponentView extends ComponentView {
             @Override
             public void stateChanged(ChangeEvent e) {
                 movementLabel.setText("" + movementSlider.getValue() / 100f);
-                ChangeMovementParameterEvent ev = new ChangeMovementParameterEvent(entity);
+                ChangeMovementParameterEvent ev = new ChangeMovementParameterEvent(entity.getID());
                 ev.setMaximumSpeed(movementSlider.getValue() / 100f);
-                EventManager.fireEvent(ev);
+                eventManager.fireEvent(ev);
             }
         });
         getContentPane().add(movementSlider);
@@ -89,9 +87,9 @@ public class MovingComponentView extends ComponentView {
             @Override
             public void stateChanged(ChangeEvent e) {
                 accelerationLabel.setText("" + accelerationSlider.getValue() / 100f);
-                ChangeMovementParameterEvent ev = new ChangeMovementParameterEvent(entity);
+                ChangeMovementParameterEvent ev = new ChangeMovementParameterEvent(entity.getID());
                 ev.setAcceleration(accelerationSlider.getValue() / 100f);
-                EventManager.fireEvent(ev);
+                eventManager.fireEvent(ev);
             }
         });
         getContentPane().add(accelerationSlider);
@@ -110,7 +108,7 @@ public class MovingComponentView extends ComponentView {
 
     @Override
     protected Component getAssociatedComponent() {
-        return EntityManager.getComponent(entity, VelocityComponent.class);
+        return entity.getComponent(VelocityComponent.class);
     }
 
     @Override

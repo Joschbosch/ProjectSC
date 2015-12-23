@@ -11,7 +11,7 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
 
-import de.projectsc.core.manager.EntityManager;
+import de.projectsc.core.interfaces.Entity;
 
 /**
  * Class for moving around in the world.
@@ -262,13 +262,13 @@ public class Camera {
      * 
      * @param entity to bind to.
      */
-    public void bindToEntity(long entity) {
-        if (entity == -1) {
+    public void bindToEntity(Entity entity) {
+        if (entity == null) {
             Vector3f newCenterPoint = new Vector3f(centeringPoint.x, centeringPoint.y, centeringPoint.z);
             centeringPoint = newCenterPoint;
             bound = false;
         } else {
-            centeringPoint = EntityManager.getEntity(entity).getTransform().getPosition();
+            centeringPoint = entity.getTransform().getPosition();
             bound = true;
         }
     }

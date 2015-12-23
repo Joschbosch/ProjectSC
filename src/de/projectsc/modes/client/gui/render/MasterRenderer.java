@@ -14,6 +14,7 @@ import org.lwjgl.util.vector.Vector4f;
 
 import de.projectsc.modes.client.gui.data.GUIScene;
 import de.projectsc.modes.client.gui.objects.Camera;
+import de.projectsc.modes.client.gui.objects.particles.ParticleMaster;
 import de.projectsc.modes.client.gui.shaders.EntityShader;
 import de.projectsc.modes.client.gui.shaders.TerrainShader;
 import de.projectsc.modes.client.gui.shaders.WireFrameShader;
@@ -55,6 +56,8 @@ public class MasterRenderer {
 
     private final WireFrameRenderer collisionBoxRenderer;
 
+    private final ParticleRenderer particleRenderer;
+
     public MasterRenderer() {
         enableCulling();
         GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
@@ -67,6 +70,7 @@ public class MasterRenderer {
         terrainRenderer = new TerrainRenderer(terrainShader, projectionMatrix);
         billboardRenderer = new BillboardRenderer(projectionMatrix);
         skyboxRenderer = new SkyboxRenderer(projectionMatrix);
+        particleRenderer = new ParticleRenderer(projectionMatrix);
 
     }
 
@@ -146,6 +150,7 @@ public class MasterRenderer {
             }
         }
         billboardRenderer.render(scene.getBillboards());
+        particleRenderer.render(ParticleMaster.render(), camera.createViewMatrix());
     }
 
     /**

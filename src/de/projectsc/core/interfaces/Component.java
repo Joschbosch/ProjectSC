@@ -54,7 +54,7 @@ public interface Component {
      * 
      * @param scene to add to.
      */
-    void addSceneInformation(Long entity, Scene scene);
+    void addSceneInformation(Scene scene);
 
     /**
      * @return true, if the component can be saved at the moment.
@@ -77,6 +77,8 @@ public interface Component {
      */
     void deserialize(Map<String, Object> serialized, File schemaDirectory);
 
+    void update();
+
     /**
      * @return name of the component.
      */
@@ -85,5 +87,7 @@ public interface Component {
     long getId();
 
     void createNewId();
+
+    void setOwner(Entity entity);
 
 }

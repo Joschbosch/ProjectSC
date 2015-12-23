@@ -24,8 +24,6 @@ import org.lwjgl.util.vector.Vector3f;
 import de.projectsc.core.data.objects.Light;
 import de.projectsc.core.events.objects.CreateNewLightEvent;
 import de.projectsc.core.interfaces.Component;
-import de.projectsc.core.manager.EntityManager;
-import de.projectsc.core.manager.EventManager;
 import de.projectsc.editor.ComponentView;
 import de.projectsc.modes.client.gui.components.EmittingLightComponent;
 
@@ -157,8 +155,8 @@ public class EmittingLightComponentView extends ComponentView {
                 try {
                     Light light = readAndCreateLight();
                     if (light != null) {
-                        CreateNewLightEvent ev = new CreateNewLightEvent(entity, light, null);
-                        EventManager.fireEvent(ev);
+                        CreateNewLightEvent ev = new CreateNewLightEvent(entity.getID(), light, null);
+                        eventManager.fireEvent(ev);
                     }
                 } catch (NumberFormatException e1) {
 
@@ -179,8 +177,8 @@ public class EmittingLightComponentView extends ComponentView {
                     removeSelectedLight(component);
                     Light l = readAndCreateLight();
                     if (l != null) {
-                        CreateNewLightEvent ev = new CreateNewLightEvent(entity, l, null);
-                        EventManager.fireEvent(ev);
+                        CreateNewLightEvent ev = new CreateNewLightEvent(entity.getID(), l, null);
+                        eventManager.fireEvent(ev);
                     }
                 }
             }
@@ -286,7 +284,7 @@ public class EmittingLightComponentView extends ComponentView {
 
     @Override
     protected Component getAssociatedComponent() {
-        return EntityManager.getComponent(entity, EmittingLightComponent.class);
+        return entity.getComponent(EmittingLightComponent.class);
 
     }
 

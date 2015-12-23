@@ -19,7 +19,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 import de.projectsc.core.data.Event;
 import de.projectsc.core.data.Scene;
 import de.projectsc.core.interfaces.Component;
-import de.projectsc.core.manager.EventManager;
+import de.projectsc.core.interfaces.Entity;
 
 /**
  * 
@@ -43,7 +43,7 @@ public abstract class DefaultComponent implements Component {
 
     protected List<String> requiredBy = new LinkedList<>();
 
-    private long owner;
+    protected Entity owner;
 
     private boolean isActive = false;
 
@@ -54,17 +54,6 @@ public abstract class DefaultComponent implements Component {
     public void setID(String id) {
         this.componentId = id;
     }
-
-    protected void fireEvent(Event e) {
-        EventManager.fireEvent(e);
-    }
-
-    /**
-     * Update method for the component.
-     * 
-     * @param ownerEntity entity that has this component.
-     */
-    public abstract void update(long ownerEntity);
 
     /**
      * @return true, if the component has all attributes to be saved.
@@ -109,11 +98,12 @@ public abstract class DefaultComponent implements Component {
 
     }
 
-    public long getOwner() {
+    public Entity getOwner() {
         return owner;
     }
 
-    public void setOwner(long owner) {
+    @Override
+    public void setOwner(Entity owner) {
         this.owner = owner;
     }
 
@@ -165,7 +155,7 @@ public abstract class DefaultComponent implements Component {
     }
 
     @Override
-    public void addSceneInformation(Long entity, Scene scene) {
+    public void addSceneInformation(Scene scene) {
 
     }
 

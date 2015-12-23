@@ -20,6 +20,8 @@ import org.lwjgl.util.vector.Vector4f;
 import de.projectsc.core.data.structure.Snapshot;
 import de.projectsc.core.data.utils.Timer;
 import de.projectsc.core.manager.ComponentManager;
+import de.projectsc.core.manager.EntityManager;
+import de.projectsc.core.manager.EventManager;
 import de.projectsc.modes.client.gui.components.GraphicalComponentImplementation;
 import de.projectsc.modes.client.gui.data.GUIScene;
 import de.projectsc.modes.client.gui.data.UI;
@@ -76,7 +78,17 @@ public class GUICore implements GUI {
 
     private RenderingSystem renderingSystem;
 
-    public GUICore() {}
+    private ComponentManager componentManager;
+
+    private EntityManager entityManager;
+
+    private EventManager eventManager;
+
+    public GUICore(ComponentManager componentManager, EntityManager entityManager, EventManager eventManager) {
+        this.componentManager = componentManager;
+        this.entityManager = entityManager;
+        this.eventManager = eventManager;
+    }
 
     @Override
     public boolean initCore() {
@@ -107,10 +119,8 @@ public class GUICore implements GUI {
         TextMaster.init();
         fontRenderer = new FontRenderer();
         LOGGER.debug("Initialized font rendering");
-        ParticleMaster.init(masterRenderer.getProjectionMatrix());
-        LOGGER.debug("Initialized particle system");
         loadGUIComponents();
-        renderingSystem = new RenderingSystem();
+        renderingSystem = new RenderingSystem(entityManager, eventManager);
         LOGGER.debug("GUI components loaded.");
         running = true;
         return running;
@@ -118,7 +128,7 @@ public class GUICore implements GUI {
 
     private void loadGUIComponents() {
         for (GraphicalComponentImplementation it : GraphicalComponentImplementation.values()) {
-            ComponentManager.registerComponent(it.getName(), it.getClazz());
+            componentManager.registerComponent(it.getName(), it.getClazz());
         }
     }
 
@@ -190,7 +200,6 @@ public class GUICore implements GUI {
             // if (waters != null && waters.size() > 0) {
             // waterRenderer.render(waters, camera, elapsedTime);
             // }
-            ParticleMaster.render(camera.createViewMatrix());
             UI ui = createUI();
             uiRenderer.render(ui.getUIElements(UI.BEFORE_TEXT));
             fontRenderer.render(TextMaster.render(), 0);

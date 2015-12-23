@@ -15,6 +15,8 @@ import org.apache.commons.logging.LogFactory;
 import de.projectsc.core.component.impl.ComponentListItem;
 import de.projectsc.core.data.utils.Timer;
 import de.projectsc.core.manager.ComponentManager;
+import de.projectsc.core.manager.EntityManager;
+import de.projectsc.core.manager.EventManager;
 import de.projectsc.core.systems.physics.PhysicsSystem;
 import de.projectsc.modes.client.core.data.ClientPlayer;
 import de.projectsc.modes.client.core.states.MenuState;
@@ -51,11 +53,20 @@ public class ClientCore implements Runnable {
 
     private PhysicsSystem physicsSystem;
 
+    private ComponentManager componentManager;
+
+    private EntityManager entityManager;
+
+    private EventManager eventManager;
+
     public ClientCore() {
         networkSendQueue = new LinkedBlockingQueue<>();
         networkReceiveQueue = new LinkedBlockingQueue<>();
         userInputQueue = new LinkedBlockingQueue<>();
         player = new ClientPlayer();
+        componentManager = new ComponentManager();
+        eventManager = new EventManager();
+        entityManager = new EntityManager(componentManager, eventManager);
     }
 
     @Override
@@ -64,7 +75,7 @@ public class ClientCore implements Runnable {
         Timer.init();
         loadComponents();
         loadSystems();
-        gui = new GUICore();
+        gui = new GUICore(componentManager, entityManager, eventManager);
         gui.initCore();
         clientRunning = true;
         currentState = new MenuState();
@@ -101,12 +112,12 @@ public class ClientCore implements Runnable {
     }
 
     private void loadSystems() {
-        physicsSystem = new PhysicsSystem();
+        physicsSystem = new PhysicsSystem(entityManager, eventManager);
     }
 
     private void loadComponents() {
         for (ComponentListItem c : ComponentListItem.values()) {
-            ComponentManager.registerComponent(c.getName(), c.getClazz());
+            componentManager.registerComponent(c.getName(), c.getClazz());
         }
     }
 

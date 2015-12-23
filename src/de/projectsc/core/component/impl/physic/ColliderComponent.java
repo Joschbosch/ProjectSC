@@ -36,7 +36,7 @@ public class ColliderComponent extends PhysicsComponent {
     }
 
     @Override
-    public void update(long ownerEntity) {
+    public void update() {
         if (this.AABB == null) {
             this.AABB = new AxisAlignedBoundingBox(new Vector3f(0, 0, 0), new Vector3f(1, 1, 1));
         }

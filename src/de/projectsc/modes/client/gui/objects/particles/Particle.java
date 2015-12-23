@@ -4,7 +4,7 @@ import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.core.data.utils.Timer;
-import de.projectsc.modes.client.gui.GUIConstants;
+import de.projectsc.modes.client.gui.utils.GUIConstants;
 
 /**
  * One particle.

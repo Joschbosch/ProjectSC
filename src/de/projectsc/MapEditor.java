@@ -29,6 +29,8 @@ import org.apache.commons.logging.LogFactory;
 import de.projectsc.core.CoreConstants;
 import de.projectsc.core.component.impl.ComponentListItem;
 import de.projectsc.core.manager.ComponentManager;
+import de.projectsc.core.manager.EntityManager;
+import de.projectsc.core.manager.EventManager;
 import de.projectsc.editor.EditorData;
 import de.projectsc.editor.MapEditorGraphicsCore;
 
@@ -66,11 +68,20 @@ public class MapEditor extends JFrame {
 
     private final EditorData data;
 
+    private ComponentManager componentManager;
+
+    private EntityManager entityManager;
+
+    private EventManager eventManager;
+
     /**
      * Create the frame.
      */
     public MapEditor() {
         data = new EditorData();
+        this.componentManager = new ComponentManager();
+        this.eventManager = new EventManager();
+        this.entityManager = new EntityManager(componentManager, eventManager);
         loadComponents();
         createContent();
         try {
@@ -246,7 +257,7 @@ public class MapEditor extends JFrame {
 
     private void loadComponents() {
         for (ComponentListItem it : ComponentListItem.values()) {
-            ComponentManager.registerComponent(it.getName(), it.getClazz());
+            componentManager.registerComponent(it.getName(), it.getClazz());
         }
     }
 
@@ -255,7 +266,7 @@ public class MapEditor extends JFrame {
      */
     public void startLWJGL() {
         messageQueue = new LinkedBlockingQueue<String>();
-        graphicsCore = new MapEditorGraphicsCore(displayParent, 1024, 768, messageQueue);
+        graphicsCore = new MapEditorGraphicsCore(displayParent, 1024, 768, messageQueue, componentManager, entityManager, eventManager);
         gameThread = new Thread(graphicsCore);
         gameThread.start();
     }

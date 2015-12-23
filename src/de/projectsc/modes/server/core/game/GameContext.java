@@ -8,13 +8,10 @@ package de.projectsc.modes.server.core.game;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.lwjgl.util.vector.Vector3f;
-
-import de.projectsc.core.data.physics.AxisAlignedBoundingBox;
-import de.projectsc.core.data.structure.OctTree;
-import de.projectsc.core.entities.Entity;
 import de.projectsc.core.game.GameAttributes;
 import de.projectsc.core.game.GameConfiguration;
+import de.projectsc.core.interfaces.Entity;
+import de.projectsc.core.systems.physics.OctTree;
 import de.projectsc.modes.server.core.game.data.ServerPlayer;
 
 /**
@@ -69,7 +66,6 @@ public class GameContext {
         loading = true;
         entities = new TreeMap<>();
 
-        octTree = new OctTree<Entity>(new AxisAlignedBoundingBox(new Vector3f(-1000, -1000, -1000), new Vector3f(1000, 1000, 1000)));
         loadMapAndEntites();
         loadingProgress = 50;
         loadingProgress = 60;

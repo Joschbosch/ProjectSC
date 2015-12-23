@@ -23,9 +23,16 @@ public abstract class DefaultSystem implements EngineSystem {
 
     protected final String name;
 
-    public DefaultSystem(String name) {
+    protected EntityManager entityManager;
+
+    private EventManager eventManager;
+
+    public DefaultSystem(String name, EntityManager entityManager, EventManager eventManager) {
         this.uID = idCount++;
         this.name = name;
+        this.entityManager = entityManager;
+        this.eventManager = eventManager;
+
     }
 
     @Override
@@ -41,11 +48,11 @@ public abstract class DefaultSystem implements EngineSystem {
     }
 
     protected void fireEvent(Event e) {
-        EventManager.fireEvent(e);
+        eventManager.fireEvent(e);
     }
 
     protected <T extends Component> T getComponent(long entityId, Class<T> componentClass) {
-        Component component = EntityManager.getComponent(entityId, componentClass);
+        Component component = entityManager.getComponent(entityId, componentClass);
         if (component != null) {
             return componentClass.cast(component);
         }

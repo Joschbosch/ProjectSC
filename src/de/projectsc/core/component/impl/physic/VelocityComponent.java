@@ -43,7 +43,7 @@ public class VelocityComponent extends PhysicsComponent {
     }
 
     @Override
-    public void update(long ownerEntity) {
+    public void update() {
 
     }
 

@@ -11,8 +11,8 @@ import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.core.data.physics.Transform;
 import de.projectsc.core.interfaces.Component;
-import de.projectsc.core.manager.ComponentManager;
 import de.projectsc.core.manager.EntityManager;
+import de.projectsc.core.utils.ComponentUtils;
 
 public class EntitySchema {
 
@@ -28,15 +28,16 @@ public class EntitySchema {
         return id;
     }
 
-    public void createNewEntity(Transform oldTransform, long e) {
-        Transform t = EntityManager.getEntity(e).getTransform();
+    public void createNewEntity(Transform oldTransform, long e, EntityManager entityManager) {
+        Transform t = entityManager.getEntity(e).getTransform();
         t.setPosition(new Vector3f(oldTransform.getPosition()));
         t.setRotation(new Vector3f(oldTransform.getRotation()));
         t.setScale(new Vector3f(oldTransform.getScale()));
         for (Component c : components) {
-            Component clone = ComponentManager.cloneComponent(c);
-            EntityManager.addComponentToEntity(e, clone);
+            Component clone = ComponentUtils.cloneComponent(c);
+            entityManager.addComponentToEntity(e, clone);
+            clone.setOwner(entityManager.getEntity(e));
         }
-        EntityManager.getEntity(e).setEntityTypeId(id);
+        entityManager.getEntity(e).setEntityTypeId(id);
     }
 }

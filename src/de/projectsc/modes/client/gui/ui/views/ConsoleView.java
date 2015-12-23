@@ -9,7 +9,6 @@ import java.util.List;
 
 import org.lwjgl.util.vector.Vector2f;
 
-import de.projectsc.modes.client.gui.GUIConstants;
 import de.projectsc.modes.client.gui.data.UI;
 import de.projectsc.modes.client.gui.data.View;
 import de.projectsc.modes.client.gui.objects.text.Font;
@@ -18,6 +17,7 @@ import de.projectsc.modes.client.gui.objects.text.FontType;
 import de.projectsc.modes.client.gui.objects.text.GUIText;
 import de.projectsc.modes.client.gui.objects.text.TextMaster;
 import de.projectsc.modes.client.gui.textures.UITexture;
+import de.projectsc.modes.client.gui.utils.GUIConstants;
 import de.projectsc.modes.client.gui.utils.Loader;
 import de.projectsc.modes.client.ui.BasicUIElement;
 import de.projectsc.modes.client.ui.elements.Console;

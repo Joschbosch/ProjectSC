@@ -43,7 +43,7 @@ public class EntityStateComponent extends DefaultComponent {
     }
 
     @Override
-    public void update(long ownerEntity) {
+    public void update() {
         if (state == EntityState.MOVING) {
             setMoved(true);
         } else {
@@ -52,12 +52,12 @@ public class EntityStateComponent extends DefaultComponent {
     }
 
     @Override
-    public void addSceneInformation(Long entity, Scene scene) {
+    public void addSceneInformation(Scene scene) {
         if (selectAble && selected) {
-            scene.getSelectedEntites().add(entity);
+            scene.getSelectedEntites().add(owner.getID());
         }
         if (highlightAble && highlighted) {
-            scene.getHightlightedEntites().add(entity);
+            scene.getHightlightedEntites().add(owner.getID());
         }
     }
 

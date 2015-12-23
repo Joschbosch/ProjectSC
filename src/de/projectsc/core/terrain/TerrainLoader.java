@@ -30,7 +30,7 @@ import org.lwjgl.util.vector.Vector3f;
 import de.projectsc.core.data.objects.Light;
 import de.projectsc.core.data.physics.Tile;
 import de.projectsc.core.data.utils.LightSerializationUtils;
-import de.projectsc.core.entities.Entity;
+import de.projectsc.core.interfaces.Entity;
 
 /**
  * Loader for a terrain map with its static lights and objects.

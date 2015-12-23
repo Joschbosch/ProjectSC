@@ -62,6 +62,7 @@ import de.projectsc.core.component.impl.ComponentListItem;
 import de.projectsc.core.interfaces.Component;
 import de.projectsc.core.manager.ComponentManager;
 import de.projectsc.core.manager.EntityManager;
+import de.projectsc.core.manager.EventManager;
 import de.projectsc.editor.ComponentView;
 import de.projectsc.editor.EditorData;
 import de.projectsc.editor.EditorGraphicsCore;
@@ -107,8 +108,6 @@ public class EntityEditor extends JFrame {
 
     private Thread gameThread;
 
-    private EditorGraphicsCore editor3dCore;
-
     private BlockingQueue<String> messageQueue;
 
     private JLabel modelNameLabel;
@@ -153,11 +152,23 @@ public class EntityEditor extends JFrame {
 
     private JCheckBox renderSkybox;
 
+    private EditorGraphicsCore editor3dCore;
+
+    private ComponentManager componentManager;
+
+    private EntityManager entityManager;
+
+    private EventManager eventManager;
+
     /**
      * Create the frame.
      */
     public EntityEditor() {
         data = new EditorData();
+
+        componentManager = new ComponentManager();
+        eventManager = new EventManager();
+        entityManager = new EntityManager(componentManager, eventManager);
         loadComponents();
         createContent();
         getNextFreeID();
@@ -185,7 +196,7 @@ public class EntityEditor extends JFrame {
 
     private void loadComponents() {
         for (ComponentListItem it : ComponentListItem.values()) {
-            ComponentManager.registerComponent(it.getName(), it.getClazz());
+            componentManager.registerComponent(it.getName(), it.getClazz());
         }
     }
 
@@ -302,7 +313,7 @@ public class EntityEditor extends JFrame {
         contentPane.add(componentPanel);
         componentPanel.setLayout(null);
 
-        componentNames = ComponentManager.getRegisteredComponents();
+        componentNames = componentManager.getRegisteredComponents();
         componentList = new JList<String>();
         componentList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         componentList.setValueIsAdjusting(true);
@@ -342,7 +353,8 @@ public class EntityEditor extends JFrame {
                                 viewOpened = true;
                                 warningsLabel.setText("");
                                 ComponentView dialog = v.getComponentClass().newInstance();
-                                dialog.setEntity(editor3dCore.getCurrentEntity());
+                                dialog.setEntity(entityManager.getEntity(editor3dCore.getCurrentEntity()));
+                                dialog.setEventManager(eventManager);
                                 dialog.setVisible(true);
                             } catch (InstantiationException | IllegalAccessException e1) {
                                 e1.printStackTrace();
@@ -382,7 +394,7 @@ public class EntityEditor extends JFrame {
 
     private void fillComponentComboAndList() {
         if (data != null && editor3dCore != null && editor3dCore.getCurrentEntity() != -1) {
-            data.setComponentsAdded(EntityManager.getAllComponents(editor3dCore.getCurrentEntity()).keySet());
+            data.setComponentsAdded(entityManager.getAllComponents(editor3dCore.getCurrentEntity()).keySet());
         }
         componentCombo.removeAllItems();
         componentList.removeAll();
@@ -746,7 +758,7 @@ public class EntityEditor extends JFrame {
                         nameFile.createNewFile();
                     }
                     Map<String, Object> componentsSerialization = new HashMap<>();
-                    for (Component c : EntityManager.getAllComponents(editor3dCore.getCurrentEntity()).values()) {
+                    for (Component c : entityManager.getAllComponents(editor3dCore.getCurrentEntity()).values()) {
                         if (c.isValidForSaving()) {
                             componentsSerialization.put(c.getComponentName(), c.serialize(schemaFolder));
                         }
@@ -813,7 +825,7 @@ public class EntityEditor extends JFrame {
      */
     public void startLWJGL() {
         messageQueue = new LinkedBlockingQueue<String>();
-        editor3dCore = new EditorGraphicsCore(displayParent, WIDTH, HEIGHT, messageQueue);
+        editor3dCore = new EditorGraphicsCore(displayParent, WIDTH, HEIGHT, messageQueue, componentManager, entityManager, eventManager);
         editor3dCore.setEditorData(data);
         gameThread = new Thread(editor3dCore);
         gameThread.start();

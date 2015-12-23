@@ -46,7 +46,6 @@ import de.projectsc.core.manager.EntityManager;
 import de.projectsc.core.manager.EventManager;
 import de.projectsc.core.systems.physics.PhysicsSystem;
 import de.projectsc.core.terrain.Terrain;
-import de.projectsc.modes.client.gui.GUIConstants;
 import de.projectsc.modes.client.gui.RenderingSystem;
 import de.projectsc.modes.client.gui.components.EmittingLightComponent;
 import de.projectsc.modes.client.gui.components.GraphicalComponentImplementation;
@@ -58,6 +57,7 @@ import de.projectsc.modes.client.gui.objects.particles.ParticleMaster;
 import de.projectsc.modes.client.gui.objects.terrain.TerrainModel;
 import de.projectsc.modes.client.gui.objects.text.TextMaster;
 import de.projectsc.modes.client.gui.render.MasterRenderer;
+import de.projectsc.modes.client.gui.utils.GUIConstants;
 import de.projectsc.modes.client.gui.utils.MousePicker;
 
 /**
@@ -101,12 +101,21 @@ public class EditorGraphicsCore implements Runnable {
 
     private PhysicsSystem physicsSystem;
 
-    public EditorGraphicsCore(Canvas displayParent, int width, int height, BlockingQueue<String> messageQueue) {
+    private ComponentManager componentManager;
+
+    private EntityManager entityManager;
+
+    private EventManager eventManager;
+
+    public EditorGraphicsCore(Canvas displayParent, int width, int height, BlockingQueue<String> messageQueue,
+        ComponentManager componentManager, EntityManager entityManager, EventManager eventManager) {
         incomingQueue = new LinkedBlockingQueue<>();
         this.displayParent = displayParent;
         this.width = width;
         this.height = height;
-
+        this.componentManager = componentManager;
+        this.entityManager = entityManager;
+        this.eventManager = eventManager;
     }
 
     @Override
@@ -122,13 +131,12 @@ public class EditorGraphicsCore implements Runnable {
         } catch (LWJGLException e) {
         }
         loadGUIComponents();
-        renderSystem = new RenderingSystem();
+        physicsSystem = new PhysicsSystem(entityManager, eventManager);
+        renderSystem = new RenderingSystem(entityManager, eventManager);
         TextMaster.init();
         camera = new EditorCamera();
-        physicsSystem = new PhysicsSystem();
         createNewEntity();
         masterRenderer = new MasterRenderer();
-        ParticleMaster.init(masterRenderer.getProjectionMatrix());
         createSun();
         createTerrain();
         gameLoop();
@@ -136,7 +144,7 @@ public class EditorGraphicsCore implements Runnable {
 
     private void loadGUIComponents() {
         for (GraphicalComponentImplementation it : GraphicalComponentImplementation.values()) {
-            ComponentManager.registerComponent(it.getName(), it.getClazz());
+            componentManager.registerComponent(it.getName(), it.getClazz());
         }
     }
 
@@ -149,9 +157,9 @@ public class EditorGraphicsCore implements Runnable {
             camera.move(Timer.getDelta());
             ParticleMaster.update(camera.getPosition());
             if (editorData.isLightAtCameraPostion()) {
-                if (!EntityManager.getEntity(entity).getTransform().getPosition().equals(
+                if (!entityManager.getEntity(entity).getTransform().getPosition().equals(
                     camera.getPosition())) {
-                    EventManager.fireEvent(new ChangePositionEvent(new Vector3f(0.1f, 0, 0), sun));
+                    eventManager.fireEvent(new ChangePositionEvent(new Vector3f(0.1f, 0, 0), sun));
                 }
             }
             physicsSystem.update(Timer.getDelta());
@@ -164,7 +172,6 @@ public class EditorGraphicsCore implements Runnable {
                 s.setTerrains(terrainModels);
                 s.setRenderSkybox(renderSkybox);
                 masterRenderer.renderScene(s, camera, Timer.getDelta(), new Vector4f(0, 100000000, 0, 100000000));
-                ParticleMaster.render(camera.createViewMatrix());
 
             }
             Display.sync(60);
@@ -182,16 +189,16 @@ public class EditorGraphicsCore implements Runnable {
     }
 
     private void createSun() {
-        sun = EntityManager.createNewEntity();
-        EventManager.fireEvent(new ChangePositionEvent(new Vector3f(0.0f, 100.0f, 100.0f), sun));
-        EventManager.fireEvent(new ChangeRotationEvent(new Vector3f(0, 0, 0), sun));
+        sun = entityManager.createNewEntity();
+        eventManager.fireEvent(new ChangePositionEvent(new Vector3f(0.0f, 100.0f, 100.0f), sun));
+        eventManager.fireEvent(new ChangeRotationEvent(new Vector3f(0, 0, 0), sun));
         EmittingLightComponent lightComponent =
-            (EmittingLightComponent) EntityManager.addComponentToEntity(sun,
+            (EmittingLightComponent) entityManager.addComponentToEntity(sun,
                 GraphicalComponentImplementation.EMMITING_LIGHT_COMPONENT.getName());
-        Transform position = EntityManager.getEntity(sun).getTransform();
+        Transform position = entityManager.getEntity(sun).getTransform();
         Light light = new Light(new Vector3f(position.getPosition()), new Vector3f(1.0f, 1.0f, 1.0f), "sun");
         lightComponent.addLight(sun, new Vector3f(position.getPosition()), light);
-        EntityManager.addComponentToEntity(sun, ColliderComponent.NAME);
+        entityManager.addComponentToEntity(sun, ColliderComponent.NAME);
     }
 
     private void createTerrain() {
@@ -215,7 +222,7 @@ public class EditorGraphicsCore implements Runnable {
             if (timer <= 0) {
                 timer = 1500;
                 MeshRendererComponent component =
-                    (MeshRendererComponent) EntityManager.getComponent(entity, MeshRendererComponent.NAME);
+                    (MeshRendererComponent) entityManager.getComponent(entity, MeshRendererComponent.NAME);
                 if (entity != -1 && component != null) {
                     component.setTextureIndex((component.getTextureIndex() + 1)
                         % (editorData.getNumColums() * editorData.getNumColums()));
@@ -244,9 +251,9 @@ public class EditorGraphicsCore implements Runnable {
      */
     public void updateData(EditorData data) {
         if (entity != -1) {
-            EventManager.fireEvent(new ChangeScaleEvent(entity, new Vector3f(editorData.getScale(), editorData.getScale(), editorData
+            eventManager.fireEvent(new ChangeScaleEvent(entity, new Vector3f(editorData.getScale(), editorData.getScale(), editorData
                 .getScale())));
-            EventManager.fireEvent(new ChangeMeshRendererParameterEvent(entity, editorData.isFakeLighting(), editorData
+            eventManager.fireEvent(new ChangeMeshRendererParameterEvent(entity, editorData.isFakeLighting(), editorData
                 .isTransparent(), editorData.getReflectivity(), editorData.getShineDamper(), editorData.getNumColums()));
         }
     }
@@ -255,11 +262,11 @@ public class EditorGraphicsCore implements Runnable {
      */
     public void createNewEntity() {
         if (entity != -1) {
-            EntityManager.deleteEntity(entity);
+            entityManager.deleteEntity(entity);
         }
         if (editorData != null) {
-            entity = EntityManager.createNewEntity();
-            camera.bindToEntity(entity);
+            entity = entityManager.createNewEntity();
+            camera.bindToEntity(entityManager.getEntity(entity));
         } else {
             entity = -1;
             camera.setLookAtPoint(0, 0, 0);
@@ -267,14 +274,14 @@ public class EditorGraphicsCore implements Runnable {
     }
 
     private void loadModel() {
-        if (EntityManager.hasComponent(entity, MeshRendererComponent.class)) {
-            EntityManager.getComponent(entity, MeshRendererComponent.NAME);
+        if (entityManager.hasComponent(entity, MeshRendererComponent.class)) {
+            entityManager.getComponent(entity, MeshRendererComponent.NAME);
         } else {
-            EntityManager.addComponentToEntity(entity, MeshRendererComponent.NAME);
+            entityManager.addComponentToEntity(entity, MeshRendererComponent.NAME);
         }
         try {
-            EventManager.fireEvent(new NewMeshEvent(entity, editorData.getModelFile()));
-            EventManager.fireEvent(new NewTextureEvent(entity,
+            eventManager.fireEvent(new NewMeshEvent(entity, editorData.getModelFile()));
+            eventManager.fireEvent(new NewTextureEvent(entity,
                 new File(EditorGraphicsCore.class.getResource(GUIConstants.TEXTURE_ROOT + GUIConstants.BASIC_TEXTURE_WHITE).toURI())));
         } catch (URISyntaxException e) {
             LOGGER.error(e);
@@ -314,7 +321,7 @@ public class EditorGraphicsCore implements Runnable {
                 Map<String, Object> serialized =
                     mapper.readValue(tree.get("components").get(name), new HashMap<String, Object>().getClass());
                 if (name.equals(TransformComponent.class)) {
-                    Transform t = EntityManager.getEntity(getCurrentEntity()).getTransform();
+                    Transform t = entityManager.getEntity(getCurrentEntity()).getTransform();
                     Vector3f position = new Vector3f();
                     Vector3f rotation = new Vector3f();
                     Vector3f scale = new Vector3f();
@@ -332,7 +339,7 @@ public class EditorGraphicsCore implements Runnable {
                     t.setScale(scale);
                 } else {
                     addComponent(name);
-                    Component c = EntityManager.getComponent(getCurrentEntity(), name);
+                    Component c = entityManager.getComponent(getCurrentEntity(), name);
                     if (c != null) {
                         c.deserialize(serialized, schemaFile);
                     }
@@ -342,14 +349,14 @@ public class EditorGraphicsCore implements Runnable {
             LOGGER.error("Could not read entity file in path " + schemaFile + ": " + e1.getMessage());
 
         }
-        camera.bindToEntity(entity);
+        camera.bindToEntity(entityManager.getEntity(entity));
         updateData();
         doRender(true);
 
     }
 
     private void updateTexture() {
-        EventManager.fireEvent(new NewTextureEvent(entity, editorData.getTextureFile()));
+        eventManager.fireEvent(new NewTextureEvent(entity, editorData.getTextureFile()));
     }
 
     /**
@@ -369,7 +376,7 @@ public class EditorGraphicsCore implements Runnable {
      * @param component to add
      */
     public void addComponent(String component) {
-        EntityManager.addComponentToEntity(entity, component);
+        entityManager.addComponentToEntity(entity, component);
     }
 
     public long getCurrentEntity() {
@@ -388,9 +395,9 @@ public class EditorGraphicsCore implements Runnable {
      */
     public void moveEntity(boolean value) {
         if (value) {
-            EventManager.fireEvent(new ChangeEntityStateEvent(entity, EntityState.MOVING));
+            eventManager.fireEvent(new ChangeEntityStateEvent(entity, EntityState.MOVING));
         } else {
-            EventManager.fireEvent(new ChangeEntityStateEvent(entity, EntityState.STANDING));
+            eventManager.fireEvent(new ChangeEntityStateEvent(entity, EntityState.STANDING));
         }
     }
 
@@ -431,7 +438,7 @@ public class EditorGraphicsCore implements Runnable {
      * @param component to remove
      */
     public void removeComponent(String component) {
-        EntityManager.removeComponentFromEntity(getCurrentEntity(), component);
+        entityManager.removeComponentFromEntity(getCurrentEntity(), component);
     }
 
     public void setRenderSkybox(boolean selected) {

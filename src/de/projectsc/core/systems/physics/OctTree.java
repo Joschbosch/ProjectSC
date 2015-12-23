@@ -3,7 +3,7 @@
  * 
  * 
  */
-package de.projectsc.core.data.structure;
+package de.projectsc.core.systems.physics;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -19,8 +19,7 @@ import de.projectsc.core.component.impl.physic.ColliderComponent;
 import de.projectsc.core.component.impl.physic.VelocityComponent;
 import de.projectsc.core.data.physics.AxisAlignedBoundingBox;
 import de.projectsc.core.data.physics.Transform;
-import de.projectsc.core.entities.Entity;
-import de.projectsc.core.manager.EntityManager;
+import de.projectsc.core.interfaces.Entity;
 
 /**
  * Data structure for finding collisions of {@link PhysicalObject}s.
@@ -238,7 +237,7 @@ public class OctTree<T extends Entity> {
 
     private boolean containsEntity(AxisAlignedBoundingBox boundingBox, T e) {
         Transform t = e.getTransform();
-        AxisAlignedBoundingBox aabb = ((ColliderComponent) EntityManager.getComponent(e.getID(), ColliderComponent.class)).getAABB();
+        AxisAlignedBoundingBox aabb = ((ColliderComponent) e.getComponent(ColliderComponent.class)).getAABB();
         Vector3f minBB = Vector3f.add(t.getPosition(), aabb.getMin(), null);
         Vector3f maxBB = Vector3f.add(t.getPosition(), aabb.getMax(), null);
         if (minBB.x <= boundingBox.getMax().x && minBB.x >= boundingBox.getMin().x
@@ -363,10 +362,8 @@ public class OctTree<T extends Entity> {
             entityCopy.remove(parentEntity);
             for (T entity : entityCopy) {
                 if (parentEntity.getID() != entity.getID()) {
-                    ColliderComponent colliderComponentA =
-                        (ColliderComponent) EntityManager.getComponent(parentEntity.getID(), ColliderComponent.class);
-                    ColliderComponent colliderComponentB =
-                        (ColliderComponent) EntityManager.getComponent(entity.getID(), ColliderComponent.class);
+                    ColliderComponent colliderComponentA = ((ColliderComponent) parentEntity.getComponent(ColliderComponent.class));
+                    ColliderComponent colliderComponentB = ((ColliderComponent) entity.getComponent(ColliderComponent.class));
                     if (colliderComponentA != null && colliderComponentB != null) {
                         AxisAlignedBoundingBox parentAABB = colliderComponentA.getAABB();
                         AxisAlignedBoundingBox entityAABB = colliderComponentB.getAABB();
@@ -393,7 +390,7 @@ public class OctTree<T extends Entity> {
                 }
             }
             for (T e : entities) {
-                if (EntityManager.hasComponent(e.getID(), VelocityComponent.class)) {
+                if (e.hasComponent(VelocityComponent.class)) {
                     parentEntities.add(e);
                 }
             }
@@ -407,8 +404,8 @@ public class OctTree<T extends Entity> {
     }
 
     private void checkForIntersect(List<T> intersectionIDs, T current, T e) {
-        ColliderComponent colliderComponentA = (ColliderComponent) EntityManager.getComponent(e.getID(), ColliderComponent.class);
-        ColliderComponent colliderComponentB = (ColliderComponent) EntityManager.getComponent(current.getID(), ColliderComponent.class);
+        ColliderComponent colliderComponentA = (ColliderComponent) e.getComponent(ColliderComponent.class);
+        ColliderComponent colliderComponentB = (ColliderComponent) current.getComponent(ColliderComponent.class);
         if (colliderComponentA != null && colliderComponentB != null) {
             AxisAlignedBoundingBox entityAABB = colliderComponentA.getAABB();
             AxisAlignedBoundingBox currentAABB = colliderComponentB.getAABB();

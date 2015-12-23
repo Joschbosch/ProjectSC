@@ -21,9 +21,9 @@ import de.projectsc.core.data.physics.ModelData;
 import de.projectsc.core.data.physics.WireFrame;
 import de.projectsc.core.data.utils.OBJFileLoader;
 import de.projectsc.core.utils.Maths;
-import de.projectsc.modes.client.gui.GUIConstants;
 import de.projectsc.modes.client.gui.models.RawModel;
 import de.projectsc.modes.client.gui.shaders.WireFrameShader;
+import de.projectsc.modes.client.gui.utils.GUIConstants;
 import de.projectsc.modes.client.gui.utils.Loader;
 
 /**
