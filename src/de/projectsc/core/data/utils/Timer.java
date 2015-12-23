@@ -13,11 +13,17 @@ public final class Timer {
 
     private static long lastSnapshotTime;
 
-    private static int lag;
+    private static long lag;
 
     private static long delta;
 
     private static long snapshotTime;
+
+    private static long frameCount = 0;
+
+    private static long fpsTimer = 0;
+
+    private static long currentFPS = 0;
 
     private Timer() {}
 
@@ -38,14 +44,25 @@ public final class Timer {
         delta = snapshotTime - lastSnapshotTime;
         lastSnapshotTime = snapshotTime;
         lag += delta;
+        frameCount++;
+        fpsTimer += delta;
+        if (fpsTimer > 1000) {
+            currentFPS = frameCount;
+            frameCount = 0;
+            fpsTimer = 0;
+        }
     }
 
-    public static int getLag() {
+    public static long getCurrentFPS() {
+        return currentFPS;
+    }
+
+    public static long getLag() {
         return lag;
     }
 
-    public static void setLag(int newLag) {
-        lag = newLag;
+    public static void setLag(long l) {
+        lag = l;
     }
 
     public static long getDelta() {

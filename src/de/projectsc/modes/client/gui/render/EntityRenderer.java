@@ -46,13 +46,15 @@ public class EntityRenderer {
      * @param scales to render.
      */
     public void render(Map<TexturedModel, List<Long>> entitiesWithModel,
-        Map<Long, Vector3f> position, Map<Long, Vector3f> rotations, Map<Long, Vector3f> scales) {
+        Map<Long, Vector3f> position, Map<Long, Vector3f> rotations, Map<Long, Vector3f> scales,
+        List<Long> selected, List<Long> highlighted) {
         for (TexturedModel model : entitiesWithModel.keySet()) {
             prepareTexturedModel(model);
             List<Long> batch = entitiesWithModel.get(model);
             for (Long e : batch) {
                 if (position.get(e) != null && rotations.get(e) != null && scales.get(e) != null) {
-                    prepareInstance(model.getTexture(), position.get(e), rotations.get(e), scales.get(e));
+                    prepareInstance(model.getTexture(), position.get(e), rotations.get(e), scales.get(e), highlighted.contains(e),
+                        selected.contains(e));
                     GL11.glDrawElements(GL11.GL_TRIANGLES, model.getRawModel().getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
                 }
             }
@@ -85,12 +87,13 @@ public class EntityRenderer {
         MasterRenderer.enableCulling();
     }
 
-    private void prepareInstance(ModelTexture modelTexture, Vector3f position, Vector3f rotation, Vector3f scale) {
+    private void prepareInstance(ModelTexture modelTexture, Vector3f position, Vector3f rotation, Vector3f scale, boolean isSelected,
+        boolean isHighlighted) {
         Matrix4f transformationMatrix =
             Maths.createTransformationMatrix(position, rotation.x, rotation.y, rotation.z, scale);
         shader.loadTransformationMatrix(transformationMatrix);
         shader.loadOffset(getTextureOffsetX(modelTexture), getTextureOffsetY(modelTexture));
-        shader.loadSelected(false, false);
+        shader.loadSelected(isHighlighted, isSelected);
 
     }
 

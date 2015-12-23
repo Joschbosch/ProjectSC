@@ -11,11 +11,13 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.rits.cloning.Cloner;
+
 import de.projectsc.core.interfaces.Component;
 
 /**
- * The {@link ComponentManager} is a registry for all types of components. It will create instances
- * of the components and maps their names to the classes.
+ * The {@link ComponentManager} is a registry for all types of components. It will create instances of the components and maps their names
+ * to the classes.
  * 
  * @author Josch Bosch
  */
@@ -76,5 +78,11 @@ public final class ComponentManager {
      */
     public static Class<? extends Component> getComponentClass(String componentName) {
         return registeredComponents.get(componentName);
+    }
+
+    public static Component cloneComponent(Component c) {
+        Component clone = Cloner.standard().deepClone(c);
+        clone.createNewId();
+        return clone;
     }
 }

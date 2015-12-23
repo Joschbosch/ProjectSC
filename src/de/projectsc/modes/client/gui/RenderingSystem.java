@@ -121,7 +121,7 @@ public class RenderingSystem extends DefaultSystem {
                     GraphicalComponent gc = (GraphicalComponent) c;
                     gc.render(entity, scene);
                 }
-                c.addDebugMode(scene);
+                c.addSceneInformation(entity, scene);
             }
             Transform pc = EntityManager.getEntity(entity).getTransform();
             scene.getPositions().put(entity, pc.getPosition());

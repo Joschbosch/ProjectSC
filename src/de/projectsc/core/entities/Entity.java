@@ -8,8 +8,7 @@ package de.projectsc.core.entities;
 import de.projectsc.core.data.physics.Transform;
 
 /**
- * All game objects in the game are entities. All entities have components, that define their role
- * and behavior.
+ * All game objects in the game are entities. All entities have components, that define their role and behavior.
  * 
  * @author Josch Bosch
  */
@@ -50,4 +49,12 @@ public class Entity {
         this.tag = tag;
     }
 
+    @Override
+    public String toString() {
+        return String.valueOf(entityUID);
+    }
+
+    public void setEntityTypeId(Long id) {
+        this.entityTypeID = id;
+    }
 }

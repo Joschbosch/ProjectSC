@@ -10,6 +10,7 @@ import java.util.Map;
 
 import de.projectsc.core.component.ComponentType;
 import de.projectsc.core.component.DefaultComponent;
+import de.projectsc.core.data.Scene;
 import de.projectsc.core.entities.states.EntityState;
 
 /**
@@ -28,6 +29,14 @@ public class EntityStateComponent extends DefaultComponent {
 
     private boolean moved = false;
 
+    public boolean selected = false;
+
+    public boolean selectAble = true;
+
+    public boolean highlighted = false;
+
+    public boolean highlightAble = true;
+
     public EntityStateComponent() {
         setType(ComponentType.PREPHYSICS);
         setID(NAME);
@@ -39,6 +48,16 @@ public class EntityStateComponent extends DefaultComponent {
             setMoved(true);
         } else {
             setMoved(false);
+        }
+    }
+
+    @Override
+    public void addSceneInformation(Long entity, Scene scene) {
+        if (selectAble && selected) {
+            scene.getSelectedEntites().add(entity);
+        }
+        if (highlightAble && highlighted) {
+            scene.getHightlightedEntites().add(entity);
         }
     }
 
@@ -86,6 +105,42 @@ public class EntityStateComponent extends DefaultComponent {
 
     public void setMoved(boolean moved) {
         this.moved = moved;
+    }
+
+    public void setEntitySelected(boolean entitySelected) {
+        this.selected = entitySelected;
+    }
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+    }
+
+    public boolean isSelectAble() {
+        return selectAble;
+    }
+
+    public void setSelectAble(boolean selectAble) {
+        this.selectAble = selectAble;
+    }
+
+    public boolean isHighlighted() {
+        return highlighted;
+    }
+
+    public void setHighlighted(boolean highlighted) {
+        this.highlighted = highlighted;
+    }
+
+    public boolean isHighlightAble() {
+        return highlightAble;
+    }
+
+    public void setHighlightAble(boolean highlightAble) {
+        this.highlightAble = highlightAble;
     }
 
 }

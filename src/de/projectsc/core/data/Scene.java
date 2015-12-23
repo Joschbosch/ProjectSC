@@ -22,6 +22,10 @@ public class Scene {
 
     private List<WireFrame> wireFrames = null;
 
+    private List<Long> selectedEntites = new LinkedList<>();
+
+    private List<Long> highlightedEntities = new LinkedList<>();
+
     public Scene() {
         wireFrames = new LinkedList<>();
     }
@@ -44,5 +48,13 @@ public class Scene {
 
     public List<WireFrame> getWireFrames() {
         return wireFrames;
+    }
+
+    public List<Long> getSelectedEntites() {
+        return selectedEntites;
+    }
+
+    public List<Long> getHightlightedEntites() {
+        return highlightedEntities;
     }
 }

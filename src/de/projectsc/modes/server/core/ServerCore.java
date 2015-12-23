@@ -194,7 +194,7 @@ public class ServerCore implements Runnable {
             for (Long id : games.keySet()) {
                 gameList +=
                     String.format("(%4d) %s (%d player) %s\n", id, games.get(id).getDisplayName(), games.get(id).getPlayerCount(), games
-                        .get(id).getGameState());
+                        .get(id).getCurrentState());
             }
         }
         LOGGER.debug(gameList);

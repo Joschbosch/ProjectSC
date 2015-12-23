@@ -48,7 +48,7 @@ public abstract class DefaultComponent implements Component {
     private boolean isActive = false;
 
     public DefaultComponent() {
-        this.uid = uidCount++;
+        createNewId();
     }
 
     public void setID(String id) {
@@ -165,7 +165,17 @@ public abstract class DefaultComponent implements Component {
     }
 
     @Override
-    public void addDebugMode(Scene scene) {
+    public void addSceneInformation(Long entity, Scene scene) {
 
+    }
+
+    @Override
+    public long getId() {
+        return uid;
+    }
+
+    @Override
+    public void createNewId() {
+        uid = uidCount++;
     }
 }

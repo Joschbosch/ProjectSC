@@ -22,7 +22,6 @@ import de.projectsc.modes.client.gui.GUICore;
 import de.projectsc.modes.client.interfaces.ClientState;
 import de.projectsc.modes.client.interfaces.GUI;
 import de.projectsc.modes.client.messages.ClientMessage;
-import de.projectsc.modes.server.core.game.GameRunningState;
 
 /**
  * Core class for the client.
@@ -31,7 +30,7 @@ import de.projectsc.modes.server.core.game.GameRunningState;
  */
 public class ClientCore implements Runnable {
 
-    private static final int TICK_TIME = (int) GameRunningState.GAME_TICK_TIME;
+    private static final int TICK_TIME = 16;
 
     private static final Log LOGGER = LogFactory.getLog(ClientCore.class);
 
@@ -86,7 +85,7 @@ public class ClientCore implements Runnable {
                 gui.render(currentState, null);
             }
             long timeNeeded = System.currentTimeMillis() - Timer.getSnapshotTime();
-            long sleepTime = Math.max((GameRunningState.GAME_TICK_TIME - timeNeeded), 0L);
+            long sleepTime = Math.max((16 - timeNeeded), 0L);
             try {
                 Thread.sleep(sleepTime);
             } catch (InterruptedException e) {

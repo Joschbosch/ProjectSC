@@ -16,6 +16,7 @@ import de.projectsc.core.component.impl.physic.TransformComponent;
 import de.projectsc.core.entities.Entity;
 import de.projectsc.core.events.components.ComponentAddedEvent;
 import de.projectsc.core.events.components.ComponentRemovedEvent;
+import de.projectsc.core.events.entities.DeletedEntityEvent;
 import de.projectsc.core.events.entities.NewEntityCreatedEvent;
 import de.projectsc.core.interfaces.Component;
 
@@ -45,9 +46,9 @@ public final class EntityManager {
     public static long createNewEntity() {
         Entity e = new Entity();
         ENTITIES.put(e.getID(), e);
+        LOGGER.debug("Created new entity " + e.getID());
         addComponentToEntity(e.getID(), TransformComponent.NAME);
         EventManager.fireEvent(new NewEntityCreatedEvent(e.getID()));
-        LOGGER.debug("Created new entity " + e.getID());
         return e.getID();
     }
 
@@ -61,26 +62,31 @@ public final class EntityManager {
      */
     public static Component addComponentToEntity(long id, String componentName) {
         Component c = ComponentManager.createComponent(componentName);
+        addComponentToEntity(id, c);
+        return c;
+    }
+
+    public static Component addComponentToEntity(long id, Component c) {
         if (c != null) {
             Map<String, Component> components = ENTITYCOMPONENTS.get(id);
             if (components == null) {
                 components = new HashMap<>();
             }
-            components.put(componentName, c);
+            components.put(c.getComponentName(), c);
             ENTITYCOMPONENTS.put(id, components);
-            LOGGER.debug("Added component " + componentName + " to entity " + id);
+            LOGGER.debug("Added component " + c.getComponentName() + " to entity " + id);
+            EventManager.fireEvent(new ComponentAddedEvent(id, c));
             List<String> required = c.getRequiredComponents();
             for (String reqComponent : required) {
                 if (!hasComponent(id, ComponentManager.getComponentClass(reqComponent))) {
                     Component reqCom = addComponentToEntity(id, reqComponent);
-                    reqCom.addRequiredByComponent(componentName);
-                    LOGGER.debug(String.format("Component %s added because it was required by %s", reqComponent, componentName));
+                    reqCom.addRequiredByComponent(c.getComponentName());
+                    LOGGER.debug(String.format("Component %s added because it was required by %s", reqComponent, c.getComponentName()));
                 } else {
                     Component reqCom = getComponent(id, reqComponent);
-                    reqCom.addRequiredByComponent(componentName);
+                    reqCom.addRequiredByComponent(c.getComponentName());
                 }
             }
-            EventManager.fireEvent(new ComponentAddedEvent(id, c));
             return c;
         }
         return null;
@@ -197,7 +203,9 @@ public final class EntityManager {
         if (ENTITIES.remove(id) != null) {
             LOGGER.debug("Removed entity " + id);
             ENTITYCOMPONENTS.remove(id);
+            EventManager.fireEvent(new DeletedEntityEvent(id));
         }
+
     }
 
     /**

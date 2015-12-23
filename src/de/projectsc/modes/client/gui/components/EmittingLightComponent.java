@@ -63,7 +63,7 @@ public class EmittingLightComponent extends GraphicalComponent {
     }
 
     @Override
-    public void addDebugMode(Scene scene) {
+    public void addSceneInformation(Long e, Scene scene) {
         for (Light l : lights) {
             WireFrame w = new WireFrame(WireFrame.SPHERE, l.getPosition(), new Vector3f(0, 0, 0), new Vector3f(1, 1, 1));
             scene.getWireFrames().add(w);
@@ -90,8 +90,7 @@ public class EmittingLightComponent extends GraphicalComponent {
     }
 
     /**
-     * Add light to entity. Note that the lights postion will be the offset of the entities
-     * position.
+     * Add light to entity. Note that the lights postion will be the offset of the entities position.
      * 
      * @param entity owner entity
      * @param position of the light

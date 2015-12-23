@@ -35,9 +35,7 @@ public class TransformComponent extends PhysicsComponent {
 
     @Override
     public void update(long ownerEntity) {
-        if (transform == null) {
-            transform = EntityManager.getEntity(ownerEntity).getTransform();
-        }
+        transform = EntityManager.getEntity(ownerEntity).getTransform();
     }
 
     /**
@@ -69,7 +67,13 @@ public class TransformComponent extends PhysicsComponent {
 
     @Override
     public void deserialize(Map<String, Object> serialized, File loadingLocation) {
-
+        this.transform = new Transform();
+        transform.setPosition(new Vector3f((float) (double) serialized.get("positionX"), (float) (double) serialized.get("positionY"),
+            (float) (double) serialized.get("positionZ")));
+        transform.setRotation(new Vector3f((float) (double) serialized.get("rotationX"), (float) (double) serialized.get("rotationY"),
+            (float) (double) serialized.get("rotationZ")));
+        transform.setScale(new Vector3f((float) (double) serialized.get("scaleX"), (float) (double) serialized.get("scaleY"),
+            (float) (double) serialized.get("scaleZ")));
     }
 
     @Override

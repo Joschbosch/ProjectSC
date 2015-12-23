@@ -25,7 +25,9 @@ import de.projectsc.core.entities.Entity;
 import de.projectsc.core.entities.states.EntityState;
 import de.projectsc.core.events.components.ComponentAddedEvent;
 import de.projectsc.core.events.components.ComponentRemovedEvent;
+import de.projectsc.core.events.entities.ChangeEntitySelectEvent;
 import de.projectsc.core.events.entities.ChangeEntityStateEvent;
+import de.projectsc.core.events.entities.DeletedEntityEvent;
 import de.projectsc.core.events.entities.NewEntityCreatedEvent;
 import de.projectsc.core.events.movement.ChangeMovementParameterEvent;
 import de.projectsc.core.events.movement.ChangePositionEvent;
@@ -60,8 +62,9 @@ public class PhysicsSystem extends DefaultSystem {
         EventManager.registerForEvent(NewMeshEvent.class, this);
         EventManager.registerForEvent(ComponentAddedEvent.class, this);
         EventManager.registerForEvent(ComponentRemovedEvent.class, this);
-
-        octree = new OctTree<Entity>(new AxisAlignedBoundingBox(new Vector3f(-500, -500, -500), new Vector3f(500, 500, 500)));
+        EventManager.registerForEvent(DeletedEntityEvent.class, this);
+        EventManager.registerForEvent(ChangeEntitySelectEvent.class, this);
+        octree = new OctTree<Entity>(new AxisAlignedBoundingBox(new Vector3f(-1000, -1000, -1000), new Vector3f(1000, 1000, 1000)));
 
     }
 
@@ -100,12 +103,14 @@ public class PhysicsSystem extends DefaultSystem {
 
     @Override
     public void processEvent(Event e) {
-        Transform transform = EntityManager.getEntity(e.getEntityId()).getTransform();
-        if (e instanceof ChangePositionEvent && transform != null) {
+        if (e instanceof ChangePositionEvent) {
+            Transform transform = EntityManager.getEntity(e.getEntityId()).getTransform();
             handlePositionEvent((ChangePositionEvent) e, transform);
-        } else if (e instanceof ChangeRotationEvent && transform != null) {
+        } else if (e instanceof ChangeRotationEvent) {
+            Transform transform = EntityManager.getEntity(e.getEntityId()).getTransform();
             handleRotateEvent((ChangeRotationEvent) e, transform);
-        } else if (e instanceof ChangeScaleEvent && transform != null) {
+        } else if (e instanceof ChangeScaleEvent) {
+            Transform transform = EntityManager.getEntity(e.getEntityId()).getTransform();
             handleScaleEvent((ChangeScaleEvent) e, transform);
         } else if (e instanceof ChangeMovementParameterEvent) {
             handleVelocityChangeEvent((ChangeMovementParameterEvent) e, getComponent(e.getEntityId(), VelocityComponent.class));
@@ -123,12 +128,18 @@ public class PhysicsSystem extends DefaultSystem {
         } else if (e instanceof ComponentRemovedEvent) {
             Component c = ((ComponentRemovedEvent) e).getComponent();
             if (c instanceof ColliderComponent) {
-                octree.removeEntity(EntityManager.getEntity(e.getEntityId()));
+                octree.removeEntity(e.getEntityId());
                 octree.recalculateTree();
             }
         } else if (e instanceof NewMeshEvent) {
             ((MeshComponent) EntityManager.getComponent(e.getEntityId(), MeshComponent.class)).changeMesh(((NewMeshEvent) e)
                 .getNewMeshFile());
+        } else if (e instanceof DeletedEntityEvent) {
+            octree.removeEntity(e.getEntityId());
+        } else if (e instanceof ChangeEntitySelectEvent) {
+            EntityStateComponent comp = ((EntityStateComponent) EntityManager.getComponent(e.getEntityId(), EntityStateComponent.class));
+            comp.setEntitySelected(((ChangeEntitySelectEvent) e).getSelected());
+            comp.setHighlighted(((ChangeEntitySelectEvent) e).isHightLighted());
         }
     }
 

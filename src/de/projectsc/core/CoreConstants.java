@@ -53,6 +53,8 @@ public final class CoreConstants {
      */
     public static final String BOX_FILENAME = "boundingBox.obj";
 
+    public static final String LEVEL_DIRECTORY_PREFIX = "L";
+
     private CoreConstants() {
 
     }

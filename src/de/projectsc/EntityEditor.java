@@ -756,7 +756,7 @@ public class EntityEditor extends JFrame {
                     complete.put("schemaName", data.getName());
                     complete.put(COMPONENTS, componentsSerialization);
                     ObjectMapper mapper = new ObjectMapper();
-                    mapper.writeValue(new File(schemaFolder, ENTITY_ENT), complete);
+                    mapper.writerWithDefaultPrettyPrinter().writeValue(new File(schemaFolder, ENTITY_ENT), complete);
                 } catch (URISyntaxException | IOException e1) {
                     LOGGER.error("Could not write EntitySchema: ", e1);
                 }
@@ -809,8 +809,7 @@ public class EntityEditor extends JFrame {
     }
 
     /**
-     * Once the Canvas is created its add notify method will call this method to start the LWJGL
-     * Display and game loop in another thread.
+     * Once the Canvas is created its add notify method will call this method to start the LWJGL Display and game loop in another thread.
      */
     public void startLWJGL() {
         messageQueue = new LinkedBlockingQueue<String>();
@@ -821,8 +820,8 @@ public class EntityEditor extends JFrame {
     }
 
     /**
-     * Tell game loop to stop running, after which the LWJGL Display will be destoryed. The main
-     * thread will wait for the Display.destroy() to complete
+     * Tell game loop to stop running, after which the LWJGL Display will be destoryed. The main thread will wait for the Display.destroy()
+     * to complete
      */
     private void stopLWJGL() {
         try {

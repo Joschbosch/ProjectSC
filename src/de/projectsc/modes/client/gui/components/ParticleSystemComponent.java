@@ -70,7 +70,7 @@ public class ParticleSystemComponent extends GraphicalComponent {
 
     @Override
     public Map<String, Object> serialize(File savingLocation) {
-        return null;
+        return new HashMap<>();
     }
 
     @Override
@@ -79,7 +79,7 @@ public class ParticleSystemComponent extends GraphicalComponent {
     }
 
     @Override
-    public void addDebugMode(Scene scene) {
+    public void addSceneInformation(Long e, Scene scene) {
         for (ParticleSystem s : particleSystems) {
             WireFrame w = new WireFrame(WireFrame.SPHERE, s.getSystemCenter(), new Vector3f(0, 0, 0), new Vector3f(1, 1, 1));
             scene.getWireFrames().add(w);

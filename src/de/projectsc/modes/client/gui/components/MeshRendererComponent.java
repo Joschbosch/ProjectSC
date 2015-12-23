@@ -146,13 +146,19 @@ public class MeshRendererComponent extends GraphicalComponent {
     public void loadAndApplyTexture(File incTextureFile) {
         if (incTextureFile != null) {
             this.textureFile = incTextureFile;
-            int texture = 0 - 1;
-            texture = Loader.loadTexture(incTextureFile);
-            if (modelTexture == null) {
-                modelTexture = new ModelTexture(texture);
-            } else {
-                modelTexture.setTextureID(texture);
-            }
+            applyTexture(incTextureFile);
+        } else if (textureFile != null) {
+            applyTexture(textureFile);
+        }
+    }
+
+    private void applyTexture(File incTextureFile) {
+        int texture = 0 - 1;
+        texture = Loader.loadTexture(incTextureFile);
+        if (modelTexture == null) {
+            modelTexture = new ModelTexture(texture);
+        } else {
+            modelTexture.setTextureID(texture);
         }
     }
 

@@ -8,12 +8,13 @@ package de.projectsc.modes.server.core.game;
 import java.util.Map;
 import java.util.TreeMap;
 
-import au.com.ds.ef.StatefulContext;
+import org.lwjgl.util.vector.Vector3f;
+
+import de.projectsc.core.data.physics.AxisAlignedBoundingBox;
+import de.projectsc.core.data.structure.OctTree;
 import de.projectsc.core.entities.Entity;
 import de.projectsc.core.game.GameAttributes;
 import de.projectsc.core.game.GameConfiguration;
-import de.projectsc.core.terrain.Terrain;
-import de.projectsc.core.terrain.TerrainLoader;
 import de.projectsc.modes.server.core.game.data.ServerPlayer;
 
 /**
@@ -21,7 +22,7 @@ import de.projectsc.modes.server.core.game.data.ServerPlayer;
  * 
  * @author Josch Bosch
  */
-public class GameContext extends StatefulContext {
+public class GameContext {
 
     private static final long serialVersionUID = 7971613418627835197L;
 
@@ -39,13 +40,13 @@ public class GameContext extends StatefulContext {
 
     private byte loadingProgress = 0;
 
-    private Terrain terrain;
-
     private Map<Integer, Entity> staticEntities;
 
     private Map<Long, Entity> entities;
 
     private final Game game;
+
+    private OctTree<Entity> octTree;
 
     public GameContext(int id, String displayName, ServerPlayer host, Game game) {
         this.gameID = id;
@@ -55,9 +56,10 @@ public class GameContext extends StatefulContext {
         players = new TreeMap<>();
         players.put(this.host.getId(), this.host);
         this.config = new GameConfiguration();
-        this.config.setMapName("newDataMap");
+        this.config.setMapName("L1/first");
         this.config.setPlayerCharacter(this.host.getId(), "person");
         this.config.setPlayerAffiliation(this.getHost().getId(), GameAttributes.AFFILIATION_LIGHT);
+        this.octTree = null;
     }
 
     /**
@@ -67,29 +69,18 @@ public class GameContext extends StatefulContext {
         loading = true;
         entities = new TreeMap<>();
 
-        terrain = TerrainLoader.loadTerrain(config.getMapName() + ".psc");
+        octTree = new OctTree<Entity>(new AxisAlignedBoundingBox(new Vector3f(-1000, -1000, -1000), new Vector3f(1000, 1000, 1000)));
+        loadMapAndEntites();
         loadingProgress = 50;
-
-        if (terrain != null) {
-            terrain.buildNeighborhood();
-        }
         loadingProgress = 60;
-        if (terrain != null) {
-            terrain.makeStaticObjectsNotWalkable();
-        }
         loadingProgress = 70;
 
         loadPlayerAndBots();
         loadingProgress = 100;
     }
 
-    /**
-     * Change state of the game.
-     * 
-     * @param gameState new state
-     */
-    public void changeState(GameState gameState) {
-        game.changeState(gameState);
+    private void loadMapAndEntites() {
+
     }
 
     private void loadPlayerAndBots() {
@@ -119,9 +110,7 @@ public class GameContext extends StatefulContext {
     /**
      * Terminate context.
      */
-    public void terminate() {
-        setTerminated();
-    }
+    public void terminate() {}
 
     public boolean isLoading() {
         return loading;
@@ -141,10 +130,6 @@ public class GameContext extends StatefulContext {
 
     public GameConfiguration getConfig() {
         return config;
-    }
-
-    public Terrain getTerrain() {
-        return terrain;
     }
 
     public Map<Integer, Entity> getStaticEntities() {

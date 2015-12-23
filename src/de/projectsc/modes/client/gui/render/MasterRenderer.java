@@ -118,7 +118,8 @@ public class MasterRenderer {
         }
         entityShader.loadLights(scene.getLights());
         entityShader.loadViewMatrix(camera);
-        entityRenderer.render(scene.getModels(), scene.getPositions(), scene.getRotations(), scene.getScales());
+        entityRenderer.render(scene.getModels(), scene.getPositions(), scene.getRotations(), scene.getScales(),
+            scene.getSelectedEntites(), scene.getHightlightedEntites());
         entityShader.stop();
         if (scene.isWireframeEnable()) {
             wireframeShader.start();

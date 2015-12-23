@@ -9,20 +9,21 @@ package de.projectsc.modes.server.core.game;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import au.com.ds.ef.EasyFlow;
-import au.com.ds.ef.FlowBuilder;
-import au.com.ds.ef.StateEnum;
-import au.com.ds.ef.call.ContextHandler;
+import de.projectsc.core.component.impl.ComponentListItem;
+import de.projectsc.core.data.utils.Timer;
 import de.projectsc.core.game.GameAttributes;
 import de.projectsc.core.game.GameConfiguration;
+import de.projectsc.core.manager.ComponentManager;
 import de.projectsc.core.messages.GameMessageConstants;
 import de.projectsc.core.messages.MessageConstants;
+import de.projectsc.core.systems.physics.PhysicsSystem;
 import de.projectsc.modes.server.core.ServerCommands;
 import de.projectsc.modes.server.core.ServerConstants;
 import de.projectsc.modes.server.core.data.AuthenticatedClient;
@@ -37,6 +38,8 @@ import de.projectsc.modes.server.core.messages.ServerMessage;
  */
 public class Game implements Runnable {
 
+    public static final long GAME_TICK_TIME = 16;
+
     private static final Log LOGGER = LogFactory.getLog(Game.class);
 
     private static final int ID_START = 1000;
@@ -49,17 +52,21 @@ public class Game implements Runnable {
 
     private final BlockingQueue<ServerMessage> coreQueue;
 
-    private GameState currenState;
-
-    private EasyFlow<GameContext> flow;
+    private States currentState;
 
     private final GameContext gameContext;
+
+    private Map<Long, Byte> playerLoadingProgress;
+
+    private boolean startLoading = false;
+
+    private boolean loading = false;
+
+    private PhysicsSystem physicsSystem;
 
     public Game(AuthenticatedClient host, BlockingQueue<ServerMessage> coreQueue) {
         this.coreQueue = coreQueue;
         this.gameContext = new GameContext(idCounter++, host.getDisplayName() + "'s game", new ServerPlayer(host), this);
-        createAndBindFlow();
-        flow.start(gameContext);
         LOGGER.debug(String.format("Created new game: %s (Host: %s, game id: %d)", gameContext.getDisplayName(), host.getDisplayName(),
             gameContext.getGameID()));
         new Thread(this).start();
@@ -67,25 +74,23 @@ public class Game implements Runnable {
 
     @Override
     public void run() {
-        long previous = System.currentTimeMillis();
-        long lag = 0;
+        Timer.init();
         LOGGER.debug(String.format("Game %d started", gameContext.getGameID()));
         while (lobbyAlive.get()) {
-            long current = System.currentTimeMillis();
-            long elapsed = current - previous;
-            previous = current;
-            lag += elapsed;
+            Timer.update();
             readMessages();
-            while (lag >= GameRunningState.GAME_TICK_TIME) {
-                synchronized (LOCK_OBJECT) {
-                    if (currenState != null) {
-                        currenState.loop();
-                    }
+            while (Timer.getLag() >= GAME_TICK_TIME) {
+                if (currentState == States.LOBBY) {
+                    loopLobby();
+                } else if (currentState == States.LOADING) {
+                    loopLoading();
+                } else if (currentState == States.RUNNING) {
+                    loopGame();
                 }
-                lag -= GameRunningState.GAME_TICK_TIME;
+                Timer.setLag(Timer.getLag() - GAME_TICK_TIME);
             }
-            long timeNeeded = System.currentTimeMillis() - current;
-            long sleepTime = Math.max((GameRunningState.GAME_TICK_TIME - timeNeeded), 0L);
+            long timeNeeded = System.currentTimeMillis() - Timer.getSnapshotTime();
+            long sleepTime = Math.max((GAME_TICK_TIME - timeNeeded), 0L);
             // LOGGER.debug(
             // String.format("Game %d needed %d ms for current tick, will sleep : %d",
             // gameContext.getGameID(), timeNeeded, sleepTime));
@@ -96,6 +101,56 @@ public class Game implements Runnable {
             }
         }
         LOGGER.debug(String.format("Game %d terminated", gameContext.getGameID()));
+    }
+
+    private void loopGame() {
+        // TODO Auto-generated method stub
+
+    }
+
+    private void loopLoading() {
+        if (startLoading) {
+            playerLoadingProgress = new TreeMap<>();
+            for (Long id : gameContext.getPlayers().keySet()) {
+                playerLoadingProgress.put(id, new Byte((byte) 0));
+            }
+            new Thread(new Runnable() {
+
+                @Override
+                public void run() {
+                    physicsSystem = new PhysicsSystem();
+                    loadComponents();
+                    gameContext.loadData();
+                }
+            }).start();
+            loading = true;
+            startLoading = false;
+        }
+        if (loading) {
+            int sumLoading = gameContext.getLoadingProgress();
+            for (Long id : playerLoadingProgress.keySet()) {
+                sumLoading += playerLoadingProgress.get(id);
+            }
+            int percentageLoaded = sumLoading / (playerLoadingProgress.size() + 1);
+            final int maximumpercentage = 100;
+            if (percentageLoaded >= maximumpercentage) {
+                LOGGER.debug("Loading done! Starting game!");
+                gameContext.setLoading(false);
+                // finishedLoading
+                loading = false;
+            }
+        }
+    }
+
+    private void loadComponents() {
+        for (ComponentListItem it : ComponentListItem.values()) {
+            ComponentManager.registerComponent(it.getName(), it.getClazz());
+        }
+    }
+
+    private void loopLobby() {
+        // TODO Auto-generated method stub
+
     }
 
     private void readMessages() {
@@ -131,8 +186,10 @@ public class Game implements Runnable {
                             gameContext.getGameID()));
 
                     }
-                } else if (currenState != null) {
-                    currenState.handleMessage(player, msg);
+                } else if (currentState == States.LOBBY) {
+                    handleMessagesLobby(player, msg);
+                } else if (currentState == States.LOADING) {
+                    handleMessagesLoading(player, msg);
                 }
             }
         }
@@ -148,25 +205,40 @@ public class Game implements Runnable {
         }
     }
 
-    private void createAndBindFlow() {
-        flow = FlowBuilder.from(States.LOBBY)
-            .transit(FlowBuilder.on(Events.START_GAME_COMMAND).to(States.LOADING)
-                .transit(FlowBuilder.on(Events.FINISHED_LOADING).to(States.RUNNING)
-                    .transit(FlowBuilder.on(Events.GAME_ENDS).finish(States.FINISHED))));
+    private void handleMessagesLoading(ServerPlayer player, ServerMessage msg) {
+        if (msg.getMessage().equals(GameMessageConstants.UPDATE_LOADING_PROGRESS)) {
+            playerLoadingProgress.put(player.getId(), Byte.parseByte((String) msg.getData()[0]));
+            LOGGER.debug("Map loading completed " + gameContext.getLoadingProgress() + "%");
+            int sumLoading = gameContext.getLoadingProgress();
+            for (Long id : playerLoadingProgress.keySet()) {
+                sumLoading += playerLoadingProgress.get(id);
+            }
+            int percentageLoaded = sumLoading / (playerLoadingProgress.size() + 1);
+            LOGGER.debug("Overall loading completed " + percentageLoaded + "%");
 
-        flow.whenEnter(States.LOBBY, new LobbyState());
-        flow.whenEnter(States.LOADING, new LoadingState());
-        flow.whenEnter(States.RUNNING, new GameRunningState());
-        flow.whenEnter(States.PAUSED, new ContextHandler<GameContext>() {
+        }
 
-            @Override
-            public void call(GameContext context) throws Exception {}
-        });
-        flow.whenEnter(States.FINISHED, new ContextHandler<GameContext>() {
+    }
 
-            @Override
-            public void call(GameContext context) throws Exception {}
-        });
+    private void handleMessagesLobby(ServerPlayer player, ServerMessage msg) {
+        if (msg.getMessage().equals(GameMessageConstants.START_GAME_REQUEST)) {
+            String reason = checkIfGameIsStartAble(player);
+            if (reason.isEmpty()) {
+                sendMessageToAllPlayer(new ServerMessage(GameMessageConstants.START_GAME));
+                this.currentState = States.LOADING;
+                startLoading = true;
+            } else {
+                player.getClient().getSendToClientQueue().offer(new ServerMessage(GameMessageConstants.ERROR_STARTING_GAME, reason));
+            }
+        }
+    }
+
+    private String checkIfGameIsStartAble(ServerPlayer player) {
+        String response = "";
+        if (!gameContext.getHost().getId().equals(player.getId())) {
+            response = "Error: Player starting game ist not host";
+        }
+        return response;
     }
 
     private void createPlayerList() {
@@ -248,10 +320,6 @@ public class Game implements Runnable {
         lobbyAlive.set(false);
     }
 
-    public StateEnum getGameState() {
-        return gameContext.getState();
-    }
-
     public long getGameID() {
         return gameContext.getGameID();
     }
@@ -265,25 +333,13 @@ public class Game implements Runnable {
     }
 
     /**
-     * Change current gamestate.
-     * 
-     * @param newState to change to
-     */
-    public void changeState(GameState newState) {
-        synchronized (LOCK_OBJECT) {
-            currenState = newState;
-            LOGGER.debug("Set current game state to " + gameContext.getState());
-        }
-    }
-
-    /**
      * Is the current lobby joinable?
      * 
      * @return true if so.
      */
     public String isJoinable() {
         String returnString = "";
-        if (!gameContext.getState().equals(States.LOBBY)) {
+        if (!currentState.equals(States.LOBBY)) {
             returnString = "Game already running";
         }
         return returnString;
@@ -291,5 +347,9 @@ public class Game implements Runnable {
 
     public GameConfiguration getConfiguration() {
         return gameContext.getConfig();
+    }
+
+    public States getCurrentState() {
+        return currentState;
     }
 }

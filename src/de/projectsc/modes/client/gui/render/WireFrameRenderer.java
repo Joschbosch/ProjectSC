@@ -112,9 +112,9 @@ public class WireFrameRenderer {
                 GL11.glDrawElements(GL11.GL_LINE_STRIP, sphere.getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
             }
             if (WireFrame.CUBE.equals(wireframe.getModelType())) {
-                prepareInstance(wireframe.getPosition(), wireframe.getRotation(), new Vector3f(0.5f, 0.5f, 0.5f), new Vector3f(1, 1, 0));
-                GL11.glLineWidth(wireframe.getLineWidth());
-                GL11.glDrawElements(GL11.GL_LINE_STRIP, sphere.getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
+                // prepareInstance(wireframe.getPosition(), wireframe.getRotation(), new Vector3f(0.5f, 0.5f, 0.5f), new Vector3f(1, 1, 0));
+                // GL11.glLineWidth(wireframe.getLineWidth());
+                // GL11.glDrawElements(GL11.GL_LINE_STRIP, sphere.getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
             }
         }
         unbindTexturedModel();

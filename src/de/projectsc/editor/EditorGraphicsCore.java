@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -54,12 +55,9 @@ import de.projectsc.modes.client.gui.data.GUIScene;
 import de.projectsc.modes.client.gui.events.ChangeMeshRendererParameterEvent;
 import de.projectsc.modes.client.gui.events.NewTextureEvent;
 import de.projectsc.modes.client.gui.objects.particles.ParticleMaster;
-import de.projectsc.modes.client.gui.objects.particles.ParticleSystem;
-import de.projectsc.modes.client.gui.objects.particles.ParticleTexture;
 import de.projectsc.modes.client.gui.objects.terrain.TerrainModel;
 import de.projectsc.modes.client.gui.objects.text.TextMaster;
 import de.projectsc.modes.client.gui.render.MasterRenderer;
-import de.projectsc.modes.client.gui.utils.Loader;
 import de.projectsc.modes.client.gui.utils.MousePicker;
 
 /**
@@ -145,13 +143,6 @@ public class EditorGraphicsCore implements Runnable {
     protected void gameLoop() {
         Timer.init();
         int timer = 1500;
-        ParticleTexture texture = new ParticleTexture(Loader.loadTexture("particles/smoke.png"), 4);
-        ParticleSystem pps = new ParticleSystem(new Vector3f(0, 20, 0), 500, 1, -0.1f, 2, 1, true, texture);
-        pps.randomizeRotation();
-        pps.setDirection(new Vector3f(0, 1, 0), 0.1f);
-        pps.setLifeError(0.1f);
-        pps.setSpeedError(0.4f);
-        pps.setScaleError(0.8f);
         while (running) {
             Timer.update();
             readMessages();
@@ -160,7 +151,7 @@ public class EditorGraphicsCore implements Runnable {
             if (editorData.isLightAtCameraPostion()) {
                 if (!EntityManager.getEntity(entity).getTransform().getPosition().equals(
                     camera.getPosition())) {
-                    EventManager.fireEvent(new ChangePositionEvent(camera.getPosition(), sun));
+                    EventManager.fireEvent(new ChangePositionEvent(new Vector3f(0.1f, 0, 0), sun));
                 }
             }
             physicsSystem.update(Timer.getDelta());
@@ -320,7 +311,7 @@ public class EditorGraphicsCore implements Runnable {
             Iterator<String> componentNamesIterator = tree.get("components").getFieldNames();
             while (componentNamesIterator.hasNext()) {
                 String name = componentNamesIterator.next();
-                java.util.Map<String, Object> serialized =
+                Map<String, Object> serialized =
                     mapper.readValue(tree.get("components").get(name), new HashMap<String, Object>().getClass());
                 if (name.equals(TransformComponent.class)) {
                     Transform t = EntityManager.getEntity(getCurrentEntity()).getTransform();

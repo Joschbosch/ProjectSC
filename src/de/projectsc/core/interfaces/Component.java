@@ -43,17 +43,18 @@ public interface Component {
     void removeRequiredByComponent(String componentName);
 
     /**
-     * @param active if the component is current active (which can have different meanings in editor
-     *        and game).
+     * @param active if the component is current active (which can have different meanings in editor and game).
      */
     void setActive(boolean active);
 
     /**
      * Adds everything to the scene that is needed for debugging mode. Might not be used.
      * 
+     * @param entity
+     * 
      * @param scene to add to.
      */
-    void addDebugMode(Scene scene);
+    void addSceneInformation(Long entity, Scene scene);
 
     /**
      * @return true, if the component can be saved at the moment.
@@ -80,4 +81,9 @@ public interface Component {
      * @return name of the component.
      */
     String getComponentName();
+
+    long getId();
+
+    void createNewId();
+
 }
