@@ -51,7 +51,7 @@ public abstract class DefaultSystem implements EngineSystem {
         eventManager.fireEvent(e);
     }
 
-    protected <T extends Component> T getComponent(long entityId, Class<T> componentClass) {
+    protected <T extends Component> T getComponent(String entityId, Class<T> componentClass) {
         Component component = entityManager.getComponent(entityId, componentClass);
         if (component != null) {
             return componentClass.cast(component);

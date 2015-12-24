@@ -21,7 +21,7 @@ public class ChangeEntityStateEvent extends Event {
 
     private final EntityState entityState;
 
-    public ChangeEntityStateEvent(long entityId, EntityState newState) {
+    public ChangeEntityStateEvent(String entityId, EntityState newState) {
         super(ID, entityId);
         entityState = newState;
     }

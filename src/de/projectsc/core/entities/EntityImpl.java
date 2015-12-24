@@ -17,11 +17,9 @@ import de.projectsc.core.manager.EntityManager;
  */
 public class EntityImpl implements Entity {
 
-    private static int idCount = 1000;
-
     private long entityTypeID;
 
-    private final long entityUID;
+    private final String entityUID;
 
     private String tag;
 
@@ -29,8 +27,8 @@ public class EntityImpl implements Entity {
 
     private EntityManager entityManager;
 
-    public EntityImpl(EntityManager entityManager) {
-        entityUID = idCount++;
+    public EntityImpl(EntityManager entityManager, String uid) {
+        entityUID = uid;
         transform = new Transform();
         this.entityManager = entityManager;
     }
@@ -56,7 +54,7 @@ public class EntityImpl implements Entity {
     }
 
     @Override
-    public long getID() {
+    public String getID() {
         return entityUID;
     }
 

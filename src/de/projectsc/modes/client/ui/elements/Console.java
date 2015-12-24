@@ -11,7 +11,10 @@ import java.util.Map;
 
 import org.lwjgl.input.Keyboard;
 
-import de.projectsc.modes.client.core.states.StateConstants;
+import de.projectsc.core.data.KeyboardInputCommand;
+import de.projectsc.core.data.MouseInputCommand;
+import de.projectsc.core.interfaces.InputCommandListener;
+import de.projectsc.modes.client.core.states.UIElementConstants;
 import de.projectsc.modes.client.ui.BasicUIElement;
 
 /**
@@ -19,14 +22,14 @@ import de.projectsc.modes.client.ui.BasicUIElement;
  * 
  * @author Josch Bosch
  */
-public class Console extends BasicUIElement {
+public class Console extends BasicUIElement implements InputCommandListener {
 
     private final List<String> lines = new ArrayList<>();
 
     private String currentInput = "";
 
     public Console() {
-        super(StateConstants.CONSOLE, 1);
+        super(UIElementConstants.CONSOLE, 1);
         lines.add("This is a test line 1");
         lines.add("This is a test line 2");
         lines.add("This is a test line 3");
@@ -74,5 +77,23 @@ public class Console extends BasicUIElement {
 
     public void setCurrentInput(String currentInput) {
         this.currentInput = currentInput;
+    }
+
+    @Override
+    public InputConsumeLevel getInputConsumeLevel() {
+        return InputConsumeLevel.FIRST;
+    }
+
+    @Override
+    public void handleKeyboardCommand(KeyboardInputCommand command) {
+        if (command.getKey() == Keyboard.KEY_F1) {
+            setVisible(!isVisible());
+        }
+    }
+
+    @Override
+    public void handleMouseCommand(MouseInputCommand command) {
+        // TODO Auto-generated method stub
+
     }
 }

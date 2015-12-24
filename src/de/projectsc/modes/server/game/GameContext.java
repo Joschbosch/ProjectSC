@@ -3,7 +3,7 @@
  * 
  * 
  */
-package de.projectsc.modes.server.core.game;
+package de.projectsc.modes.server.game;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -11,8 +11,7 @@ import java.util.TreeMap;
 import de.projectsc.core.game.GameAttributes;
 import de.projectsc.core.game.GameConfiguration;
 import de.projectsc.core.interfaces.Entity;
-import de.projectsc.core.systems.physics.OctTree;
-import de.projectsc.modes.server.core.game.data.ServerPlayer;
+import de.projectsc.modes.server.game.data.ServerPlayer;
 
 /**
  * Context for all game states.
@@ -43,8 +42,6 @@ public class GameContext {
 
     private final Game game;
 
-    private OctTree<Entity> octTree;
-
     public GameContext(int id, String displayName, ServerPlayer host, Game game) {
         this.gameID = id;
         this.displayName = displayName;
@@ -53,10 +50,9 @@ public class GameContext {
         players = new TreeMap<>();
         players.put(this.host.getId(), this.host);
         this.config = new GameConfiguration();
-        this.config.setMapName("L1/first");
+        this.config.setMapName("L1/first.map");
         this.config.setPlayerCharacter(this.host.getId(), "person");
         this.config.setPlayerAffiliation(this.getHost().getId(), GameAttributes.AFFILIATION_LIGHT);
-        this.octTree = null;
     }
 
     /**

@@ -27,13 +27,13 @@ public class GUIScene extends Scene {
 
     private List<TerrainModel> terrains;
 
-    private Map<TexturedModel, List<Long>> models;
+    private Map<TexturedModel, List<String>> models;
 
-    private Map<Long, Vector3f> scales;
+    private Map<String, Vector3f> scales;
 
-    private Map<Long, Vector3f> positions;
+    private Map<String, Vector3f> positions;
 
-    private Map<Long, Vector3f> rotations;
+    private Map<String, Vector3f> rotations;
 
     private List<Light> lights;
 
@@ -61,7 +61,7 @@ public class GUIScene extends Scene {
         return terrains;
     }
 
-    public Map<TexturedModel, List<Long>> getModels() {
+    public Map<TexturedModel, List<String>> getModels() {
         return models;
     }
 
@@ -77,7 +77,7 @@ public class GUIScene extends Scene {
         this.terrains = terrains;
     }
 
-    public void setModels(Map<TexturedModel, List<Long>> models) {
+    public void setModels(Map<TexturedModel, List<String>> models) {
         this.models = models;
     }
 
@@ -89,27 +89,27 @@ public class GUIScene extends Scene {
         this.billboards = billboards;
     }
 
-    public Map<Long, Vector3f> getScales() {
+    public Map<String, Vector3f> getScales() {
         return scales;
     }
 
-    public void setScales(Map<Long, Vector3f> scale) {
+    public void setScales(Map<String, Vector3f> scale) {
         this.scales = scale;
     }
 
-    public Map<Long, Vector3f> getPositions() {
+    public Map<String, Vector3f> getPositions() {
         return positions;
     }
 
-    public void setPositions(Map<Long, Vector3f> positions) {
+    public void setPositions(Map<String, Vector3f> positions) {
         this.positions = positions;
     }
 
-    public Map<Long, Vector3f> getRotations() {
+    public Map<String, Vector3f> getRotations() {
         return rotations;
     }
 
-    public void setRotations(Map<Long, Vector3f> rotations) {
+    public void setRotations(Map<String, Vector3f> rotations) {
         this.rotations = rotations;
     }
 

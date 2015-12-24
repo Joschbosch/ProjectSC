@@ -19,8 +19,8 @@ import org.apache.commons.logging.LogFactory;
 import de.projectsc.core.messages.MessageConstants;
 import de.projectsc.modes.server.core.data.AuthenticatedClient;
 import de.projectsc.modes.server.core.data.connections.messages.NewClientConnectedServerMessage;
-import de.projectsc.modes.server.core.game.Game;
 import de.projectsc.modes.server.core.messages.ServerMessage;
+import de.projectsc.modes.server.game.Game;
 
 /**
  * Core of server.
@@ -150,9 +150,9 @@ public class ServerCore implements Runnable {
         } else if (msg.getMessage().equals(MessageConstants.NEW_CLIENT_CONNECTED)) {
             LOGGER.debug("New Client connected to server!");
             NewClientConnectedServerMessage newClient = (NewClientConnectedServerMessage) msg;
+            clientsInMainLobby.put(newClient.getClient().getId(), newClient.getClient());
             sendMsgToAllClients(new ServerMessage(MessageConstants.CLIENT_JOINED_LOBBY, newClient.getClient().getId(), newClient
                 .getClient().getDisplayName()));
-            clientsInMainLobby.put(newClient.getClient().getId(), newClient.getClient());
         } else if (msg.getMessage().equals(MessageConstants.CLIENT_DISCONNECTED)) {
             Long id = Long.parseLong((String) msg.getData()[0]);
             // handle id not here

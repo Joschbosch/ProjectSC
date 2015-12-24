@@ -16,7 +16,7 @@ public class ComponentRemovedEvent extends Event {
 
     private Component component;
 
-    public ComponentRemovedEvent(long entityID, Component c) {
+    public ComponentRemovedEvent(String entityID, Component c) {
         super(ID, entityID);
         this.component = c;
     }

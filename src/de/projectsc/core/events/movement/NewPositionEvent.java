@@ -26,7 +26,7 @@ public class NewPositionEvent extends Event {
 
     private final Vector3f scale;
 
-    public NewPositionEvent(long entityId, Vector3f newPosition, Vector3f newRotation, Vector3f scale) {
+    public NewPositionEvent(String entityId, Vector3f newPosition, Vector3f newRotation, Vector3f scale) {
         super(ID, entityId);
         this.newPosition = newPosition;
         this.newRotation = newRotation;

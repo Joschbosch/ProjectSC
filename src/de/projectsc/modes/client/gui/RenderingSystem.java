@@ -80,8 +80,8 @@ public class RenderingSystem extends DefaultSystem {
 
     @Override
     public void update(long tick) {
-        Set<Long> entities = entityManager.getAllEntites();
-        for (Long entity : entities) {
+        Set<String> entities = entityManager.getAllEntites();
+        for (String entity : entities) {
             for (Component comp : entityManager.getAllComponents(entity).values()) {
                 if (comp instanceof GraphicalComponent) {
                     ((GraphicalComponent) comp).update();
@@ -99,9 +99,10 @@ public class RenderingSystem extends DefaultSystem {
             }
 
         }
+
     }
 
-    private boolean hasComponent(Long entity, Class<? extends DefaultComponent> clazz) {
+    private boolean hasComponent(String entity, Class<? extends DefaultComponent> clazz) {
         return entityManager.hasComponent(entity, clazz);
     }
 
@@ -112,9 +113,9 @@ public class RenderingSystem extends DefaultSystem {
      */
 
     public GUIScene createScene() {
-        Set<Long> entities = entityManager.getAllEntites();
+        Set<String> entities = entityManager.getAllEntites();
         GUIScene scene = new GUIScene();
-        for (Long entity : entities) {
+        for (String entity : entities) {
             Map<String, Component> allComponents = entityManager.getAllComponents(entity);
             for (Component c : allComponents.values()) {
                 if (c instanceof GraphicalComponent) {

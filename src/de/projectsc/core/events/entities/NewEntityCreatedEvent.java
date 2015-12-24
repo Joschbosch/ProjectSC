@@ -15,7 +15,7 @@ public class NewEntityCreatedEvent extends Event {
 
     private static final String NAME = "NewEntityEvent";
 
-    public NewEntityCreatedEvent(long entityID) {
+    public NewEntityCreatedEvent(String entityID) {
         super(NAME, entityID);
     }
 

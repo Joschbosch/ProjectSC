@@ -16,7 +16,7 @@ public class ComponentAddedEvent extends Event {
 
     private Component component;
 
-    public ComponentAddedEvent(long entityID, Component c) {
+    public ComponentAddedEvent(String entityID, Component c) {
         super(ID, entityID);
         this.component = c;
     }

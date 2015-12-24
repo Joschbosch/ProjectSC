@@ -4,7 +4,7 @@
  * 
  */
 
-package de.projectsc.modes.server.core.game.utils;
+package de.projectsc.modes.server.game.utils;
 
 
 /**

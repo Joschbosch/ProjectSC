@@ -22,7 +22,7 @@ public class NewMeshEvent extends Event {
 
     private final File newMeshFile;
 
-    public NewMeshEvent(long entityId, File newMeshFile) {
+    public NewMeshEvent(String entityId, File newMeshFile) {
         super(ID, entityId);
         this.newMeshFile = newMeshFile;
 

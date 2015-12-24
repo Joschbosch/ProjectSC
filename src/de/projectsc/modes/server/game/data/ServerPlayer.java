@@ -3,7 +3,7 @@
  * 
  * 
  */
-package de.projectsc.modes.server.core.game.data;
+package de.projectsc.modes.server.game.data;
 
 import de.projectsc.core.interfaces.Entity;
 import de.projectsc.modes.server.core.data.AuthenticatedClient;

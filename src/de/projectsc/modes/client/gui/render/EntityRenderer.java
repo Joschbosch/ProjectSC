@@ -45,13 +45,13 @@ public class EntityRenderer {
      * @param rotations to render.
      * @param scales to render.
      */
-    public void render(Map<TexturedModel, List<Long>> entitiesWithModel,
-        Map<Long, Vector3f> position, Map<Long, Vector3f> rotations, Map<Long, Vector3f> scales,
-        List<Long> selected, List<Long> highlighted) {
+    public void render(Map<TexturedModel, List<String>> entitiesWithModel,
+        Map<String, Vector3f> position, Map<String, Vector3f> rotations, Map<String, Vector3f> scales,
+        List<String> selected, List<String> highlighted) {
         for (TexturedModel model : entitiesWithModel.keySet()) {
             prepareTexturedModel(model);
-            List<Long> batch = entitiesWithModel.get(model);
-            for (Long e : batch) {
+            List<String> batch = entitiesWithModel.get(model);
+            for (String e : batch) {
                 if (position.get(e) != null && rotations.get(e) != null && scales.get(e) != null) {
                     prepareInstance(model.getTexture(), position.get(e), rotations.get(e), scales.get(e), highlighted.contains(e),
                         selected.contains(e));

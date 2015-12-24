@@ -19,7 +19,7 @@ public class NewTextureEvent extends Event {
 
     private final File textureFile;
 
-    public NewTextureEvent(long entityID, File textureFile) {
+    public NewTextureEvent(String entityID, File textureFile) {
         super(NAME, entityID);
         this.textureFile = textureFile;
     }

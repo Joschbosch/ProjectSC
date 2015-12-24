@@ -20,6 +20,6 @@ public abstract class GraphicalComponent extends DefaultComponent {
      * @param entity to render
      * @param scene for positions
      */
-    public abstract void render(long entity, GUIScene scene);
+    public abstract void render(String entity, GUIScene scene);
 
 }

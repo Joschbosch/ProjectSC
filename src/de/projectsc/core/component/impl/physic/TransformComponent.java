@@ -46,7 +46,7 @@ public class TransformComponent extends PhysicsComponent {
      * @param velocity to change
      * @param rotation of the entity
      */
-    public void updatePosition(long entity, Vector3f velocity, Vector3f rotation) {
+    public void updatePosition(String entity, Vector3f velocity, Vector3f rotation) {
         Vector3f.add(transform.getPosition(), velocity, transform.getPosition());
         Vector3f.add(transform.getRotation(), rotation, transform.getRotation());
     }

@@ -92,4 +92,8 @@ public final class TextMaster {
     public static Map<FontType, List<GUIText>> render() {
         return texts;
     }
+
+    public static void removeAll() {
+        texts.clear();
+    }
 }

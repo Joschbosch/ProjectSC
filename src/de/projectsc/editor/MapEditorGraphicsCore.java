@@ -47,12 +47,14 @@ import de.projectsc.core.interfaces.Entity;
 import de.projectsc.core.manager.ComponentManager;
 import de.projectsc.core.manager.EntityManager;
 import de.projectsc.core.manager.EventManager;
+import de.projectsc.core.manager.InputConsumeManager;
 import de.projectsc.core.systems.physics.PhysicsSystem;
 import de.projectsc.core.terrain.Terrain;
 import de.projectsc.modes.client.gui.RenderingSystem;
 import de.projectsc.modes.client.gui.components.EmittingLightComponent;
 import de.projectsc.modes.client.gui.components.GraphicalComponentImplementation;
 import de.projectsc.modes.client.gui.data.GUIScene;
+import de.projectsc.modes.client.gui.input.InputSystem;
 import de.projectsc.modes.client.gui.objects.Camera;
 import de.projectsc.modes.client.gui.objects.particles.ParticleMaster;
 import de.projectsc.modes.client.gui.objects.terrain.TerrainModel;
@@ -71,7 +73,7 @@ import de.projectsc.modes.client.gui.utils.MousePicker;
  */
 public class MapEditorGraphicsCore implements Runnable {
 
-    private static final String SLASHED_MODEL_DIR = "/" + CoreConstants.SCHEME_DIRECTORY_NAME + "/";
+    private static final String SLASHED_MODEL_DIR = CoreConstants.SCHEME_DIRECTORY_NAME + "/";
 
     private static final String SEPARATOR = ";";
 
@@ -93,19 +95,19 @@ public class MapEditorGraphicsCore implements Runnable {
 
     private final BlockingQueue<String> incomingQueue;
 
-    private long sun;
+    private String sun;
 
     private final AtomicBoolean doRender = new AtomicBoolean(true);
 
     private final Map<Long, EntitySchema> entitySchemas = new TreeMap<>();
 
-    private long entityAtCursor;
+    private String entityAtCursor = "";
 
     private boolean alreadyClicked;
 
     private int mode;
 
-    private long selectedEntity = -1;
+    private String selectedEntity = "";
 
     private List<TerrainModel> terrainModels;
 
@@ -121,8 +123,12 @@ public class MapEditorGraphicsCore implements Runnable {
 
     private EventManager eventManager;
 
+    private InputConsumeManager inputConsumeManager;
+
+    private InputSystem inputSystem;
+
     public MapEditorGraphicsCore(Canvas displayParent, int width, int height, BlockingQueue<String> messageQueue,
-        ComponentManager componentManager, EntityManager entityManager, EventManager eventManager) {
+        ComponentManager componentManager, EntityManager entityManager, EventManager eventManager, InputConsumeManager inputConsumeManager) {
         incomingQueue = new LinkedBlockingQueue<>();
         this.displayParent = displayParent;
         this.width = width;
@@ -130,6 +136,7 @@ public class MapEditorGraphicsCore implements Runnable {
         this.componentManager = componentManager;
         this.entityManager = entityManager;
         this.eventManager = eventManager;
+        this.inputConsumeManager = inputConsumeManager;
     }
 
     @Override
@@ -147,8 +154,11 @@ public class MapEditorGraphicsCore implements Runnable {
         loadGUIComponents();
         physicsSystem = new PhysicsSystem(entityManager, eventManager);
         renderSystem = new RenderingSystem(entityManager, eventManager);
+        inputSystem = new InputSystem();
+
         TextMaster.init();
         camera = new Camera();
+        inputConsumeManager.addListener(camera);
         camera.setLookAtPoint(0, 0, 0);
         masterRenderer = new MasterRenderer();
         fontRenderer = new FontRenderer();
@@ -166,7 +176,6 @@ public class MapEditorGraphicsCore implements Runnable {
     }
 
     private void loadEntitySchemas() {
-        doRender(false);
 
         try {
             File folder = new File(MapEditorGraphicsCore.class.getResource(SLASHED_MODEL_DIR).toURI());
@@ -197,7 +206,6 @@ public class MapEditorGraphicsCore implements Runnable {
         } catch (URISyntaxException e1) {
             LOGGER.error(e1);
         }
-        doRender(true);
 
     }
 
@@ -206,6 +214,7 @@ public class MapEditorGraphicsCore implements Runnable {
         while (running) {
             readMessages();
             Timer.update();
+            inputConsumeManager.processInput(inputSystem.updateInputs());
             camera.move(Timer.getDelta());
             ParticleMaster.update(camera.getPosition());
             if (entityManager.getEntity(sun) != null && !entityManager.getEntity(sun).getTransform().getPosition().equals(
@@ -227,7 +236,7 @@ public class MapEditorGraphicsCore implements Runnable {
                     Entity highlightingEntity = null;
                     float tMin = Float.MAX_VALUE;
                 }
-                if (entityAtCursor != -1 && mousePicker.getCurrentTerrainPoint() != null) {
+                if (!entityAtCursor.isEmpty() && mousePicker.getCurrentTerrainPoint() != null) {
                     entityManager.getEntity(entityAtCursor).getTransform().setPosition(mousePicker.getCurrentTerrainPoint());
                 }
 
@@ -236,7 +245,7 @@ public class MapEditorGraphicsCore implements Runnable {
                     physicsSystem.debug(s);
                     s.setTerrains(terrainModels);
                     s.setRenderSkybox(true);
-                    if (entityAtCursor != -1) {
+                    if (!entityAtCursor.isEmpty()) {
                         s.getWireFrames().add(
                             new WireFrame(WireFrame.SPHERE, entityManager.getEntity(entityAtCursor).getTransform().getPosition(),
                                 new Vector3f(), new Vector3f(0.5f, 0.5f,
@@ -290,11 +299,11 @@ public class MapEditorGraphicsCore implements Runnable {
         }
         if (Mouse.isButtonDown(0) && mode == 1 && !alreadyClicked) {
             alreadyClicked = true;
-            for (Long e : entityManager.getAllEntites()) {
+            for (String e : entityManager.getAllEntites()) {
                 if (entityManager.hasComponent(e, ColliderComponent.class)) {
                     ColliderComponent collider = (ColliderComponent) entityManager.getComponent(e, ColliderComponent.class);
                     if (collider.intersects(entityManager.getEntity(e).getTransform(), camera.getPosition(), mousePicker.getCurrentRay()) > 0) {
-                        if (selectedEntity != -1) {
+                        if (!selectedEntity.isEmpty()) {
                             eventManager.fireEvent(new ChangeEntitySelectEvent(selectedEntity, false, false));
                         }
                         selectedEntity = e;
@@ -316,7 +325,7 @@ public class MapEditorGraphicsCore implements Runnable {
                     while (entitySchemas.get(id) == null) {
                         id = (id + 1) % 1000000;
                     }
-                    long oldEntity = entityAtCursor;
+                    String oldEntity = entityAtCursor;
                     newMouseEntity(id);
                     entityManager.deleteEntity(oldEntity);
                 }
@@ -326,8 +335,8 @@ public class MapEditorGraphicsCore implements Runnable {
     }
 
     private void newMouseEntity(long type) {
-        long e = entityManager.createNewEntity();
-        if (entityAtCursor == 0 || entityAtCursor == -1) {
+        String e = entityManager.createNewEntity();
+        if (entityAtCursor.isEmpty()) {
             entitySchemas.get(type).createNewEntity(entityManager.getEntity(e).getTransform(), e, entityManager);
         } else {
             entitySchemas.get(type).createNewEntity(entityManager.getEntity(entityAtCursor).getTransform(), e, entityManager);
@@ -410,9 +419,9 @@ public class MapEditorGraphicsCore implements Runnable {
         } else {
             if (this.mode != 1) {
                 this.mode = 1;
-                selectedEntity = -1;
+                selectedEntity = "";
                 entityManager.deleteEntity(entityAtCursor);
-                entityAtCursor = -1;
+                entityAtCursor = "";
             }
 
         }
@@ -427,8 +436,8 @@ public class MapEditorGraphicsCore implements Runnable {
                 new File(levelRootDirectory, CoreConstants.LEVEL_DIRECTORY_PREFIX + 1);
             levelFolder.mkdir();
             Map<String, Object> complete = new HashMap<>();
-            Map<Long, Object> entities = new HashMap<>();
-            for (long e : entityManager.getAllEntites()) {
+            Map<String, Object> entities = new HashMap<>();
+            for (String e : entityManager.getAllEntites()) {
                 Map<String, Object> props = new HashMap<>();
                 props.put("type", entityManager.getEntity(e).getEntityTypeId());
                 props.put("transform", entityManager.getEntity(e).getTransform());

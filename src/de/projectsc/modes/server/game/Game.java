@@ -4,7 +4,7 @@
  * 
  */
 
-package de.projectsc.modes.server.core.game;
+package de.projectsc.modes.server.game;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -17,6 +17,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import de.projectsc.core.component.impl.ComponentListItem;
+import de.projectsc.core.data.structure.Snapshot;
 import de.projectsc.core.data.utils.Timer;
 import de.projectsc.core.game.GameAttributes;
 import de.projectsc.core.game.GameConfiguration;
@@ -26,11 +27,12 @@ import de.projectsc.core.manager.EventManager;
 import de.projectsc.core.messages.GameMessageConstants;
 import de.projectsc.core.messages.MessageConstants;
 import de.projectsc.core.systems.physics.PhysicsSystem;
+import de.projectsc.core.utils.MapLoader;
 import de.projectsc.modes.server.core.ServerCommands;
 import de.projectsc.modes.server.core.ServerConstants;
 import de.projectsc.modes.server.core.data.AuthenticatedClient;
-import de.projectsc.modes.server.core.game.data.ServerPlayer;
 import de.projectsc.modes.server.core.messages.ServerMessage;
+import de.projectsc.modes.server.game.data.ServerPlayer;
 
 /**
  * 
@@ -45,8 +47,6 @@ public class Game implements Runnable {
     private static final Log LOGGER = LogFactory.getLog(Game.class);
 
     private static final int ID_START = 1000;
-
-    private static final Object LOCK_OBJECT = new Object();
 
     private static int idCounter = ID_START;
 
@@ -72,14 +72,18 @@ public class Game implements Runnable {
 
     private EventManager eventManager;
 
+    private AtomicBoolean loadingDone = new AtomicBoolean(false);
+
+    private long gameTime;
+
+    private long tick;
+
     public Game(AuthenticatedClient host, BlockingQueue<ServerMessage> coreQueue) {
         this.coreQueue = coreQueue;
         this.gameContext = new GameContext(idCounter++, host.getDisplayName() + "'s game", new ServerPlayer(host), this);
-        this.componentManager = new ComponentManager();
-        this.eventManager = new EventManager();
-        this.entityManager = new EntityManager(componentManager, eventManager);
         LOGGER.debug(String.format("Created new game: %s (Host: %s, game id: %d)", gameContext.getDisplayName(), host.getDisplayName(),
             gameContext.getGameID()));
+        this.currentState = States.LOBBY;
         new Thread(this).start();
     }
 
@@ -102,9 +106,6 @@ public class Game implements Runnable {
             }
             long timeNeeded = System.currentTimeMillis() - Timer.getSnapshotTime();
             long sleepTime = Math.max((GAME_TICK_TIME - timeNeeded), 0L);
-            // LOGGER.debug(
-            // String.format("Game %d needed %d ms for current tick, will sleep : %d",
-            // gameContext.getGameID(), timeNeeded, sleepTime));
             try {
                 Thread.sleep(sleepTime);
             } catch (InterruptedException e) {
@@ -115,8 +116,28 @@ public class Game implements Runnable {
     }
 
     private void loopGame() {
-        // TODO Auto-generated method stub
+        tick++;
+        gameTime += GAME_TICK_TIME;
+        physicsSystem.update(GAME_TICK_TIME);
+        Snapshot s = new Snapshot();
+        s.setTick(tick);
+        s.setGameTime(gameTime);
 
+        if (tick == 300) {
+            String e = entityManager.createNewEntityFromSchema(10000L);
+            s.addCreated("" + e + ";" + "10001" + ";"
+                + "{\"position\":{\"x\":0.0,\"y\":0.0,\"z\":0.0},"
+                + "\"rotation\":{\"x\":0.0,\"y\":0.0,\"z\":0.0},"
+                + "\"scale\":{\"x\":1.0,\"y\":1.0,\"z\":1.0}}");
+        }
+        if (tick > 200 && tick < 300) {
+            if (!entityManager.getAllEntites().isEmpty()) {
+                String id = entityManager.getAllEntites().iterator().next();
+                entityManager.deleteEntity(id);
+                s.addRemoved(id);
+            }
+        }
+        sendMessageToAllPlayer(new ServerMessage(GameMessageConstants.NEW_SNAPSHOT, s));
     }
 
     private void loopLoading() {
@@ -129,9 +150,14 @@ public class Game implements Runnable {
 
                 @Override
                 public void run() {
+                    componentManager = new ComponentManager();
+                    eventManager = new EventManager();
+                    entityManager = new EntityManager(componentManager, eventManager, null);
                     physicsSystem = new PhysicsSystem(entityManager, eventManager);
                     loadComponents();
                     gameContext.loadData();
+                    MapLoader.loadMap(gameContext.getConfig().getMapName(), entityManager);
+                    loadingDone.set(true);
                 }
             }).start();
             loading = true;
@@ -144,11 +170,14 @@ public class Game implements Runnable {
             }
             int percentageLoaded = sumLoading / (playerLoadingProgress.size() + 1);
             final int maximumpercentage = 100;
-            if (percentageLoaded >= maximumpercentage) {
+            if (percentageLoaded >= maximumpercentage && loadingDone.get()) {
                 LOGGER.debug("Loading done! Starting game!");
                 gameContext.setLoading(false);
                 // finishedLoading
                 loading = false;
+                currentState = States.RUNNING;
+                gameTime = 0;
+                tick = 0;
             }
         }
     }

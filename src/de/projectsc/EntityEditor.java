@@ -63,6 +63,7 @@ import de.projectsc.core.interfaces.Component;
 import de.projectsc.core.manager.ComponentManager;
 import de.projectsc.core.manager.EntityManager;
 import de.projectsc.core.manager.EventManager;
+import de.projectsc.core.manager.InputConsumeManager;
 import de.projectsc.editor.ComponentView;
 import de.projectsc.editor.EditorData;
 import de.projectsc.editor.EditorGraphicsCore;
@@ -94,7 +95,7 @@ public class EntityEditor extends JFrame {
 
     private static final long serialVersionUID = 3313139728699706144L;
 
-    private static final String SLASHED_MODEL_DIR = "/" + CoreConstants.SCHEME_DIRECTORY_NAME + "/";
+    private static final String SLASHED_MODEL_DIR = CoreConstants.SCHEME_DIRECTORY_NAME + "/";
 
     private JPanel contentPane;
 
@@ -160,6 +161,8 @@ public class EntityEditor extends JFrame {
 
     private EventManager eventManager;
 
+    private InputConsumeManager inputConsumeManager;
+
     /**
      * Create the frame.
      */
@@ -168,7 +171,8 @@ public class EntityEditor extends JFrame {
 
         componentManager = new ComponentManager();
         eventManager = new EventManager();
-        entityManager = new EntityManager(componentManager, eventManager);
+        inputConsumeManager = new InputConsumeManager();
+        entityManager = new EntityManager(componentManager, eventManager, inputConsumeManager);
         loadComponents();
         createContent();
         getNextFreeID();
@@ -393,7 +397,7 @@ public class EntityEditor extends JFrame {
     }
 
     private void fillComponentComboAndList() {
-        if (data != null && editor3dCore != null && editor3dCore.getCurrentEntity() != -1) {
+        if (data != null && editor3dCore != null && !editor3dCore.getCurrentEntity().isEmpty()) {
             data.setComponentsAdded(entityManager.getAllComponents(editor3dCore.getCurrentEntity()).keySet());
         }
         componentCombo.removeAllItems();
@@ -825,7 +829,9 @@ public class EntityEditor extends JFrame {
      */
     public void startLWJGL() {
         messageQueue = new LinkedBlockingQueue<String>();
-        editor3dCore = new EditorGraphicsCore(displayParent, WIDTH, HEIGHT, messageQueue, componentManager, entityManager, eventManager);
+        editor3dCore =
+            new EditorGraphicsCore(displayParent, WIDTH, HEIGHT, messageQueue, componentManager, entityManager, eventManager,
+                inputConsumeManager);
         editor3dCore.setEditorData(data);
         gameThread = new Thread(editor3dCore);
         gameThread.start();

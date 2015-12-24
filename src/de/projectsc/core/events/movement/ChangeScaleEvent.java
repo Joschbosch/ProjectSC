@@ -22,7 +22,7 @@ public class ChangeScaleEvent extends Event {
 
     private final Vector3f newScale;
 
-    public ChangeScaleEvent(long entityID, Vector3f newScale) {
+    public ChangeScaleEvent(String entityID, Vector3f newScale) {
         super(ID, entityID);
         this.newScale = newScale;
     }

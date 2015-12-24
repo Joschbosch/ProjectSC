@@ -28,7 +28,7 @@ public class EntitySchema {
         return id;
     }
 
-    public void createNewEntity(Transform oldTransform, long e, EntityManager entityManager) {
+    public void createNewEntity(Transform oldTransform, String e, EntityManager entityManager) {
         Transform t = entityManager.getEntity(e).getTransform();
         t.setPosition(new Vector3f(oldTransform.getPosition()));
         t.setRotation(new Vector3f(oldTransform.getRotation()));
@@ -39,5 +39,9 @@ public class EntitySchema {
             clone.setOwner(entityManager.getEntity(e));
         }
         entityManager.getEntity(e).setEntityTypeId(id);
+    }
+
+    public List<Component> getComponents() {
+        return components;
     }
 }

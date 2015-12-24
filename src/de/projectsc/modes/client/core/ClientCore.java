@@ -5,7 +5,6 @@
  */
 package de.projectsc.modes.client.core;
 
-import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -14,10 +13,13 @@ import org.apache.commons.logging.LogFactory;
 
 import de.projectsc.core.component.impl.ComponentListItem;
 import de.projectsc.core.data.utils.Timer;
+import de.projectsc.core.interfaces.InputCommandListener;
 import de.projectsc.core.manager.ComponentManager;
 import de.projectsc.core.manager.EntityManager;
 import de.projectsc.core.manager.EventManager;
+import de.projectsc.core.manager.InputConsumeManager;
 import de.projectsc.core.systems.physics.PhysicsSystem;
+import de.projectsc.modes.client.core.data.ClientGameContext;
 import de.projectsc.modes.client.core.data.ClientPlayer;
 import de.projectsc.modes.client.core.states.MenuState;
 import de.projectsc.modes.client.gui.GUICore;
@@ -59,6 +61,8 @@ public class ClientCore implements Runnable {
 
     private EventManager eventManager;
 
+    private InputConsumeManager inputConsumeManager;
+
     public ClientCore() {
         networkSendQueue = new LinkedBlockingQueue<>();
         networkReceiveQueue = new LinkedBlockingQueue<>();
@@ -66,7 +70,9 @@ public class ClientCore implements Runnable {
         player = new ClientPlayer();
         componentManager = new ComponentManager();
         eventManager = new EventManager();
-        entityManager = new EntityManager(componentManager, eventManager);
+        inputConsumeManager = new InputConsumeManager();
+        entityManager = new EntityManager(componentManager, eventManager, inputConsumeManager);
+
     }
 
     @Override
@@ -75,25 +81,29 @@ public class ClientCore implements Runnable {
         Timer.init();
         loadComponents();
         loadSystems();
-        gui = new GUICore(componentManager, entityManager, eventManager);
+        gui = new GUICore(componentManager, entityManager, eventManager, inputConsumeManager);
         gui.initCore();
         clientRunning = true;
         currentState = new MenuState();
-        currentState.init(gui);
+        changeState(currentState);
         LOGGER.debug(String.format("Client started"));
         while (clientRunning) {
             Timer.update();
-            readServerMessages();
+            ClientState newState = null;
+            newState = readServerMessages();
             if (currentState != null) {
-                Map<Integer, Integer> keyMap = gui.readInput();
-                currentState.handleInput(keyMap);
+                inputConsumeManager.processInput(gui.readInput());
+
                 while (Timer.getLag() >= TICK_TIME) {
                     physicsSystem.update(TICK_TIME);
                     currentState.loop(TICK_TIME);
                     Timer.setLag(Timer.getLag() - TICK_TIME);
                 }
                 currentState.loop(Timer.getLag());
-                gui.render(currentState, null);
+                gui.render(currentState);
+            }
+            if (newState != null) {
+                changeState(newState);
             }
             long timeNeeded = System.currentTimeMillis() - Timer.getSnapshotTime();
             long sleepTime = Math.max((16 - timeNeeded), 0L);
@@ -111,6 +121,21 @@ public class ClientCore implements Runnable {
 
     }
 
+    private void changeState(ClientState newState) {
+        if (currentState != null) {
+            gui.cleanUpState(currentState);
+            if (inputConsumeManager != null && currentState instanceof InputCommandListener) {
+                inputConsumeManager.removeListener((InputCommandListener) currentState);
+            }
+        }
+        ClientGameContext gameData = new ClientGameContext();
+        newState.init(gui, networkSendQueue, entityManager, eventManager, componentManager, gameData);
+        currentState = newState;
+        if (inputConsumeManager != null && currentState instanceof InputCommandListener) {
+            inputConsumeManager.addListener((InputCommandListener) currentState);
+        }
+    }
+
     private void loadSystems() {
         physicsSystem = new PhysicsSystem(entityManager, eventManager);
     }
@@ -121,14 +146,16 @@ public class ClientCore implements Runnable {
         }
     }
 
-    private void readServerMessages() {
+    private ClientState readServerMessages() {
+        ClientState newState = null;
         if (currentState != null) {
             while (!networkReceiveQueue.isEmpty()) {
                 ClientMessage msg = networkReceiveQueue.poll();
-                LOGGER.debug("Got message from server: " + msg);
-                currentState.handleMessage(msg);
+                // LOGGER.debug("Got message from server: " + msg);
+                newState = currentState.handleMessage(msg);
             }
         }
+        return newState;
     }
 
     /**

@@ -17,7 +17,7 @@ public class ChangeEntitySelectEvent extends Event {
 
     private boolean hightLighted;
 
-    public ChangeEntitySelectEvent(long entityId, boolean selected, boolean highligted) {
+    public ChangeEntitySelectEvent(String entityId, boolean selected, boolean highligted) {
         super(ID, entityId);
         this.selected = selected;
         this.hightLighted = highligted;

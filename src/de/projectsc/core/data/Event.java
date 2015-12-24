@@ -13,9 +13,9 @@ public class Event {
 
     private final String eventId;
 
-    private final long entityId;
+    private final String entityId;
 
-    public Event(String eventId, long entityID) {
+    public Event(String eventId, String entityID) {
         this.eventId = eventId;
         this.entityId = entityID;
     }
@@ -24,7 +24,7 @@ public class Event {
         return eventId;
     }
 
-    public long getEntityId() {
+    public String getEntityId() {
         return entityId;
     }
 }

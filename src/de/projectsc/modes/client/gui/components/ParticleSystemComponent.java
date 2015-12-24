@@ -42,7 +42,7 @@ public class ParticleSystemComponent extends GraphicalComponent {
     }
 
     @Override
-    public void render(long entity, GUIScene scene) {
+    public void render(String entity, GUIScene scene) {
 
     }
 

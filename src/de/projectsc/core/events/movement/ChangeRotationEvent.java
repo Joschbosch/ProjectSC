@@ -24,12 +24,12 @@ public class ChangeRotationEvent extends Event {
 
     private final Vector3f newRotation;
 
-    public ChangeRotationEvent(Vector3f newRotation, long entityId) {
+    public ChangeRotationEvent(Vector3f newRotation, String entityId) {
         super(ID, entityId);
         this.newRotation = newRotation;
     }
 
-    public ChangeRotationEvent(float dx, float dy, float dz, long entityId) {
+    public ChangeRotationEvent(float dx, float dy, float dz, String entityId) {
         super(ID, entityId);
         this.newRotation = new Vector3f(dx, dy, dz);
         isRelative = true;

@@ -113,5 +113,10 @@ public final class MessageConstants {
      */
     public static final String PLAYER_JOINED_GAME = "player_joined_game";
 
+    /**
+     * Constant.
+     */
+    public static final String LOGIN_REQUEST = "request:login";
+
     private MessageConstants() {};
 }

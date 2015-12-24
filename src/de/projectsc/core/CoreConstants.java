@@ -16,7 +16,7 @@ public final class CoreConstants {
     /**
      * Constant.
      */
-    public static final String SCHEME_DIRECTORY_NAME = "schemes";
+    public static final String SCHEME_DIRECTORY_NAME = "/schemes";
 
     /**
      * Constant.

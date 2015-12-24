@@ -42,5 +42,10 @@ public final class GameMessageConstants {
      */
     public static final String BEGIN_GAME = "begin_game";
 
+    /**
+     * Message ID.
+     */
+    public static final String NEW_SNAPSHOT = "new_snapshot";
+
     private GameMessageConstants() {};
 }

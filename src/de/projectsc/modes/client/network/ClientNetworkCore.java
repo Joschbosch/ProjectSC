@@ -115,10 +115,8 @@ public class ClientNetworkCore implements Runnable {
             });
             LOGGER.debug("Client connection established");
         } catch (IOException e) {
-            LOGGER.error(e.getStackTrace());
+            LOGGER.error("Could not connect: " + e);
         }
-        LOGGER.debug("connected.");
-
     }
 
     @Override

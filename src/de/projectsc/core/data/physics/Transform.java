@@ -4,6 +4,8 @@
 
 package de.projectsc.core.data.physics;
 
+import java.util.Map;
+
 import org.lwjgl.util.vector.Vector3f;
 
 /**
@@ -41,5 +43,17 @@ public class Transform {
 
     public Vector3f getPosition() {
         return position;
+    }
+
+    public void parseTransformValues(Map<String, Map<String, Double>> values) {
+        this.position.x = (float) (double) values.get("position").get("x");
+        this.position.y = (float) (double) values.get("position").get("y");
+        this.position.z = (float) (double) values.get("position").get("z");
+        this.rotation.x = (float) (double) values.get("rotation").get("x");
+        this.rotation.y = (float) (double) values.get("rotation").get("y");
+        this.rotation.z = (float) (double) values.get("rotation").get("z");
+        this.scale.x = (float) (double) values.get("scale").get("x");
+        this.scale.y = (float) (double) values.get("scale").get("y");
+        this.scale.z = (float) (double) values.get("scale").get("z");
     }
 }

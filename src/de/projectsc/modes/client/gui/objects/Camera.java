@@ -6,19 +6,21 @@
 package de.projectsc.modes.client.gui.objects;
 
 import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
 
+import de.projectsc.core.data.KeyboardInputCommand;
+import de.projectsc.core.data.MouseInputCommand;
 import de.projectsc.core.interfaces.Entity;
+import de.projectsc.core.interfaces.InputCommandListener;
 
 /**
  * Class for moving around in the world.
  * 
  * @author Josch Bosch
  */
-public class Camera {
+public class Camera implements InputCommandListener {
 
     protected static final int DEGREES_180 = 180;
 
@@ -34,7 +36,7 @@ public class Camera {
 
     protected static final float PITCH_FACTOR = 0.1f;
 
-    protected static final float MOUSE_WHEEL_ZOOM_FACTOR = 0.05f;
+    protected static final float MOUSE_WHEEL_ZOOM_FACTOR = 0.005f;
 
     protected static final int MAXIMUM_PITCH_ANGLE = 90;
 
@@ -64,11 +66,25 @@ public class Camera {
 
     protected float roll = 0;
 
-    private float currentSpeedX;
+    private float currentSpeedXKeys;
 
-    private float currentSpeedZ;
+    private float currentSpeedZKeys;
 
     private boolean bound;
+
+    private float currentSpeedXMouse;
+
+    private float currentSpeedZMouse;
+
+    private int mouseWheel = 0;
+
+    private int mouseDX;
+
+    private int mouseDY;
+
+    private boolean mouseButton1;
+
+    private boolean mouseButton0;
 
     public Camera() {
 
@@ -83,7 +99,6 @@ public class Camera {
         if (NO_CAMERA_MOVING) {
             return;
         }
-
         if (!MOBA_MODE) {
             calculateZoom();
             calculatePitch();
@@ -93,8 +108,6 @@ public class Camera {
             calculateCameraPosition(centeringPoint, horizontalDistance, verticalDistance);
             this.yaw = DEGREES_180 - (0 + angleAroundPlayer);
         } else {
-
-            checkInputs();
             if (!bound) {
                 calculateZoom();
                 calculateCameraPosition(delta);
@@ -106,43 +119,70 @@ public class Camera {
         }
     }
 
-    protected void checkInputs() {
+    @Override
+    public InputConsumeLevel getInputConsumeLevel() {
+        return InputConsumeLevel.SECOND;
+    }
+
+    @Override
+    public void handleKeyboardCommand(KeyboardInputCommand command) {
+        currentSpeedXKeys = 0;
+        currentSpeedZKeys = 0;
         float movementSpeed = MOVEMENT_SPEED;
         if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)) {
             movementSpeed *= FAST_MOVEMENT_SPEED_FACTOR;
         }
         if (Keyboard.isKeyDown(Keyboard.KEY_A)) {
-            currentSpeedX = -movementSpeed;
+            currentSpeedXKeys = -movementSpeed;
         } else if (Keyboard.isKeyDown(Keyboard.KEY_D)) {
-            currentSpeedX = movementSpeed;
+            currentSpeedXKeys = movementSpeed;
         } else {
-            currentSpeedX = 0;
+            currentSpeedXKeys = 0;
         }
         if (Keyboard.isKeyDown(Keyboard.KEY_W)) {
-            currentSpeedZ = -movementSpeed;
+            currentSpeedZKeys = -movementSpeed;
         } else if (Keyboard.isKeyDown(Keyboard.KEY_S)) {
-            currentSpeedZ = movementSpeed;
+            currentSpeedZKeys = movementSpeed;
         } else {
-            currentSpeedZ = 0;
+            currentSpeedZKeys = 0;
         }
-        if (isBetween(Mouse.getX(), 0, SCROLL_MARGIN)) {
-            currentSpeedX = -FAST_MOVEMENT_SPEED_FACTOR * movementSpeed;
-        } else if (isBetween(Mouse.getX(), Display.getWidth() - SCROLL_MARGIN, Display.getWidth())) {
-            currentSpeedX = FAST_MOVEMENT_SPEED_FACTOR * movementSpeed;
-        } else if (isBetween(Mouse.getX(), SCROLL_MARGIN, 2 * SCROLL_MARGIN)) {
-            currentSpeedX = -movementSpeed;
-        } else if (isBetween(Mouse.getX(), Display.getWidth() - 2 * SCROLL_MARGIN, Display.getWidth() - SCROLL_MARGIN)) {
-            currentSpeedX = movementSpeed;
+        command.consumed();
+    }
+
+    @Override
+    public void handleMouseCommand(MouseInputCommand command) {
+        currentSpeedXMouse = 0;
+        currentSpeedZMouse = 0;
+
+        float movementSpeed = MOVEMENT_SPEED;
+        if (isBetween(command.getMouseX(), 0, SCROLL_MARGIN)) {
+            currentSpeedXMouse = -FAST_MOVEMENT_SPEED_FACTOR * movementSpeed;
+        } else if (isBetween(command.getMouseX(), Display.getWidth() - SCROLL_MARGIN, Display.getWidth())) {
+            currentSpeedXMouse = FAST_MOVEMENT_SPEED_FACTOR * movementSpeed;
+        } else if (isBetween(command.getMouseX(), SCROLL_MARGIN, 2 * SCROLL_MARGIN)) {
+            currentSpeedXMouse = -movementSpeed;
+        } else if (isBetween(command.getMouseX(), Display.getWidth() - 2 * SCROLL_MARGIN, Display.getWidth() - SCROLL_MARGIN)) {
+            currentSpeedXMouse = movementSpeed;
         }
-        if (isBetween(Mouse.getY(), 0, SCROLL_MARGIN)) {
-            currentSpeedZ = FAST_MOVEMENT_SPEED_FACTOR * movementSpeed;
-        } else if (isBetween(Mouse.getY(), Display.getHeight() - SCROLL_MARGIN, Display.getWidth())) {
-            currentSpeedZ = -FAST_MOVEMENT_SPEED_FACTOR * movementSpeed;
-        } else if (isBetween(Mouse.getY(), SCROLL_MARGIN, 2 * SCROLL_MARGIN)) {
-            currentSpeedZ = movementSpeed;
-        } else if (isBetween(Mouse.getY(), Display.getHeight() - 2 * SCROLL_MARGIN, Display.getWidth() - SCROLL_MARGIN)) {
-            currentSpeedZ = -movementSpeed;
+        if (isBetween(command.getMouseY(), 0, SCROLL_MARGIN)) {
+            currentSpeedZMouse = FAST_MOVEMENT_SPEED_FACTOR * movementSpeed;
+        } else if (isBetween(command.getMouseY(), Display.getHeight() - SCROLL_MARGIN, Display.getWidth())) {
+            currentSpeedZMouse = -FAST_MOVEMENT_SPEED_FACTOR * movementSpeed;
+        } else if (isBetween(command.getMouseY(), SCROLL_MARGIN, 2 * SCROLL_MARGIN)) {
+            currentSpeedZMouse = movementSpeed;
+        } else if (isBetween(command.getMouseY(), Display.getHeight() - 2 * SCROLL_MARGIN, Display.getWidth() - SCROLL_MARGIN)) {
+            currentSpeedZMouse = -movementSpeed;
         }
+        this.mouseWheel = command.getMouseWheel();
+        this.mouseDX = command.getMouseDX();
+        this.mouseDY = command.getMouseDY();
+        if (command.getButton() == 0) {
+            this.mouseButton0 = command.isButtonDown();
+        }
+        if (command.getButton() == 1) {
+            this.mouseButton1 = command.isButtonDown();
+        }
+        command.consumed();
     }
 
     protected boolean isBetween(float value, int lower, int upper) {
@@ -150,8 +190,10 @@ public class Camera {
     }
 
     protected void calculateCameraPosition(float delta) {
+        float currentSpeedX = currentSpeedXKeys + currentSpeedXMouse;
+        float currentSpeedZ = currentSpeedZKeys + currentSpeedZMouse;
         centeringPoint.x = centeringPoint.x + delta / 1000.0f * currentSpeedX;
-        centeringPoint.z = centeringPoint.z + delta / 1000.0f * currentSpeedX;
+        centeringPoint.z = centeringPoint.z + delta / 1000.0f * currentSpeedZ;
         position.x = position.x + delta / 1000.0f * currentSpeedX;
         position.z = position.z + delta / 1000.0f * currentSpeedZ;
     }
@@ -206,7 +248,7 @@ public class Camera {
 
     protected void calculateZoom() {
         if (!MOBA_MODE) {
-            float zoomLevel = Mouse.getDWheel() * MOUSE_WHEEL_ZOOM_FACTOR;
+            float zoomLevel = mouseWheel * MOUSE_WHEEL_ZOOM_FACTOR;
             distanceFromCenterPoint -= zoomLevel;
             if (distanceFromCenterPoint < 0) {
                 distanceFromCenterPoint = 0;
@@ -214,7 +256,7 @@ public class Camera {
                 distanceFromCenterPoint = MAX_DISTANCE_TO_PLAYER;
             }
         } else {
-            float zoomLevel = Mouse.getDWheel() * MOUSE_WHEEL_ZOOM_FACTOR;
+            float zoomLevel = mouseWheel * MOUSE_WHEEL_ZOOM_FACTOR;
             if (position.y <= MAXIMUM_Y_POSITION && zoomLevel < 0 || position.y >= MINIMUM_Y_POSITION && zoomLevel > 0) {
                 position.y -= zoomLevel;
                 pitch -= zoomLevel;
@@ -224,8 +266,8 @@ public class Camera {
     }
 
     protected void calculatePitch() {
-        if (Mouse.isButtonDown(1)) {
-            float pitchChange = Mouse.getDY() * PITCH_FACTOR;
+        if (mouseButton1) {
+            float pitchChange = mouseDY * PITCH_FACTOR;
             pitch -= pitchChange;
         }
         if (pitch < MINIMUM_PITCH_ANGLE) {
@@ -236,8 +278,8 @@ public class Camera {
     }
 
     protected void calculateAngleAroundPlayer() {
-        if (Mouse.isButtonDown(0)) {
-            float angleChange = Mouse.getDX() * ANGLE_AROUND_PLAYER_FACTOR;
+        if (mouseButton0) {
+            float angleChange = mouseDX * ANGLE_AROUND_PLAYER_FACTOR;
             angleAroundPlayer -= angleChange;
         }
     }
@@ -294,4 +336,5 @@ public class Camera {
         centeringPoint.y = y;
         centeringPoint.z = z;
     }
+
 }

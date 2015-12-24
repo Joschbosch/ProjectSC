@@ -10,7 +10,7 @@ import java.util.Map;
 
 import org.lwjgl.input.Keyboard;
 
-import de.projectsc.modes.client.core.states.StateConstants;
+import de.projectsc.modes.client.core.states.UIElementConstants;
 import de.projectsc.modes.client.ui.BasicUIElement;
 
 /**
@@ -25,7 +25,7 @@ public class Menu extends BasicUIElement {
     private int chosenItem;
 
     public Menu() {
-        super(StateConstants.MENU, 0);
+        super(UIElementConstants.MENU, 0);
         menuItems.add("Play a Game");
         menuItems.add("Create a Game");
         menuItems.add("Quit");

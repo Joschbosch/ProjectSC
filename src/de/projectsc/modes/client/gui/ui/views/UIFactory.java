@@ -7,7 +7,7 @@ package de.projectsc.modes.client.gui.ui.views;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import de.projectsc.modes.client.core.states.StateConstants;
+import de.projectsc.modes.client.core.states.UIElementConstants;
 import de.projectsc.modes.client.gui.data.View;
 import de.projectsc.modes.client.ui.BasicUIElement;
 
@@ -32,12 +32,14 @@ public final class UIFactory {
      */
     public static View createView(BasicUIElement element) {
         switch (element.getUiViewId()) {
-        case StateConstants.CONSOLE:
+        case UIElementConstants.CONSOLE:
             return new ConsoleView(element);
-        case StateConstants.LOGIN:
+        case UIElementConstants.LOGIN:
             return new ConsoleView(element);
-        case StateConstants.MENU:
+        case UIElementConstants.MENU:
             return new MenuView(element);
+        case UIElementConstants.GAMETIMER:
+            return new GameTimeView(element);
         default:
             LOGGER.error("Could not create view for id " + element.getUiViewId());
             return null;

@@ -8,7 +8,7 @@ import de.projectsc.core.data.physics.Transform;
 
 public interface Entity {
 
-    long getID();
+    String getID();
 
     Transform getTransform();
 

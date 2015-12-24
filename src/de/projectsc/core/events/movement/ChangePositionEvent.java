@@ -24,12 +24,12 @@ public class ChangePositionEvent extends Event {
 
     private final Vector3f newPosition;
 
-    public ChangePositionEvent(Vector3f newPosition, long entityId) {
+    public ChangePositionEvent(Vector3f newPosition, String entityId) {
         super(ID, entityId);
         this.newPosition = newPosition;
     }
 
-    public ChangePositionEvent(float dx, float dy, float dz, long entityId) {
+    public ChangePositionEvent(float dx, float dy, float dz, String entityId) {
         super(ID, entityId);
         this.newPosition = new Vector3f(dx, dy, dz);
         isRelative = true;

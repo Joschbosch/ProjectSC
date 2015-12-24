@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -20,6 +21,10 @@ import de.projectsc.core.events.entities.DeletedEntityEvent;
 import de.projectsc.core.events.entities.NewEntityCreatedEvent;
 import de.projectsc.core.interfaces.Component;
 import de.projectsc.core.interfaces.Entity;
+import de.projectsc.core.interfaces.InputCommandListener;
+import de.projectsc.core.utils.ComponentUtils;
+import de.projectsc.core.utils.EntitySchemaLoader;
+import de.projectsc.editor.EntitySchema;
 
 /**
  * This is the core class for using {@link Entity}(ies). All entities are created by this class and are stored here. Also, all components
@@ -31,17 +36,22 @@ public class EntityManager {
 
     private static final Log LOGGER = LogFactory.getLog(EntityManager.class);
 
-    private final Map<Long, Entity> entities = new HashMap<>();
+    private final Map<String, Entity> entities = new HashMap<>();
 
-    private final Map<Long, Map<String, Component>> entityComponents = new HashMap<>();
+    private final Map<String, Map<String, Component>> entityComponents = new HashMap<>();
+
+    private final Map<Long, EntitySchema> entitySchemas = new HashMap<>();
 
     private ComponentManager componentManager;
 
     private EventManager eventManager;
 
-    public EntityManager(ComponentManager componentManager, EventManager eventManager) {
+    private InputConsumeManager inputConsumeManager;
+
+    public EntityManager(ComponentManager componentManager, EventManager eventManager, InputConsumeManager inputConsumeManager) {
         this.componentManager = componentManager;
         this.eventManager = eventManager;
+        this.inputConsumeManager = inputConsumeManager;
     }
 
     /**
@@ -49,13 +59,49 @@ public class EntityManager {
      * 
      * @return entity id
      */
-    public long createNewEntity() {
-        Entity e = new EntityImpl(this);
+    public String createNewEntity() {
+        String uuid = UUID.randomUUID().toString();
+        return createNewEntity(uuid);
+    }
+
+    public String createNewEntity(String uid) {
+        if (entities.get(uid) != null) {
+            LOGGER.error("Entity with id " + uid + " already exists!");
+            return "";
+        }
+        Entity e = new EntityImpl(this, uid);
         entities.put(e.getID(), e);
         LOGGER.debug("Created new entity " + e.getID());
         addComponentToEntity(e.getID(), TransformComponent.NAME);
         eventManager.fireEvent(new NewEntityCreatedEvent(e.getID()));
         return e.getID();
+    }
+
+    public String createNewEntityFromSchema(long schemaId, String entityUID) {
+        if (entitySchemas.get(schemaId) == null) {
+            EntitySchema newSchema = EntitySchemaLoader.loadEntitySchema(schemaId, componentManager);
+            if (newSchema != null) {
+                entitySchemas.put(newSchema.getId(), newSchema);
+            } else {
+                return "";
+            }
+        }
+        EntitySchema schema = entitySchemas.get(schemaId);
+        String e = createNewEntity(entityUID);
+        for (Component c : schema.getComponents()) {
+            Component clone = ComponentUtils.cloneComponent(c);
+            if (inputConsumeManager != null && clone instanceof InputCommandListener) {
+                inputConsumeManager.addListener((InputCommandListener) c);
+            }
+            addComponentToEntity(e, clone);
+            clone.setOwner(getEntity(e));
+        }
+        getEntity(e).setEntityTypeId(schema.getId());
+        return e;
+    }
+
+    public String createNewEntityFromSchema(long schemaId) {
+        return createNewEntityFromSchema(schemaId, UUID.randomUUID().toString());
     }
 
     /**
@@ -66,14 +112,17 @@ public class EntityManager {
      * @param componentName of the component to add
      * @return the component that was created.
      */
-    public Component addComponentToEntity(long id, String componentName) {
+    public Component addComponentToEntity(String id, String componentName) {
         Component c = componentManager.createComponent(componentName);
         c.setOwner(getEntity(id));
+        if (inputConsumeManager != null && c instanceof InputCommandListener) {
+            inputConsumeManager.addListener((InputCommandListener) c);
+        }
         addComponentToEntity(id, c);
         return c;
     }
 
-    public Component addComponentToEntity(long id, Component c) {
+    public Component addComponentToEntity(String id, Component c) {
         if (c != null) {
             Map<String, Component> components = entityComponents.get(id);
             if (components == null) {
@@ -106,12 +155,15 @@ public class EntityManager {
      * @param id of the entity
      * @param componentName to remove
      */
-    public void removeComponentFromEntity(long id, String componentName) {
+    public void removeComponentFromEntity(String id, String componentName) {
         Map<String, Component> components = entityComponents.get(id);
         if (components != null) {
             Component toRemove = components.get(componentName);
             if (toRemove != null && toRemove.getRequiredBy().isEmpty()) {
                 components.remove(componentName);
+                if (inputConsumeManager != null && toRemove instanceof InputCommandListener) {
+                    inputConsumeManager.removeListener((InputCommandListener) toRemove);
+                }
                 for (String reqComponentName : toRemove.getRequiredComponents()) {
                     if (hasComponent(id, componentManager.getComponentClass(reqComponentName))) {
                         Component c = getComponent(id, reqComponentName);
@@ -134,7 +186,7 @@ public class EntityManager {
      * @param componentName to get
      * @return the component, if there
      */
-    public Component getComponent(long id, String componentName) {
+    public Component getComponent(String id, String componentName) {
         Map<String, Component> components = entityComponents.get(id);
         if (components != null) {
             Component c = components.get(componentName);
@@ -157,7 +209,7 @@ public class EntityManager {
      * @param componentClass to get
      * @return the component, if there
      */
-    public Component getComponent(long entityId, Class<? extends Component> componentClass) {
+    public Component getComponent(String entityId, Class<? extends Component> componentClass) {
         Map<String, Component> componentsOfEntity = entityComponents.get(entityId);
         if (componentsOfEntity != null) {
             for (Component c : componentsOfEntity.values()) {
@@ -179,7 +231,7 @@ public class EntityManager {
      * @param clazz to check
      * @return true, if entity has component attached.
      */
-    public boolean hasComponent(Long entity, Class<? extends Component> clazz) {
+    public boolean hasComponent(String entity, Class<? extends Component> clazz) {
         Map<String, Component> componentsOfEntity = entityComponents.get(entity);
         if (componentsOfEntity != null) {
             for (Component c : componentsOfEntity.values()) {
@@ -197,7 +249,7 @@ public class EntityManager {
      * @param id of the entity
      * @return all components from id
      */
-    public Map<String, Component> getAllComponents(long id) {
+    public Map<String, Component> getAllComponents(String id) {
         return entityComponents.get(id);
     }
 
@@ -206,25 +258,40 @@ public class EntityManager {
      * 
      * @param id of entity to remove
      */
-    public void deleteEntity(long id) {
+    public void deleteEntity(String id) {
         if (entities.remove(id) != null) {
             LOGGER.debug("Removed entity " + id);
-            entityComponents.remove(id);
-            eventManager.fireEvent(new DeletedEntityEvent(id));
+            Map<String, Component> components = entityComponents.remove(id);
+            if (inputConsumeManager != null) {
+                for (Component c : components.values()) {
+                    if (c instanceof InputCommandListener) {
+                        inputConsumeManager.removeListener((InputCommandListener) c);
+                    }
+                }
+                eventManager.fireEvent(new DeletedEntityEvent(id));
+            }
         }
-
     }
 
     /**
      * @param id of an entity
      * @return the entity with the given id
      */
-    public Entity getEntity(long id) {
+    public Entity getEntity(String id) {
         return entities.get(id);
     }
 
-    public Set<Long> getAllEntites() {
+    public Set<String> getAllEntites() {
         return entities.keySet();
+    }
+
+    public void addAllEntites(Map<String, Entity> newEntities) {
+        entities.clear();
+        entities.putAll(newEntities);
+    }
+
+    public Map<String, Entity> getEntites() {
+        return entities;
     }
 
 }

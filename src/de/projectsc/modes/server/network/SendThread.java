@@ -37,6 +37,7 @@ public class SendThread implements Runnable {
 
     @Override
     public void run() {
+        LOGGER.debug("Starting send thread for " + client.getDisplayName());
         while (true) {
             try {
                 ObjectMapper mapper = new ObjectMapper();
@@ -44,7 +45,7 @@ public class SendThread implements Runnable {
                 NetworkMessage sendMessage = new NetworkMessage();
                 sendMessage.setMsg(message.getMessage());
                 sendMessage.setData(mapper.writeValueAsString(message.getData()));
-                LOGGER.debug("Server sends message to client: " + mapper.writeValueAsString(sendMessage));
+                // LOGGER.debug("Server sends message to client: " + mapper.writeValueAsString(sendMessage));
                 connection.sendUDP(mapper.writeValueAsString(sendMessage));
             } catch (InterruptedException | IOException e) {
                 LOGGER.error("Client thread interrupted", e);

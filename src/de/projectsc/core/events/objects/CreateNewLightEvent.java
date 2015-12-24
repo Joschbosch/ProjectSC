@@ -25,7 +25,7 @@ public class CreateNewLightEvent extends Event {
 
     private final Vector3f position;
 
-    public CreateNewLightEvent(long entity, Light light, Vector3f position) {
+    public CreateNewLightEvent(String entity, Light light, Vector3f position) {
         super(ID, entity);
         this.light = light;
         this.position = position;

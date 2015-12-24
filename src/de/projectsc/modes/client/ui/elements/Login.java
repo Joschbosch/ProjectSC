@@ -6,7 +6,7 @@
 
 package de.projectsc.modes.client.ui.elements;
 
-import de.projectsc.modes.client.core.states.StateConstants;
+import de.projectsc.modes.client.core.states.UIElementConstants;
 import de.projectsc.modes.client.ui.BasicUIElement;
 
 /**
@@ -19,7 +19,7 @@ public class Login extends BasicUIElement {
     private String loginMessage = "";
 
     public Login() {
-        super(StateConstants.LOGIN, 0);
+        super(UIElementConstants.LOGIN, 0);
     }
 
     public void setLoginMessage(String msg) {

@@ -5,9 +5,9 @@
  */
 package de.projectsc.modes.client.interfaces;
 
-import java.util.Map;
+import java.util.Queue;
 
-import de.projectsc.core.data.structure.Snapshot;
+import de.projectsc.core.data.InputCommand;
 import de.projectsc.modes.client.ui.BasicUIElement;
 
 /**
@@ -26,16 +26,15 @@ public interface GUI {
      * Render gui.
      * 
      * @param state to render
-     * @param data to render
      */
-    void render(ClientState state, Snapshot data);
+    void render(ClientState state);
 
     /**
      * Read user input.
      * 
      * @return messages for core.
      */
-    Map<Integer, Integer> readInput();
+    Queue<InputCommand> readInput();
 
     /**
      * Initialize the state.
@@ -114,4 +113,6 @@ public interface GUI {
      * Clean up everything after program is done.
      */
     void cleanUpCore();
+
+    void loadTerrain();
 }

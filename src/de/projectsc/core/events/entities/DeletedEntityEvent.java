@@ -10,7 +10,7 @@ public class DeletedEntityEvent extends Event {
 
     private static final String NAME = "DeletedEntityEvent";
 
-    public DeletedEntityEvent(long entityID) {
+    public DeletedEntityEvent(String entityID) {
         super(NAME, entityID);
     }
 

@@ -28,7 +28,7 @@ public class ChangeMeshRendererParameterEvent extends Event {
 
     private final int numColums;
 
-    public ChangeMeshRendererParameterEvent(long entityID, boolean fakeLightning, boolean transparent, float reflectivity,
+    public ChangeMeshRendererParameterEvent(String entityID, boolean fakeLightning, boolean transparent, float reflectivity,
         float shineDamper, int numColums) {
         super(ID, entityID);
         this.fakeLightning = fakeLightning;

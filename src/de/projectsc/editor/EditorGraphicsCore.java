@@ -44,6 +44,7 @@ import de.projectsc.core.interfaces.Component;
 import de.projectsc.core.manager.ComponentManager;
 import de.projectsc.core.manager.EntityManager;
 import de.projectsc.core.manager.EventManager;
+import de.projectsc.core.manager.InputConsumeManager;
 import de.projectsc.core.systems.physics.PhysicsSystem;
 import de.projectsc.core.terrain.Terrain;
 import de.projectsc.modes.client.gui.RenderingSystem;
@@ -53,6 +54,7 @@ import de.projectsc.modes.client.gui.components.MeshRendererComponent;
 import de.projectsc.modes.client.gui.data.GUIScene;
 import de.projectsc.modes.client.gui.events.ChangeMeshRendererParameterEvent;
 import de.projectsc.modes.client.gui.events.NewTextureEvent;
+import de.projectsc.modes.client.gui.input.InputSystem;
 import de.projectsc.modes.client.gui.objects.particles.ParticleMaster;
 import de.projectsc.modes.client.gui.objects.terrain.TerrainModel;
 import de.projectsc.modes.client.gui.objects.text.TextMaster;
@@ -83,13 +85,13 @@ public class EditorGraphicsCore implements Runnable {
 
     private MasterRenderer masterRenderer;
 
-    private long entity = -1;
+    private String entity = "";
 
     private EditorData editorData;
 
     private final BlockingQueue<String> incomingQueue;
 
-    private long sun;
+    private String sun;
 
     private final AtomicBoolean doRender = new AtomicBoolean(true);
 
@@ -107,8 +109,12 @@ public class EditorGraphicsCore implements Runnable {
 
     private EventManager eventManager;
 
+    private InputConsumeManager inputConsumeManager;
+
+    private InputSystem inputSystem;
+
     public EditorGraphicsCore(Canvas displayParent, int width, int height, BlockingQueue<String> messageQueue,
-        ComponentManager componentManager, EntityManager entityManager, EventManager eventManager) {
+        ComponentManager componentManager, EntityManager entityManager, EventManager eventManager, InputConsumeManager inputConsumeManager) {
         incomingQueue = new LinkedBlockingQueue<>();
         this.displayParent = displayParent;
         this.width = width;
@@ -116,6 +122,7 @@ public class EditorGraphicsCore implements Runnable {
         this.componentManager = componentManager;
         this.entityManager = entityManager;
         this.eventManager = eventManager;
+        this.inputConsumeManager = inputConsumeManager;
     }
 
     @Override
@@ -133,8 +140,10 @@ public class EditorGraphicsCore implements Runnable {
         loadGUIComponents();
         physicsSystem = new PhysicsSystem(entityManager, eventManager);
         renderSystem = new RenderingSystem(entityManager, eventManager);
+        this.inputSystem = new InputSystem();
         TextMaster.init();
         camera = new EditorCamera();
+        inputConsumeManager.addListener(camera);
         createNewEntity();
         masterRenderer = new MasterRenderer();
         createSun();
@@ -154,6 +163,7 @@ public class EditorGraphicsCore implements Runnable {
         while (running) {
             Timer.update();
             readMessages();
+            inputConsumeManager.processInput(inputSystem.updateInputs());
             camera.move(Timer.getDelta());
             ParticleMaster.update(camera.getPosition());
             if (editorData.isLightAtCameraPostion()) {
@@ -223,7 +233,7 @@ public class EditorGraphicsCore implements Runnable {
                 timer = 1500;
                 MeshRendererComponent component =
                     (MeshRendererComponent) entityManager.getComponent(entity, MeshRendererComponent.NAME);
-                if (entity != -1 && component != null) {
+                if (!entity.isEmpty() && component != null) {
                     component.setTextureIndex((component.getTextureIndex() + 1)
                         % (editorData.getNumColums() * editorData.getNumColums()));
                 }
@@ -250,7 +260,7 @@ public class EditorGraphicsCore implements Runnable {
      * @param data to update
      */
     public void updateData(EditorData data) {
-        if (entity != -1) {
+        if (!entity.isEmpty()) {
             eventManager.fireEvent(new ChangeScaleEvent(entity, new Vector3f(editorData.getScale(), editorData.getScale(), editorData
                 .getScale())));
             eventManager.fireEvent(new ChangeMeshRendererParameterEvent(entity, editorData.isFakeLighting(), editorData
@@ -261,14 +271,14 @@ public class EditorGraphicsCore implements Runnable {
     /**
      */
     public void createNewEntity() {
-        if (entity != -1) {
+        if (!entity.isEmpty()) {
             entityManager.deleteEntity(entity);
         }
         if (editorData != null) {
             entity = entityManager.createNewEntity();
             camera.bindToEntity(entityManager.getEntity(entity));
         } else {
-            entity = -1;
+            entity = "";
             camera.setLookAtPoint(0, 0, 0);
         }
     }
@@ -379,7 +389,7 @@ public class EditorGraphicsCore implements Runnable {
         entityManager.addComponentToEntity(entity, component);
     }
 
-    public long getCurrentEntity() {
+    public String getCurrentEntity() {
         return entity;
     }
 

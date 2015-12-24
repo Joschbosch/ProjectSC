@@ -71,7 +71,7 @@ public class PhysicsSystem extends DefaultSystem {
     @Override
     public void update(long tick) {
         List<Entity> movedEntities = new LinkedList<>();
-        for (long entity : entityManager.getAllEntites()) {
+        for (String entity : entityManager.getAllEntites()) {
             for (Component c : entityManager.getAllComponents(entity).values()) {
                 if (c instanceof PhysicsComponent) {
                     ((PhysicsComponent) c).update();
@@ -210,7 +210,7 @@ public class PhysicsSystem extends DefaultSystem {
             s.getWireFrames().add(wf);
         }
 
-        for (long entity : entityManager.getAllEntites()) {
+        for (String entity : entityManager.getAllEntites()) {
             for (Component c : entityManager.getAllComponents(entity).values()) {
                 if (c instanceof ColliderComponent) {
                     AxisAlignedBoundingBox box = ((ColliderComponent) c).getAABB();

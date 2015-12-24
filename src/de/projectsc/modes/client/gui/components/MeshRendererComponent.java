@@ -84,17 +84,17 @@ public class MeshRendererComponent extends GraphicalComponent {
     }
 
     @Override
-    public void render(long entity, GUIScene scene) {
+    public void render(String entity, GUIScene scene) {
         TexturedModel m = getTexturedModel();
         if (m != null && m.getRawModel() != null && m.getTexture() != null) {
             if (modelTexture != null) {
                 modelTexture.setActiveTextureIndex(textureIndex);
             }
-            List<Long> batch = scene.getModels().get(m);
+            List<String> batch = scene.getModels().get(m);
             if (batch != null) {
                 batch.add(entity);
             } else {
-                List<Long> newBatch = new ArrayList<>();
+                List<String> newBatch = new ArrayList<>();
                 newBatch.add(entity);
                 scene.getModels().put(m, newBatch);
             }

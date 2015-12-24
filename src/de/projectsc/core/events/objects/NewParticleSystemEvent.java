@@ -13,7 +13,7 @@ public class NewParticleSystemEvent extends Event {
      */
     public static final String ID = "NewParticelSystemEvent";
 
-    public NewParticleSystemEvent(long entityId) {
+    public NewParticleSystemEvent(String entityId) {
         super(ID, entityId);
 
     }

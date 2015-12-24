@@ -26,7 +26,7 @@ public class ChangeMovementParameterEvent extends Event {
 
     private float currentSpeed = Float.NEGATIVE_INFINITY;
 
-    public ChangeMovementParameterEvent(long entityId) {
+    public ChangeMovementParameterEvent(String entityId) {
         super(ID, entityId);
     }
 

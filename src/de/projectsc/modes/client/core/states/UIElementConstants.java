@@ -9,7 +9,7 @@ package de.projectsc.modes.client.core.states;
  * 
  * @author Josch Bosch
  */
-public final class StateConstants {
+public final class UIElementConstants {
 
     /**
      * Constant.
@@ -31,6 +31,11 @@ public final class StateConstants {
      */
     public static final String CONSOLE = "uielement.console";
 
-    private StateConstants() {}
+    /**
+     * Constant.
+     */
+    public static final String GAMETIMER = "uielement.gametimer";
+
+    private UIElementConstants() {}
 
 }

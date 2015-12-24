@@ -21,7 +21,7 @@ public class RemoveLightEvent extends Event {
 
     private final Light light;
 
-    public RemoveLightEvent(long entity, Light light) {
+    public RemoveLightEvent(String entity, Light light) {
         super(ID, entity);
         this.light = light;
     }

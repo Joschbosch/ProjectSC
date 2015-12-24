@@ -13,6 +13,8 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.TreeMap;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.core.component.impl.physic.ColliderComponent;
@@ -28,6 +30,8 @@ import de.projectsc.core.interfaces.Entity;
  * @author Josch Bosch
  */
 public class OctTree<T extends Entity> {
+
+    private static final Log LOGGER = LogFactory.getLog(OctTree.class);
 
     private static final int MAXIMUM_LIFESPAN = 64;
 
@@ -424,13 +428,14 @@ public class OctTree<T extends Entity> {
         return region;
     }
 
-    public void removeEntity(long l) {
+    public void removeEntity(String l) {
         if (removeRecursive(l)) {
+            LOGGER.debug("Successfully removed entity from octree: " + l);
             buildTree();
         }
     }
 
-    private boolean removeRecursive(long toRemove) {
+    private boolean removeRecursive(String toRemove) {
         Iterator<T> it = entities.iterator();
         while (it.hasNext()) {
             if (it.next().getID() == toRemove) {
