@@ -19,13 +19,12 @@ import de.projectsc.core.manager.EntityManager;
 import de.projectsc.core.manager.EventManager;
 import de.projectsc.core.manager.InputConsumeManager;
 import de.projectsc.core.systems.physics.PhysicsSystem;
-import de.projectsc.modes.client.core.data.ClientGameContext;
+import de.projectsc.modes.client.core.data.ClientMessage;
 import de.projectsc.modes.client.core.data.ClientPlayer;
-import de.projectsc.modes.client.core.states.MenuState;
+import de.projectsc.modes.client.core.interfaces.ClientState;
+import de.projectsc.modes.client.core.interfaces.GUI;
+import de.projectsc.modes.client.game.states.MenuState;
 import de.projectsc.modes.client.gui.GUICore;
-import de.projectsc.modes.client.interfaces.ClientState;
-import de.projectsc.modes.client.interfaces.GUI;
-import de.projectsc.modes.client.messages.ClientMessage;
 
 /**
  * Core class for the client.
@@ -100,7 +99,7 @@ public class ClientCore implements Runnable {
                     Timer.setLag(Timer.getLag() - TICK_TIME);
                 }
                 currentState.loop(Timer.getLag());
-                gui.render(currentState);
+                gui.render();
             }
             if (newState != null) {
                 changeState(newState);
@@ -123,17 +122,16 @@ public class ClientCore implements Runnable {
 
     private void changeState(ClientState newState) {
         if (currentState != null) {
-            gui.cleanUpState(currentState);
             if (inputConsumeManager != null && currentState instanceof InputCommandListener) {
                 inputConsumeManager.removeListener((InputCommandListener) currentState);
             }
         }
-        ClientGameContext gameData = new ClientGameContext();
-        newState.init(gui, networkSendQueue, entityManager, eventManager, componentManager, gameData);
+        newState.init(networkSendQueue, entityManager, eventManager, componentManager, inputConsumeManager);
         currentState = newState;
         if (inputConsumeManager != null && currentState instanceof InputCommandListener) {
             inputConsumeManager.addListener((InputCommandListener) currentState);
         }
+        gui.initState(newState);
     }
 
     private void loadSystems() {

@@ -36,21 +36,21 @@ public class InputConsumeManager {
     }
 
     public void processInput(Queue<InputCommand> readInput) {
-
         for (InputCommandListener.InputConsumeLevel level : InputCommandListener.InputConsumeLevel.values()) {
             if (registered.get(level) != null) {
-                for (InputCommandListener listener : registered.get(level)) {
-                    for (InputCommand command : readInput) {
-                        if (command instanceof KeyboardInputCommand) {
-                            listener.handleKeyboardCommand((KeyboardInputCommand) command);
-                        }
-                        if (command instanceof MouseInputCommand) {
-                            listener.handleMouseCommand((MouseInputCommand) command);
+                for (InputCommand command : readInput) {
+                    for (InputCommandListener listener : registered.get(level)) {
+                        if (!command.isConsumed()) {
+                            if (command instanceof KeyboardInputCommand) {
+                                listener.handleKeyboardCommand((KeyboardInputCommand) command);
+                            }
+                            if (command instanceof MouseInputCommand) {
+                                listener.handleMouseCommand((MouseInputCommand) command);
+                            }
                         }
                     }
                 }
             }
         }
     }
-
 }

@@ -4,23 +4,18 @@
 
 package de.projectsc.modes.client.gui.ui.views;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import org.lwjgl.util.vector.Vector2f;
+import org.lwjgl.util.vector.Vector4f;
 
+import de.projectsc.modes.client.core.ui.UIManager;
+import de.projectsc.modes.client.game.ui.controls.Console;
 import de.projectsc.modes.client.gui.data.UI;
 import de.projectsc.modes.client.gui.data.View;
-import de.projectsc.modes.client.gui.objects.text.Font;
-import de.projectsc.modes.client.gui.objects.text.FontStore;
-import de.projectsc.modes.client.gui.objects.text.FontType;
-import de.projectsc.modes.client.gui.objects.text.GUIText;
-import de.projectsc.modes.client.gui.objects.text.TextMaster;
-import de.projectsc.modes.client.gui.textures.UITexture;
+import de.projectsc.modes.client.gui.ui.basic.Container;
+import de.projectsc.modes.client.gui.ui.basic.Label;
 import de.projectsc.modes.client.gui.utils.GUIConstants;
-import de.projectsc.modes.client.gui.utils.Loader;
-import de.projectsc.modes.client.ui.BasicUIElement;
-import de.projectsc.modes.client.ui.elements.Console;
 
 /**
  * View for the {@link Console}.
@@ -29,64 +24,53 @@ import de.projectsc.modes.client.ui.elements.Console;
  */
 public class ConsoleView extends View {
 
-    private static final Vector2f SIZE = new Vector2f(2f, 0.5f);
+    private static final Vector4f POSITION_AND_SIZE = new Vector4f(0, 0.5f, 1f, 0.5f);
 
-    private static final Vector2f POSITION = new Vector2f(0f, 0f);
+    private static final int MAXIMAL_LINES = 23;
 
-    private static final int MAXIMAL_LINES = 20;
-
-    private final Console console;
+    private Console console = null;
 
     private final float fontSize = 0.7f;
 
-    private final FontType font;
+    private Label textLabel;
 
-    private final Vector2f position;
+    private Container consoleContainer;
 
-    private final UITexture bg;
+    public ConsoleView(Container c) {
+        super(c);
+        console = (Console) UIManager.getElement(Console.class);
+        consoleContainer = new Container(c, POSITION_AND_SIZE);
+        consoleContainer.setBackground(GUIConstants.BASIC_TEXTURE_BLACK);
+        textLabel = new Label(consoleContainer, new Vector2f(0, 0));
+        textLabel.setFontSize(fontSize);
+        textLabel.setTextColor(1, 1, 1);
+        consoleContainer.setVisible(false);
+        consoleContainer.setOrder(UI.FOREGROUND);
+        textLabel.setRenderOrder(UI.FOREGROUND);
 
-    private final List<GUIText> lastText = new LinkedList<>();
-
-    private final float linePadding = 0.018f;
-
-    public ConsoleView(BasicUIElement element) {
-        super(element);
-        console = (Console) element;
-        this.font = FontStore.getFont(Font.CANDARA);
-        this.position = new Vector2f(0, 0);
-        bg = new UITexture(Loader.loadTexture(GUIConstants.BASIC_TEXTURE_BLACK), POSITION, SIZE);
     }
 
     @Override
-    public void render(UI ui) {
-        for (GUIText lines : lastText) {
-            TextMaster.removeText(lines);
-        }
+    public void update() {
         if (console.isVisible()) {
             List<String> lines = console.getLines();
-            int startValue = lines.size();
-            if (startValue > MAXIMAL_LINES) {
-                startValue -= MAXIMAL_LINES;
-            } else {
-                startValue = 0;
+            String text = "";
+            for (int i = 0; i < MAXIMAL_LINES - lines.size(); i++) {
+                text += " \n";
             }
-            for (int i = startValue; i < lines.size(); i++) {
-                Vector2f linePosition = new Vector2f(position);
-                linePosition.y = position.y + SIZE.y - (i - startValue + 2) * linePadding;
-                GUIText newLine = TextMaster.createAndLoadText(lines.get(i), fontSize, font, linePosition, 1.0f, false);
-                lastText.add(newLine);
-                newLine.setColour(1, 1, 1);
-                newLine.setRenderOrder(1);
+            int start = 0;
+            if (lines.size() > MAXIMAL_LINES) {
+                start = lines.size() - MAXIMAL_LINES;
             }
-            Vector2f linePosition = new Vector2f(position);
-            linePosition.y = position.y + SIZE.y - linePadding - 0.001f;
-            GUIText commandPrompt =
-                TextMaster.createAndLoadText("> " + console.getCurrentInput() + "_", fontSize, font, linePosition, 1.0f, false);
-            commandPrompt.setColour(1, 1, 1);
-            lastText.add(commandPrompt);
-            commandPrompt.setRenderOrder(1);
-            ui.addElement(bg, UI.AFTER_TEXT);
+            for (int i = start; i < lines.size(); i++) {
+                text += lines.get(i) + " \n";
+            }
+            text += "> " + console.getCurrentInput() + "_";
+            textLabel.setText(text);
+            consoleContainer.setVisible(true);
+        } else {
+            textLabel.setText("");
+            consoleContainer.setVisible(false);
         }
-
     }
 }

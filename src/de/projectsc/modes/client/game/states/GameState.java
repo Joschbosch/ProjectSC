@@ -2,12 +2,10 @@
  * Copyright (C) 2015 
  */
 
-package de.projectsc.modes.client.core.states;
+package de.projectsc.modes.client.game.states;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 
@@ -20,34 +18,35 @@ import de.projectsc.core.data.physics.Transform;
 import de.projectsc.core.data.structure.Snapshot;
 import de.projectsc.core.events.movement.ChangePositionEvent;
 import de.projectsc.core.events.movement.ChangeRotationEvent;
+import de.projectsc.core.game.GameConfiguration;
 import de.projectsc.core.manager.ComponentManager;
 import de.projectsc.core.manager.EntityManager;
 import de.projectsc.core.manager.EventManager;
+import de.projectsc.core.manager.InputConsumeManager;
 import de.projectsc.core.messages.GameMessageConstants;
 import de.projectsc.core.utils.MapLoader;
-import de.projectsc.modes.client.core.data.ClientGameContext;
+import de.projectsc.modes.client.core.data.ClientMessage;
+import de.projectsc.modes.client.core.interfaces.ClientState;
+import de.projectsc.modes.client.core.states.CommonClientState;
+import de.projectsc.modes.client.game.ui.controls.GameTime;
 import de.projectsc.modes.client.gui.components.EmittingLightComponent;
 import de.projectsc.modes.client.gui.components.GraphicalComponentImplementation;
-import de.projectsc.modes.client.interfaces.ClientState;
-import de.projectsc.modes.client.interfaces.GUI;
-import de.projectsc.modes.client.messages.ClientMessage;
-import de.projectsc.modes.client.ui.BasicUIElement;
-import de.projectsc.modes.client.ui.elements.GameTime;
 
 public class GameState extends CommonClientState {
 
     private boolean loadingDone = false;
 
-    private Snapshot currentSnapshot = null;
-
     private GameTime gametimeUI;
 
+    private GameConfiguration gameConfig;
+
     @Override
-    public void init(GUI gui, BlockingQueue<ClientMessage> networkQueue, EntityManager entityManager, EventManager eventManager,
-        ComponentManager componentManager, ClientGameContext gameData) {
-        super.init(gui, networkQueue, entityManager, eventManager, componentManager, gameData);
-        gametimeUI = new GameTime();
-        gui.initState(this);
+    public void init(BlockingQueue<ClientMessage> networkQueue, EntityManager entityManager, EventManager eventManager,
+        ComponentManager componentManager, InputConsumeManager inputManager) {
+        super.init(networkQueue, entityManager, eventManager, componentManager, inputManager);
+        this.gameConfig = new GameConfiguration();
+        System.out.println("Init gametime");
+        this.gametimeUI = new GameTime();
     }
 
     @Override
@@ -73,7 +72,6 @@ public class GameState extends CommonClientState {
                         }
                     }
                 }
-                currentSnapshot = s;
                 gametimeUI.setGameTime(s.getGameTime());
             } catch (IOException e) {
             }
@@ -85,7 +83,6 @@ public class GameState extends CommonClientState {
     public void loop(long tickTime) {
         if (!loadingDone) {
             loadMap();
-            gui.loadTerrain();
             createSun();
             sendMessage(new ClientMessage(GameMessageConstants.UPDATE_LOADING_PROGRESS, "100"));
             loadingDone = true;
@@ -106,19 +103,12 @@ public class GameState extends CommonClientState {
     }
 
     private void loadMap() {
-        MapLoader.loadMap(gameData.getMapName(), entityManager);
+        MapLoader.loadMap(gameConfig.getMapName(), entityManager);
     }
 
     @Override
-    public List<BasicUIElement> getUI() {
-        List<BasicUIElement> ui = new LinkedList<>();
-        ui.add(gametimeUI);
-        return ui;
-    }
-
-    @Override
-    public Snapshot getSnapshot() {
-        return currentSnapshot;
+    public String getId() {
+        return "Game";
     }
 
 }

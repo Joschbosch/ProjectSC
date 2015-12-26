@@ -28,7 +28,7 @@ public class ColliderComponent extends PhysicsComponent {
      */
     public static final String NAME = "Collider Component";
 
-    private AxisAlignedBoundingBox AABB;
+    private AxisAlignedBoundingBox axisAlignedBoundingBox;
 
     public ColliderComponent() {
         setType(ComponentType.PREPHYSICS);
@@ -37,8 +37,8 @@ public class ColliderComponent extends PhysicsComponent {
 
     @Override
     public void update() {
-        if (this.AABB == null) {
-            this.AABB = new AxisAlignedBoundingBox(new Vector3f(0, 0, 0), new Vector3f(1, 1, 1));
+        if (this.axisAlignedBoundingBox == null) {
+            this.axisAlignedBoundingBox = new AxisAlignedBoundingBox(new Vector3f(0, 0, 0), new Vector3f(1, 1, 1));
         }
     }
 
@@ -65,8 +65,8 @@ public class ColliderComponent extends PhysicsComponent {
      * @return true if it intersects
      */
     public float intersects(Transform transform, Vector3f org, Vector3f ray) {
-        Vector3f lb = Vector3f.add(transform.getPosition(), AABB.getMin(), null);
-        Vector3f rt = Vector3f.add(transform.getPosition(), AABB.getMax(), null);
+        Vector3f lb = Vector3f.add(transform.getPosition(), axisAlignedBoundingBox.getMin(), null);
+        Vector3f rt = Vector3f.add(transform.getPosition(), axisAlignedBoundingBox.getMax(), null);
         // r.dir is unit direction vector of ray
         float dirfracx = 1.0f / ray.x;
         float dirfracy = 1.0f / ray.y;
@@ -101,7 +101,7 @@ public class ColliderComponent extends PhysicsComponent {
     }
 
     public AxisAlignedBoundingBox getAABB() {
-        return AABB;
+        return axisAlignedBoundingBox;
     }
 
 }

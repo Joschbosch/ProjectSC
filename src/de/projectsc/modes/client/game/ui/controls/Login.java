@@ -4,22 +4,21 @@
  * 
  */
 
-package de.projectsc.modes.client.ui.elements;
+package de.projectsc.modes.client.game.ui.controls;
 
-import de.projectsc.modes.client.core.states.UIElementConstants;
-import de.projectsc.modes.client.ui.BasicUIElement;
+import de.projectsc.modes.client.core.ui.UIElement;
 
 /**
  * Screen if client wants to login.
  * 
  * @author Josch Bosch
  */
-public class Login extends BasicUIElement {
+public class Login extends UIElement {
 
     private String loginMessage = "";
 
     public Login() {
-        super(UIElementConstants.LOGIN, 0);
+        super("Login", 0);
     }
 
     public void setLoginMessage(String msg) {

@@ -4,7 +4,7 @@
 
 package de.projectsc.modes.client.gui.data;
 
-import de.projectsc.modes.client.ui.BasicUIElement;
+import de.projectsc.modes.client.gui.ui.basic.Container;
 
 /**
  * This is the parent class for all UI element representations in the GUI.
@@ -13,10 +13,10 @@ import de.projectsc.modes.client.ui.BasicUIElement;
  */
 public abstract class View {
 
-    protected BasicUIElement element;
+    private Container container;
 
-    public View(BasicUIElement element) {
-        this.element = element;
+    public View(Container c) {
+        this.container = c;
     }
 
     /**
@@ -24,5 +24,5 @@ public abstract class View {
      * 
      * @param ui container to add elements
      */
-    public abstract void render(UI ui);
+    public abstract void update();
 }

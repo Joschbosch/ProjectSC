@@ -2,7 +2,7 @@
  * Copyright (C) 2015 
  */
 
-package de.projectsc.modes.client.core.data;
+package de.projectsc.modes.client.game.data;
 
 public class ClientGameContext {
 

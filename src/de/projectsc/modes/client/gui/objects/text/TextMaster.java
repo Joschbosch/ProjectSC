@@ -48,6 +48,11 @@ public final class TextMaster {
 
     }
 
+    public static boolean hasText(GUIText text) {
+        List<GUIText> textBatch = texts.get(text.getFont());
+        return textBatch.contains(text);
+    }
+
     /**
      * Creates and loads a new text to the GUI.
      * 
@@ -96,4 +101,5 @@ public final class TextMaster {
     public static void removeAll() {
         texts.clear();
     }
+
 }

@@ -2,21 +2,20 @@
  * Copyright (C) 2015 
  */
 
-package de.projectsc.modes.client.ui.elements;
+package de.projectsc.modes.client.game.ui.controls;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import de.projectsc.modes.client.core.states.UIElementConstants;
-import de.projectsc.modes.client.ui.BasicUIElement;
+import de.projectsc.modes.client.core.ui.UIElement;
 
-public class GameTime extends BasicUIElement {
+public class GameTime extends UIElement {
 
     private long gameTime;
 
     public GameTime() {
-        super(UIElementConstants.GAMETIMER, 0);
+        super("Game Timer", 0);
     }
 
     public String getCurrentTimeString() {

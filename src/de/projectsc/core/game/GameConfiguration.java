@@ -15,7 +15,7 @@ import java.util.Map;
  */
 public class GameConfiguration {
 
-    private String mapName;
+    private String mapName = "L1/first.map";
 
     private Map<Long, String> playerCharacters;
 

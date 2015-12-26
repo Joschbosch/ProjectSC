@@ -15,6 +15,8 @@ public class TextMeshCreator {
 
     protected static final int SPACE_ASCII = 32;
 
+    protected static final int RETURN_ASCII = 10;
+
     private MetaFile metaData;
 
     protected TextMeshCreator(File metaFile) {
@@ -43,9 +45,15 @@ public class TextMeshCreator {
                 }
                 currentWord = new Word(text.getFontSize());
                 continue;
+            } else if (ascii == RETURN_ASCII) {
+                lines.add(currentLine);
+                currentLine = new Line(metaData.getSpaceWidth(), text.getFontSize(), text.getMaxLineSize());
+                // currentLine.attemptToAddWord(currentWord);
             }
-            Character character = metaData.getCharacter(ascii);
-            currentWord.addCharacter(character);
+            if (ascii != RETURN_ASCII) {
+                Character character = metaData.getCharacter(ascii);
+                currentWord.addCharacter(character);
+            }
         }
         completeStructure(lines, currentLine, currentWord, text);
         return lines;

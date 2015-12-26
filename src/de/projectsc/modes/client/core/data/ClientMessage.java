@@ -3,7 +3,7 @@
  * 
  * 
  */
-package de.projectsc.modes.client.messages;
+package de.projectsc.modes.client.core.data;
 
 import de.projectsc.core.messages.DefaultMessage;
 

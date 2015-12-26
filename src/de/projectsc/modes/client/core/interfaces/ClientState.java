@@ -3,18 +3,15 @@
  * 
  * 
  */
-package de.projectsc.modes.client.interfaces;
+package de.projectsc.modes.client.core.interfaces;
 
-import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
-import de.projectsc.core.data.structure.Snapshot;
 import de.projectsc.core.manager.ComponentManager;
 import de.projectsc.core.manager.EntityManager;
 import de.projectsc.core.manager.EventManager;
-import de.projectsc.modes.client.core.data.ClientGameContext;
-import de.projectsc.modes.client.messages.ClientMessage;
-import de.projectsc.modes.client.ui.BasicUIElement;
+import de.projectsc.core.manager.InputConsumeManager;
+import de.projectsc.modes.client.core.data.ClientMessage;
 
 /**
  * The states for a Client.
@@ -40,23 +37,16 @@ public interface ClientState {
     void loop(long tickTime);
 
     /**
-     * This method returns all UI elements that need to be rendered by the GUI.
-     * 
-     * @return all ui elements
-     */
-    List<BasicUIElement> getUI();
-
-    /**
      * Initialize the state.
      * 
-     * @param gui the {@link GUI} used for this client.
      * @param gameData
      * @param componentManager
      * @param eventManager
      * @param entityManager
      */
-    void init(GUI gui, BlockingQueue<ClientMessage> networkQueue, EntityManager entityManager, EventManager eventManager,
-        ComponentManager componentManager, ClientGameContext gameData);
+    void init(BlockingQueue<ClientMessage> networkQueue, EntityManager entityManager, EventManager eventManager,
+        ComponentManager componentManager, InputConsumeManager inputManager);
 
-    Snapshot getSnapshot();
+    String getId();
+
 }

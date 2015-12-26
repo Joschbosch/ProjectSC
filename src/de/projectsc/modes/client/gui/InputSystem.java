@@ -2,7 +2,7 @@
  * Copyright (C) 2015 
  */
 
-package de.projectsc.modes.client.gui.input;
+package de.projectsc.modes.client.gui;
 
 import java.util.LinkedList;
 import java.util.Queue;
@@ -23,6 +23,8 @@ public class InputSystem {
 
     private boolean[] keysDown = new boolean[0xDB];
 
+    private boolean[] buttonsDown = new boolean[5];
+
     public InputSystem() {
         try {
             Mouse.create();
@@ -39,8 +41,6 @@ public class InputSystem {
         getKeyboardEvents(currentInputs);
         return currentInputs;
     }
-
-    private boolean[] buttonsDown = new boolean[5];
 
     private void getMouseEvents(Queue<InputCommand> currentInputs) {
         while (Mouse.next()) {

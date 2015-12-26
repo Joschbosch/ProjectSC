@@ -20,12 +20,12 @@ public class UI {
     /**
      * 
      */
-    public static final Integer BEFORE_TEXT = 0;
+    public static final Integer BACKGROUND = 0;
 
     /**
      * 
      */
-    public static final Integer AFTER_TEXT = 1;
+    public static final Integer FOREGROUND = 1;
 
     private Map<Integer, List<UITexture>> uiElements = new HashMap<>();
 

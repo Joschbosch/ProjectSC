@@ -9,16 +9,13 @@ import java.util.concurrent.BlockingQueue;
 import de.projectsc.core.manager.ComponentManager;
 import de.projectsc.core.manager.EntityManager;
 import de.projectsc.core.manager.EventManager;
-import de.projectsc.modes.client.core.data.ClientGameContext;
-import de.projectsc.modes.client.interfaces.ClientState;
-import de.projectsc.modes.client.interfaces.GUI;
-import de.projectsc.modes.client.messages.ClientMessage;
+import de.projectsc.core.manager.InputConsumeManager;
+import de.projectsc.modes.client.core.data.ClientMessage;
+import de.projectsc.modes.client.core.interfaces.ClientState;
 
 public abstract class CommonClientState implements ClientState {
 
     protected BlockingQueue<ClientMessage> networkQueue;
-
-    protected GUI gui;
 
     protected EntityManager entityManager;
 
@@ -26,17 +23,16 @@ public abstract class CommonClientState implements ClientState {
 
     protected EventManager eventManager;
 
-    protected ClientGameContext gameData;
+    protected InputConsumeManager inputManager;
 
     @Override
-    public void init(GUI gui, BlockingQueue<ClientMessage> networkQueue, EntityManager entityManager, EventManager eventManager,
-        ComponentManager componentManager, ClientGameContext gameData) {
+    public void init(BlockingQueue<ClientMessage> networkQueue, EntityManager entityManager, EventManager eventManager,
+        ComponentManager componentManager, InputConsumeManager inputManager) {
         this.networkQueue = networkQueue;
-        this.gui = gui;
         this.entityManager = entityManager;
         this.componentManager = componentManager;
         this.eventManager = eventManager;
-        this.gameData = gameData;
+        this.inputManager = inputManager;
     }
 
     public void sendMessage(ClientMessage e) {

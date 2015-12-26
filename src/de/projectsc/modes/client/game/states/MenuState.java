@@ -2,30 +2,26 @@
  * Copyright (C) 2015
  */
 
-package de.projectsc.modes.client.core.states;
+package de.projectsc.modes.client.game.states;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
 import org.lwjgl.input.Keyboard;
 
 import de.projectsc.core.data.KeyboardInputCommand;
 import de.projectsc.core.data.MouseInputCommand;
-import de.projectsc.core.data.structure.Snapshot;
 import de.projectsc.core.interfaces.InputCommandListener;
 import de.projectsc.core.manager.ComponentManager;
 import de.projectsc.core.manager.EntityManager;
 import de.projectsc.core.manager.EventManager;
+import de.projectsc.core.manager.InputConsumeManager;
 import de.projectsc.core.messages.GameMessageConstants;
 import de.projectsc.core.messages.MessageConstants;
-import de.projectsc.modes.client.core.data.ClientGameContext;
-import de.projectsc.modes.client.interfaces.ClientState;
-import de.projectsc.modes.client.interfaces.GUI;
-import de.projectsc.modes.client.messages.ClientMessage;
-import de.projectsc.modes.client.ui.BasicUIElement;
-import de.projectsc.modes.client.ui.elements.Console;
-import de.projectsc.modes.client.ui.elements.Menu;
+import de.projectsc.modes.client.core.data.ClientMessage;
+import de.projectsc.modes.client.core.interfaces.ClientState;
+import de.projectsc.modes.client.core.states.CommonClientState;
+import de.projectsc.modes.client.game.ui.controls.Console;
+import de.projectsc.modes.client.game.ui.controls.Menu;
 
 /**
  * The menu is the state when no game is running. The player can change options, create or join games or do many more things.
@@ -49,20 +45,22 @@ public class MenuState extends CommonClientState implements InputCommandListener
     private Menu menu;
 
     @Override
-    public void init(GUI gui, BlockingQueue<ClientMessage> networkQueue, EntityManager entityManager, EventManager eventManager,
-        ComponentManager componentManager, ClientGameContext gameData) {
-        super.init(gui, networkQueue, entityManager, eventManager, componentManager, gameData);
+    public void init(BlockingQueue<ClientMessage> networkQueue, EntityManager entityManager, EventManager eventManager,
+        ComponentManager componentManager, InputConsumeManager inputManager) {
+        super.init(networkQueue, entityManager, eventManager, componentManager, inputManager);
         initState(STATE_LOGIN);
-        console.setVisible(false);
-        gui.initState(this);
+        // console.setVisible(false);
     }
 
     private void initState(int state) {
         menuState = state;
-        console = new Console();
+        // console = new Console();
         switch (state) {
         case STATE_LOGIN:
             menu = new Menu();
+            console = new Console();
+            inputManager.addListener(menu);
+            inputManager.addListener(console);
             break;
         case STATE_MAIN_MENU:
             // menu.setVisible(false);
@@ -127,16 +125,8 @@ public class MenuState extends CommonClientState implements InputCommandListener
     }
 
     @Override
-    public List<BasicUIElement> getUI() {
-        List<BasicUIElement> ui = new LinkedList<>();
-        ui.add(console);
-        ui.add(menu);
-        return ui;
-    }
-
-    @Override
-    public Snapshot getSnapshot() {
-        return null;
+    public String getId() {
+        return "Menu";
     }
 
 }

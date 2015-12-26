@@ -46,7 +46,7 @@ public class Camera implements InputCommandListener {
 
     protected static final int FAST_MOVEMENT_SPEED_FACTOR = 5;
 
-    protected static final float MOVEMENT_SPEED = 60f;
+    protected static float MOVEMENT_SPEED = 60f;
 
     protected static final int SCROLL_MARGIN = 15;
 
@@ -85,6 +85,16 @@ public class Camera implements InputCommandListener {
     private boolean mouseButton1;
 
     private boolean mouseButton0;
+
+    private boolean moveLeft;
+
+    private boolean moveRight;
+
+    private int movementFactor = 1;
+
+    private boolean moveUp;
+
+    private boolean moveDown;
 
     public Camera() {
 
@@ -126,27 +136,26 @@ public class Camera implements InputCommandListener {
 
     @Override
     public void handleKeyboardCommand(KeyboardInputCommand command) {
-        currentSpeedXKeys = 0;
-        currentSpeedZKeys = 0;
-        float movementSpeed = MOVEMENT_SPEED;
-        if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)) {
-            movementSpeed *= FAST_MOVEMENT_SPEED_FACTOR;
-        }
-        if (Keyboard.isKeyDown(Keyboard.KEY_A)) {
-            currentSpeedXKeys = -movementSpeed;
-        } else if (Keyboard.isKeyDown(Keyboard.KEY_D)) {
-            currentSpeedXKeys = movementSpeed;
+        if (command.isShiftDown()) {
+            movementFactor = FAST_MOVEMENT_SPEED_FACTOR;
         } else {
-            currentSpeedXKeys = 0;
+            movementFactor = 1;
         }
-        if (Keyboard.isKeyDown(Keyboard.KEY_W)) {
-            currentSpeedZKeys = -movementSpeed;
-        } else if (Keyboard.isKeyDown(Keyboard.KEY_S)) {
-            currentSpeedZKeys = movementSpeed;
-        } else {
-            currentSpeedZKeys = 0;
+        if (command.getKey() == Keyboard.KEY_A) {
+            moveLeft = command.isKeyDown();
+            command.consumed();
+        } else if (command.getKey() == Keyboard.KEY_D) {
+            moveRight = command.isKeyDown();
+            command.consumed();
         }
-        command.consumed();
+        if (command.getKey() == Keyboard.KEY_W) {
+            moveUp = command.isKeyDown();
+            command.consumed();
+        } else if (command.getKey() == Keyboard.KEY_S) {
+            moveDown = command.isKeyDown();
+            command.consumed();
+        }
+
     }
 
     @Override
@@ -190,6 +199,20 @@ public class Camera implements InputCommandListener {
     }
 
     protected void calculateCameraPosition(float delta) {
+        currentSpeedXKeys = 0;
+        currentSpeedZKeys = 0;
+        if (moveLeft) {
+            currentSpeedXKeys -= movementFactor * MOVEMENT_SPEED;
+        }
+        if (moveRight) {
+            currentSpeedXKeys += movementFactor * MOVEMENT_SPEED;
+        }
+        if (moveUp) {
+            currentSpeedZKeys -= movementFactor * MOVEMENT_SPEED;
+        }
+        if (moveDown) {
+            currentSpeedZKeys += movementFactor * MOVEMENT_SPEED;
+        }
         float currentSpeedX = currentSpeedXKeys + currentSpeedXMouse;
         float currentSpeedZ = currentSpeedZKeys + currentSpeedZMouse;
         centeringPoint.x = centeringPoint.x + delta / 1000.0f * currentSpeedX;
