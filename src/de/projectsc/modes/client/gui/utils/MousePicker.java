@@ -46,14 +46,6 @@ public class MousePicker {
         projectionMatrix = projection;
     }
 
-    public Vector3f getCurrentTerrainPoint() {
-        return currentTerrainPoint;
-    }
-
-    public Vector3f getCurrentRay() {
-        return currentRay;
-    }
-
     /**
      * Update picker to current camera position.
      * 
@@ -157,6 +149,18 @@ public class MousePicker {
 
     public Terrain getCurrentTerrain() {
         return currentTerrain;
+    }
+
+    public Vector3f getCurrentTerrainPoint() {
+        return currentTerrainPoint;
+    }
+
+    public Vector3f getCurrentRay() {
+        return currentRay;
+    }
+
+    public Vector3f getCurrentCameraPosition() {
+        return cameraPosition;
     }
 
 }

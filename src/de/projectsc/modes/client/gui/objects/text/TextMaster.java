@@ -39,6 +39,7 @@ public final class TextMaster {
         TextMeshData data = font.loadText(text);
         int vao = Loader.loadToVAO(data.getVertexPositions(), data.getTextureCoords());
         text.setMeshInfo(vao, data.getVertexCount());
+        text.setSize(getSize(data.getVertexPositions(), text));
         List<GUIText> textBatch = texts.get(font);
         if (textBatch == null) {
             textBatch = new ArrayList<>();
@@ -46,6 +47,26 @@ public final class TextMaster {
         }
         textBatch.add(text);
 
+    }
+
+    private static Vector2f getSize(float[] vertexPositions, GUIText text) {
+        Vector2f size = new Vector2f(-Float.MAX_VALUE, -Float.MAX_VALUE);
+        for (int i = 0; i < vertexPositions.length; i++) {
+            if (i % 2 == 0) {
+                float translated = vertexPositions[i] - text.getPosition().x;
+                if (translated > size.x) {
+                    size.x = vertexPositions[i];
+                }
+            } else {
+                float translated = vertexPositions[i] - text.getPosition().y;
+                if (translated > size.y) {
+                    size.y = vertexPositions[i];
+                }
+            }
+        }
+        size.x /= 2;
+        size.y /= 2;
+        return size;
     }
 
     public static boolean hasText(GUIText text) {

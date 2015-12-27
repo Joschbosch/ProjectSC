@@ -44,8 +44,7 @@ import de.projectsc.core.interfaces.Component;
 import de.projectsc.core.manager.ComponentManager;
 import de.projectsc.core.manager.EntityManager;
 import de.projectsc.core.manager.EventManager;
-import de.projectsc.core.manager.InputConsumeManager;
-import de.projectsc.core.systems.physics.PhysicsSystem;
+import de.projectsc.core.systems.physics.BasicPhysicsSystem;
 import de.projectsc.core.terrain.Terrain;
 import de.projectsc.modes.client.gui.InputSystem;
 import de.projectsc.modes.client.gui.RenderingSystem;
@@ -55,6 +54,7 @@ import de.projectsc.modes.client.gui.components.MeshRendererComponent;
 import de.projectsc.modes.client.gui.data.GUIScene;
 import de.projectsc.modes.client.gui.events.ChangeMeshRendererParameterEvent;
 import de.projectsc.modes.client.gui.events.NewTextureEvent;
+import de.projectsc.modes.client.gui.input.InputConsumeManager;
 import de.projectsc.modes.client.gui.objects.particles.ParticleMaster;
 import de.projectsc.modes.client.gui.objects.terrain.TerrainModel;
 import de.projectsc.modes.client.gui.objects.text.TextMaster;
@@ -101,7 +101,7 @@ public class EditorGraphicsCore implements Runnable {
 
     private boolean renderSkybox = true;
 
-    private PhysicsSystem physicsSystem;
+    private BasicPhysicsSystem physicsSystem;
 
     private ComponentManager componentManager;
 
@@ -114,7 +114,7 @@ public class EditorGraphicsCore implements Runnable {
     private InputSystem inputSystem;
 
     public EditorGraphicsCore(Canvas displayParent, int width, int height, BlockingQueue<String> messageQueue,
-        ComponentManager componentManager, EntityManager entityManager, EventManager eventManager, InputConsumeManager inputConsumeManager) {
+        ComponentManager componentManager, EntityManager entityManager, EventManager eventManager) {
         incomingQueue = new LinkedBlockingQueue<>();
         this.displayParent = displayParent;
         this.width = width;
@@ -122,7 +122,7 @@ public class EditorGraphicsCore implements Runnable {
         this.componentManager = componentManager;
         this.entityManager = entityManager;
         this.eventManager = eventManager;
-        this.inputConsumeManager = inputConsumeManager;
+        this.inputConsumeManager = new InputConsumeManager();
     }
 
     @Override
@@ -138,7 +138,7 @@ public class EditorGraphicsCore implements Runnable {
         } catch (LWJGLException e) {
         }
         loadGUIComponents();
-        physicsSystem = new PhysicsSystem(entityManager, eventManager);
+        physicsSystem = new BasicPhysicsSystem(entityManager, eventManager);
         renderSystem = new RenderingSystem(entityManager, eventManager);
         this.inputSystem = new InputSystem();
         TextMaster.init();

@@ -34,11 +34,11 @@ public abstract class UIElement {
         this.id = uiViewId;
     }
 
-    public boolean isVisible() {
+    public boolean isActive() {
         return visible;
     }
 
-    public void setVisible(boolean visible) {
+    public void setActive(boolean visible) {
         this.visible = visible;
     }
 

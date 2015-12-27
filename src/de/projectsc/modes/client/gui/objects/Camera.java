@@ -10,10 +10,10 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
 
-import de.projectsc.core.data.KeyboardInputCommand;
-import de.projectsc.core.data.MouseInputCommand;
 import de.projectsc.core.interfaces.Entity;
-import de.projectsc.core.interfaces.InputCommandListener;
+import de.projectsc.modes.client.core.data.KeyboardInputCommand;
+import de.projectsc.modes.client.core.data.MouseInputCommand;
+import de.projectsc.modes.client.core.interfaces.InputCommandListener;
 
 /**
  * Class for moving around in the world.
@@ -46,7 +46,7 @@ public class Camera implements InputCommandListener {
 
     protected static final int FAST_MOVEMENT_SPEED_FACTOR = 5;
 
-    protected static float MOVEMENT_SPEED = 60f;
+    protected static final float MOVEMENT_SPEED = 60f;
 
     protected static final int SCROLL_MARGIN = 15;
 
@@ -96,6 +96,8 @@ public class Camera implements InputCommandListener {
 
     private boolean moveDown;
 
+    private boolean consumeInput;
+
     public Camera() {
 
     }
@@ -136,24 +138,26 @@ public class Camera implements InputCommandListener {
 
     @Override
     public void handleKeyboardCommand(KeyboardInputCommand command) {
-        if (command.isShiftDown()) {
-            movementFactor = FAST_MOVEMENT_SPEED_FACTOR;
-        } else {
-            movementFactor = 1;
-        }
-        if (command.getKey() == Keyboard.KEY_A) {
-            moveLeft = command.isKeyDown();
-            command.consumed();
-        } else if (command.getKey() == Keyboard.KEY_D) {
-            moveRight = command.isKeyDown();
-            command.consumed();
-        }
-        if (command.getKey() == Keyboard.KEY_W) {
-            moveUp = command.isKeyDown();
-            command.consumed();
-        } else if (command.getKey() == Keyboard.KEY_S) {
-            moveDown = command.isKeyDown();
-            command.consumed();
+        if (consumeInput) {
+            if (command.isShiftDown()) {
+                movementFactor = FAST_MOVEMENT_SPEED_FACTOR;
+            } else {
+                movementFactor = 1;
+            }
+            if (command.getKey() == Keyboard.KEY_A) {
+                moveLeft = command.isKeyDown();
+                command.consume();
+            } else if (command.getKey() == Keyboard.KEY_D) {
+                moveRight = command.isKeyDown();
+                command.consume();
+            }
+            if (command.getKey() == Keyboard.KEY_W) {
+                moveUp = command.isKeyDown();
+                command.consume();
+            } else if (command.getKey() == Keyboard.KEY_S) {
+                moveDown = command.isKeyDown();
+                command.consume();
+            }
         }
 
     }
@@ -162,7 +166,6 @@ public class Camera implements InputCommandListener {
     public void handleMouseCommand(MouseInputCommand command) {
         currentSpeedXMouse = 0;
         currentSpeedZMouse = 0;
-
         float movementSpeed = MOVEMENT_SPEED;
         if (isBetween(command.getMouseX(), 0, SCROLL_MARGIN)) {
             currentSpeedXMouse = -FAST_MOVEMENT_SPEED_FACTOR * movementSpeed;
@@ -191,7 +194,6 @@ public class Camera implements InputCommandListener {
         if (command.getButton() == 1) {
             this.mouseButton1 = command.isButtonDown();
         }
-        command.consumed();
     }
 
     protected boolean isBetween(float value, int lower, int upper) {
@@ -358,6 +360,10 @@ public class Camera implements InputCommandListener {
         centeringPoint.x = x;
         centeringPoint.y = y;
         centeringPoint.z = z;
+    }
+
+    public void setConsumeInput(boolean cameraMoveable) {
+        this.consumeInput = cameraMoveable;
     }
 
 }

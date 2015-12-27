@@ -11,8 +11,10 @@ import java.util.Map;
 import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.core.component.ComponentType;
+import de.projectsc.core.data.Scene;
 import de.projectsc.core.data.physics.AxisAlignedBoundingBox;
 import de.projectsc.core.data.physics.Transform;
+import de.projectsc.core.data.physics.WireFrame;
 
 /**
  * When this component is attached to an entity, it will be able to collide with the world or being able to be selected.
@@ -98,6 +100,15 @@ public class ColliderComponent extends PhysicsComponent {
 
         t = tmin;
         return t;
+    }
+
+    @Override
+    public void addSceneInformation(Scene scene) {
+        WireFrame wf =
+            new WireFrame(WireFrame.CUBE, owner.getTransform().getPosition(), new Vector3f(),
+                axisAlignedBoundingBox.getSize());
+        wf.setColor(new Vector3f(1.0f, 0, 0));
+        scene.getWireFrames().add(wf);
     }
 
     public AxisAlignedBoundingBox getAABB() {

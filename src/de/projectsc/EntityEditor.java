@@ -63,7 +63,6 @@ import de.projectsc.core.interfaces.Component;
 import de.projectsc.core.manager.ComponentManager;
 import de.projectsc.core.manager.EntityManager;
 import de.projectsc.core.manager.EventManager;
-import de.projectsc.core.manager.InputConsumeManager;
 import de.projectsc.editor.ComponentView;
 import de.projectsc.editor.EditorData;
 import de.projectsc.editor.EditorGraphicsCore;
@@ -161,8 +160,6 @@ public class EntityEditor extends JFrame {
 
     private EventManager eventManager;
 
-    private InputConsumeManager inputConsumeManager;
-
     /**
      * Create the frame.
      */
@@ -171,8 +168,7 @@ public class EntityEditor extends JFrame {
 
         componentManager = new ComponentManager();
         eventManager = new EventManager();
-        inputConsumeManager = new InputConsumeManager();
-        entityManager = new EntityManager(componentManager, eventManager, inputConsumeManager);
+        entityManager = new EntityManager(componentManager, eventManager);
         loadComponents();
         createContent();
         getNextFreeID();
@@ -830,8 +826,8 @@ public class EntityEditor extends JFrame {
     public void startLWJGL() {
         messageQueue = new LinkedBlockingQueue<String>();
         editor3dCore =
-            new EditorGraphicsCore(displayParent, WIDTH, HEIGHT, messageQueue, componentManager, entityManager, eventManager,
-                inputConsumeManager);
+            new EditorGraphicsCore(displayParent, WIDTH, HEIGHT, messageQueue, componentManager, entityManager, eventManager
+            );
         editor3dCore.setEditorData(data);
         gameThread = new Thread(editor3dCore);
         gameThread.start();

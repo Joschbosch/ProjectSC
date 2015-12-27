@@ -6,15 +6,9 @@ package de.projectsc.modes.client.game.states;
 
 import java.util.concurrent.BlockingQueue;
 
-import org.lwjgl.input.Keyboard;
-
-import de.projectsc.core.data.KeyboardInputCommand;
-import de.projectsc.core.data.MouseInputCommand;
-import de.projectsc.core.interfaces.InputCommandListener;
 import de.projectsc.core.manager.ComponentManager;
 import de.projectsc.core.manager.EntityManager;
 import de.projectsc.core.manager.EventManager;
-import de.projectsc.core.manager.InputConsumeManager;
 import de.projectsc.core.messages.GameMessageConstants;
 import de.projectsc.core.messages.MessageConstants;
 import de.projectsc.modes.client.core.data.ClientMessage;
@@ -28,15 +22,17 @@ import de.projectsc.modes.client.game.ui.controls.Menu;
  * 
  * @author Josch Bosch
  */
-public class MenuState extends CommonClientState implements InputCommandListener {
+public class MenuState extends CommonClientState {
 
-    private static final int STATE_LOGIN = 0;
+    public static final int STATE_LOGIN = 0;
 
-    private static final int STATE_MAIN_MENU = 1;
+    public static final int STATE_MAIN_MENU = 1;
 
-    private static final int STATE_CREATE_GAME_MENU = 2;
+    public static final int STATE_CREATE_GAME_MENU = 2;
 
-    private static final int STATE_JOIN_GAME_MENU = 3;
+    public static final int STATE_JOIN_GAME_MENU = 3;
+
+    private static MenuState instance;
 
     private int menuState = STATE_LOGIN;
 
@@ -44,12 +40,16 @@ public class MenuState extends CommonClientState implements InputCommandListener
 
     private Menu menu;
 
+    public MenuState() {
+        super("MenuState", 0);
+    }
+
     @Override
     public void init(BlockingQueue<ClientMessage> networkQueue, EntityManager entityManager, EventManager eventManager,
-        ComponentManager componentManager, InputConsumeManager inputManager) {
-        super.init(networkQueue, entityManager, eventManager, componentManager, inputManager);
+        ComponentManager componentManager) {
+        super.init(networkQueue, entityManager, eventManager, componentManager);
+        setInstance(this);
         initState(STATE_LOGIN);
-        // console.setVisible(false);
     }
 
     private void initState(int state) {
@@ -59,11 +59,9 @@ public class MenuState extends CommonClientState implements InputCommandListener
         case STATE_LOGIN:
             menu = new Menu();
             console = new Console();
-            inputManager.addListener(menu);
-            inputManager.addListener(console);
             break;
         case STATE_MAIN_MENU:
-            // menu.setVisible(false);
+            menu.setActive(false);
             break;
         case STATE_CREATE_GAME_MENU:
 
@@ -94,39 +92,20 @@ public class MenuState extends CommonClientState implements InputCommandListener
     }
 
     @Override
-    public void handleKeyboardCommand(KeyboardInputCommand command) {
-        if (command.isKeyDown()) {
-            if (command.getKey() == Keyboard.KEY_RETURN) {
-                if (command.isKeyDown() && !command.isKeyRepeated()) {
-                    if (menuState == STATE_LOGIN) {
-                        sendMessage(new ClientMessage(MessageConstants.CONNECT));
-                    }
-                    if (menuState == STATE_MAIN_MENU) {
-                        sendMessage(new ClientMessage(MessageConstants.CREATE_NEW_GAME_REQUEST));
-
-                    }
-                    if (menuState == STATE_CREATE_GAME_MENU) {
-                        sendMessage(new ClientMessage(GameMessageConstants.START_GAME_REQUEST));
-                    }
-                }
-                command.consumed();
-            }
-        }
-    }
-
-    @Override
-    public void handleMouseCommand(MouseInputCommand command) {
-
-    }
-
-    @Override
-    public InputConsumeLevel getInputConsumeLevel() {
-        return InputConsumeLevel.SECOND;
-    }
-
-    @Override
     public String getId() {
         return "Menu";
+    }
+
+    public static MenuState getInstance() {
+        return instance;
+    }
+
+    public static void setInstance(MenuState instance) {
+        MenuState.instance = instance;
+    }
+
+    public int getState() {
+        return menuState;
     }
 
 }

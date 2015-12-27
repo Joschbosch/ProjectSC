@@ -10,18 +10,19 @@ import java.util.List;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector4f;
 
+import de.projectsc.modes.client.core.data.KeyboardInputCommand;
+import de.projectsc.modes.client.core.data.MouseInputCommand;
+import de.projectsc.modes.client.core.interfaces.InputCommandListener;
 import de.projectsc.modes.client.gui.data.UI;
 import de.projectsc.modes.client.gui.textures.UITexture;
 import de.projectsc.modes.client.gui.ui.GUIElement;
 import de.projectsc.modes.client.gui.utils.Loader;
 
-public class Container implements GUIElement {
+public class Container extends BasicGUIElement implements InputCommandListener {
 
     private List<GUIElement> elements;
 
     private UITexture bg;
-
-    private Vector4f positionAndSize;
 
     private String backgroundFile;
 
@@ -32,18 +33,21 @@ public class Container implements GUIElement {
     public Container() {
         elements = new LinkedList<>();
         positionAndSize = new Vector4f(0, 0, 1, 1);
+        inputConsumeManager.addListener(this);
     }
 
     public Container(Container c) {
         elements = new LinkedList<>();
         positionAndSize = new Vector4f(0, 0, 1, 1);
         c.add(this);
+        inputConsumeManager.addListener(this);
     }
 
     public Container(Container c, Vector4f positionAndSize) {
         elements = new LinkedList<>();
         this.positionAndSize = positionAndSize;
         c.add(this);
+        inputConsumeManager.addListener(this);
     }
 
     public void setOrder(int order) {
@@ -107,7 +111,34 @@ public class Container implements GUIElement {
     }
 
     @Override
+    public void setActive(boolean value) {
+        this.visible = value;
+        for (GUIElement element : elements) {
+            element.setActive(value);
+        }
+    }
+
+    @Override
     public boolean isVisible() {
         return visible;
     }
+
+    @Override
+    public InputConsumeLevel getInputConsumeLevel() {
+        if (uiOrder == 0) {
+            return InputConsumeLevel.SECOND;
+        } else {
+            return InputConsumeLevel.FIRST;
+        }
+    }
+
+    @Override
+    public void handleKeyboardCommand(KeyboardInputCommand command) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void handleMouseCommand(MouseInputCommand command) {}
+
 }

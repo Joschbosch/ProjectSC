@@ -26,7 +26,7 @@ import de.projectsc.core.manager.EntityManager;
 import de.projectsc.core.manager.EventManager;
 import de.projectsc.core.messages.GameMessageConstants;
 import de.projectsc.core.messages.MessageConstants;
-import de.projectsc.core.systems.physics.PhysicsSystem;
+import de.projectsc.core.systems.physics.BasicPhysicsSystem;
 import de.projectsc.core.utils.MapLoader;
 import de.projectsc.modes.server.core.ServerCommands;
 import de.projectsc.modes.server.core.ServerConstants;
@@ -64,7 +64,7 @@ public class Game implements Runnable {
 
     private boolean loading = false;
 
-    private PhysicsSystem physicsSystem;
+    private BasicPhysicsSystem physicsSystem;
 
     private ComponentManager componentManager;
 
@@ -123,20 +123,20 @@ public class Game implements Runnable {
         s.setTick(tick);
         s.setGameTime(gameTime);
 
-        if (tick == 300) {
-            String e = entityManager.createNewEntityFromSchema(10000L);
-            s.addCreated("" + e + ";" + "10001" + ";"
-                + "{\"position\":{\"x\":0.0,\"y\":0.0,\"z\":0.0},"
-                + "\"rotation\":{\"x\":0.0,\"y\":0.0,\"z\":0.0},"
-                + "\"scale\":{\"x\":1.0,\"y\":1.0,\"z\":1.0}}");
-        }
-        if (tick > 200 && tick < 300) {
-            if (!entityManager.getAllEntites().isEmpty()) {
-                String id = entityManager.getAllEntites().iterator().next();
-                entityManager.deleteEntity(id);
-                s.addRemoved(id);
-            }
-        }
+        // if (tick == 300) {
+        // String e = entityManager.createNewEntityFromSchema(10000L);
+        // s.addCreated("" + e + ";" + "10001" + ";"
+        // + "{\"position\":{\"x\":0.0,\"y\":0.0,\"z\":0.0},"
+        // + "\"rotation\":{\"x\":0.0,\"y\":0.0,\"z\":0.0},"
+        // + "\"scale\":{\"x\":1.0,\"y\":1.0,\"z\":1.0}}");
+        // }
+        // if (tick > 200 && tick < 300) {
+        // if (!entityManager.getAllEntites().isEmpty()) {
+        // String id = entityManager.getAllEntites().iterator().next();
+        // entityManager.deleteEntity(id);
+        // s.addRemoved(id);
+        // }
+        // }
         sendMessageToAllPlayer(new ServerMessage(GameMessageConstants.NEW_SNAPSHOT, s));
     }
 
@@ -152,8 +152,8 @@ public class Game implements Runnable {
                 public void run() {
                     componentManager = new ComponentManager();
                     eventManager = new EventManager();
-                    entityManager = new EntityManager(componentManager, eventManager, null);
-                    physicsSystem = new PhysicsSystem(entityManager, eventManager);
+                    entityManager = new EntityManager(componentManager, eventManager);
+                    physicsSystem = new BasicPhysicsSystem(entityManager, eventManager);
                     loadComponents();
                     gameContext.loadData();
                     MapLoader.loadMap(gameContext.getConfig().getMapName(), entityManager);
@@ -246,7 +246,7 @@ public class Game implements Runnable {
     }
 
     private void handleMessagesLoading(ServerPlayer player, ServerMessage msg) {
-        if (msg.getMessage().equals(GameMessageConstants.UPDATE_LOADING_PROGRESS)) {
+        if (msg.getMessage().equals(GameMessageConstants.UPDATE_LOADING_PROGRESS) && playerLoadingProgress != null) {
             playerLoadingProgress.put(player.getId(), Byte.parseByte((String) msg.getData()[0]));
             LOGGER.debug("Map loading completed " + gameContext.getLoadingProgress() + "%");
             int sumLoading = gameContext.getLoadingProgress();

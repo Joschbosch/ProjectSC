@@ -8,11 +8,10 @@ package de.projectsc.modes.client.game.ui.controls;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.lwjgl.input.Keyboard;
-
-import de.projectsc.core.data.KeyboardInputCommand;
-import de.projectsc.core.data.MouseInputCommand;
-import de.projectsc.core.interfaces.InputCommandListener;
+import de.projectsc.core.data.Event;
+import de.projectsc.core.interfaces.EventListener;
+import de.projectsc.modes.client.core.data.NewCommandLineEvent;
+import de.projectsc.modes.client.core.manager.ClientEventManager;
 import de.projectsc.modes.client.core.ui.UIElement;
 
 /**
@@ -20,15 +19,14 @@ import de.projectsc.modes.client.core.ui.UIElement;
  * 
  * @author Josch Bosch
  */
-public class Console extends UIElement implements InputCommandListener {
+public class Console extends UIElement implements EventListener {
 
     private final List<String> lines = new ArrayList<>();
 
-    private String currentInput = "";
-
     public Console() {
         super("Console", 1);
-        setVisible(false);
+        setActive(false);
+        ClientEventManager.getInstance().registerForEvent(NewCommandLineEvent.class, this);
     }
 
     /**
@@ -44,65 +42,14 @@ public class Console extends UIElement implements InputCommandListener {
         return lines;
     }
 
-    public String getCurrentInput() {
-        return currentInput;
-    }
-
-    public void setCurrentInput(String currentInput) {
-        this.currentInput = currentInput;
+    @Override
+    public void processEvent(Event e) {
+        lines.add(((NewCommandLineEvent) e).getCommand());
     }
 
     @Override
-    public InputConsumeLevel getInputConsumeLevel() {
-        return InputConsumeLevel.FIRST;
+    public Class<?> getSource() {
+        return this.getClass();
     }
 
-    @Override
-    public void handleKeyboardCommand(KeyboardInputCommand command) {
-        if (command.getKey() == Keyboard.KEY_F1 && command.isKeyDown() && !command.isKeyRepeated()) {
-            setVisible(!isVisible());
-            command.consumed();
-        }
-        if (this.isVisible()) {
-            if (command.isKeyDown() && !command.isKeyRepeated()) {
-                if ((command.getKey() >= Keyboard.KEY_1 && command.getKey() <= Keyboard.KEY_0)) {
-                    currentInput += command.getCharacter();
-                }
-                if ((command.getKey() >= Keyboard.KEY_Q && command.getKey() <= Keyboard.KEY_P)) {
-                    if (command.isShiftDown()) {
-                        currentInput += Character.toUpperCase(command.getCharacter());
-                    } else {
-                        currentInput += command.getCharacter();
-                    }
-                }
-                if ((command.getKey() >= Keyboard.KEY_A && command.getKey() <= Keyboard.KEY_L)) {
-                    if (command.isShiftDown()) {
-                        currentInput += Character.toUpperCase(command.getCharacter());
-                    } else {
-                        currentInput += command.getCharacter();
-                    }
-                }
-                if ((command.getKey() >= Keyboard.KEY_Z && command.getKey() <= Keyboard.KEY_M)) {
-                    if (command.isShiftDown()) {
-                        currentInput += Character.toUpperCase(command.getCharacter());
-                    } else {
-                        currentInput += command.getCharacter();
-                    }
-                }
-                if (command.getKey() == Keyboard.KEY_RETURN) {
-                    String newLine = currentInput;
-                    lines.add(newLine);
-                    currentInput = "";
-                }
-            }
-            command.consumed();
-        }
-
-    }
-
-    @Override
-    public void handleMouseCommand(MouseInputCommand command) {
-        // TODO Auto-generated method stub
-
-    }
 }

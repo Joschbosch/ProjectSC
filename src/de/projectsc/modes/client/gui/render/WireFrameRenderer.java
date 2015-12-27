@@ -42,14 +42,15 @@ public class WireFrameRenderer {
 
     private RawModel cube;
 
+    private RawModel line;
+
     public WireFrameRenderer(WireFrameShader shader, Matrix4f projectionMatrix) {
         this.shader = shader;
         try {
             ModelData data =
                 OBJFileLoader.loadOBJ(new File(WireFrameRenderer.class.getResource(GUIConstants.BASIC_MESH_PRIMITIVES_SPHERE).toURI()));
             sphere = Loader.loadToVAO(data.getVertices(), data.getTextureCoords(), data.getNormals(), data.getIndices());
-            //
-            float[] vertices = {
+            float[] verticesCube = {
                 -0.5f, 0, -0.5f,
                 0.5f, 0, -0.5f,
 
@@ -86,7 +87,12 @@ public class WireFrameRenderer {
                 -0.5f, 0f, 0.5f,
                 -0.5f, 1f, 0.5f
             };
-            cube = Loader.loadToVAO(vertices, 3);
+            cube = Loader.loadToVAO(verticesCube, 3);
+
+            float[] verticesLine = { -0.5f, 0, -0.5f,
+                0.5f, 0, -0.5f };
+
+            line = Loader.loadToVAO(verticesLine, 3);
 
         } catch (URISyntaxException e) {
             LOGGER.error("Could not load sphere model: ", e);
@@ -107,12 +113,7 @@ public class WireFrameRenderer {
         prepareModel(sphere);
         for (WireFrame wireframe : wireFrames) {
             if (WireFrame.SPHERE.equals(wireframe.getModelType())) {
-                prepareInstance(wireframe.getPosition(), wireframe.getRotation(), wireframe.getScale(), wireframe.getColor());
-                GL11.glLineWidth(wireframe.getLineWidth());
-                GL11.glDrawElements(GL11.GL_LINE_STRIP, sphere.getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
-            }
-            if (WireFrame.CUBE.equals(wireframe.getModelType())) {
-                // prepareInstance(wireframe.getPosition(), wireframe.getRotation(), new Vector3f(0.5f, 0.5f, 0.5f), new Vector3f(1, 1, 0));
+                // prepareInstance(wireframe.getPosition(), wireframe.getRotation(), wireframe.getScale(), wireframe.getColor());
                 // GL11.glLineWidth(wireframe.getLineWidth());
                 // GL11.glDrawElements(GL11.GL_LINE_STRIP, sphere.getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
             }
@@ -121,6 +122,15 @@ public class WireFrameRenderer {
         prepareModel(cube);
         for (WireFrame wireframe : wireFrames) {
             if (WireFrame.CUBE.equals(wireframe.getModelType())) {
+                prepareInstance(wireframe.getPosition(), wireframe.getRotation(), wireframe.getScale(), wireframe.getColor());
+                GL11.glLineWidth(wireframe.getLineWidth());
+                GL11.glDrawArrays(GL11.GL_LINES, 0, cube.getVertexCount());
+            }
+        }
+        unbindTexturedModel();
+        prepareModel(line);
+        for (WireFrame wireframe : wireFrames) {
+            if (WireFrame.LINE.equals(wireframe.getModelType())) {
                 prepareInstance(wireframe.getPosition(), wireframe.getRotation(), wireframe.getScale(), wireframe.getColor());
                 GL11.glLineWidth(wireframe.getLineWidth());
                 GL11.glDrawArrays(GL11.GL_LINES, 0, cube.getVertexCount());

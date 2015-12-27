@@ -14,8 +14,12 @@ public interface GUIState {
 
     void update();
 
-    void render(UI ui);
+    void getUIElements(UI ui);
 
     void tearDown();
+
+    boolean getCameraMoveable();
+
+    boolean isDebugModeActive();
 
 }

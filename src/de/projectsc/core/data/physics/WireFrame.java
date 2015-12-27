@@ -28,6 +28,11 @@ public class WireFrame {
      */
     public static final String MESH = "Mesh";
 
+    /**
+     * Wireframe type.
+     */
+    public static final String LINE = "Line";
+
     private String modelType = "";
 
     private final Vector3f position;

@@ -13,25 +13,22 @@ import org.apache.commons.logging.LogFactory;
 
 import de.projectsc.core.component.impl.ComponentListItem;
 import de.projectsc.core.data.utils.Timer;
-import de.projectsc.core.interfaces.InputCommandListener;
 import de.projectsc.core.manager.ComponentManager;
 import de.projectsc.core.manager.EntityManager;
 import de.projectsc.core.manager.EventManager;
-import de.projectsc.core.manager.InputConsumeManager;
-import de.projectsc.core.systems.physics.PhysicsSystem;
+import de.projectsc.core.systems.physics.BasicPhysicsSystem;
 import de.projectsc.modes.client.core.data.ClientMessage;
 import de.projectsc.modes.client.core.data.ClientPlayer;
 import de.projectsc.modes.client.core.interfaces.ClientState;
 import de.projectsc.modes.client.core.interfaces.GUI;
-import de.projectsc.modes.client.game.states.MenuState;
-import de.projectsc.modes.client.gui.GUICore;
+import de.projectsc.modes.client.core.manager.ClientEventManager;
 
 /**
  * Core class for the client.
  * 
  * @author Josch Bosch
  */
-public class ClientCore implements Runnable {
+public abstract class ClientCore implements Runnable {
 
     private static final int TICK_TIME = 16;
 
@@ -48,11 +45,9 @@ public class ClientCore implements Runnable {
 
     private boolean clientRunning;
 
-    private LinkedBlockingQueue<ClientMessage> userInputQueue;
-
     private GUI gui;
 
-    private PhysicsSystem physicsSystem;
+    private BasicPhysicsSystem physicsSystem;
 
     private ComponentManager componentManager;
 
@@ -60,17 +55,13 @@ public class ClientCore implements Runnable {
 
     private EventManager eventManager;
 
-    private InputConsumeManager inputConsumeManager;
-
     public ClientCore() {
         networkSendQueue = new LinkedBlockingQueue<>();
         networkReceiveQueue = new LinkedBlockingQueue<>();
-        userInputQueue = new LinkedBlockingQueue<>();
         player = new ClientPlayer();
         componentManager = new ComponentManager();
-        eventManager = new EventManager();
-        inputConsumeManager = new InputConsumeManager();
-        entityManager = new EntityManager(componentManager, eventManager, inputConsumeManager);
+        eventManager = new ClientEventManager();
+        entityManager = new EntityManager(componentManager, eventManager);
 
     }
 
@@ -80,10 +71,9 @@ public class ClientCore implements Runnable {
         Timer.init();
         loadComponents();
         loadSystems();
-        gui = new GUICore(componentManager, entityManager, eventManager, inputConsumeManager);
-        gui.initCore();
+        gui.init();
         clientRunning = true;
-        currentState = new MenuState();
+        currentState = getInitialState();
         changeState(currentState);
         LOGGER.debug(String.format("Client started"));
         while (clientRunning) {
@@ -91,8 +81,7 @@ public class ClientCore implements Runnable {
             ClientState newState = null;
             newState = readServerMessages();
             if (currentState != null) {
-                inputConsumeManager.processInput(gui.readInput());
-
+                gui.readInput();
                 while (Timer.getLag() >= TICK_TIME) {
                     physicsSystem.update(TICK_TIME);
                     currentState.loop(TICK_TIME);
@@ -120,22 +109,17 @@ public class ClientCore implements Runnable {
 
     }
 
+    protected abstract ClientState getInitialState();
+
     private void changeState(ClientState newState) {
-        if (currentState != null) {
-            if (inputConsumeManager != null && currentState instanceof InputCommandListener) {
-                inputConsumeManager.removeListener((InputCommandListener) currentState);
-            }
-        }
-        newState.init(networkSendQueue, entityManager, eventManager, componentManager, inputConsumeManager);
+        LOGGER.debug("Initialising state " + newState.getId());
+        newState.init(networkSendQueue, entityManager, eventManager, componentManager);
         currentState = newState;
-        if (inputConsumeManager != null && currentState instanceof InputCommandListener) {
-            inputConsumeManager.addListener((InputCommandListener) currentState);
-        }
         gui.initState(newState);
     }
 
     private void loadSystems() {
-        physicsSystem = new PhysicsSystem(entityManager, eventManager);
+        physicsSystem = new BasicPhysicsSystem(entityManager, eventManager);
     }
 
     private void loadComponents() {
@@ -179,12 +163,19 @@ public class ClientCore implements Runnable {
         this.networkReceiveQueue = networkOutgoingQueue;
     }
 
-    public LinkedBlockingQueue<ClientMessage> getUserInputQueue() {
-        return userInputQueue;
+    public ComponentManager getComponentManager() {
+        return componentManager;
     }
 
-    public void setUserInputQueue(LinkedBlockingQueue<ClientMessage> userInputQueue) {
-        this.userInputQueue = userInputQueue;
+    public EntityManager getEntityManager() {
+        return entityManager;
     }
 
+    public EventManager getEventManager() {
+        return eventManager;
+    }
+
+    public void setGUI(GUI gui) {
+        this.gui = gui;
+    }
 }

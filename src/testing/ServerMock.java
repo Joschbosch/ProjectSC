@@ -28,6 +28,7 @@ import de.projectsc.core.game.GameConfiguration;
 import de.projectsc.core.messages.MessageConstants;
 import de.projectsc.modes.client.core.ClientCore;
 import de.projectsc.modes.client.core.data.ClientMessage;
+import de.projectsc.modes.client.game.ClientGameCore;
 import de.projectsc.modes.client.network.ClientNetworkCore;
 import de.projectsc.modes.server.core.messages.ServerMessage;
 
@@ -119,7 +120,7 @@ public class ServerMock {
 
     public static void main(String[] args) {
         mock = new ServerMock();
-        ClientCore clientCore = new ClientCore();
+        ClientCore clientCore = new ClientGameCore();
         BlockingQueue<ClientMessage> fakeInternetQueue = new LinkedBlockingQueue<ClientMessage>();
         ClientNetworkCore network =
             new ClientNetworkCore(clientCore.getNetworkSendQueue(), clientCore.getNetworkReceiveQueue(), fakeInternetQueue);

@@ -4,11 +4,16 @@
 
 package de.projectsc.modes.client.gui.ui.views;
 
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.util.vector.Vector2f;
 
+import de.projectsc.modes.client.core.data.KeyboardInputCommand;
+import de.projectsc.modes.client.core.data.MouseInputCommand;
+import de.projectsc.modes.client.core.interfaces.InputCommandListener;
 import de.projectsc.modes.client.core.ui.UIManager;
 import de.projectsc.modes.client.game.ui.controls.Menu;
-import de.projectsc.modes.client.gui.data.View;
+import de.projectsc.modes.client.gui.input.InputConsumeManager;
+import de.projectsc.modes.client.gui.ui.View;
 import de.projectsc.modes.client.gui.ui.basic.Container;
 import de.projectsc.modes.client.gui.ui.basic.Label;
 
@@ -17,7 +22,7 @@ import de.projectsc.modes.client.gui.ui.basic.Label;
  * 
  * @author Josch Bosch
  */
-public class MenuView extends View {
+public class MenuView extends View implements InputCommandListener {
 
     private final Menu menu;
 
@@ -26,6 +31,8 @@ public class MenuView extends View {
     private Label[] labels;
 
     private int currentChosenLabel = -1;
+
+    private int chosenItem;
 
     public MenuView(Container c) {
         super(c);
@@ -42,6 +49,9 @@ public class MenuView extends View {
             label.setBorderWidth(0.5f);
             labels[index++] = label;
         }
+        chosenItem = 0;
+        InputConsumeManager.getInstance().addListener(this);
+
     }
 
     private Vector2f getPosition(int i) {
@@ -50,12 +60,49 @@ public class MenuView extends View {
 
     @Override
     public void update() {
-        if (menu.getChosenItem() != currentChosenLabel) {
+        if (chosenItem != currentChosenLabel) {
             if (currentChosenLabel != -1) {
                 labels[currentChosenLabel].setOutlineColor(1, 1, 1);
             }
-            labels[menu.getChosenItem()].setOutlineColor(1, 0, 0);
-            currentChosenLabel = menu.getChosenItem();
+            labels[chosenItem].setOutlineColor(1, 0, 0);
+            currentChosenLabel = chosenItem;
         }
     }
+
+    @Override
+    public InputConsumeLevel getInputConsumeLevel() {
+        return InputConsumeLevel.SECOND;
+    }
+
+    @Override
+    public void handleKeyboardCommand(KeyboardInputCommand command) {
+        if (command.isKeyDown()) {
+            if (command.getKey() == Keyboard.KEY_DOWN) {
+                chosenItem = (chosenItem + 1) % menu.getMenuItems().size();
+            }
+        }
+        if (command.isKeyDown() && !command.isKeyRepeated()) {
+            if (command.getKey() == Keyboard.KEY_UP) {
+                if (chosenItem > 0) {
+                    chosenItem--;
+                } else {
+                    chosenItem = menu.getMenuItems().size() - 1;
+                }
+            }
+        }
+    }
+
+    @Override
+    public void handleMouseCommand(MouseInputCommand command) {
+        // if (container.hit(command)) {
+        // for (int i = 0; i < labels.length; i++) {
+        // System.out.println(command.getMouseX() + "  " + command.getMouseY());
+        // System.out.println("testing: " + labels[i].getPositionAndSize());
+        // if (labels[i].hit(command)) {
+        // System.out.println("hit " + labels[i].getText());
+        // }
+        // }
+        // }
+    }
+
 }

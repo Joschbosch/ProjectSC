@@ -47,14 +47,14 @@ import de.projectsc.core.interfaces.Entity;
 import de.projectsc.core.manager.ComponentManager;
 import de.projectsc.core.manager.EntityManager;
 import de.projectsc.core.manager.EventManager;
-import de.projectsc.core.manager.InputConsumeManager;
-import de.projectsc.core.systems.physics.PhysicsSystem;
+import de.projectsc.core.systems.physics.BasicPhysicsSystem;
 import de.projectsc.core.terrain.Terrain;
 import de.projectsc.modes.client.gui.InputSystem;
 import de.projectsc.modes.client.gui.RenderingSystem;
 import de.projectsc.modes.client.gui.components.EmittingLightComponent;
 import de.projectsc.modes.client.gui.components.GraphicalComponentImplementation;
 import de.projectsc.modes.client.gui.data.GUIScene;
+import de.projectsc.modes.client.gui.input.InputConsumeManager;
 import de.projectsc.modes.client.gui.objects.Camera;
 import de.projectsc.modes.client.gui.objects.particles.ParticleMaster;
 import de.projectsc.modes.client.gui.objects.terrain.TerrainModel;
@@ -113,7 +113,7 @@ public class MapEditorGraphicsCore implements Runnable {
 
     private RenderingSystem renderSystem;
 
-    private PhysicsSystem physicsSystem;
+    private BasicPhysicsSystem physicsSystem;
 
     private ComponentManager componentManager;
 
@@ -128,7 +128,7 @@ public class MapEditorGraphicsCore implements Runnable {
     private InputSystem inputSystem;
 
     public MapEditorGraphicsCore(Canvas displayParent, int width, int height, BlockingQueue<String> messageQueue,
-        ComponentManager componentManager, EntityManager entityManager, EventManager eventManager, InputConsumeManager inputConsumeManager) {
+        ComponentManager componentManager, EntityManager entityManager, EventManager eventManager) {
         incomingQueue = new LinkedBlockingQueue<>();
         this.displayParent = displayParent;
         this.width = width;
@@ -136,7 +136,7 @@ public class MapEditorGraphicsCore implements Runnable {
         this.componentManager = componentManager;
         this.entityManager = entityManager;
         this.eventManager = eventManager;
-        this.inputConsumeManager = inputConsumeManager;
+        this.inputConsumeManager = new InputConsumeManager();
     }
 
     @Override
@@ -152,7 +152,7 @@ public class MapEditorGraphicsCore implements Runnable {
         } catch (LWJGLException e) {
         }
         loadGUIComponents();
-        physicsSystem = new PhysicsSystem(entityManager, eventManager);
+        physicsSystem = new BasicPhysicsSystem(entityManager, eventManager);
         renderSystem = new RenderingSystem(entityManager, eventManager);
         inputSystem = new InputSystem();
 

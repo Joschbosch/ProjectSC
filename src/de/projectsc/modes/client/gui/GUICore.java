@@ -5,11 +5,8 @@
  */
 package de.projectsc.modes.client.gui;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Queue;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -20,20 +17,17 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector4f;
 
-import de.projectsc.core.data.InputCommand;
 import de.projectsc.core.data.utils.Timer;
 import de.projectsc.core.manager.ComponentManager;
 import de.projectsc.core.manager.EntityManager;
 import de.projectsc.core.manager.EventManager;
-import de.projectsc.core.manager.InputConsumeManager;
 import de.projectsc.core.terrain.Terrain;
 import de.projectsc.modes.client.core.interfaces.ClientState;
 import de.projectsc.modes.client.core.interfaces.GUI;
-import de.projectsc.modes.client.core.ui.UIElement;
 import de.projectsc.modes.client.gui.components.GraphicalComponentImplementation;
 import de.projectsc.modes.client.gui.data.GUIScene;
 import de.projectsc.modes.client.gui.data.UI;
-import de.projectsc.modes.client.gui.data.View;
+import de.projectsc.modes.client.gui.input.InputConsumeManager;
 import de.projectsc.modes.client.gui.objects.Camera;
 import de.projectsc.modes.client.gui.objects.particles.ParticleMaster;
 import de.projectsc.modes.client.gui.objects.terrain.TerrainModel;
@@ -82,8 +76,6 @@ public class GUICore implements GUI {
 
     private UIRenderer uiRenderer;
 
-    private final Map<UIElement, View> registeredViews = new HashMap<>();
-
     private FontRenderer fontRenderer;
 
     private RenderingSystem renderingSystem;
@@ -102,16 +94,15 @@ public class GUICore implements GUI {
 
     private GUIState currentGUIState;
 
-    public GUICore(ComponentManager componentManager, EntityManager entityManager, EventManager eventManager,
-        InputConsumeManager inputManager) {
+    public GUICore(ComponentManager componentManager, EntityManager entityManager, EventManager eventManager) {
         this.componentManager = componentManager;
         this.entityManager = entityManager;
         this.eventManager = eventManager;
-        this.inputManager = inputManager;
+        this.inputManager = new InputConsumeManager();
     }
 
     @Override
-    public boolean initCore() {
+    public boolean init() {
         LOGGER.debug("Initialize GUI core");
         try {
             Display.setDisplayMode(new DisplayMode(WIDTH, HEIGHT));
@@ -187,9 +178,11 @@ public class GUICore implements GUI {
         }
         if (newState.getId().equals("Game")) {
             currentGUIState = new GameGUIState();
+            ((GameGUIState) currentGUIState).setMousePicker(mousePicker);
         }
 
         currentGUIState.initialize();
+        camera.setConsumeInput(currentGUIState.getCameraMoveable());
     }
 
     @Override
@@ -210,13 +203,13 @@ public class GUICore implements GUI {
             renderWater();
             GUIScene scene = renderingSystem.createScene();
             scene.setTerrains(terrainModels);
-            scene.setDebugMode(false);
+            scene.setDebugMode(currentGUIState.isDebugModeActive());
             masterRenderer.renderScene(scene, camera, Timer.getDelta(), new Vector4f(0,
                 1, 0, CLIPPING_PLANE_NOT_RENDERING));
 
         }
         UI ui = new UI();
-        currentGUIState.render(ui);
+        currentGUIState.getUIElements(ui);
         uiRenderer.render(ui.getUIElements(UI.BACKGROUND));
         fontRenderer.render(TextMaster.render(), UI.BACKGROUND);
         uiRenderer.render(ui.getUIElements(UI.FOREGROUND));
@@ -270,8 +263,8 @@ public class GUICore implements GUI {
     }
 
     @Override
-    public Queue<InputCommand> readInput() {
-        return inputSystem.updateInputs();
+    public void readInput() {
+        inputManager.processInput(inputSystem.updateInputs());
     }
 
     @Override

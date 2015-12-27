@@ -17,6 +17,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.lwjgl.util.vector.Vector3f;
 
+import de.projectsc.core.component.impl.behaviour.EntityStateComponent;
 import de.projectsc.core.component.impl.physic.ColliderComponent;
 import de.projectsc.core.component.impl.physic.VelocityComponent;
 import de.projectsc.core.data.physics.AxisAlignedBoundingBox;
@@ -485,5 +486,27 @@ public class OctTree<T extends Entity> {
             }
         }
         return boxes;
+    }
+
+    public List<Entity> intersectsRay(Vector3f currentRay, Vector3f currentCameraPosition) {
+        List<Entity> intersecting = new LinkedList<>();
+        if (entities.size() == 0 && !hasChildren()) {
+            return intersecting;
+        }
+        for (Entity e : entities) {
+            if (((EntityStateComponent) e.getComponent(EntityStateComponent.class)).isHighlightAble()) {
+                if (((ColliderComponent) e.getComponent(ColliderComponent.class)).getAABB().intersects(e.getTransform().getPosition(),
+                    currentRay, currentCameraPosition)) {
+                    intersecting.add(e);
+                }
+            }
+        }
+        for (int i = 0; i < 8; i++) {
+            if (children[i] != null
+                && children[i].getRegion().intersects(children[i].getRegion().getPosition(), currentRay, currentCameraPosition)) {
+                intersecting.addAll(children[i].intersectsRay(currentRay, currentCameraPosition));
+            }
+        }
+        return intersecting;
     }
 }

@@ -2,7 +2,7 @@
  * Copyright (C) 2015 
  */
 
-package de.projectsc.core.manager;
+package de.projectsc.modes.client.gui.input;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -10,14 +10,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
-import de.projectsc.core.data.InputCommand;
-import de.projectsc.core.data.KeyboardInputCommand;
-import de.projectsc.core.data.MouseInputCommand;
-import de.projectsc.core.interfaces.InputCommandListener;
+import de.projectsc.modes.client.core.data.InputCommand;
+import de.projectsc.modes.client.core.data.KeyboardInputCommand;
+import de.projectsc.modes.client.core.data.MouseInputCommand;
+import de.projectsc.modes.client.core.interfaces.InputCommandListener;
 
 public class InputConsumeManager {
 
+    private static InputConsumeManager instance;
+
     private Map<InputCommandListener.InputConsumeLevel, List<InputCommandListener>> registered = new HashMap<>();
+
+    public InputConsumeManager() {
+        setInstance(this);
+    }
 
     public void addListener(InputCommandListener c) {
         if (c != null) {
@@ -52,5 +58,13 @@ public class InputConsumeManager {
                 }
             }
         }
+    }
+
+    public static InputConsumeManager getInstance() {
+        return instance;
+    }
+
+    public static void setInstance(InputConsumeManager instance) {
+        InputConsumeManager.instance = instance;
     }
 }

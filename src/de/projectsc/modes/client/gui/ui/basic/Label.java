@@ -6,6 +6,7 @@ package de.projectsc.modes.client.gui.ui.basic;
 
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
+import org.lwjgl.util.vector.Vector4f;
 
 import de.projectsc.modes.client.gui.data.UI;
 import de.projectsc.modes.client.gui.objects.text.Font;
@@ -13,11 +14,10 @@ import de.projectsc.modes.client.gui.objects.text.FontStore;
 import de.projectsc.modes.client.gui.objects.text.FontType;
 import de.projectsc.modes.client.gui.objects.text.GUIText;
 import de.projectsc.modes.client.gui.objects.text.TextMaster;
-import de.projectsc.modes.client.gui.ui.GUIElement;
 
-public class Label implements GUIElement {
+public class Label extends BasicGUIElement {
 
-    private String text = "";
+    protected String text = "";
 
     private float fontSize = 1.0f;
 
@@ -49,6 +49,7 @@ public class Label implements GUIElement {
         c.add(this);
         this.font = FontStore.getFont(Font.CANDARA);
         this.position = position;
+        createNewText();
     }
 
     private void createNewText() {
@@ -63,6 +64,7 @@ public class Label implements GUIElement {
         guiText.setRenderOrder(renderOrder);
         guiText.setShadowOffset(shadowOffset);
         TextMaster.loadText(guiText);
+        this.positionAndSize = new Vector4f(position.x, position.y, guiText.getSize().x, guiText.getSize().y);
     }
 
     @Override
@@ -129,4 +131,9 @@ public class Label implements GUIElement {
     public int getRenderOrder() {
         return renderOrder;
     }
+
+    public String getText() {
+        return text;
+    }
+
 }

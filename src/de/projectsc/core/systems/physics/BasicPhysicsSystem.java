@@ -27,6 +27,7 @@ import de.projectsc.core.events.entities.ChangeEntitySelectEvent;
 import de.projectsc.core.events.entities.ChangeEntityStateEvent;
 import de.projectsc.core.events.entities.DeletedEntityEvent;
 import de.projectsc.core.events.entities.NewEntityCreatedEvent;
+import de.projectsc.core.events.input.MousePositionEvent;
 import de.projectsc.core.events.movement.ChangeMovementParameterEvent;
 import de.projectsc.core.events.movement.ChangePositionEvent;
 import de.projectsc.core.events.movement.ChangeRotationEvent;
@@ -44,14 +45,14 @@ import de.projectsc.core.systems.DefaultSystem;
  * 
  * @author Josch Bosch
  */
-public class PhysicsSystem extends DefaultSystem {
+public class BasicPhysicsSystem extends DefaultSystem {
 
     private static final String NAME = "Physics System";
 
     private OctTree<Entity> octree;
 
-    public PhysicsSystem(EntityManager entityManager, EventManager eventManager) {
-        super(PhysicsSystem.NAME, entityManager, eventManager);
+    public BasicPhysicsSystem(EntityManager entityManager, EventManager eventManager) {
+        super(BasicPhysicsSystem.NAME, entityManager, eventManager);
         eventManager.registerForEvent(NewEntityCreatedEvent.class, this);
         eventManager.registerForEvent(ChangeRotationEvent.class, this);
         eventManager.registerForEvent(ChangePositionEvent.class, this);
@@ -63,6 +64,7 @@ public class PhysicsSystem extends DefaultSystem {
         eventManager.registerForEvent(ComponentRemovedEvent.class, this);
         eventManager.registerForEvent(DeletedEntityEvent.class, this);
         eventManager.registerForEvent(ChangeEntitySelectEvent.class, this);
+        eventManager.registerForEvent(MousePositionEvent.class, this);
         octree =
             new OctTree<Entity>(new AxisAlignedBoundingBox(new Vector3f(-1000, -1000, -1000), new Vector3f(1000, 1000, 1000)));
 
@@ -140,6 +142,9 @@ public class PhysicsSystem extends DefaultSystem {
             EntityStateComponent comp = ((EntityStateComponent) entityManager.getComponent(e.getEntityId(), EntityStateComponent.class));
             comp.setEntitySelected(((ChangeEntitySelectEvent) e).getSelected());
             comp.setHighlighted(((ChangeEntitySelectEvent) e).isHightLighted());
+        } else if (e instanceof MousePositionEvent) {
+            System.out.println(octree.intersectsRay(((MousePositionEvent) e).getCurrentRay(),
+                ((MousePositionEvent) e).getCurrentCameraPosition()));
         }
     }
 
@@ -208,19 +213,6 @@ public class PhysicsSystem extends DefaultSystem {
             WireFrame wf = new WireFrame(WireFrame.CUBE, position, new Vector3f(), box.getSize());
             wf.setColor(new Vector3f(0.0f, 1f, 0));
             s.getWireFrames().add(wf);
-        }
-
-        for (String entity : entityManager.getAllEntites()) {
-            for (Component c : entityManager.getAllComponents(entity).values()) {
-                if (c instanceof ColliderComponent) {
-                    AxisAlignedBoundingBox box = ((ColliderComponent) c).getAABB();
-                    WireFrame wf =
-                        new WireFrame(WireFrame.CUBE, entityManager.getEntity(entity).getTransform().getPosition(), new Vector3f(),
-                            box.getSize());
-                    wf.setColor(new Vector3f(1.0f, 0, 0));
-                    s.getWireFrames().add(wf);
-                }
-            }
         }
 
     }

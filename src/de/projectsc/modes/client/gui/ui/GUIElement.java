@@ -13,4 +13,8 @@ public interface GUIElement {
     boolean isVisible();
 
     void setVisible(boolean value);
+
+    boolean isActive();
+
+    void setActive(boolean active);
 }

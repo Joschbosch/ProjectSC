@@ -5,10 +5,6 @@
  */
 package de.projectsc.modes.client.core.interfaces;
 
-import java.util.Queue;
-
-import de.projectsc.core.data.InputCommand;
-
 /**
  * Interface for GUI implementations.
  * 
@@ -24,10 +20,8 @@ public interface GUI {
 
     /**
      * Read user input.
-     * 
-     * @return messages for core.
      */
-    Queue<InputCommand> readInput();
+    void readInput();
 
     /**
      * Terminate status.
@@ -39,7 +33,7 @@ public interface GUI {
      * 
      * @return true, if successful
      */
-    boolean initCore();
+    boolean init();
 
     /**
      * @return true, if the GUI is still running

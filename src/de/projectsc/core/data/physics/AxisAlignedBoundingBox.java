@@ -43,6 +43,52 @@ public class AxisAlignedBoundingBox {
         this.scale = new Vector3f(1, 1, 1);
     }
 
+    /**
+     * Check if the current entity intersects with the picking ray.
+     * 
+     * @param org position of camera
+     * @param ray to intersect
+     * @return true if it intersects
+     */
+    public boolean intersects(Vector3f entityPosition, Vector3f ray, Vector3f org) {
+        System.out.println("check  " + org + "  " + ray + " " + entityPosition + "   " + getMin() + "   " + getMax());
+        Vector3f lb = Vector3f.add(entityPosition, getMin(), null);
+        Vector3f rt = Vector3f.add(entityPosition, getMax(), null);
+        // r.dir is unit direction vector of ray
+        float dirfracx = 1.0f / ray.x;
+        float dirfracy = 1.0f / ray.y;
+        float dirfracz = 1.0f / ray.z;
+        // lb is the corner of AABB with minimal coordinates - left bottom, rt is maximal corner
+        // r.org is origin of ray
+        float t1 = (lb.x - org.x) * dirfracx;
+        float t2 = (rt.x - org.x) * dirfracx;
+        float t3 = (lb.y - org.y) * dirfracy;
+        float t4 = (rt.y - org.y) * dirfracy;
+        float t5 = (lb.z - org.z) * dirfracz;
+        float t6 = (rt.z - org.z) * dirfracz;
+
+        float tmin = Math.max(Math.max(Math.min(t1, t2), Math.min(t3, t4)), Math.min(t5, t6));
+        float tmax = Math.min(Math.min(Math.max(t1, t2), Math.max(t3, t4)), Math.max(t5, t6));
+
+        float t;
+        // if tmax < 0, ray (line) is intersecting AABB, but whole AABB is behind us
+        if (tmax < 0) {
+            t = tmax;
+            System.out.println("f1");
+            return false;
+        }
+
+        // if tmin > tmax, ray doesn't intersect AABB
+        if (tmin > tmax) {
+            t = tmax;
+            System.out.println("f2");
+            return false;
+        }
+
+        t = tmin;
+        return true;
+    }
+
     public Vector3f getMin() {
         return min;
     }

@@ -129,6 +129,7 @@ public class RenderingSystem extends DefaultSystem {
             scene.getRotations().put(entity, pc.getRotation());
             scene.getScales().put(entity, pc.getScale());
         }
+
         return scene;
     }
 }

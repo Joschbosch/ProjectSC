@@ -7,15 +7,19 @@ package de.projectsc.modes.client.gui;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
-import de.projectsc.core.data.InputCommand;
-import de.projectsc.core.data.KeyboardInputCommand;
-import de.projectsc.core.data.MouseInputCommand;
+import de.projectsc.modes.client.core.data.InputCommand;
+import de.projectsc.modes.client.core.data.KeyboardInputCommand;
+import de.projectsc.modes.client.core.data.MouseInputCommand;
 
 public class InputSystem {
+
+    private static final Log LOGGER = LogFactory.getLog(InputSystem.class);
 
     private boolean shiftDown;
 
@@ -31,7 +35,7 @@ public class InputSystem {
             Keyboard.create();
             Keyboard.enableRepeatEvents(true);
         } catch (LWJGLException e) {
-
+            LOGGER.error("Failed to init input system: ", e);
         }
     }
 
@@ -115,4 +119,5 @@ public class InputSystem {
         Mouse.destroy();
         Keyboard.destroy();
     }
+
 }

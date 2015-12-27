@@ -22,7 +22,6 @@ import de.projectsc.core.game.GameConfiguration;
 import de.projectsc.core.manager.ComponentManager;
 import de.projectsc.core.manager.EntityManager;
 import de.projectsc.core.manager.EventManager;
-import de.projectsc.core.manager.InputConsumeManager;
 import de.projectsc.core.messages.GameMessageConstants;
 import de.projectsc.core.utils.MapLoader;
 import de.projectsc.modes.client.core.data.ClientMessage;
@@ -40,12 +39,15 @@ public class GameState extends CommonClientState {
 
     private GameConfiguration gameConfig;
 
+    public GameState() {
+        super("GameState", 0);
+    }
+
     @Override
     public void init(BlockingQueue<ClientMessage> networkQueue, EntityManager entityManager, EventManager eventManager,
-        ComponentManager componentManager, InputConsumeManager inputManager) {
-        super.init(networkQueue, entityManager, eventManager, componentManager, inputManager);
+        ComponentManager componentManager) {
+        super.init(networkQueue, entityManager, eventManager, componentManager);
         this.gameConfig = new GameConfiguration();
-        System.out.println("Init gametime");
         this.gametimeUI = new GameTime();
     }
 

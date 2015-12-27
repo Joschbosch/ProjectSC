@@ -21,7 +21,6 @@ import de.projectsc.core.events.entities.DeletedEntityEvent;
 import de.projectsc.core.events.entities.NewEntityCreatedEvent;
 import de.projectsc.core.interfaces.Component;
 import de.projectsc.core.interfaces.Entity;
-import de.projectsc.core.interfaces.InputCommandListener;
 import de.projectsc.core.utils.ComponentUtils;
 import de.projectsc.core.utils.EntitySchemaLoader;
 import de.projectsc.editor.EntitySchema;
@@ -46,12 +45,9 @@ public class EntityManager {
 
     private EventManager eventManager;
 
-    private InputConsumeManager inputConsumeManager;
-
-    public EntityManager(ComponentManager componentManager, EventManager eventManager, InputConsumeManager inputConsumeManager) {
+    public EntityManager(ComponentManager componentManager, EventManager eventManager) {
         this.componentManager = componentManager;
         this.eventManager = eventManager;
-        this.inputConsumeManager = inputConsumeManager;
     }
 
     /**
@@ -90,9 +86,6 @@ public class EntityManager {
         String e = createNewEntity(entityUID);
         for (Component c : schema.getComponents()) {
             Component clone = ComponentUtils.cloneComponent(c);
-            if (inputConsumeManager != null && clone instanceof InputCommandListener) {
-                inputConsumeManager.addListener((InputCommandListener) c);
-            }
             addComponentToEntity(e, clone);
             clone.setOwner(getEntity(e));
         }
@@ -115,9 +108,6 @@ public class EntityManager {
     public Component addComponentToEntity(String id, String componentName) {
         Component c = componentManager.createComponent(componentName);
         c.setOwner(getEntity(id));
-        if (inputConsumeManager != null && c instanceof InputCommandListener) {
-            inputConsumeManager.addListener((InputCommandListener) c);
-        }
         addComponentToEntity(id, c);
         return c;
     }
@@ -161,9 +151,6 @@ public class EntityManager {
             Component toRemove = components.get(componentName);
             if (toRemove != null && toRemove.getRequiredBy().isEmpty()) {
                 components.remove(componentName);
-                if (inputConsumeManager != null && toRemove instanceof InputCommandListener) {
-                    inputConsumeManager.removeListener((InputCommandListener) toRemove);
-                }
                 for (String reqComponentName : toRemove.getRequiredComponents()) {
                     if (hasComponent(id, componentManager.getComponentClass(reqComponentName))) {
                         Component c = getComponent(id, reqComponentName);
@@ -261,15 +248,7 @@ public class EntityManager {
     public void deleteEntity(String id) {
         if (entities.remove(id) != null) {
             LOGGER.debug("Removed entity " + id);
-            Map<String, Component> components = entityComponents.remove(id);
-            if (inputConsumeManager != null) {
-                for (Component c : components.values()) {
-                    if (c instanceof InputCommandListener) {
-                        inputConsumeManager.removeListener((InputCommandListener) c);
-                    }
-                }
-                eventManager.fireEvent(new DeletedEntityEvent(id));
-            }
+            eventManager.fireEvent(new DeletedEntityEvent(id));
         }
     }
 

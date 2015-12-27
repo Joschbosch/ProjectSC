@@ -8,7 +8,7 @@ import org.lwjgl.util.vector.Vector2f;
 
 import de.projectsc.modes.client.core.ui.UIManager;
 import de.projectsc.modes.client.game.ui.controls.GameTime;
-import de.projectsc.modes.client.gui.data.View;
+import de.projectsc.modes.client.gui.ui.View;
 import de.projectsc.modes.client.gui.ui.basic.Container;
 import de.projectsc.modes.client.gui.ui.basic.Label;
 

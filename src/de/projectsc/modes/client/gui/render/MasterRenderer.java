@@ -125,7 +125,7 @@ public class MasterRenderer {
         entityRenderer.render(scene.getModels(), scene.getPositions(), scene.getRotations(), scene.getScales(),
             scene.getSelectedEntites(), scene.getHightlightedEntites());
         entityShader.stop();
-        if (scene.isWireframeEnable()) {
+        if (scene.isDebugMode()) {
             wireframeShader.start();
             wireframeShader.loadViewMatrix(camera);
             collisionBoxRenderer.render(scene.getWireFrames());

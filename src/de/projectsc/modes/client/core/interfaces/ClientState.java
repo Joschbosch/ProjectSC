@@ -10,7 +10,6 @@ import java.util.concurrent.BlockingQueue;
 import de.projectsc.core.manager.ComponentManager;
 import de.projectsc.core.manager.EntityManager;
 import de.projectsc.core.manager.EventManager;
-import de.projectsc.core.manager.InputConsumeManager;
 import de.projectsc.modes.client.core.data.ClientMessage;
 
 /**
@@ -45,7 +44,7 @@ public interface ClientState {
      * @param entityManager
      */
     void init(BlockingQueue<ClientMessage> networkQueue, EntityManager entityManager, EventManager eventManager,
-        ComponentManager componentManager, InputConsumeManager inputManager);
+        ComponentManager componentManager);
 
     String getId();
 

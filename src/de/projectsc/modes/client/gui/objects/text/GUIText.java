@@ -41,6 +41,8 @@ public class GUIText {
 
     private int renderOrder = 0;
 
+    private Vector2f size = new Vector2f(0, 0);
+
     /**
      * Creates a new text, loads the text's quads into a VAO, and adds the text to the screen.
      * 
@@ -121,6 +123,10 @@ public class GUIText {
     public void setMeshInfo(int vao, int verticesCount) {
         this.textMeshVao = vao;
         this.vertexCount = verticesCount;
+    }
+
+    public Vector2f getSize() {
+        return size;
     }
 
     /**
@@ -213,4 +219,9 @@ public class GUIText {
     public void setRenderOrder(int renderOrder) {
         this.renderOrder = renderOrder;
     }
+
+    public void setSize(Vector2f size) {
+        this.size = size;
+    }
+
 }

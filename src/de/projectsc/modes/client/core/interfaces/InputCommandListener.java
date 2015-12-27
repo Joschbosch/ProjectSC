@@ -2,10 +2,10 @@
  * Copyright (C) 2015 
  */
 
-package de.projectsc.core.interfaces;
+package de.projectsc.modes.client.core.interfaces;
 
-import de.projectsc.core.data.KeyboardInputCommand;
-import de.projectsc.core.data.MouseInputCommand;
+import de.projectsc.modes.client.core.data.KeyboardInputCommand;
+import de.projectsc.modes.client.core.data.MouseInputCommand;
 
 public interface InputCommandListener {
 

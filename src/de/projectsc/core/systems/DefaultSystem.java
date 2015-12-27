@@ -58,4 +58,9 @@ public abstract class DefaultSystem implements EngineSystem {
         }
         return null;
     }
+
+    @Override
+    public Class<?> getSource() {
+        return this.getClass();
+    }
 }

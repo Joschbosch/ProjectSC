@@ -2,7 +2,8 @@
  * Copyright (C) 2015 
  */
 
-package de.projectsc.core.data;
+package de.projectsc.modes.client.core.data;
+
 
 public class KeyboardInputCommand implements InputCommand {
 
@@ -30,7 +31,7 @@ public class KeyboardInputCommand implements InputCommand {
     }
 
     @Override
-    public void consumed() {
+    public void consume() {
         consumed = true;
     }
 
