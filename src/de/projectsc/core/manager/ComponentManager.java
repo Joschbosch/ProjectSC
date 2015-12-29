@@ -11,7 +11,6 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import de.projectsc.core.component.DefaultComponent;
 import de.projectsc.core.interfaces.Component;
 
 /**
@@ -55,11 +54,10 @@ public class ComponentManager {
      */
     public Component createComponent(String name) {
         Class<? extends Component> componentClass = registeredComponents.get(name);
+        System.out.println(name);
         if (componentClass != null) {
             try {
-                Component c = componentClass.newInstance();
-                ((DefaultComponent) c).setEventManager(eventManager);
-                return c;
+                return componentClass.newInstance();
             } catch (InstantiationException | IllegalAccessException e) {
                 LOGGER.error("Could not create component: ", e);
             }

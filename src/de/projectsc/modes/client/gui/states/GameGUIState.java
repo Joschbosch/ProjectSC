@@ -6,8 +6,8 @@ package de.projectsc.modes.client.gui.states;
 
 import org.lwjgl.input.Keyboard;
 
-import de.projectsc.core.events.input.MouseButtonClickedEvent;
-import de.projectsc.core.events.input.MousePositionChangedEvent;
+import de.projectsc.core.events.input.MouseButtonClickedAction;
+import de.projectsc.core.events.input.MousePositionChangedAction;
 import de.projectsc.modes.client.core.data.KeyboardInputCommand;
 import de.projectsc.modes.client.core.data.MouseInputCommand;
 import de.projectsc.modes.client.core.interfaces.InputCommandListener;
@@ -81,11 +81,11 @@ public class GameGUIState implements GUIState, InputCommandListener {
         if (!isUIElementHit(command)) {
             if (command.getButton() == -1) {
                 ClientEventManager.getInstance().fireEvent(
-                    new MousePositionChangedEvent(mousePicker.getCurrentRay(), mousePicker.getCurrentCameraPosition()));
+                    new MousePositionChangedAction(mousePicker.getCurrentRay(), mousePicker.getCurrentCameraPosition()));
             }
             if (command.isButtonDown(1) || command.isRepeatedDown()) {
                 ClientEventManager.getInstance().fireEvent(
-                    new MouseButtonClickedEvent(1, true, mousePicker.getCurrentRay(),
+                    new MouseButtonClickedAction(1, true, mousePicker.getCurrentRay(),
                         mousePicker.getCurrentCameraPosition(), mousePicker.getCurrentTerrainPoint()));
             }
         }

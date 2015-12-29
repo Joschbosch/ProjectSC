@@ -4,7 +4,7 @@
 
 package de.projectsc.editor.componentViews;
 
-import de.projectsc.core.component.impl.physic.VelocityComponent;
+import de.projectsc.core.component.physic.VelocityComponent;
 import de.projectsc.editor.ComponentView;
 import de.projectsc.modes.client.gui.components.EmittingLightComponent;
 

@@ -7,13 +7,12 @@ package de.projectsc.modes.client.gui;
 import java.util.Map;
 import java.util.Set;
 
-import de.projectsc.core.component.DefaultComponent;
 import de.projectsc.core.data.EntityEvent;
 import de.projectsc.core.data.Event;
 import de.projectsc.core.data.physics.Transform;
-import de.projectsc.core.events.movement.NewPositionEvent;
-import de.projectsc.core.events.objects.CreateNewLightEvent;
-import de.projectsc.core.events.objects.RemoveLightEvent;
+import de.projectsc.core.events.entity.movement.NotifyTransformUpdateEvent;
+import de.projectsc.core.events.entity.objects.CreateLightEvent;
+import de.projectsc.core.events.entity.objects.RemoveLightEvent;
 import de.projectsc.core.interfaces.Component;
 import de.projectsc.core.manager.EntityManager;
 import de.projectsc.core.manager.EventManager;
@@ -22,8 +21,8 @@ import de.projectsc.modes.client.gui.components.EmittingLightComponent;
 import de.projectsc.modes.client.gui.components.GraphicalComponent;
 import de.projectsc.modes.client.gui.components.MeshRendererComponent;
 import de.projectsc.modes.client.gui.data.GUIScene;
-import de.projectsc.modes.client.gui.events.ChangeMeshRendererParameterEvent;
-import de.projectsc.modes.client.gui.events.NewTextureEvent;
+import de.projectsc.modes.client.gui.events.UpdateMeshRendererParameterEvent;
+import de.projectsc.modes.client.gui.events.UpdateTextureEvent;
 
 /**
  * System for rendering everything.
@@ -36,10 +35,10 @@ public class RenderingSystem extends DefaultSystem {
 
     public RenderingSystem(EntityManager entityManager, EventManager eventManager) {
         super(NAME, entityManager, eventManager);
-        eventManager.registerForEvent(NewPositionEvent.class, this);
-        eventManager.registerForEvent(ChangeMeshRendererParameterEvent.class, this);
-        eventManager.registerForEvent(NewTextureEvent.class, this);
-        eventManager.registerForEvent(CreateNewLightEvent.class, this);
+        eventManager.registerForEvent(NotifyTransformUpdateEvent.class, this);
+        eventManager.registerForEvent(UpdateMeshRendererParameterEvent.class, this);
+        eventManager.registerForEvent(UpdateTextureEvent.class, this);
+        eventManager.registerForEvent(CreateLightEvent.class, this);
         eventManager.registerForEvent(RemoveLightEvent.class, this);
     }
 
@@ -50,26 +49,31 @@ public class RenderingSystem extends DefaultSystem {
         }
     }
 
+    /**
+     * Process an entity event.
+     * 
+     * @param e event to process
+     */
     public void processEvent(EntityEvent e) {
         if (entityManager.hasComponent(e.getEntityId(), MeshRendererComponent.class)) {
             MeshRendererComponent c =
                 ((MeshRendererComponent) entityManager.getComponent(e.getEntityId(), MeshRendererComponent.NAME));
-            if (e instanceof ChangeMeshRendererParameterEvent) {
-                ChangeMeshRendererParameterEvent ev = (ChangeMeshRendererParameterEvent) e;
+            if (e instanceof UpdateMeshRendererParameterEvent) {
+                UpdateMeshRendererParameterEvent ev = (UpdateMeshRendererParameterEvent) e;
                 c.setFakeLighting(ev.isFakeLightning());
                 c.setIsTransparent(ev.isTransparent());
                 c.setNumberOfRows(ev.getNumColums());
                 c.setReflectivity(ev.getReflectivity());
                 c.setShineDamper(ev.getShineDamper());
-            } else if (e instanceof NewTextureEvent) {
-                NewTextureEvent event = (NewTextureEvent) e;
+            } else if (e instanceof UpdateTextureEvent) {
+                UpdateTextureEvent event = (UpdateTextureEvent) e;
                 if (event.getTextureFile() != null) {
                     c.loadAndApplyTexture(event.getTextureFile());
                 }
             }
         }
-        if (e instanceof CreateNewLightEvent && hasComponent(e.getEntityId(), EmittingLightComponent.class)) {
-            CreateNewLightEvent createNewLightEvent = (CreateNewLightEvent) e;
+        if (e instanceof CreateLightEvent && hasComponent(e.getEntityId(), EmittingLightComponent.class)) {
+            CreateLightEvent createNewLightEvent = (CreateLightEvent) e;
             if (createNewLightEvent.getPosition() != null) {
                 getComponent(e.getEntityId(), EmittingLightComponent.class).addLight(createNewLightEvent.getEntityId(),
                     createNewLightEvent.getPosition(), createNewLightEvent.getLight());
@@ -100,10 +104,6 @@ public class RenderingSystem extends DefaultSystem {
 
         }
 
-    }
-
-    private boolean hasComponent(String entity, Class<? extends DefaultComponent> clazz) {
-        return entityManager.hasComponent(entity, clazz);
     }
 
     /**

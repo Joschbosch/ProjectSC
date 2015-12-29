@@ -22,7 +22,7 @@ import javax.swing.table.TableModel;
 import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.core.data.objects.Light;
-import de.projectsc.core.events.objects.CreateNewLightEvent;
+import de.projectsc.core.events.entity.objects.CreateLightEvent;
 import de.projectsc.core.interfaces.Component;
 import de.projectsc.editor.ComponentView;
 import de.projectsc.modes.client.gui.components.EmittingLightComponent;
@@ -155,7 +155,7 @@ public class EmittingLightComponentView extends ComponentView {
                 try {
                     Light light = readAndCreateLight();
                     if (light != null) {
-                        CreateNewLightEvent ev = new CreateNewLightEvent(entity.getID(), light, null);
+                        CreateLightEvent ev = new CreateLightEvent(entity.getID(), light, null);
                         eventManager.fireEvent(ev);
                     }
                 } catch (NumberFormatException e1) {
@@ -177,7 +177,7 @@ public class EmittingLightComponentView extends ComponentView {
                     removeSelectedLight(component);
                     Light l = readAndCreateLight();
                     if (l != null) {
-                        CreateNewLightEvent ev = new CreateNewLightEvent(entity.getID(), l, null);
+                        CreateLightEvent ev = new CreateLightEvent(entity.getID(), l, null);
                         eventManager.fireEvent(ev);
                     }
                 }

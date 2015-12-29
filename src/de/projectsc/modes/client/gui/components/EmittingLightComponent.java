@@ -37,7 +37,7 @@ public class EmittingLightComponent extends GraphicalComponent {
     private final Map<Light, Vector3f> offsets = new HashMap<>();
 
     public EmittingLightComponent() {
-        setID(NAME);
+        setComponentName(NAME);
         setType(ComponentType.GRAPHICS);
     }
 

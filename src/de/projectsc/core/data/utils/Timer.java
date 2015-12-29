@@ -87,21 +87,38 @@ public final class Timer {
         return gameTime;
     }
 
+    /**
+     * Update times.
+     * 
+     * @param gameTickTime to add
+     */
     public void updateGameTimeAndTick(long gameTickTime) {
         gameTime += gameTickTime;
         tick++;
     }
 
+    /**
+     * Start a simple measurement.
+     */
     public void start() {
         measureMent = System.currentTimeMillis();
     }
 
+    /**
+     * Stop the measurement from start() and get difference.
+     * 
+     * @return difference since start.
+     */
     public long stop() {
         return System.currentTimeMillis() - measureMent;
     }
 
     public void setGameTime(long gameTime) {
         this.gameTime = gameTime;
+    }
+
+    public void setTick(long tick) {
+        this.tick = tick;
     }
 
 }

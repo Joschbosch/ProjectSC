@@ -13,13 +13,13 @@ import java.util.UUID;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import de.projectsc.core.component.DefaultComponent;
-import de.projectsc.core.component.impl.physic.TransformComponent;
+import de.projectsc.core.component.physic.TransformComponent;
+import de.projectsc.core.component.state.EntityStateComponent;
 import de.projectsc.core.entities.EntityImpl;
-import de.projectsc.core.events.components.ComponentAddedEvent;
-import de.projectsc.core.events.components.ComponentRemovedEvent;
-import de.projectsc.core.events.entities.DeletedEntityEvent;
-import de.projectsc.core.events.entities.NewEntityCreatedEvent;
+import de.projectsc.core.events.entity.component.ComponentAddedEvent;
+import de.projectsc.core.events.entity.component.ComponentRemovedEvent;
+import de.projectsc.core.events.entity.objects.NotifyEntityCreatedEvent;
+import de.projectsc.core.events.entity.objects.NotifyEntityDeletedEvent;
 import de.projectsc.core.interfaces.Component;
 import de.projectsc.core.interfaces.Entity;
 import de.projectsc.core.utils.ComponentUtils;
@@ -70,13 +70,15 @@ public class EntityManager {
         entities.put(e.getID(), e);
         LOGGER.debug("Created new entity " + e.getID());
         addComponentToEntity(e.getID(), TransformComponent.NAME);
-        eventManager.fireEvent(new NewEntityCreatedEvent(e.getID()));
+        addComponentToEntity(e.getID(), EntityStateComponent.NAME);
+        eventManager.fireEvent(new NotifyEntityCreatedEvent(e.getID()));
         return e.getID();
     }
 
     public String createNewEntityFromSchema(long schemaId, String entityUID) {
+        String e = createNewEntity(entityUID);
         if (entitySchemas.get(schemaId) == null) {
-            EntitySchema newSchema = EntitySchemaLoader.loadEntitySchema(schemaId, componentManager);
+            EntitySchema newSchema = EntitySchemaLoader.loadEntitySchema(schemaId, getEntity(e), componentManager);
             if (newSchema != null) {
                 entitySchemas.put(newSchema.getId(), newSchema);
             } else {
@@ -84,13 +86,10 @@ public class EntityManager {
             }
         }
         EntitySchema schema = entitySchemas.get(schemaId);
-        String e = createNewEntity(entityUID);
         for (Component c : schema.getComponents()) {
             Component clone = ComponentUtils.cloneComponent(c);
             addComponentToEntity(e, clone);
             clone.setOwner(getEntity(e));
-            DefaultComponent cc = ((DefaultComponent) clone);
-            cc.setEventManager(eventManager);
         }
         getEntity(e).setEntityTypeId(schema.getId());
         return e;
@@ -251,7 +250,7 @@ public class EntityManager {
     public void deleteEntity(String id) {
         if (entities.remove(id) != null) {
             LOGGER.debug("Removed entity " + id);
-            eventManager.fireEvent(new DeletedEntityEvent(id));
+            eventManager.fireEvent(new NotifyEntityDeletedEvent(id));
         }
     }
 

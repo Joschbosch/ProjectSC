@@ -5,26 +5,28 @@
 package de.projectsc.modes.client.game.states;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.lwjgl.util.vector.Vector3f;
 
-import de.projectsc.core.component.impl.physic.ColliderComponent;
+import de.projectsc.core.component.collision.ColliderComponent;
 import de.projectsc.core.data.objects.Light;
 import de.projectsc.core.data.physics.Transform;
 import de.projectsc.core.data.structure.Snapshot;
 import de.projectsc.core.data.structure.SnapshotDelta;
 import de.projectsc.core.data.utils.Timer;
-import de.projectsc.core.events.movement.ChangePositionEvent;
-import de.projectsc.core.events.movement.ChangeRotationEvent;
+import de.projectsc.core.events.entity.movement.UpdatePositionEvent;
+import de.projectsc.core.events.entity.movement.UpdateRotationEvent;
 import de.projectsc.core.game.GameConfiguration;
 import de.projectsc.core.manager.ComponentManager;
 import de.projectsc.core.manager.EntityManager;
 import de.projectsc.core.manager.EventManager;
 import de.projectsc.core.messages.GameMessageConstants;
+import de.projectsc.core.systems.physics.collision.CollisionSystem;
+import de.projectsc.core.systems.state.EntityStateSystem;
 import de.projectsc.core.utils.MapLoader;
 import de.projectsc.modes.client.core.data.ClientMessage;
 import de.projectsc.modes.client.core.interfaces.ClientState;
@@ -35,17 +37,26 @@ import de.projectsc.modes.client.game.ui.controls.GameTime;
 import de.projectsc.modes.client.gui.components.EmittingLightComponent;
 import de.projectsc.modes.client.gui.components.GraphicalComponentImplementation;
 
+/**
+ * State of the client when the game is running.
+ * 
+ * @author Josch Bosch
+ */
 public class GameState extends CommonClientState {
 
-    private boolean loadingDone = false;
+    private static Log LOGGER = LogFactory.getLog(GameState.class);
 
-    private GameTime gametimeUI;
+    private boolean loadingDone = false;
 
     private GameConfiguration gameConfig;
 
     private GamePhysicsSystem physicsSystem;
 
     private String sun;
+
+    private EntityStateSystem stateSystem;
+
+    private CollisionSystem collisionSystem;
 
     public GameState() {
         super("GameState", 0);
@@ -56,34 +67,19 @@ public class GameState extends CommonClientState {
         ComponentManager componentManager, ClientSnapshotManger snapshotManager, Timer timer) {
         super.init(networkQueue, entityManager, eventManager, componentManager, snapshotManager, timer);
         this.gameConfig = new GameConfiguration();
-        this.gametimeUI = new GameTime(timer);
+        new GameTime(timer);
     }
 
     @Override
     public ClientState handleMessage(ClientMessage msg) {
-        if (msg.getMessage().equals(GameMessageConstants.NEW_SNAPSHOT)) {
+        if (msg.getMessage().equals(GameMessageConstants.NEW_SNAPSHOT_DELTA)) {
             ObjectMapper mapper = new ObjectMapper();
             try {
                 String data = (String) msg.getData()[0];
                 SnapshotDelta s = mapper.readValue(data.substring(1, data.length() - 1), SnapshotDelta.class);
-                if (s.getRemoved() != null) {
-                    for (String id : s.getRemoved()) {
-                        entityManager.deleteEntity(id);
-                    }
-                }
-                if (s.getCreated() != null) {
-                    for (String newEntity : s.getCreated()) {
-                        String[] values = newEntity.split(";");
-                        if (entityManager.getEntity(values[0]) == null) {
-                            String e = entityManager.createNewEntityFromSchema(Long.parseLong(values[1]), values[0]);
-                            Map<String, Map<String, Double>> transformInfo =
-                                mapper.readValue(values[2], new HashMap<String, Map<String, Double>>().getClass());
-                            entityManager.getEntity(e).getTransform().parseTransformValues(transformInfo);
-                        }
-                    }
-                }
-
+                snapshotManager.applyNewSnapshotDelta(s);
             } catch (IOException e) {
+                LOGGER.error("Could not read snapshot delta: ", e);
             }
         } else if (msg.getMessage().equals("FullSnapshot")) {
             Snapshot s = null;
@@ -91,30 +87,33 @@ public class GameState extends CommonClientState {
             ObjectMapper mapper = new ObjectMapper();
             try {
                 s = mapper.readValue(snapshotData.substring(1, snapshotData.length() - 1), new Snapshot().getClass());
+                snapshotManager.applyNewAknowledgedSnapshot(s);
             } catch (IOException e) {
-
+                LOGGER.error("Could not read snapshot: ", e);
             }
-            snapshotManager.applyNewAknowledgedSnapshot(s);
         }
         return null;
     }
 
     @Override
     public void loop(long tickTime) {
-        timer.updateGameTimeAndTick(tickTime);
         if (!loadingDone) {
+            stateSystem = new EntityStateSystem(entityManager, eventManager);
             physicsSystem = new GamePhysicsSystem(entityManager, eventManager);
+            collisionSystem = new CollisionSystem(entityManager, eventManager);
             loadMap();
             createSun();
             sendMessage(new ClientMessage(GameMessageConstants.UPDATE_LOADING_PROGRESS, "100"));
             loadingDone = true;
         }
-        physicsSystem.update(tickTime);
+        stateSystem.update(tickTime);
+        // physicsSystem.update(tickTime);
+        collisionSystem.update(tickTime);
     }
 
     private void createSun() {
         sun = entityManager.createNewEntity();
-        eventManager.fireEvent(new ChangeRotationEvent(sun, new Vector3f(0, 0, 0)));
+        eventManager.fireEvent(new UpdateRotationEvent(sun, new Vector3f(0, 0, 0)));
         EmittingLightComponent lightComponent =
             (EmittingLightComponent) entityManager.addComponentToEntity(sun,
                 GraphicalComponentImplementation.EMMITING_LIGHT_COMPONENT.getName());
@@ -122,7 +121,7 @@ public class GameState extends CommonClientState {
         Light light = new Light(new Vector3f(position.getPosition()), new Vector3f(1.0f, 1.0f, 1.0f), "sun");
         lightComponent.addLight(sun, new Vector3f(position.getPosition()), light);
         entityManager.addComponentToEntity(sun, ColliderComponent.NAME);
-        eventManager.fireEvent(new ChangePositionEvent(new Vector3f(0.0f, 100.0f, 100.0f), sun));
+        eventManager.fireEvent(new UpdatePositionEvent(new Vector3f(0.0f, 100.0f, 100.0f), sun));
 
     }
 

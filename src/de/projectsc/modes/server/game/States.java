@@ -5,14 +5,13 @@
  */
 package de.projectsc.modes.server.game;
 
-import au.com.ds.ef.StateEnum;
 
 /**
  * The states for a Game.
  * 
  * @author Josch Bosch
  */
-public enum States implements StateEnum {
+public enum States {
     /**
      * State.
      */

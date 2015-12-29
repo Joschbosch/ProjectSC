@@ -93,4 +93,5 @@ public interface Component {
     String serializeForNetwork();
 
     void deserializeFromNetwork(String serial);
+
 }

@@ -58,7 +58,7 @@ import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import de.projectsc.core.CoreConstants;
-import de.projectsc.core.component.impl.ComponentListItem;
+import de.projectsc.core.component.ComponentListItem;
 import de.projectsc.core.interfaces.Component;
 import de.projectsc.core.manager.ComponentManager;
 import de.projectsc.core.manager.EntityManager;

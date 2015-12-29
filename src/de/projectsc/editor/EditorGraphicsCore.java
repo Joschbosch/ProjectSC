@@ -29,22 +29,24 @@ import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
 import de.projectsc.core.CoreConstants;
-import de.projectsc.core.component.impl.physic.ColliderComponent;
-import de.projectsc.core.component.impl.physic.TransformComponent;
+import de.projectsc.core.component.collision.ColliderComponent;
+import de.projectsc.core.component.physic.TransformComponent;
 import de.projectsc.core.data.objects.Light;
 import de.projectsc.core.data.physics.Transform;
 import de.projectsc.core.data.utils.Timer;
 import de.projectsc.core.entities.states.EntityState;
-import de.projectsc.core.events.entities.ChangeEntityStateEvent;
-import de.projectsc.core.events.movement.ChangePositionEvent;
-import de.projectsc.core.events.movement.ChangeRotationEvent;
-import de.projectsc.core.events.movement.ChangeScaleEvent;
-import de.projectsc.core.events.objects.NewMeshEvent;
+import de.projectsc.core.events.entity.movement.UpdatePositionEvent;
+import de.projectsc.core.events.entity.movement.UpdateRotationEvent;
+import de.projectsc.core.events.entity.movement.UpdateScaleEvent;
+import de.projectsc.core.events.entity.objects.UpdateMeshEvent;
+import de.projectsc.core.events.entity.state.UpdateEntityStateEvent;
 import de.projectsc.core.interfaces.Component;
 import de.projectsc.core.manager.ComponentManager;
 import de.projectsc.core.manager.EntityManager;
 import de.projectsc.core.manager.EventManager;
 import de.projectsc.core.systems.physics.BasicPhysicsSystem;
+import de.projectsc.core.systems.physics.collision.CollisionSystem;
+import de.projectsc.core.systems.state.EntityStateSystem;
 import de.projectsc.core.terrain.Terrain;
 import de.projectsc.modes.client.gui.InputSystem;
 import de.projectsc.modes.client.gui.RenderingSystem;
@@ -52,8 +54,8 @@ import de.projectsc.modes.client.gui.components.EmittingLightComponent;
 import de.projectsc.modes.client.gui.components.GraphicalComponentImplementation;
 import de.projectsc.modes.client.gui.components.MeshRendererComponent;
 import de.projectsc.modes.client.gui.data.GUIScene;
-import de.projectsc.modes.client.gui.events.ChangeMeshRendererParameterEvent;
-import de.projectsc.modes.client.gui.events.NewTextureEvent;
+import de.projectsc.modes.client.gui.events.UpdateMeshRendererParameterEvent;
+import de.projectsc.modes.client.gui.events.UpdateTextureEvent;
 import de.projectsc.modes.client.gui.input.InputConsumeManager;
 import de.projectsc.modes.client.gui.objects.particles.ParticleMaster;
 import de.projectsc.modes.client.gui.objects.terrain.TerrainModel;
@@ -115,6 +117,10 @@ public class EditorGraphicsCore implements Runnable {
 
     private Timer timer;
 
+    private EntityStateSystem stateSystem;
+
+    private CollisionSystem collisionSystem;
+
     public EditorGraphicsCore(Canvas displayParent, int width, int height, BlockingQueue<String> messageQueue,
         ComponentManager componentManager, EntityManager entityManager, EventManager eventManager) {
         incomingQueue = new LinkedBlockingQueue<>();
@@ -141,7 +147,9 @@ public class EditorGraphicsCore implements Runnable {
         } catch (LWJGLException e) {
         }
         loadGUIComponents();
+        stateSystem = new EntityStateSystem(entityManager, eventManager);
         physicsSystem = new BasicPhysicsSystem(entityManager, eventManager);
+        collisionSystem = new CollisionSystem(entityManager, eventManager);
         renderSystem = new RenderingSystem(entityManager, eventManager);
         this.inputSystem = new InputSystem();
         TextMaster.init();
@@ -171,16 +179,16 @@ public class EditorGraphicsCore implements Runnable {
             if (editorData.isLightAtCameraPostion()) {
                 if (!entityManager.getEntity(entity).getTransform().getPosition().equals(
                     camera.getPosition())) {
-                    eventManager.fireEvent(new ChangePositionEvent(new Vector3f(0.1f, 0, 0), sun));
+                    eventManager.fireEvent(new UpdatePositionEvent(new Vector3f(0.1f, 0, 0), sun));
                 }
             }
             physicsSystem.update(timer.getDelta());
+            collisionSystem.update(timer.getDelta());
             renderSystem.update(timer.getDelta());
             cycleTextures(0, timer.getDelta());
             mousePicker.update(getTerrains(), camera.getPosition(), camera.createViewMatrix());
             if (doRender.get()) {
                 GUIScene s = renderSystem.createScene();
-                physicsSystem.debug(s);
                 s.setTerrains(terrainModels);
                 s.setRenderSkybox(renderSkybox);
                 masterRenderer.renderScene(s, camera, timer.getDelta(), new Vector4f(0, 100000000, 0, 100000000));
@@ -202,8 +210,8 @@ public class EditorGraphicsCore implements Runnable {
 
     private void createSun() {
         sun = entityManager.createNewEntity();
-        eventManager.fireEvent(new ChangePositionEvent(new Vector3f(0.0f, 100.0f, 100.0f), sun));
-        eventManager.fireEvent(new ChangeRotationEvent(sun, new Vector3f(0, 0, 0)));
+        eventManager.fireEvent(new UpdatePositionEvent(new Vector3f(0.0f, 100.0f, 100.0f), sun));
+        eventManager.fireEvent(new UpdateRotationEvent(sun, new Vector3f(0, 0, 0)));
         EmittingLightComponent lightComponent =
             (EmittingLightComponent) entityManager.addComponentToEntity(sun,
                 GraphicalComponentImplementation.EMMITING_LIGHT_COMPONENT.getName());
@@ -263,9 +271,9 @@ public class EditorGraphicsCore implements Runnable {
      */
     public void updateData(EditorData data) {
         if (!entity.isEmpty()) {
-            eventManager.fireEvent(new ChangeScaleEvent(entity, new Vector3f(editorData.getScale(), editorData.getScale(), editorData
+            eventManager.fireEvent(new UpdateScaleEvent(entity, new Vector3f(editorData.getScale(), editorData.getScale(), editorData
                 .getScale())));
-            eventManager.fireEvent(new ChangeMeshRendererParameterEvent(entity, editorData.isFakeLighting(), editorData
+            eventManager.fireEvent(new UpdateMeshRendererParameterEvent(entity, editorData.isFakeLighting(), editorData
                 .isTransparent(), editorData.getReflectivity(), editorData.getShineDamper(), editorData.getNumColums()));
         }
     }
@@ -292,8 +300,8 @@ public class EditorGraphicsCore implements Runnable {
             entityManager.addComponentToEntity(entity, MeshRendererComponent.NAME);
         }
         try {
-            eventManager.fireEvent(new NewMeshEvent(entity, editorData.getModelFile()));
-            eventManager.fireEvent(new NewTextureEvent(entity,
+            eventManager.fireEvent(new UpdateMeshEvent(entity, editorData.getModelFile()));
+            eventManager.fireEvent(new UpdateTextureEvent(entity,
                 new File(EditorGraphicsCore.class.getResource(GUIConstants.TEXTURE_ROOT + GUIConstants.BASIC_TEXTURE_WHITE).toURI())));
         } catch (URISyntaxException e) {
             LOGGER.error(e);
@@ -368,7 +376,7 @@ public class EditorGraphicsCore implements Runnable {
     }
 
     private void updateTexture() {
-        eventManager.fireEvent(new NewTextureEvent(entity, editorData.getTextureFile()));
+        eventManager.fireEvent(new UpdateTextureEvent(entity, editorData.getTextureFile()));
     }
 
     /**
@@ -407,9 +415,9 @@ public class EditorGraphicsCore implements Runnable {
      */
     public void moveEntity(boolean value) {
         if (value) {
-            eventManager.fireEvent(new ChangeEntityStateEvent(entity, EntityState.MOVING));
+            eventManager.fireEvent(new UpdateEntityStateEvent(entity, EntityState.MOVING));
         } else {
-            eventManager.fireEvent(new ChangeEntityStateEvent(entity, EntityState.STANDING));
+            eventManager.fireEvent(new UpdateEntityStateEvent(entity, EntityState.STANDING));
         }
     }
 

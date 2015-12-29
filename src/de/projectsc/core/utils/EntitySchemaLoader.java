@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -17,6 +18,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 
 import de.projectsc.core.CoreConstants;
 import de.projectsc.core.interfaces.Component;
+import de.projectsc.core.interfaces.Entity;
 import de.projectsc.core.manager.ComponentManager;
 import de.projectsc.editor.EntitySchema;
 import de.projectsc.editor.MapEditorGraphicsCore;
@@ -25,7 +27,7 @@ public class EntitySchemaLoader {
 
     private static final Log LOGGER = LogFactory.getLog(EntitySchemaLoader.class);
 
-    public static EntitySchema loadEntitySchema(long id, ComponentManager componentManager) {
+    public static EntitySchema loadEntitySchema(long id, Entity entity, ComponentManager componentManager) {
         try {
             File schemaRoot =
                 new File(MapEditorGraphicsCore.class.getResource(
@@ -39,10 +41,11 @@ public class EntitySchemaLoader {
                 Iterator<String> componentNamesIterator = tree.get("components").getFieldNames();
                 while (componentNamesIterator.hasNext()) {
                     String name = componentNamesIterator.next();
-                    java.util.Map<String, Object> serialized =
+                    @SuppressWarnings("unchecked") Map<String, Object> serialized =
                         mapper.readValue(tree.get("components").get(name), new HashMap<String, Object>().getClass());
                     Component c = componentManager.createComponent(name);
                     if (c != null) {
+                        c.setOwner(entity);
                         c.deserialize(serialized, schemaFolder);
                         newSchema.getComponents().add(c);
                     }

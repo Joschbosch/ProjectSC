@@ -45,7 +45,7 @@ public final class GameMessageConstants {
     /**
      * Message ID.
      */
-    public static final String NEW_SNAPSHOT = "new_snapshot";
+    public static final String NEW_SNAPSHOT_DELTA = "new_snapshot";
 
     private GameMessageConstants() {};
 }

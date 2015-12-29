@@ -79,6 +79,7 @@ public class ClientNetworkCore implements Runnable {
                     sendMessage.setData(msg.getData());
                     ObjectMapper mapper = new ObjectMapper();
                     client.sendUDP(mapper.writeValueAsString(sendMessage));
+
                 }
             } catch (InterruptedException | IOException e) {
                 LOGGER.error("Error reading core messages: ", e);

@@ -27,4 +27,5 @@ public interface Entity {
     String getTag();
 
     void setTag(String tag);
+
 }

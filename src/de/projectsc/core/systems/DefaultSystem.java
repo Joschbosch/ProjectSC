@@ -59,6 +59,10 @@ public abstract class DefaultSystem implements EngineSystem {
         return null;
     }
 
+    protected boolean hasComponent(String entityId, Class<? extends Component> componentClass) {
+        return entityManager.hasComponent(entityId, componentClass);
+    }
+
     @Override
     public Class<?> getSource() {
         return this.getClass();

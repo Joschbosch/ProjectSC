@@ -15,14 +15,11 @@ import java.util.UUID;
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.map.JsonMappingException;
-import org.codehaus.jackson.map.ObjectMapper;
 
 import de.projectsc.core.data.EntityEvent;
-import de.projectsc.core.data.Event;
 import de.projectsc.core.data.Scene;
 import de.projectsc.core.interfaces.Component;
 import de.projectsc.core.interfaces.Entity;
-import de.projectsc.core.manager.EventManager;
 
 /**
  * 
@@ -32,13 +29,11 @@ import de.projectsc.core.manager.EventManager;
  */
 public abstract class DefaultComponent implements Component {
 
-    protected String componentId;
+    protected String componentName;
 
     protected String uid;
 
     protected ComponentType type;
-
-    protected ObjectMapper mapper = new ObjectMapper();
 
     protected List<String> requiredComponents = new LinkedList<>();
 
@@ -48,22 +43,12 @@ public abstract class DefaultComponent implements Component {
 
     private boolean isActive = false;
 
-    private EventManager eventManager;
-
     public DefaultComponent() {
         createNewId();
     }
 
-    public void setID(String id) {
-        this.componentId = id;
-    }
-
-    public void setEventManager(EventManager manager) {
-        this.eventManager = manager;
-    }
-
-    protected void fireEvent(Event e) {
-        eventManager.fireEvent(e);
+    public void setComponentName(String name) {
+        this.componentName = name;
     }
 
     /**
@@ -132,13 +117,13 @@ public abstract class DefaultComponent implements Component {
     }
 
     @Override
-    public void addRequiredByComponent(String componentName) {
-        requiredBy.add(componentName);
+    public void addRequiredByComponent(String incComponentName) {
+        requiredBy.add(incComponentName);
     }
 
     @Override
-    public void removeRequiredByComponent(String componentName) {
-        requiredBy.remove(componentName);
+    public void removeRequiredByComponent(String incComponentName) {
+        requiredBy.remove(incComponentName);
     }
 
     @Override
@@ -156,7 +141,7 @@ public abstract class DefaultComponent implements Component {
 
     @Override
     public String getComponentName() {
-        return componentId;
+        return componentName;
 
     }
 

@@ -19,7 +19,7 @@ import org.apache.commons.logging.LogFactory;
 
 import de.projectsc.core.CoreConstants;
 import de.projectsc.core.component.ComponentType;
-import de.projectsc.core.component.impl.physic.MeshComponent;
+import de.projectsc.core.component.physic.MeshComponent;
 import de.projectsc.core.data.physics.ModelData;
 import de.projectsc.modes.client.gui.data.GUIScene;
 import de.projectsc.modes.client.gui.models.RawModel;
@@ -54,7 +54,7 @@ public class MeshRendererComponent extends GraphicalComponent {
     private TexturedModel texturedModel;
 
     public MeshRendererComponent() {
-        setID(NAME);
+        setComponentName(NAME);
         setType(ComponentType.GRAPHICS);
         textureIndex = 0;
         requiredComponents.add(MeshComponent.NAME);

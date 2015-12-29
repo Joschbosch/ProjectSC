@@ -11,8 +11,8 @@ import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import de.projectsc.core.component.impl.physic.VelocityComponent;
-import de.projectsc.core.events.movement.ChangeMovementParameterEvent;
+import de.projectsc.core.component.physic.VelocityComponent;
+import de.projectsc.core.events.entity.movement.UpdateVelocityEvent;
 import de.projectsc.core.interfaces.Component;
 import de.projectsc.editor.ComponentView;
 
@@ -60,7 +60,7 @@ public class MovingComponentView extends ComponentView {
             @Override
             public void stateChanged(ChangeEvent e) {
                 movementLabel.setText("" + movementSlider.getValue() / 100f);
-                ChangeMovementParameterEvent ev = new ChangeMovementParameterEvent(entity.getID());
+                UpdateVelocityEvent ev = new UpdateVelocityEvent(entity.getID());
                 ev.setMaximumSpeed(movementSlider.getValue() / 100f);
                 eventManager.fireEvent(ev);
             }
@@ -87,7 +87,7 @@ public class MovingComponentView extends ComponentView {
             @Override
             public void stateChanged(ChangeEvent e) {
                 accelerationLabel.setText("" + accelerationSlider.getValue() / 100f);
-                ChangeMovementParameterEvent ev = new ChangeMovementParameterEvent(entity.getID());
+                UpdateVelocityEvent ev = new UpdateVelocityEvent(entity.getID());
                 ev.setAcceleration(accelerationSlider.getValue() / 100f);
                 eventManager.fireEvent(ev);
             }

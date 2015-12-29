@@ -17,10 +17,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.lwjgl.util.vector.Vector3f;
 
-import de.projectsc.core.component.impl.ComponentListItem;
+import de.projectsc.core.component.ComponentListItem;
 import de.projectsc.core.data.structure.Snapshot;
+import de.projectsc.core.data.structure.SnapshotDelta;
 import de.projectsc.core.data.utils.Timer;
-import de.projectsc.core.events.movement.NewMovingToTargetEvent;
+import de.projectsc.core.events.entity.actions.MoveEntityToTargetAction;
 import de.projectsc.core.game.GameAttributes;
 import de.projectsc.core.game.GameConfiguration;
 import de.projectsc.core.manager.ComponentManager;
@@ -29,6 +30,8 @@ import de.projectsc.core.manager.EventManager;
 import de.projectsc.core.messages.GameMessageConstants;
 import de.projectsc.core.messages.MessageConstants;
 import de.projectsc.core.systems.physics.BasicPhysicsSystem;
+import de.projectsc.core.systems.physics.collision.CollisionSystem;
+import de.projectsc.core.systems.state.EntityStateSystem;
 import de.projectsc.core.utils.MapLoader;
 import de.projectsc.modes.server.core.ServerCommands;
 import de.projectsc.modes.server.core.ServerConstants;
@@ -45,6 +48,9 @@ import de.projectsc.modes.server.game.data.ServerPlayer;
  */
 public class Game implements Runnable {
 
+    /**
+     * Tick time on the server-.
+     */
     public static final long GAME_TICK_TIME = 16;
 
     private static final Log LOGGER = LogFactory.getLog(Game.class);
@@ -68,6 +74,10 @@ public class Game implements Runnable {
     private boolean loading = false;
 
     private BasicPhysicsSystem physicsSystem;
+
+    private EntityStateSystem stateSystem;
+
+    private CollisionSystem collisionSystem;
 
     private ComponentManager componentManager;
 
@@ -123,24 +133,26 @@ public class Game implements Runnable {
 
     private void loopGame() {
         timer.updateGameTimeAndTick(GAME_TICK_TIME);
+        stateSystem.update(GAME_TICK_TIME);
         physicsSystem.update(GAME_TICK_TIME);
+        collisionSystem.update(GAME_TICK_TIME);
         snapshotManager.createSnapshot(timer);
         for (ServerPlayer player : gameContext.getPlayers().values()) {
             long lastSendSnapshotTick = snapshotManager.getLastSendSnapshotTick(player.getId());
             if (lastSendSnapshotTick == -1) {
                 sendFullSnapshotToClient(player);
-            } else if (timer.getTick() - lastSendSnapshotTick > 2) {
-                sendFullSnapshotToClient(player);
-                // // sendSnapshotDelta(player);
+            } else if (timer.getTick() - lastSendSnapshotTick > 1) {
+                sendSnapshotDelta(player, lastSendSnapshotTick);
             }
         }
-        // }
-        // System.out.println("sending" + timer.stop());
     }
 
     private void sendSnapshotDelta(ServerPlayer player, long lastTick) {
         Snapshot lastSnapshotSend = snapshotManager.getSnapshot(lastTick);
         Snapshot currentSnapshot = snapshotManager.getLastSnapshot();
+        SnapshotDelta sd = snapshotManager.createSnapshotDelta(lastSnapshotSend, currentSnapshot);
+        player.getClient().sendMessage(new ServerMessage(GameMessageConstants.NEW_SNAPSHOT_DELTA, sd));
+        snapshotManager.setLastSnapshotSendTick(player.getId(), sd.getTick());
     }
 
     private void sendFullSnapshotToClient(ServerPlayer player) {
@@ -162,7 +174,9 @@ public class Game implements Runnable {
                     eventManager = new EventManager();
                     componentManager = new ComponentManager(eventManager);
                     entityManager = new EntityManager(componentManager, eventManager);
+                    stateSystem = new EntityStateSystem(entityManager, eventManager);
                     physicsSystem = new BasicPhysicsSystem(entityManager, eventManager);
+                    collisionSystem = new CollisionSystem(entityManager, eventManager);
                     snapshotManager = new ServerSnapshotManager(entityManager);
                     loadComponents();
                     gameContext.loadData();
@@ -261,7 +275,7 @@ public class Game implements Runnable {
             @SuppressWarnings("unchecked") Map<String, Double> positionData = (Map<String, Double>) msg.getData()[1];
             Vector3f position =
                 new Vector3f(positionData.get("x").floatValue(), positionData.get("y").floatValue(), positionData.get("z").floatValue());
-            eventManager.fireEvent(new NewMovingToTargetEvent((String) msg.getData()[0], position));
+            eventManager.fireEvent(new MoveEntityToTargetAction((String) msg.getData()[0], position));
         }
     }
 

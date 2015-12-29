@@ -11,7 +11,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import de.projectsc.core.component.impl.ComponentListItem;
+import de.projectsc.core.component.ComponentListItem;
 import de.projectsc.core.data.structure.Snapshot;
 import de.projectsc.core.data.utils.Timer;
 import de.projectsc.core.manager.ComponentManager;
@@ -42,7 +42,6 @@ public abstract class ClientCore implements Runnable {
 
     protected ClientState currentState;
 
-    @SuppressWarnings("unused")
     protected final ClientPlayer player;
 
     protected boolean clientRunning;
@@ -65,10 +64,10 @@ public abstract class ClientCore implements Runnable {
         networkSendQueue = new LinkedBlockingQueue<>();
         networkReceiveQueue = new LinkedBlockingQueue<>();
         player = new ClientPlayer();
+        timer = new Timer();
         eventManager = new ClientEventManager();
         componentManager = new ComponentManager(eventManager);
         entityManager = new EntityManager(componentManager, eventManager);
-        timer = new Timer();
         snapshotManager = new ClientSnapshotManger(entityManager, timer);
     }
 

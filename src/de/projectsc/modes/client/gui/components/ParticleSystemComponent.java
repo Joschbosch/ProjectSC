@@ -36,7 +36,7 @@ public class ParticleSystemComponent extends GraphicalComponent {
     private Map<Integer, Vector3f> offsets = new HashMap<>();
 
     public ParticleSystemComponent() {
-        setID(NAME);
+        setComponentName(NAME);
         setType(ComponentType.GRAPHICS);
 
     }

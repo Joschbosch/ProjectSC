@@ -34,20 +34,21 @@ import org.lwjgl.util.vector.Vector4f;
 
 import de.projectsc.EntityEditor;
 import de.projectsc.core.CoreConstants;
-import de.projectsc.core.component.impl.physic.ColliderComponent;
+import de.projectsc.core.component.collision.ColliderComponent;
 import de.projectsc.core.data.objects.Light;
 import de.projectsc.core.data.physics.Transform;
 import de.projectsc.core.data.physics.WireFrame;
 import de.projectsc.core.data.utils.Timer;
-import de.projectsc.core.events.entities.ChangeEntitySelectEvent;
-import de.projectsc.core.events.movement.ChangePositionEvent;
-import de.projectsc.core.events.movement.ChangeRotationEvent;
+import de.projectsc.core.events.entity.movement.UpdatePositionEvent;
+import de.projectsc.core.events.entity.movement.UpdateRotationEvent;
+import de.projectsc.core.events.entity.state.UpdateEntitySelectionEvent;
 import de.projectsc.core.interfaces.Component;
-import de.projectsc.core.interfaces.Entity;
 import de.projectsc.core.manager.ComponentManager;
 import de.projectsc.core.manager.EntityManager;
 import de.projectsc.core.manager.EventManager;
 import de.projectsc.core.systems.physics.BasicPhysicsSystem;
+import de.projectsc.core.systems.physics.collision.CollisionSystem;
+import de.projectsc.core.systems.state.EntityStateSystem;
 import de.projectsc.core.terrain.Terrain;
 import de.projectsc.modes.client.gui.InputSystem;
 import de.projectsc.modes.client.gui.RenderingSystem;
@@ -129,6 +130,10 @@ public class MapEditorGraphicsCore implements Runnable {
 
     private Timer timer;
 
+    private EntityStateSystem stateSystem;
+
+    private CollisionSystem collisionSystem;
+
     public MapEditorGraphicsCore(Canvas displayParent, int width, int height, BlockingQueue<String> messageQueue,
         ComponentManager componentManager, EntityManager entityManager, EventManager eventManager) {
         incomingQueue = new LinkedBlockingQueue<>();
@@ -155,7 +160,9 @@ public class MapEditorGraphicsCore implements Runnable {
         } catch (LWJGLException e) {
         }
         loadGUIComponents();
+        stateSystem = new EntityStateSystem(entityManager, eventManager);
         physicsSystem = new BasicPhysicsSystem(entityManager, eventManager);
+        collisionSystem = new CollisionSystem(entityManager, eventManager);
         renderSystem = new RenderingSystem(entityManager, eventManager);
         inputSystem = new InputSystem();
 
@@ -192,7 +199,7 @@ public class MapEditorGraphicsCore implements Runnable {
                         Iterator<String> componentNamesIterator = tree.get("components").getFieldNames();
                         while (componentNamesIterator.hasNext()) {
                             String name = componentNamesIterator.next();
-                            java.util.Map<String, Object> serialized =
+                            @SuppressWarnings("unchecked") java.util.Map<String, Object> serialized =
                                 mapper.readValue(tree.get("components").get(name), new HashMap<String, Object>().getClass());
                             Component c = componentManager.createComponent(name);
                             if (c != null) {
@@ -222,10 +229,11 @@ public class MapEditorGraphicsCore implements Runnable {
             ParticleMaster.update(timer.getDelta(), camera.getPosition());
             if (entityManager.getEntity(sun) != null && !entityManager.getEntity(sun).getTransform().getPosition().equals(
                 camera.getPosition())) {
-                eventManager.fireEvent(new ChangePositionEvent(camera.getPosition(), sun));
+                eventManager.fireEvent(new UpdatePositionEvent(camera.getPosition(), sun));
             }
 
             physicsSystem.update(timer.getDelta());
+            collisionSystem.update(timer.getDelta());
             renderSystem.update(timer.getDelta());
 
             GUIText fps =
@@ -235,17 +243,13 @@ public class MapEditorGraphicsCore implements Runnable {
                 mousePicker.update(getTerrains(), camera.getPosition(), camera.createViewMatrix());
                 readInput();
 
-                if (camera != null && mousePicker.getCurrentRay() != null) {
-                    Entity highlightingEntity = null;
-                    float tMin = Float.MAX_VALUE;
-                }
                 if (!entityAtCursor.isEmpty() && mousePicker.getCurrentTerrainPoint() != null) {
                     entityManager.getEntity(entityAtCursor).getTransform().setPosition(mousePicker.getCurrentTerrainPoint());
                 }
 
                 if (doRender.get()) {
                     GUIScene s = renderSystem.createScene();
-                    physicsSystem.debug(s);
+                    collisionSystem.debug(s);
                     s.setTerrains(terrainModels);
                     s.setRenderSkybox(true);
                     if (!entityAtCursor.isEmpty()) {
@@ -255,7 +259,6 @@ public class MapEditorGraphicsCore implements Runnable {
                                     0.5f)));
                     }
                     masterRenderer.renderScene(s, camera, timer.getDelta(), new Vector4f(0, 100000000, 0, 100000000));
-
                     fontRenderer.render(TextMaster.render(), 0);
                 }
             }
@@ -324,15 +327,15 @@ public class MapEditorGraphicsCore implements Runnable {
 
     private void calculateSelectionAndHighlighting() {
         if (!selectedEntity.isEmpty()) {
-            eventManager.fireEvent(new ChangeEntitySelectEvent(selectedEntity, false, false));
+            eventManager.fireEvent(new UpdateEntitySelectionEvent(selectedEntity, false, false));
         }
         for (String e : entityManager.getAllEntites()) {
             ColliderComponent collider = (ColliderComponent) entityManager.getComponent(e, ColliderComponent.class);
             if (collider.getAABB().intersects(entityManager.getEntity(e).getTransform(), camera.getPosition(),
                 mousePicker.getCurrentRay()) > 0) {
-                eventManager.fireEvent(new ChangeEntitySelectEvent(e, false, true));
+                eventManager.fireEvent(new UpdateEntitySelectionEvent(e, false, true));
             } else {
-                eventManager.fireEvent(new ChangeEntitySelectEvent(e, false, false));
+                eventManager.fireEvent(new UpdateEntitySelectionEvent(e, false, false));
             }
         }
         if (Mouse.isButtonDown(0) && mode == 1 && !alreadyClicked) {
@@ -340,7 +343,7 @@ public class MapEditorGraphicsCore implements Runnable {
             for (String e : entityManager.getAllEntites()) {
                 if (entityManager.hasComponent(e, ColliderComponent.class)) {
                     ColliderComponent collider = (ColliderComponent) entityManager.getComponent(e, ColliderComponent.class);
-                    if (collider.intersects(entityManager.getEntity(e).getTransform(),
+                    if (collider.getAABB().intersects(entityManager.getEntity(e).getTransform(),
                         camera.getPosition(), mousePicker.getCurrentRay()) > 0) {
                         selectedEntity = e;
                     }
@@ -348,7 +351,7 @@ public class MapEditorGraphicsCore implements Runnable {
             }
         }
         if (!selectedEntity.isEmpty()) {
-            eventManager.fireEvent(new ChangeEntitySelectEvent(selectedEntity, true, false));
+            eventManager.fireEvent(new UpdateEntitySelectionEvent(selectedEntity, true, false));
         }
     }
 
@@ -359,14 +362,15 @@ public class MapEditorGraphicsCore implements Runnable {
         } else {
             entitySchemas.get(type).createNewEntity(entityManager.getEntity(entityAtCursor).getTransform(), e, entityManager);
         }
+
         entityAtCursor = e;
 
     }
 
     private void createSun() {
         sun = entityManager.createNewEntity();
-        eventManager.fireEvent(new ChangePositionEvent(new Vector3f(0.0f, 100.0f, 100.0f), sun));
-        eventManager.fireEvent(new ChangeRotationEvent(sun, new Vector3f(0, 0, 0)));
+        eventManager.fireEvent(new UpdatePositionEvent(new Vector3f(0.0f, 100.0f, 100.0f), sun));
+        eventManager.fireEvent(new UpdateRotationEvent(sun, new Vector3f(0, 0, 0)));
         EmittingLightComponent lightComponent =
             (EmittingLightComponent) entityManager.addComponentToEntity(sun,
                 GraphicalComponentImplementation.EMMITING_LIGHT_COMPONENT.getName());

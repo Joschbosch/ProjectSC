@@ -9,7 +9,7 @@ import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 
 import de.projectsc.core.data.Event;
-import de.projectsc.core.events.input.MoveToPositionRequest;
+import de.projectsc.core.events.input.MoveToPositionAction;
 import de.projectsc.core.interfaces.Entity;
 import de.projectsc.core.manager.EntityManager;
 import de.projectsc.core.manager.EventManager;
@@ -26,17 +26,16 @@ public class ClientControlSystem extends DefaultSystem {
         super("ClientControlSystem", entityManager, eventManager);
         controllingEntities = new HashSet<>();
         this.networkSendQueue = networkSendQueue;
-        eventManager.registerForEvent(MoveToPositionRequest.class, this);
+        eventManager.registerForEvent(MoveToPositionAction.class, this);
     }
 
     @Override
     public void processEvent(Event e) {
         controllingEntities.add(entityManager.getEntity(entityManager.getAllEntites().iterator().next()));
 
-        if (e instanceof MoveToPositionRequest) {
+        if (e instanceof MoveToPositionAction) {
             for (Entity entity : controllingEntities) {
-                // fireEvent(new MoveEntityToPosition(entity.getID(), ((MoveToPositionRequest) e).getTarget()));
-                networkSendQueue.offer(new ClientMessage("moveToPosition", entity.getID(), ((MoveToPositionRequest) e).getTarget()));
+                networkSendQueue.offer(new ClientMessage("moveToPosition", entity.getID(), ((MoveToPositionAction) e).getTarget()));
             }
         }
     }

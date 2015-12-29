@@ -4,43 +4,29 @@
 
 package de.projectsc.core.systems.physics;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import org.lwjgl.util.vector.Vector3f;
 
-import de.projectsc.core.component.impl.behaviour.EntityStateComponent;
-import de.projectsc.core.component.impl.physic.ColliderComponent;
-import de.projectsc.core.component.impl.physic.MeshComponent;
-import de.projectsc.core.component.impl.physic.PathComponent;
-import de.projectsc.core.component.impl.physic.PhysicsComponent;
-import de.projectsc.core.component.impl.physic.TransformComponent;
-import de.projectsc.core.component.impl.physic.VelocityComponent;
+import de.projectsc.core.component.physic.MeshComponent;
+import de.projectsc.core.component.physic.PathComponent;
+import de.projectsc.core.component.physic.PhysicsComponent;
+import de.projectsc.core.component.physic.TransformComponent;
+import de.projectsc.core.component.physic.VelocityComponent;
+import de.projectsc.core.component.state.EntityStateComponent;
 import de.projectsc.core.data.EntityEvent;
 import de.projectsc.core.data.Event;
-import de.projectsc.core.data.Scene;
-import de.projectsc.core.data.physics.AxisAlignedBoundingBox;
 import de.projectsc.core.data.physics.Transform;
-import de.projectsc.core.data.physics.WireFrame;
 import de.projectsc.core.entities.states.EntityState;
-import de.projectsc.core.events.components.ComponentAddedEvent;
-import de.projectsc.core.events.components.ComponentRemovedEvent;
-import de.projectsc.core.events.entities.ChangeEntitySelectEvent;
-import de.projectsc.core.events.entities.ChangeEntityStateEvent;
-import de.projectsc.core.events.entities.DeletedEntityEvent;
-import de.projectsc.core.events.entities.NewEntityCreatedEvent;
-import de.projectsc.core.events.input.MouseButtonClickedEvent;
-import de.projectsc.core.events.input.MousePositionChangedEvent;
-import de.projectsc.core.events.input.MoveToPositionRequest;
-import de.projectsc.core.events.movement.ChangeMovementParameterEvent;
-import de.projectsc.core.events.movement.ChangePositionEvent;
-import de.projectsc.core.events.movement.ChangeRotationEvent;
-import de.projectsc.core.events.movement.ChangeScaleEvent;
-import de.projectsc.core.events.movement.NewMovingToTargetEvent;
-import de.projectsc.core.events.movement.NewPositionEvent;
-import de.projectsc.core.events.objects.NewMeshEvent;
+import de.projectsc.core.events.entity.actions.MoveEntityToTargetAction;
+import de.projectsc.core.events.entity.movement.NotifyRotationTargetUpdateEvent;
+import de.projectsc.core.events.entity.movement.NotifyTransformUpdateEvent;
+import de.projectsc.core.events.entity.movement.NotifyVelocityUpdateEvent;
+import de.projectsc.core.events.entity.movement.UpdatePositionEvent;
+import de.projectsc.core.events.entity.movement.UpdateRotationEvent;
+import de.projectsc.core.events.entity.movement.UpdateScaleEvent;
+import de.projectsc.core.events.entity.movement.UpdateVelocityEvent;
+import de.projectsc.core.events.entity.objects.UpdateMeshEvent;
+import de.projectsc.core.events.entity.state.UpdateEntityStateEvent;
 import de.projectsc.core.interfaces.Component;
-import de.projectsc.core.interfaces.Entity;
 import de.projectsc.core.manager.EntityManager;
 import de.projectsc.core.manager.EventManager;
 import de.projectsc.core.systems.DefaultSystem;
@@ -54,139 +40,110 @@ public class BasicPhysicsSystem extends DefaultSystem {
 
     private static final String NAME = "Physics System";
 
-    private OctTree<Entity> octree;
+    private static final float DISTANCE_TO_TARGET = 2f;
 
     public BasicPhysicsSystem(EntityManager entityManager, EventManager eventManager) {
         super(BasicPhysicsSystem.NAME, entityManager, eventManager);
-        eventManager.registerForEvent(NewEntityCreatedEvent.class, this);
-        eventManager.registerForEvent(ChangeRotationEvent.class, this);
-        eventManager.registerForEvent(ChangePositionEvent.class, this);
-        eventManager.registerForEvent(ChangeEntityStateEvent.class, this);
-        eventManager.registerForEvent(ChangeMovementParameterEvent.class, this);
-        eventManager.registerForEvent(ChangeScaleEvent.class, this);
-        eventManager.registerForEvent(NewMeshEvent.class, this);
-        eventManager.registerForEvent(ComponentAddedEvent.class, this);
-        eventManager.registerForEvent(ComponentRemovedEvent.class, this);
-        eventManager.registerForEvent(DeletedEntityEvent.class, this);
-        eventManager.registerForEvent(ChangeEntitySelectEvent.class, this);
-        eventManager.registerForEvent(MousePositionChangedEvent.class, this);
-        eventManager.registerForEvent(MouseButtonClickedEvent.class, this);
-        eventManager.registerForEvent(NewMovingToTargetEvent.class, this);
-        octree =
-            new OctTree<Entity>(new AxisAlignedBoundingBox(new Vector3f(-1000, -1000, -1000), new Vector3f(1000, 1000, 1000)));
-
+        eventManager.registerForEvent(UpdateRotationEvent.class, this);
+        eventManager.registerForEvent(UpdatePositionEvent.class, this);
+        eventManager.registerForEvent(UpdateVelocityEvent.class, this);
+        eventManager.registerForEvent(UpdateScaleEvent.class, this);
+        eventManager.registerForEvent(UpdateMeshEvent.class, this);
+        eventManager.registerForEvent(MoveEntityToTargetAction.class, this);
     }
 
     @Override
     public void update(long tick) {
-        List<Entity> movedEntities = new LinkedList<>();
         for (String entity : entityManager.getAllEntites()) {
             for (Component c : entityManager.getAllComponents(entity).values()) {
                 if (c instanceof PhysicsComponent) {
                     ((PhysicsComponent) c).update(tick);
                 }
             }
-            if (entityManager.hasComponent(entity, EntityStateComponent.class)) {
-                EntityState entityState = getComponent(entity, EntityStateComponent.class).getState();
+            EntityState entityState = getComponent(entity, EntityStateComponent.class).getState();
+            TransformComponent transformComp =
+                (TransformComponent) entityManager.getComponent(entity, TransformComponent.class);
+            if (hasComponent(entity, VelocityComponent.class) && hasComponent(entity, PathComponent.class)) {
+                PathComponent pathComponent = getComponent(entity, PathComponent.class);
+                VelocityComponent velocityComp = getComponent(entity, VelocityComponent.class);
+                Vector3f currentTarget = pathComponent.getCurrentTarget();
+                if (currentTarget != null
+                    && !isAtTarget(transformComp.getTransform().getPosition(), currentTarget)) {
+                    fireEvent(new UpdateEntityStateEvent(entity, EntityState.MOVING));
+                    velocityComp.setCurrentSpeed(velocityComp.getMaximumSpeed());
+
+                    float newAngle =
+                        (float) Math.atan2(currentTarget.x - transformComp.getTransform().getPosition().x, currentTarget.z
+                            - transformComp.getTransform().getPosition().z);
+                    newAngle = (float) (newAngle * (180 / Math.PI));
+                    if (newAngle != transformComp.getRotation().y) {
+                        pathComponent.setTargetRotation(new Vector3f(0, newAngle, 0));
+                        velocityComp.setTurnSpeed(velocityComp.getMaximumTurnSpeed());
+                        fireEvent(new NotifyRotationTargetUpdateEvent(entity));
+                    }
+                } else {
+                    fireEvent(new UpdateEntityStateEvent(entity, EntityState.STANDING));
+
+                }
+
                 if (entityState == EntityState.MOVING) {
-                    if (entityManager.hasComponent(entity, VelocityComponent.class)) {
-                        VelocityComponent velocityComp = getComponent(entity, VelocityComponent.class);
-                        PathComponent pathComponent = getComponent(entity, PathComponent.class);
-                        TransformComponent transformComp =
-                            (TransformComponent) entityManager.getComponent(entity, TransformComponent.class);
-                        velocityComp.updateVelocity(tick, transformComp.getRotation(), pathComponent.getTargetRotation());
-                        Vector3f velocity = velocityComp.getVelocity();
-                        Vector3f rotationDelta = velocityComp.getRotationDelta();
-                        transformComp.updatePosition(entity, velocity, rotationDelta);
-                        movedEntities.add(entityManager.getEntity(entity));
-                    }
-                } else if (entityState == EntityState.STANDING) {
-                    if (entityManager.hasComponent(entity, VelocityComponent.class)) {
-                        VelocityComponent velocityComp = getComponent(entity, VelocityComponent.class);
-                        velocityComp.setCurrentSpeed(0f);
-                    }
+                    updateVelocity(tick, transformComp.getRotation(), pathComponent, velocityComp);
+                    fireEvent(new NotifyVelocityUpdateEvent(entity));
+                    transformComp.updatePosition(entity, velocityComp.getVelocity(), velocityComp.getRotationDelta());
+                    fireEvent(new NotifyTransformUpdateEvent(entity));
+                } else if (velocityComp.getCurrentSpeed() != 0 || velocityComp.getTurnSpeed() != 0) {
+                    velocityComp.setCurrentSpeed(0f);
+                    velocityComp.setTurnSpeed(0f);
+                    velocityComp.setRotationDelta(new Vector3f());
+                    velocityComp.setVelocity(new Vector3f());
+                    fireEvent(new NotifyVelocityUpdateEvent(entity));
                 }
             }
         }
-        octree.update(movedEntities);
+
+    }
+
+    private boolean isAtTarget(Vector3f position, Vector3f target) {
+        if (Vector3f.sub(position, target, null).lengthSquared() < DISTANCE_TO_TARGET) {
+            return true;
+        }
+        return false;
     }
 
     @Override
     public void processEvent(Event e) {
         if (e instanceof EntityEvent) {
             processEvent((EntityEvent) e);
-        } else {
-            if (e instanceof MousePositionChangedEvent) {
-                for (Entity entity : octree.intersectsRay(((MousePositionChangedEvent) e).getCurrentRay(),
-                    ((MousePositionChangedEvent) e).getCurrentCameraPosition())) {
-                    EntityStateComponent comp =
-                        ((EntityStateComponent) entityManager.getComponent(entity.getID(), EntityStateComponent.class));
-                    comp.setEntitySelected(false);
-                    comp.setHighlighted(true);
-                }
-
-            } else if (e instanceof MouseButtonClickedEvent) {
-                if (octree.intersectsRay(((MouseButtonClickedEvent) e).getCurrentRay(),
-                    ((MouseButtonClickedEvent) e).getCurrentCameraPosition()).isEmpty()) {
-                    if (((MouseButtonClickedEvent) e).getButton() == 1) {
-                        fireEvent(new MoveToPositionRequest(((MouseButtonClickedEvent) e).getTerrainPoint()));
-                    }
-                }
-            }
         }
     }
 
+    /**
+     * Process an entity event.
+     * 
+     * @param e to process
+     */
     public void processEvent(EntityEvent e) {
-        if (e instanceof ChangePositionEvent) {
+        if (e instanceof UpdatePositionEvent) {
             Transform transform = entityManager.getEntity(e.getEntityId()).getTransform();
-            handlePositionEvent((ChangePositionEvent) e, transform);
-        } else if (e instanceof ChangeRotationEvent) {
+            handlePositionEvent((UpdatePositionEvent) e, transform);
+        } else if (e instanceof UpdateRotationEvent) {
             Transform transform = entityManager.getEntity(e.getEntityId()).getTransform();
-            handleRotateEvent((ChangeRotationEvent) e, transform);
-        } else if (e instanceof ChangeScaleEvent) {
+            handleRotateEvent((UpdateRotationEvent) e, transform);
+        } else if (e instanceof UpdateScaleEvent) {
             Transform transform = entityManager.getEntity(e.getEntityId()).getTransform();
-            handleScaleEvent((ChangeScaleEvent) e, transform);
-        } else if (e instanceof ChangeMovementParameterEvent) {
-            handleVelocityChangeEvent((ChangeMovementParameterEvent) e, getComponent(e.getEntityId(), VelocityComponent.class));
-        } else if (e instanceof ChangeEntityStateEvent) {
-            handleChangeEntityStateEvent((ChangeEntityStateEvent) e);
-        } else if (e instanceof NewEntityCreatedEvent) {
-            entityManager.addComponentToEntity(e.getEntityId(), EntityStateComponent.NAME);
-        } else if (e instanceof ComponentAddedEvent) {
-            Component c = ((ComponentAddedEvent) e).getComponent();
-            if (c instanceof ColliderComponent) {
-                ((ColliderComponent) c).update(0);
-                octree.addEntity(entityManager.getEntity(e.getEntityId()));
-                octree.recalculateTree();
-            }
-        } else if (e instanceof ComponentRemovedEvent) {
-            Component c = ((ComponentRemovedEvent) e).getComponent();
-            if (c instanceof ColliderComponent) {
-                octree.removeEntity(e.getEntityId());
-                octree.recalculateTree();
-            }
-        } else if (e instanceof NewMeshEvent) {
-            ((MeshComponent) entityManager.getComponent(e.getEntityId(), MeshComponent.class)).changeMesh(((NewMeshEvent) e)
+            handleScaleEvent((UpdateScaleEvent) e, transform);
+        } else if (e instanceof UpdateVelocityEvent) {
+            handleVelocityChangeEvent((UpdateVelocityEvent) e, getComponent(e.getEntityId(), VelocityComponent.class));
+        } else if (e instanceof UpdateMeshEvent) {
+            ((MeshComponent) entityManager.getComponent(e.getEntityId(), MeshComponent.class)).changeMesh(((UpdateMeshEvent) e)
                 .getNewMeshFile());
-        } else if (e instanceof DeletedEntityEvent) {
-            octree.removeEntity(e.getEntityId());
-        } else if (e instanceof ChangeEntitySelectEvent) {
-            EntityStateComponent comp = ((EntityStateComponent) entityManager.getComponent(e.getEntityId(), EntityStateComponent.class));
-            comp.setEntitySelected(((ChangeEntitySelectEvent) e).getSelected());
-            comp.setHighlighted(((ChangeEntitySelectEvent) e).isHightLighted());
-        } else if (e instanceof NewMovingToTargetEvent) {
+        } else if (e instanceof MoveEntityToTargetAction) {
             PathComponent component = (PathComponent) entityManager.getComponent(e.getEntityId(), PathComponent.class);
-            component.setCurrentTarget(((NewMovingToTargetEvent) e).getTarget());
+            component.setCurrentTarget(((MoveEntityToTargetAction) e).getTarget());
         }
     }
 
-    private void handleChangeEntityStateEvent(ChangeEntityStateEvent e) {
-        if (entityManager.hasComponent(e.getEntityId(), EntityStateComponent.class)) {
-            getComponent(e.getEntityId(), EntityStateComponent.class).changeState(e.getEntityState());
-        }
-    }
-
-    private void handleVelocityChangeEvent(ChangeMovementParameterEvent e, VelocityComponent component) {
+    private void handleVelocityChangeEvent(UpdateVelocityEvent e, VelocityComponent component) {
         if (e.getAcceleration() != Float.NEGATIVE_INFINITY) {
             component.setAcceleration(e.getAcceleration());
         }
@@ -199,19 +156,20 @@ public class BasicPhysicsSystem extends DefaultSystem {
         if (e.getTurnSpeed() != Float.NEGATIVE_INFINITY) {
             component.setTurnSpeed(e.getTurnSpeed());
         }
+        fireEvent(new NotifyVelocityUpdateEvent(e.getEntityId()));
     }
 
-    private void handleScaleEvent(ChangeScaleEvent e, Transform transform) {
+    private void handleScaleEvent(UpdateScaleEvent e, Transform transform) {
         if (transform.getScale() == null) {
             transform.setScale(e.getNewScale());
         } else {
             transform.getScale().set(e.getNewScale());
         }
-        fireEvent(new NewPositionEvent(e.getEntityId(), transform.getPosition(), transform.getRotation(), transform.getScale()));
+        fireEvent(new NotifyTransformUpdateEvent(e.getEntityId()));
 
     }
 
-    private void handleRotateEvent(ChangeRotationEvent e, Transform transform) {
+    private void handleRotateEvent(UpdateRotationEvent e, Transform transform) {
         if (e.isRelative()) {
             Vector3f.add(transform.getRotation(), e.getNewRotation(), transform.getRotation());
         } else if (transform.getRotation() == null) {
@@ -219,10 +177,10 @@ public class BasicPhysicsSystem extends DefaultSystem {
         } else {
             transform.getRotation().set(e.getNewRotation());
         }
-        fireEvent(new NewPositionEvent(e.getEntityId(), transform.getPosition(), transform.getRotation(), transform.getScale()));
+        fireEvent(new NotifyTransformUpdateEvent(e.getEntityId()));
     }
 
-    private void handlePositionEvent(ChangePositionEvent e, Transform transform) {
+    private void handlePositionEvent(UpdatePositionEvent e, Transform transform) {
         if (e.isRelative()) {
             Vector3f.add(transform.getPosition(), e.getNewPosition(), transform.getPosition());
         } else {
@@ -232,21 +190,47 @@ public class BasicPhysicsSystem extends DefaultSystem {
                 transform.getPosition().set(e.getNewPosition());
             }
         }
-        fireEvent(new NewPositionEvent(e.getEntityId(), transform.getPosition(), transform.getRotation(), transform.getScale()));
+        fireEvent(new NotifyTransformUpdateEvent(e.getEntityId()));
     }
 
-    public void debug(Scene s) {
-        List<AxisAlignedBoundingBox> boxes = octree.getBoxes();
-        for (AxisAlignedBoundingBox box : boxes) {
-            Vector3f size = new Vector3f(box.getSize());
-            size.scale(0.5f);
-            Vector3f position = new Vector3f(box.getCenter());
-            position.y = position.y - size.y;
-            WireFrame wf = new WireFrame(WireFrame.CUBE, position, new Vector3f(), box.getSize());
-            wf.setColor(new Vector3f(0.0f, 1f, 0));
-            s.getWireFrames().add(wf);
+    private void updateVelocity(long tick, Vector3f rotation, PathComponent pathComponent, VelocityComponent velocityComp) {
+
+        float newSpeed = velocityComp.getCurrentSpeed() + velocityComp.getAcceleration() * tick;
+        if (newSpeed >= velocityComp.getMaximumSpeed()) {
+            newSpeed = velocityComp.getMaximumSpeed();
+        }
+        float distance = newSpeed * tick / 1000.0f;
+        float dx = (float) (distance * Math.sin(Math.toRadians(rotation.y)));
+        float dz = (float) (distance * Math.cos(Math.toRadians(rotation.y)));
+        float dy = 0;
+        float targetRotation = pathComponent.getTargetRotation().y;
+        float angleDiff = rotation.y - targetRotation;
+        if (Math.abs(angleDiff) >= 180) {
+            if (rotation.y > targetRotation) {
+                angleDiff = -1 * ((360 - rotation.y) + targetRotation);
+            } else {
+                angleDiff = (360 - targetRotation) + rotation.y;
+            }
+        }
+        if (angleDiff > 5.E-4f) {
+            if (Math.abs(angleDiff) > 180) {
+                if (rotation.y > targetRotation) {
+                    angleDiff = -1 * ((360 - rotation.y) + targetRotation);
+                } else {
+                    angleDiff = (360 - targetRotation) + rotation.y;
+                }
+            }
+            if (angleDiff > 0) {
+                dy = -velocityComp.getMaximumTurnSpeed() * tick / 1000.0f;
+            } else {
+                dy = velocityComp.getMaximumTurnSpeed() * tick / 1000.0f;
+            }
+        } else {
+            dy = targetRotation - rotation.y;
         }
 
+        velocityComp.setVelocity(new Vector3f(dx, 0, dz));
+        velocityComp.setRotationDelta(new Vector3f(0, dy, 0));
     }
 
 }

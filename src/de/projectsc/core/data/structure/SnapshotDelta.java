@@ -27,6 +27,11 @@ public class SnapshotDelta {
 
     private Map<String, Map<String, String>> changed = null;
 
+    /**
+     * Removed entities.
+     * 
+     * @param uid removed.
+     */
     public void addRemoved(String uid) {
         if (removed == null) {
             removed = new HashSet<>();
@@ -34,6 +39,11 @@ public class SnapshotDelta {
         removed.add(uid);
     }
 
+    /**
+     * New created entity.
+     * 
+     * @param newEntityInformation new entitiy
+     */
     public void addCreated(String newEntityInformation) {
         if (created == null) {
             created = new HashSet<>();
@@ -41,6 +51,12 @@ public class SnapshotDelta {
         created.add(newEntityInformation);
     }
 
+    /**
+     * Changed entities.
+     * 
+     * @param uid of entity
+     * @param componentChanges changes
+     */
     public void addChange(String uid, Map<String, String> componentChanges) {
         if (changed == null) {
             changed = new HashMap<>();
@@ -70,6 +86,10 @@ public class SnapshotDelta {
 
     public Map<String, Map<String, String>> getChanged() {
         return changed;
+    }
+
+    public void setChanged(Map<String, Map<String, String>> changed) {
+        this.changed = changed;
     }
 
     public Set<String> getCreated() {
