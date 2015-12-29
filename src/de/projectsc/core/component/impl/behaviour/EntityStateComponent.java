@@ -12,6 +12,7 @@ import de.projectsc.core.component.ComponentType;
 import de.projectsc.core.component.DefaultComponent;
 import de.projectsc.core.data.Scene;
 import de.projectsc.core.entities.states.EntityState;
+import de.projectsc.core.events.movement.ChangeMovementParameterEvent;
 
 /**
  * Component that represents the state of an entity.
@@ -29,13 +30,13 @@ public class EntityStateComponent extends DefaultComponent {
 
     private boolean moved = false;
 
-    public boolean selected = false;
+    private boolean selected = false;
 
-    public boolean selectAble = true;
+    private boolean selectAble = true;
 
-    public boolean highlighted = false;
+    private boolean highlighted = false;
 
-    public boolean highlightAble = true;
+    private boolean highlightAble = true;
 
     public EntityStateComponent() {
         setType(ComponentType.PREPHYSICS);
@@ -43,8 +44,12 @@ public class EntityStateComponent extends DefaultComponent {
     }
 
     @Override
-    public void update() {
+    public void update(long elapsed) {
         if (state == EntityState.MOVING) {
+            ChangeMovementParameterEvent event = new ChangeMovementParameterEvent(owner.getID());
+            event.setCurrentSpeed(Float.MAX_VALUE);
+            event.setTurnSpeed(Float.MAX_VALUE);
+            fireEvent(event);
             setMoved(true);
         } else {
             setMoved(false);
@@ -70,6 +75,34 @@ public class EntityStateComponent extends DefaultComponent {
     @Override
     public void deserialize(Map<String, Object> input, File loadingLocation) {
 
+    }
+
+    @Override
+    public String serializeForNetwork() {
+        int selectedInt = 0;
+        if (isSelected()) {
+            selectedInt = 1;
+        }
+        int highlightedInt = 0;
+        if (isHighlighted()) {
+            highlightedInt = 1;
+        }
+        return "" + state.ordinal() + ";" + selectedInt + ";" + highlightedInt;
+    }
+
+    @Override
+    public void deserializeFromNetwork(String serialized) {
+        String[] split = serialized.split(";");
+        int ordinal = Integer.parseInt(split[0]);
+        if (ordinal == EntityState.MOVING.ordinal()) {
+            state = EntityState.MOVING;
+        } else {
+            state = EntityState.STANDING;
+        }
+        int selectedInt = Integer.parseInt(split[1]);
+        int highlightedInt = Integer.parseInt(split[2]);
+        selected = selectedInt != 0;
+        highlighted = highlightedInt != 0;
     }
 
     @Override

@@ -33,7 +33,7 @@ public class TransformComponent extends PhysicsComponent {
     }
 
     @Override
-    public void update() {
+    public void update(long elapsed) {
         if (owner != null) {
             transform = owner.getTransform();
         }
@@ -75,6 +75,20 @@ public class TransformComponent extends PhysicsComponent {
             (float) (double) serialized.get("rotationZ")));
         transform.setScale(new Vector3f((float) (double) serialized.get("scaleX"), (float) (double) serialized.get("scaleY"),
             (float) (double) serialized.get("scaleZ")));
+    }
+
+    @Override
+    public String serializeForNetwork() {
+        return "" + transform.toString();
+    }
+
+    @Override
+    public void deserializeFromNetwork(String serialized) {
+        String[] split = serialized.split(";");
+        transform.setPosition(new Vector3f(Float.valueOf(split[0]), Float.valueOf(split[1]), Float.valueOf(split[2])));
+        transform.setRotation(new Vector3f(Float.valueOf(split[3]), Float.valueOf(split[4]), Float.valueOf(split[5])));
+        transform.setScale(new Vector3f(Float.valueOf(split[6]), Float.valueOf(split[7]), Float.valueOf(split[8])));
+        System.out.println(serialized);
     }
 
     @Override

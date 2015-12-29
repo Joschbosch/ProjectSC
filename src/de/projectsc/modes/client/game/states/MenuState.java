@@ -6,6 +6,7 @@ package de.projectsc.modes.client.game.states;
 
 import java.util.concurrent.BlockingQueue;
 
+import de.projectsc.core.data.utils.Timer;
 import de.projectsc.core.manager.ComponentManager;
 import de.projectsc.core.manager.EntityManager;
 import de.projectsc.core.manager.EventManager;
@@ -13,6 +14,7 @@ import de.projectsc.core.messages.GameMessageConstants;
 import de.projectsc.core.messages.MessageConstants;
 import de.projectsc.modes.client.core.data.ClientMessage;
 import de.projectsc.modes.client.core.interfaces.ClientState;
+import de.projectsc.modes.client.core.manager.ClientSnapshotManger;
 import de.projectsc.modes.client.core.states.CommonClientState;
 import de.projectsc.modes.client.game.ui.controls.Console;
 import de.projectsc.modes.client.game.ui.controls.Menu;
@@ -46,8 +48,8 @@ public class MenuState extends CommonClientState {
 
     @Override
     public void init(BlockingQueue<ClientMessage> networkQueue, EntityManager entityManager, EventManager eventManager,
-        ComponentManager componentManager) {
-        super.init(networkQueue, entityManager, eventManager, componentManager);
+        ComponentManager componentManager, ClientSnapshotManger snapshotManager, Timer timer) {
+        super.init(networkQueue, entityManager, eventManager, componentManager, snapshotManager, timer);
         setInstance(this);
         initState(STATE_LOGIN);
     }

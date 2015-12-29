@@ -12,9 +12,11 @@ import org.lwjgl.util.vector.Vector3f;
 import de.projectsc.core.component.impl.behaviour.EntityStateComponent;
 import de.projectsc.core.component.impl.physic.ColliderComponent;
 import de.projectsc.core.component.impl.physic.MeshComponent;
+import de.projectsc.core.component.impl.physic.PathComponent;
 import de.projectsc.core.component.impl.physic.PhysicsComponent;
 import de.projectsc.core.component.impl.physic.TransformComponent;
 import de.projectsc.core.component.impl.physic.VelocityComponent;
+import de.projectsc.core.data.EntityEvent;
 import de.projectsc.core.data.Event;
 import de.projectsc.core.data.Scene;
 import de.projectsc.core.data.physics.AxisAlignedBoundingBox;
@@ -27,11 +29,14 @@ import de.projectsc.core.events.entities.ChangeEntitySelectEvent;
 import de.projectsc.core.events.entities.ChangeEntityStateEvent;
 import de.projectsc.core.events.entities.DeletedEntityEvent;
 import de.projectsc.core.events.entities.NewEntityCreatedEvent;
-import de.projectsc.core.events.input.MousePositionEvent;
+import de.projectsc.core.events.input.MouseButtonClickedEvent;
+import de.projectsc.core.events.input.MousePositionChangedEvent;
+import de.projectsc.core.events.input.MoveToPositionRequest;
 import de.projectsc.core.events.movement.ChangeMovementParameterEvent;
 import de.projectsc.core.events.movement.ChangePositionEvent;
 import de.projectsc.core.events.movement.ChangeRotationEvent;
 import de.projectsc.core.events.movement.ChangeScaleEvent;
+import de.projectsc.core.events.movement.NewMovingToTargetEvent;
 import de.projectsc.core.events.movement.NewPositionEvent;
 import de.projectsc.core.events.objects.NewMeshEvent;
 import de.projectsc.core.interfaces.Component;
@@ -64,7 +69,9 @@ public class BasicPhysicsSystem extends DefaultSystem {
         eventManager.registerForEvent(ComponentRemovedEvent.class, this);
         eventManager.registerForEvent(DeletedEntityEvent.class, this);
         eventManager.registerForEvent(ChangeEntitySelectEvent.class, this);
-        eventManager.registerForEvent(MousePositionEvent.class, this);
+        eventManager.registerForEvent(MousePositionChangedEvent.class, this);
+        eventManager.registerForEvent(MouseButtonClickedEvent.class, this);
+        eventManager.registerForEvent(NewMovingToTargetEvent.class, this);
         octree =
             new OctTree<Entity>(new AxisAlignedBoundingBox(new Vector3f(-1000, -1000, -1000), new Vector3f(1000, 1000, 1000)));
 
@@ -76,7 +83,7 @@ public class BasicPhysicsSystem extends DefaultSystem {
         for (String entity : entityManager.getAllEntites()) {
             for (Component c : entityManager.getAllComponents(entity).values()) {
                 if (c instanceof PhysicsComponent) {
-                    ((PhysicsComponent) c).update();
+                    ((PhysicsComponent) c).update(tick);
                 }
             }
             if (entityManager.hasComponent(entity, EntityStateComponent.class)) {
@@ -84,9 +91,10 @@ public class BasicPhysicsSystem extends DefaultSystem {
                 if (entityState == EntityState.MOVING) {
                     if (entityManager.hasComponent(entity, VelocityComponent.class)) {
                         VelocityComponent velocityComp = getComponent(entity, VelocityComponent.class);
+                        PathComponent pathComponent = getComponent(entity, PathComponent.class);
                         TransformComponent transformComp =
                             (TransformComponent) entityManager.getComponent(entity, TransformComponent.class);
-                        velocityComp.updateVelocity(transformComp.getRotation());
+                        velocityComp.updateVelocity(tick, transformComp.getRotation(), pathComponent.getTargetRotation());
                         Vector3f velocity = velocityComp.getVelocity();
                         Vector3f rotationDelta = velocityComp.getRotationDelta();
                         transformComp.updatePosition(entity, velocity, rotationDelta);
@@ -105,6 +113,30 @@ public class BasicPhysicsSystem extends DefaultSystem {
 
     @Override
     public void processEvent(Event e) {
+        if (e instanceof EntityEvent) {
+            processEvent((EntityEvent) e);
+        } else {
+            if (e instanceof MousePositionChangedEvent) {
+                for (Entity entity : octree.intersectsRay(((MousePositionChangedEvent) e).getCurrentRay(),
+                    ((MousePositionChangedEvent) e).getCurrentCameraPosition())) {
+                    EntityStateComponent comp =
+                        ((EntityStateComponent) entityManager.getComponent(entity.getID(), EntityStateComponent.class));
+                    comp.setEntitySelected(false);
+                    comp.setHighlighted(true);
+                }
+
+            } else if (e instanceof MouseButtonClickedEvent) {
+                if (octree.intersectsRay(((MouseButtonClickedEvent) e).getCurrentRay(),
+                    ((MouseButtonClickedEvent) e).getCurrentCameraPosition()).isEmpty()) {
+                    if (((MouseButtonClickedEvent) e).getButton() == 1) {
+                        fireEvent(new MoveToPositionRequest(((MouseButtonClickedEvent) e).getTerrainPoint()));
+                    }
+                }
+            }
+        }
+    }
+
+    public void processEvent(EntityEvent e) {
         if (e instanceof ChangePositionEvent) {
             Transform transform = entityManager.getEntity(e.getEntityId()).getTransform();
             handlePositionEvent((ChangePositionEvent) e, transform);
@@ -123,7 +155,7 @@ public class BasicPhysicsSystem extends DefaultSystem {
         } else if (e instanceof ComponentAddedEvent) {
             Component c = ((ComponentAddedEvent) e).getComponent();
             if (c instanceof ColliderComponent) {
-                ((ColliderComponent) c).update();
+                ((ColliderComponent) c).update(0);
                 octree.addEntity(entityManager.getEntity(e.getEntityId()));
                 octree.recalculateTree();
             }
@@ -142,9 +174,9 @@ public class BasicPhysicsSystem extends DefaultSystem {
             EntityStateComponent comp = ((EntityStateComponent) entityManager.getComponent(e.getEntityId(), EntityStateComponent.class));
             comp.setEntitySelected(((ChangeEntitySelectEvent) e).getSelected());
             comp.setHighlighted(((ChangeEntitySelectEvent) e).isHightLighted());
-        } else if (e instanceof MousePositionEvent) {
-            System.out.println(octree.intersectsRay(((MousePositionEvent) e).getCurrentRay(),
-                ((MousePositionEvent) e).getCurrentCameraPosition()));
+        } else if (e instanceof NewMovingToTargetEvent) {
+            PathComponent component = (PathComponent) entityManager.getComponent(e.getEntityId(), PathComponent.class);
+            component.setCurrentTarget(((NewMovingToTargetEvent) e).getTarget());
         }
     }
 

@@ -12,16 +12,18 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import de.projectsc.core.component.impl.ComponentListItem;
+import de.projectsc.core.data.structure.Snapshot;
 import de.projectsc.core.data.utils.Timer;
 import de.projectsc.core.manager.ComponentManager;
 import de.projectsc.core.manager.EntityManager;
 import de.projectsc.core.manager.EventManager;
-import de.projectsc.core.systems.physics.BasicPhysicsSystem;
 import de.projectsc.modes.client.core.data.ClientMessage;
 import de.projectsc.modes.client.core.data.ClientPlayer;
 import de.projectsc.modes.client.core.interfaces.ClientState;
 import de.projectsc.modes.client.core.interfaces.GUI;
 import de.projectsc.modes.client.core.manager.ClientEventManager;
+import de.projectsc.modes.client.core.manager.ClientSnapshotManger;
+import de.projectsc.modes.client.core.system.ClientControlSystem;
 
 /**
  * Core class for the client.
@@ -30,45 +32,50 @@ import de.projectsc.modes.client.core.manager.ClientEventManager;
  */
 public abstract class ClientCore implements Runnable {
 
-    private static final int TICK_TIME = 16;
+    protected static final int TICK_TIME = 16;
 
-    private static final Log LOGGER = LogFactory.getLog(ClientCore.class);
+    protected static final Log LOGGER = LogFactory.getLog(ClientCore.class);
 
-    private BlockingQueue<ClientMessage> networkSendQueue;
+    protected BlockingQueue<ClientMessage> networkSendQueue;
 
-    private BlockingQueue<ClientMessage> networkReceiveQueue;
+    protected BlockingQueue<ClientMessage> networkReceiveQueue;
 
-    private ClientState currentState;
+    protected ClientState currentState;
 
     @SuppressWarnings("unused")
-    private final ClientPlayer player;
+    protected final ClientPlayer player;
 
-    private boolean clientRunning;
+    protected boolean clientRunning;
 
-    private GUI gui;
+    protected GUI gui;
 
-    private BasicPhysicsSystem physicsSystem;
+    protected ComponentManager componentManager;
 
-    private ComponentManager componentManager;
+    protected EntityManager entityManager;
 
-    private EntityManager entityManager;
+    protected EventManager eventManager;
 
-    private EventManager eventManager;
+    protected ClientControlSystem controlSystem;
+
+    private Timer timer;
+
+    private ClientSnapshotManger snapshotManager;
 
     public ClientCore() {
         networkSendQueue = new LinkedBlockingQueue<>();
         networkReceiveQueue = new LinkedBlockingQueue<>();
         player = new ClientPlayer();
-        componentManager = new ComponentManager();
         eventManager = new ClientEventManager();
+        componentManager = new ComponentManager(eventManager);
         entityManager = new EntityManager(componentManager, eventManager);
-
+        timer = new Timer();
+        snapshotManager = new ClientSnapshotManger(entityManager, timer);
     }
 
     @Override
     public void run() {
         LOGGER.debug("Starting core ... ");
-        Timer.init();
+        timer.init();
         loadComponents();
         loadSystems();
         gui.init();
@@ -77,24 +84,28 @@ public abstract class ClientCore implements Runnable {
         changeState(currentState);
         LOGGER.debug(String.format("Client started"));
         while (clientRunning) {
-            Timer.update();
+            timer.update();
             ClientState newState = null;
             newState = readServerMessages();
             if (currentState != null) {
                 gui.readInput();
-                while (Timer.getLag() >= TICK_TIME) {
-                    physicsSystem.update(TICK_TIME);
+                while (timer.getLag() >= TICK_TIME) {
                     currentState.loop(TICK_TIME);
-                    Timer.setLag(Timer.getLag() - TICK_TIME);
+                    timer.setLag(timer.getLag() - TICK_TIME);
                 }
-                currentState.loop(Timer.getLag());
-                gui.render();
+                Snapshot[] interpolationSnapshots = snapshotManager.getSnapshotsForInterpolation(timer.getGameTime() - 1000);
+                if (interpolationSnapshots != null) {
+                    long interpolationTime = timer.getGameTime() - interpolationSnapshots[0].getGameTime();
+                    gui.render(interpolationSnapshots, interpolationTime);
+                } else {
+                    gui.render();
+                }
             }
             if (newState != null) {
                 changeState(newState);
             }
-            long timeNeeded = System.currentTimeMillis() - Timer.getSnapshotTime();
-            long sleepTime = Math.max((16 - timeNeeded), 0L);
+            long timeNeeded = System.currentTimeMillis() - timer.getSnapshotTime();
+            long sleepTime = Math.max((TICK_TIME - timeNeeded), 0L);
             try {
                 Thread.sleep(sleepTime);
             } catch (InterruptedException e) {
@@ -111,15 +122,13 @@ public abstract class ClientCore implements Runnable {
 
     protected abstract ClientState getInitialState();
 
+    protected abstract void loadSystems();
+
     private void changeState(ClientState newState) {
         LOGGER.debug("Initialising state " + newState.getId());
-        newState.init(networkSendQueue, entityManager, eventManager, componentManager);
+        newState.init(networkSendQueue, entityManager, eventManager, componentManager, snapshotManager, timer);
         currentState = newState;
         gui.initState(newState);
-    }
-
-    private void loadSystems() {
-        physicsSystem = new BasicPhysicsSystem(entityManager, eventManager);
     }
 
     private void loadComponents() {
@@ -133,7 +142,6 @@ public abstract class ClientCore implements Runnable {
         if (currentState != null) {
             while (!networkReceiveQueue.isEmpty()) {
                 ClientMessage msg = networkReceiveQueue.poll();
-                // LOGGER.debug("Got message from server: " + msg);
                 newState = currentState.handleMessage(msg);
             }
         }
@@ -177,5 +185,9 @@ public abstract class ClientCore implements Runnable {
 
     public void setGUI(GUI gui) {
         this.gui = gui;
+    }
+
+    public Timer getTimer() {
+        return timer;
     }
 }

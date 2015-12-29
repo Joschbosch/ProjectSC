@@ -6,7 +6,7 @@ package de.projectsc.core.events.objects;
 
 import org.lwjgl.util.vector.Vector3f;
 
-import de.projectsc.core.data.Event;
+import de.projectsc.core.data.EntityEvent;
 import de.projectsc.core.data.objects.Light;
 
 /**
@@ -14,7 +14,7 @@ import de.projectsc.core.data.objects.Light;
  * 
  * @author Josch Bosch
  */
-public class CreateNewLightEvent extends Event {
+public class CreateNewLightEvent extends EntityEvent {
 
     /**
      * ID.

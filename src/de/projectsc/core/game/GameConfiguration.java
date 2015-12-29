@@ -17,16 +17,16 @@ public class GameConfiguration {
 
     private String mapName = "L1/first.map";
 
-    private Map<Long, String> playerCharacters;
+    private Map<String, String> playerCharacters;
 
-    private Map<Long, Byte> playerAffiliation;
+    private Map<String, Byte> playerAffiliation;
 
     public GameConfiguration() {
         playerCharacters = new HashMap<>();
         playerAffiliation = new HashMap<>();
     }
 
-    public GameConfiguration(Map<Long, String> playerCharacters, Map<Long, Byte> playerAffiliation) {
+    public GameConfiguration(Map<String, String> playerCharacters, Map<String, Byte> playerAffiliation) {
         this.playerCharacters = playerCharacters;
         this.playerAffiliation = playerAffiliation;
     }
@@ -36,7 +36,7 @@ public class GameConfiguration {
      * @param id of the player
      * @param affiliation to set
      */
-    public void setPlayerAffiliation(Long id, byte affiliation) {
+    public void setPlayerAffiliation(String id, byte affiliation) {
         playerAffiliation.put(id, affiliation);
 
     }
@@ -45,7 +45,7 @@ public class GameConfiguration {
      * @param id of the player
      * @return current affiliation
      */
-    public byte getPlayerAffiliation(Long id) {
+    public byte getPlayerAffiliation(String id) {
         return playerAffiliation.get(id);
     }
 
@@ -53,7 +53,7 @@ public class GameConfiguration {
      * @param id of player
      * @param character chosen
      */
-    public void setPlayerCharacter(Long id, String character) {
+    public void setPlayerCharacter(String id, String character) {
         playerCharacters.put(id, character);
 
     }
@@ -63,7 +63,7 @@ public class GameConfiguration {
      * @param id of player
      * @return current selected character
      */
-    public String getPlayerCharacter(Long id) {
+    public String getPlayerCharacter(String id) {
         return playerCharacters.get(id);
     }
 
@@ -75,7 +75,7 @@ public class GameConfiguration {
         this.mapName = mapName;
     }
 
-    public void setPlayerAffiliation(Map<Long, Byte> playerAffiliation) {
+    public void setPlayerAffiliation(Map<String, Byte> playerAffiliation) {
         this.playerAffiliation = playerAffiliation;
     }
 
@@ -93,7 +93,7 @@ public class GameConfiguration {
         return count;
     }
 
-    public void setPlayerCharacters(Map<Long, String> playerCharacters) {
+    public void setPlayerCharacters(Map<String, String> playerCharacters) {
         this.playerCharacters = playerCharacters;
     }
 }

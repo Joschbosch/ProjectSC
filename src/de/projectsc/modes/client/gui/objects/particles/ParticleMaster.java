@@ -18,14 +18,14 @@ public class ParticleMaster {
 
     private static Map<ParticleTexture, List<Particle>> particles = new HashMap<>();
 
-    public static void update(Vector3f camPosition) {
+    public static void update(long delta, Vector3f camPosition) {
         Iterator<Entry<ParticleTexture, List<Particle>>> mapIterator = particles.entrySet().iterator();
         while (mapIterator.hasNext()) {
             List<Particle> list = mapIterator.next().getValue();
             Iterator<Particle> it = list.iterator();
             while (it.hasNext()) {
                 Particle p = it.next();
-                if (!p.update(camPosition)) {
+                if (!p.update(delta / 1000f, camPosition)) {
                     it.remove();
                     if (list.isEmpty()) {
                         mapIterator.remove();

@@ -9,7 +9,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.lwjgl.util.vector.Vector3f;
 
-import de.projectsc.core.data.physics.Tile;
 import de.projectsc.core.terrain.Terrain;
 import de.projectsc.core.terrain.TerrainLoader;
 import de.projectsc.modes.client.gui.models.RawModel;
@@ -36,13 +35,10 @@ public class TerrainModel {
 
     private final TerrainTexture blendMap;
 
-    private final Tile[][] tiles;
-
     private final Terrain terrain;
 
     public TerrainModel(Terrain terrain) {
         this.terrain = terrain;
-        this.tiles = terrain.getTerrain();
         this.xCoord = terrain.getWorldPositionX();
         this.zCoord = terrain.getWorldPositionZ();
         TerrainTexture backgroundTex = new TerrainTexture(Loader.loadTexture(terrain.getBGTexture()));
@@ -69,7 +65,7 @@ public class TerrainModel {
         for (int i = 0; i < vertCountX; i++) {
             for (int j = 0; j < vertCountX; j++) {
                 vertices[vertexPointer * 3] = j / ((float) vertCountX - 1) * vertCountX * Terrain.TERRAIN_TILE_SIZE;
-                float height = tiles[i][j] != null ? tiles[i][j].getHeight() : 0;
+                float height = 0;
                 vertices[vertexPointer * 3 + 1] = height;
                 vertices[vertexPointer * 3 + 2] = i / ((float) vertCountX - 1) * vertCountX * Terrain.TERRAIN_TILE_SIZE;
                 Vector3f normal = calculateNormal(j, i);

@@ -8,8 +8,6 @@ import de.projectsc.core.data.physics.Transform;
 
 public interface Entity {
 
-    String getID();
-
     Transform getTransform();
 
     boolean hasComponent(Class<? extends Component> clazz);
@@ -20,4 +18,13 @@ public interface Entity {
 
     void setEntityTypeId(long id);
 
+    int getLayer();
+
+    String getID();
+
+    void setLayer(int layer);
+
+    String getTag();
+
+    void setTag(String tag);
 }

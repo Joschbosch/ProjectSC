@@ -43,20 +43,23 @@ public class ParticleSystemComponent extends GraphicalComponent {
 
     @Override
     public void render(String entity, GUIScene scene) {
-
-    }
-
-    @Override
-    public void update() {
-        if (particleSystems.size() == 0) {
-            addNewParticleSystem();
-        }
         for (ParticleSystem s : particleSystems) {
             if (offsets.get(s.getId()) != null && owner.getTransform() != null) {
                 Vector3f position =
                     Vector3f.add(owner.getTransform().getPosition(), offsets.get(s.getId()), null);
                 s.setSystemCenter(position);
-                s.generateParticles();
+            }
+        }
+    }
+
+    @Override
+    public void update(long elapsed) {
+        if (particleSystems.size() == 0) {
+            addNewParticleSystem();
+        }
+        for (ParticleSystem s : particleSystems) {
+            if (offsets.get(s.getId()) != null) {
+                s.generateParticles(elapsed);
             }
         }
     }

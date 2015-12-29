@@ -6,14 +6,14 @@ package de.projectsc.core.events.objects;
 
 import java.io.File;
 
-import de.projectsc.core.data.Event;
+import de.projectsc.core.data.EntityEvent;
 
 /**
  * Event if a new mesh should be used.
  * 
  * @author Josch Bosch
  */
-public class NewMeshEvent extends Event {
+public class NewMeshEvent extends EntityEvent {
 
     /**
      * ID.

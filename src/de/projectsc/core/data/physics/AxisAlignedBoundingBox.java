@@ -43,6 +43,13 @@ public class AxisAlignedBoundingBox {
         this.scale = new Vector3f(1, 1, 1);
     }
 
+    public float intersects(Vector3f ray, Vector3f org) {
+        Vector3f lb = Vector3f.add(position, getMin(), null);
+        Vector3f rt = Vector3f.add(position, getMax(), null);
+        return calculateIntersection(ray, org, lb, rt);
+
+    }
+
     /**
      * Check if the current entity intersects with the picking ray.
      * 
@@ -50,10 +57,13 @@ public class AxisAlignedBoundingBox {
      * @param ray to intersect
      * @return true if it intersects
      */
-    public boolean intersects(Vector3f entityPosition, Vector3f ray, Vector3f org) {
-        System.out.println("check  " + org + "  " + ray + " " + entityPosition + "   " + getMin() + "   " + getMax());
-        Vector3f lb = Vector3f.add(entityPosition, getMin(), null);
-        Vector3f rt = Vector3f.add(entityPosition, getMax(), null);
+    public float intersects(Transform transform, Vector3f ray, Vector3f org) {
+        Vector3f lb = Vector3f.add(transform.getPosition(), getMin(), null);
+        Vector3f rt = Vector3f.add(transform.getPosition(), getMax(), null);
+        return calculateIntersection(ray, org, lb, rt);
+    }
+
+    private float calculateIntersection(Vector3f ray, Vector3f org, Vector3f lb, Vector3f rt) {
         // r.dir is unit direction vector of ray
         float dirfracx = 1.0f / ray.x;
         float dirfracy = 1.0f / ray.y;
@@ -71,22 +81,20 @@ public class AxisAlignedBoundingBox {
         float tmax = Math.min(Math.min(Math.max(t1, t2), Math.max(t3, t4)), Math.max(t5, t6));
 
         float t;
-        // if tmax < 0, ray (line) is intersecting AABB, but whole AABB is behind us
+        // if tmax < 0, ray (line) is intersecting AABB, but whole AABB is behing us
         if (tmax < 0) {
             t = tmax;
-            System.out.println("f1");
-            return false;
+            return -1;
         }
 
         // if tmin > tmax, ray doesn't intersect AABB
         if (tmin > tmax) {
             t = tmax;
-            System.out.println("f2");
-            return false;
+            return -1;
         }
 
         t = tmin;
-        return true;
+        return t;
     }
 
     public Vector3f getMin() {

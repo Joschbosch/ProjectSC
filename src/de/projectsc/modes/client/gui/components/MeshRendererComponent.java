@@ -68,7 +68,7 @@ public class MeshRendererComponent extends GraphicalComponent {
     }
 
     @Override
-    public void update() {
+    public void update(long elpased) {
         if (owner != null && model == null && owner.hasComponent(MeshComponent.class)) {
             ModelData mesh = ((MeshComponent) owner.getComponent(MeshComponent.class)).getModel();
             if (mesh != null) {

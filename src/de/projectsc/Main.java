@@ -36,7 +36,9 @@ public class Main {
 
         } else {
             ClientCore clientCore = new ClientGameCore();
-            GUICore gui = new GUICore(clientCore.getComponentManager(), clientCore.getEntityManager(), clientCore.getEventManager());
+            GUICore gui =
+                new GUICore(clientCore.getComponentManager(), clientCore.getEntityManager(), clientCore.getEventManager(),
+                    clientCore.getTimer());
             clientCore.setGUI(gui);
             ClientNetworkCore network =
                 new ClientNetworkCore(clientCore.getNetworkSendQueue(), clientCore.getNetworkReceiveQueue(), null);

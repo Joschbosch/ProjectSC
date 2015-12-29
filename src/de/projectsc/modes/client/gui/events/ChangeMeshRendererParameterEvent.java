@@ -4,14 +4,14 @@
 
 package de.projectsc.modes.client.gui.events;
 
-import de.projectsc.core.data.Event;
+import de.projectsc.core.data.EntityEvent;
 
 /**
  * Changes the mesh renderer parameters.
  * 
  * @author Josch Bosch
  */
-public class ChangeMeshRendererParameterEvent extends Event {
+public class ChangeMeshRendererParameterEvent extends EntityEvent {
 
     /**
      * ID.

@@ -37,7 +37,7 @@ public class ServerCore implements Runnable {
 
     private final BlockingQueue<ServerMessage> receiveQueue;
 
-    private final Map<Long, AuthenticatedClient> clientsInMainLobby;
+    private final Map<String, AuthenticatedClient> clientsInMainLobby;
 
     private final Map<Long, Game> games;
 
@@ -97,13 +97,13 @@ public class ServerCore implements Runnable {
 
     private void handleClientMessage(AuthenticatedClient client, ServerMessage msg, List<AuthenticatedClient> toRemove) {
         if (msg.getMessage().equals(MessageConstants.CHAT_MESSAGE)) {
-            receiveQueue.offer(new ServerMessage(msg.getMessage(), msg.getData()[0], clientsInMainLobby.get(client.getId())
+            receiveQueue.offer(new ServerMessage(msg.getMessage(), msg.getData() + ";" + clientsInMainLobby.get(client.getId())
                 .getDisplayName()));
         } else if (msg.getMessage().equals(MessageConstants.CREATE_NEW_GAME_REQUEST)) {
             Game newGame = new Game(client, receiveQueue);
             games.put(newGame.getGameID(), newGame);
             toRemove.add(client);
-            sendMsgToAllClients(new ServerMessage(MessageConstants.CLIENT_LEFT_LOBBY, client.getId(), client.getDisplayName()));
+            sendMsgToAllClients(new ServerMessage(MessageConstants.CLIENT_LEFT_LOBBY, client.getId() + ";" + client.getDisplayName()));
             client.sendMessage(new ServerMessage(MessageConstants.NEW_GAME_CREATED, newGame.getConfiguration()));
         } else if (msg.getMessage().equals(MessageConstants.JOIN_GAME_REQUEST) && msg.getData() != null && msg.getData().length > 0) {
             try {
@@ -179,7 +179,7 @@ public class ServerCore implements Runnable {
         if (clientsInMainLobby.size() == 0) {
             clientList = "\nNo clients in the lobby";
         } else {
-            for (Long id : clientsInMainLobby.keySet()) {
+            for (String id : clientsInMainLobby.keySet()) {
                 clientList += String.format("(%d) %s\n", id, clientsInMainLobby.get(id).getDisplayName());
             }
         }

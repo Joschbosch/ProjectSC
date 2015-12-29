@@ -316,7 +316,7 @@ public class OctTree<T extends Entity> {
         int listSize = entities.size();
         List<T> remove = new LinkedList<>();
         for (int i = 0; i < listSize; i++) {
-            if (entities.get(i) == null) {
+            if (entities.get(i) != null) {
                 if (moved.contains(entities.get(i))) {
                     moved.remove(entities.get(i));
                 }
@@ -495,15 +495,15 @@ public class OctTree<T extends Entity> {
         }
         for (Entity e : entities) {
             if (((EntityStateComponent) e.getComponent(EntityStateComponent.class)).isHighlightAble()) {
-                if (((ColliderComponent) e.getComponent(ColliderComponent.class)).getAABB().intersects(e.getTransform().getPosition(),
-                    currentRay, currentCameraPosition)) {
+                if (((ColliderComponent) e.getComponent(ColliderComponent.class)).intersects(e.getTransform(),
+                    currentRay, currentCameraPosition) > 0) {
                     intersecting.add(e);
                 }
             }
         }
         for (int i = 0; i < 8; i++) {
             if (children[i] != null
-                && children[i].getRegion().intersects(children[i].getRegion().getPosition(), currentRay, currentCameraPosition)) {
+                && children[i].getRegion().intersects(currentRay, currentCameraPosition) > 0) {
                 intersecting.addAll(children[i].intersectsRay(currentRay, currentCameraPosition));
             }
         }

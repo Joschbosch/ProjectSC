@@ -15,10 +15,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.core.component.impl.ComponentListItem;
 import de.projectsc.core.data.structure.Snapshot;
 import de.projectsc.core.data.utils.Timer;
+import de.projectsc.core.events.movement.NewMovingToTargetEvent;
 import de.projectsc.core.game.GameAttributes;
 import de.projectsc.core.game.GameConfiguration;
 import de.projectsc.core.manager.ComponentManager;
@@ -31,6 +33,7 @@ import de.projectsc.core.utils.MapLoader;
 import de.projectsc.modes.server.core.ServerCommands;
 import de.projectsc.modes.server.core.ServerConstants;
 import de.projectsc.modes.server.core.data.AuthenticatedClient;
+import de.projectsc.modes.server.core.manager.ServerSnapshotManager;
 import de.projectsc.modes.server.core.messages.ServerMessage;
 import de.projectsc.modes.server.game.data.ServerPlayer;
 
@@ -58,7 +61,7 @@ public class Game implements Runnable {
 
     private final GameContext gameContext;
 
-    private Map<Long, Byte> playerLoadingProgress;
+    private Map<String, Byte> playerLoadingProgress;
 
     private boolean startLoading = false;
 
@@ -72,11 +75,11 @@ public class Game implements Runnable {
 
     private EventManager eventManager;
 
+    private ServerSnapshotManager snapshotManager;
+
     private AtomicBoolean loadingDone = new AtomicBoolean(false);
 
-    private long gameTime;
-
-    private long tick;
+    private Timer timer;
 
     public Game(AuthenticatedClient host, BlockingQueue<ServerMessage> coreQueue) {
         this.coreQueue = coreQueue;
@@ -84,17 +87,18 @@ public class Game implements Runnable {
         LOGGER.debug(String.format("Created new game: %s (Host: %s, game id: %d)", gameContext.getDisplayName(), host.getDisplayName(),
             gameContext.getGameID()));
         this.currentState = States.LOBBY;
+        timer = new Timer();
         new Thread(this).start();
     }
 
     @Override
     public void run() {
-        Timer.init();
+        timer.init();
         LOGGER.debug(String.format("Game %d started", gameContext.getGameID()));
         while (lobbyAlive.get()) {
-            Timer.update();
+            timer.update();
             readMessages();
-            while (Timer.getLag() >= GAME_TICK_TIME) {
+            while (timer.getLag() >= GAME_TICK_TIME) {
                 if (currentState == States.LOBBY) {
                     loopLobby();
                 } else if (currentState == States.LOADING) {
@@ -102,58 +106,64 @@ public class Game implements Runnable {
                 } else if (currentState == States.RUNNING) {
                     loopGame();
                 }
-                Timer.setLag(Timer.getLag() - GAME_TICK_TIME);
+                timer.setLag(timer.getLag() - GAME_TICK_TIME);
             }
-            long timeNeeded = System.currentTimeMillis() - Timer.getSnapshotTime();
+            long timeNeeded = System.currentTimeMillis() - timer.getSnapshotTime();
             long sleepTime = Math.max((GAME_TICK_TIME - timeNeeded), 0L);
-            try {
-                Thread.sleep(sleepTime);
-            } catch (InterruptedException e) {
-                LOGGER.debug(e);
+            if (sleepTime != 0) {
+                try {
+                    Thread.sleep(sleepTime);
+                } catch (InterruptedException e) {
+                    LOGGER.debug(e);
+                }
             }
         }
         LOGGER.debug(String.format("Game %d terminated", gameContext.getGameID()));
     }
 
     private void loopGame() {
-        tick++;
-        gameTime += GAME_TICK_TIME;
+        timer.updateGameTimeAndTick(GAME_TICK_TIME);
         physicsSystem.update(GAME_TICK_TIME);
-        Snapshot s = new Snapshot();
-        s.setTick(tick);
-        s.setGameTime(gameTime);
+        snapshotManager.createSnapshot(timer);
+        for (ServerPlayer player : gameContext.getPlayers().values()) {
+            long lastSendSnapshotTick = snapshotManager.getLastSendSnapshotTick(player.getId());
+            if (lastSendSnapshotTick == -1) {
+                sendFullSnapshotToClient(player);
+            } else if (timer.getTick() - lastSendSnapshotTick > 2) {
+                sendFullSnapshotToClient(player);
+                // // sendSnapshotDelta(player);
+            }
+        }
+        // }
+        // System.out.println("sending" + timer.stop());
+    }
 
-        // if (tick == 300) {
-        // String e = entityManager.createNewEntityFromSchema(10000L);
-        // s.addCreated("" + e + ";" + "10001" + ";"
-        // + "{\"position\":{\"x\":0.0,\"y\":0.0,\"z\":0.0},"
-        // + "\"rotation\":{\"x\":0.0,\"y\":0.0,\"z\":0.0},"
-        // + "\"scale\":{\"x\":1.0,\"y\":1.0,\"z\":1.0}}");
-        // }
-        // if (tick > 200 && tick < 300) {
-        // if (!entityManager.getAllEntites().isEmpty()) {
-        // String id = entityManager.getAllEntites().iterator().next();
-        // entityManager.deleteEntity(id);
-        // s.addRemoved(id);
-        // }
-        // }
-        sendMessageToAllPlayer(new ServerMessage(GameMessageConstants.NEW_SNAPSHOT, s));
+    private void sendSnapshotDelta(ServerPlayer player, long lastTick) {
+        Snapshot lastSnapshotSend = snapshotManager.getSnapshot(lastTick);
+        Snapshot currentSnapshot = snapshotManager.getLastSnapshot();
+    }
+
+    private void sendFullSnapshotToClient(ServerPlayer player) {
+        Snapshot s = snapshotManager.getLastSnapshot();
+        snapshotManager.setLastSnapshotSendTick(player.getId(), s.getTick());
+        player.getClient().sendMessage(new ServerMessage("FullSnapshot", s));
     }
 
     private void loopLoading() {
         if (startLoading) {
             playerLoadingProgress = new TreeMap<>();
-            for (Long id : gameContext.getPlayers().keySet()) {
+            for (String id : gameContext.getPlayers().keySet()) {
                 playerLoadingProgress.put(id, new Byte((byte) 0));
             }
             new Thread(new Runnable() {
 
                 @Override
                 public void run() {
-                    componentManager = new ComponentManager();
                     eventManager = new EventManager();
+                    componentManager = new ComponentManager(eventManager);
                     entityManager = new EntityManager(componentManager, eventManager);
                     physicsSystem = new BasicPhysicsSystem(entityManager, eventManager);
+                    snapshotManager = new ServerSnapshotManager(entityManager);
                     loadComponents();
                     gameContext.loadData();
                     MapLoader.loadMap(gameContext.getConfig().getMapName(), entityManager);
@@ -165,7 +175,7 @@ public class Game implements Runnable {
         }
         if (loading) {
             int sumLoading = gameContext.getLoadingProgress();
-            for (Long id : playerLoadingProgress.keySet()) {
+            for (String id : playerLoadingProgress.keySet()) {
                 sumLoading += playerLoadingProgress.get(id);
             }
             int percentageLoaded = sumLoading / (playerLoadingProgress.size() + 1);
@@ -176,8 +186,7 @@ public class Game implements Runnable {
                 // finishedLoading
                 loading = false;
                 currentState = States.RUNNING;
-                gameTime = 0;
-                tick = 0;
+
             }
         }
     }
@@ -197,7 +206,7 @@ public class Game implements Runnable {
         List<ServerPlayer> toRemove = new LinkedList<>();
         List<ServerPlayer> toQuit = new LinkedList<>();
 
-        Map<Long, ServerPlayer> players = gameContext.getPlayers();
+        Map<String, ServerPlayer> players = gameContext.getPlayers();
         for (ServerPlayer player : players.values()) {
             BlockingQueue<ServerMessage> queue = player.getClient().getReceiveFromClientQueue();
             while (!queue.isEmpty()) {
@@ -230,6 +239,8 @@ public class Game implements Runnable {
                     handleMessagesLobby(player, msg);
                 } else if (currentState == States.LOADING) {
                     handleMessagesLoading(player, msg);
+                } else if (currentState == States.RUNNING) {
+                    handleMessagesGame(player, msg);
                 }
             }
         }
@@ -245,12 +256,21 @@ public class Game implements Runnable {
         }
     }
 
+    private void handleMessagesGame(ServerPlayer player, ServerMessage msg) {
+        if (msg.getMessage().equals("moveToPosition")) {
+            @SuppressWarnings("unchecked") Map<String, Double> positionData = (Map<String, Double>) msg.getData()[1];
+            Vector3f position =
+                new Vector3f(positionData.get("x").floatValue(), positionData.get("y").floatValue(), positionData.get("z").floatValue());
+            eventManager.fireEvent(new NewMovingToTargetEvent((String) msg.getData()[0], position));
+        }
+    }
+
     private void handleMessagesLoading(ServerPlayer player, ServerMessage msg) {
         if (msg.getMessage().equals(GameMessageConstants.UPDATE_LOADING_PROGRESS) && playerLoadingProgress != null) {
             playerLoadingProgress.put(player.getId(), Byte.parseByte((String) msg.getData()[0]));
             LOGGER.debug("Map loading completed " + gameContext.getLoadingProgress() + "%");
             int sumLoading = gameContext.getLoadingProgress();
-            for (Long id : playerLoadingProgress.keySet()) {
+            for (String id : playerLoadingProgress.keySet()) {
                 sumLoading += playerLoadingProgress.get(id);
             }
             int percentageLoaded = sumLoading / (playerLoadingProgress.size() + 1);
@@ -283,8 +303,8 @@ public class Game implements Runnable {
 
     private void createPlayerList() {
         String gameList = "\nPlayer in game: \n";
-        Map<Long, ServerPlayer> players = gameContext.getPlayers();
-        for (Long id : players.keySet()) {
+        Map<String, ServerPlayer> players = gameContext.getPlayers();
+        for (String id : players.keySet()) {
             gameList +=
                 String.format("(%4d) %s Affiliation: %d - Character: %s\n", id, players.get(id).getDisplayName(), gameContext.getConfig()
                     .getPlayerAffiliation(id), gameContext.getConfig().getPlayerCharacter(id));
@@ -293,9 +313,9 @@ public class Game implements Runnable {
     }
 
     private void newHost(ServerPlayer remove) {
-        Map<Long, ServerPlayer> players = gameContext.getPlayers();
+        Map<String, ServerPlayer> players = gameContext.getPlayers();
         if (players.size() > 0 && remove.getId().equals(gameContext.getHost().getId())) {
-            Long nextHost = players.keySet().iterator().next();
+            String nextHost = players.keySet().iterator().next();
             gameContext.setHost(players.get(nextHost));
             sendMessageToAllPlayer(new ServerMessage(GameMessageConstants.NEW_HOST, gameContext.getHost().getId(), gameContext.getHost()
                 .getDisplayName()));

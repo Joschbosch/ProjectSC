@@ -56,7 +56,12 @@ public final class GUIConstants {
     /**
      * Standard gravity.
      */
-    public static final Vector3f GRAVITY = new Vector3f(0.0f, -50f, 0.0f);
+    public static final Vector3f GRAVITY_PARTICLES = new Vector3f(0.0f, -50f, 0.0f);
+
+    /**
+     * Standard gravity.
+     */
+    public static final double TEXT_LINE_HEIGHT = 0.03f;
 
     private GUIConstants() {
 

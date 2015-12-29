@@ -30,7 +30,7 @@ public class Camera implements InputCommandListener {
 
     protected static final int MAXIMUM_Y_POSITION = 80;
 
-    protected static final boolean MOBA_MODE = true;
+    protected static final boolean FIXED_MODE = true;
 
     protected static final float ANGLE_AROUND_PLAYER_FACTOR = 0.3f;
 
@@ -48,29 +48,29 @@ public class Camera implements InputCommandListener {
 
     protected static final float MOVEMENT_SPEED = 60f;
 
-    protected static final int SCROLL_MARGIN = 15;
+    protected static final int SCROLL_MARGIN = 2;
 
     protected static final boolean NO_CAMERA_MOVING = false;
+
+    protected boolean bound;
 
     protected float distanceFromCenterPoint = 3 * 10f;
 
     protected float yaw = 0;
 
+    protected float pitch = 5 * 10;
+
+    protected float roll = 0;
+
     protected float angleAroundPlayer = 0;
 
     protected final Vector3f position = new Vector3f(0, 80f, 0);
 
-    protected float pitch = 5 * 10;
-
     protected Vector3f centeringPoint = new Vector3f(0, 0, 0);
-
-    protected float roll = 0;
 
     private float currentSpeedXKeys;
 
     private float currentSpeedZKeys;
-
-    private boolean bound;
 
     private float currentSpeedXMouse;
 
@@ -111,7 +111,7 @@ public class Camera implements InputCommandListener {
         if (NO_CAMERA_MOVING) {
             return;
         }
-        if (!MOBA_MODE) {
+        if (!FIXED_MODE) {
             calculateZoom();
             calculatePitch();
             calculateAngleAroundPlayer();
@@ -189,10 +189,10 @@ public class Camera implements InputCommandListener {
         this.mouseDX = command.getMouseDX();
         this.mouseDY = command.getMouseDY();
         if (command.getButton() == 0) {
-            this.mouseButton0 = command.isButtonDown();
+            this.mouseButton0 = command.isButtonDown(0);
         }
         if (command.getButton() == 1) {
-            this.mouseButton1 = command.isButtonDown();
+            this.mouseButton1 = command.isButtonDown(1);
         }
     }
 
@@ -243,36 +243,8 @@ public class Camera implements InputCommandListener {
         return viewMatrix;
     }
 
-    public float getPitch() {
-        return pitch;
-    }
-
-    public void setPitch(float pitch) {
-        this.pitch = pitch;
-    }
-
-    public float getYaw() {
-        return yaw;
-    }
-
-    public void setYaw(float yaw) {
-        this.yaw = yaw;
-    }
-
-    public float getRoll() {
-        return roll;
-    }
-
-    public void setRoll(float roll) {
-        this.roll = roll;
-    }
-
-    public Vector3f getPosition() {
-        return position;
-    }
-
     protected void calculateZoom() {
-        if (!MOBA_MODE) {
+        if (!FIXED_MODE) {
             float zoomLevel = mouseWheel * MOUSE_WHEEL_ZOOM_FACTOR;
             distanceFromCenterPoint -= zoomLevel;
             if (distanceFromCenterPoint < 0) {
@@ -288,6 +260,7 @@ public class Camera implements InputCommandListener {
                 position.z -= zoomLevel;
             }
         }
+        mouseWheel = 0;
     }
 
     protected void calculatePitch() {
@@ -366,4 +339,31 @@ public class Camera implements InputCommandListener {
         this.consumeInput = cameraMoveable;
     }
 
+    public float getPitch() {
+        return pitch;
+    }
+
+    public void setPitch(float pitch) {
+        this.pitch = pitch;
+    }
+
+    public float getYaw() {
+        return yaw;
+    }
+
+    public void setYaw(float yaw) {
+        this.yaw = yaw;
+    }
+
+    public float getRoll() {
+        return roll;
+    }
+
+    public void setRoll(float roll) {
+        this.roll = roll;
+    }
+
+    public Vector3f getPosition() {
+        return position;
+    }
 }

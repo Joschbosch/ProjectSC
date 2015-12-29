@@ -4,7 +4,7 @@
 
 package de.projectsc.core.events.entities;
 
-import de.projectsc.core.data.Event;
+import de.projectsc.core.data.EntityEvent;
 import de.projectsc.core.entities.states.EntityState;
 
 /**
@@ -12,7 +12,7 @@ import de.projectsc.core.entities.states.EntityState;
  * 
  * @author Josch Bosch
  */
-public class ChangeEntityStateEvent extends Event {
+public class ChangeEntityStateEvent extends EntityEvent {
 
     /**
      * ID.

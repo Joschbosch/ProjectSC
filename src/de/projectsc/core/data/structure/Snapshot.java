@@ -1,78 +1,80 @@
 /*
- * Project SC - 2015
- * 
- * 
+ * Copyright (C) 2015 
  */
+
 package de.projectsc.core.data.structure;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
-/**
- * Snapshot for the client.
- * 
- * @author Josch Bosch
- */
+import de.projectsc.core.interfaces.Component;
+import de.projectsc.core.interfaces.Entity;
+
 public class Snapshot {
-
-    private long tick;
 
     private long gameTime;
 
-    private Set<String> created = null;
+    private long tick;
 
-    private Set<String> removed = null;
+    private Map<String, String> entitiesSerialized;
 
-    private Map<String, Map<String, String>> changed = null;
+    private Map<String, Map<String, String>> componentsSerialized;
 
-    public void addRemoved(String uid) {
-        if (removed == null) {
-            removed = new HashSet<>();
-        }
-        removed.add(uid);
-    }
-
-    public void addCreated(String newEntityInformation) {
-        if (created == null) {
-            created = new HashSet<>();
-        }
-        created.add(newEntityInformation);
-    }
-
-    public void addChange(String uid, Map<String, String> componentChanges) {
-        if (changed == null) {
-            changed = new HashMap<>();
-        }
-        changed.put(uid, componentChanges);
-    }
-
-    public void setTick(long tick) {
-        this.tick = tick;
-    }
-
-    public void setGameTime(long gameTime) {
+    public void addData(long gameTime, long tick, Map<String, Entity> entities, Map<String, Map<String, Component>> entityComponents) {
         this.gameTime = gameTime;
-    }
-
-    public long getTick() {
-        return tick;
+        this.tick = tick;
+        entitiesSerialized = new HashMap<>();
+        componentsSerialized = new HashMap<>();
+        for (String id : entities.keySet()) {
+            Entity e = entities.get(id);
+            String serial = "" + e.getEntityTypeId() + ";" + e.getTag() + ";" + e.getLayer();
+            entitiesSerialized.put(id, serial);
+            Map<String, String> components = new HashMap<>();
+            for (Component c : entityComponents.get(id).values()) {
+                String serialComponent = c.serializeForNetwork();
+                if (!serial.isEmpty()) {
+                    components.put(c.getComponentName(), serialComponent);
+                }
+            }
+            componentsSerialized.put(id, components);
+        }
     }
 
     public long getGameTime() {
         return gameTime;
     }
 
-    public Set<String> getRemoved() {
-        return removed;
+    public long getTick() {
+        return tick;
     }
 
-    public Map<String, Map<String, String>> getChanged() {
-        return changed;
+    @Override
+    public String toString() {
+        return String.format("Snapshot@%s (%s): Entities: %s ; Components: %s", tick, gameTime, entitiesSerialized, componentsSerialized);
     }
 
-    public Set<String> getCreated() {
-        return created;
+    public Map<String, String> getEntitiesSerialized() {
+        return entitiesSerialized;
     }
+
+    public void setEntitiesSerialized(Map<String, String> entitiesSerialized) {
+        this.entitiesSerialized = entitiesSerialized;
+    }
+
+    public Map<String, Map<String, String>> getComponentsSerialized() {
+        return componentsSerialized;
+    }
+
+    public void setComponentsSerialized(Map<String, Map<String, String>> componentsSerialized) {
+        this.componentsSerialized = componentsSerialized;
+    }
+
+    public void setGameTime(long gameTime) {
+        this.gameTime = gameTime;
+    }
+
+    public void setTick(long tick) {
+        this.tick = tick;
+    }
+
 }

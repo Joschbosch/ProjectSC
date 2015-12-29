@@ -24,7 +24,7 @@ public class GameContext {
 
     private ServerPlayer host;
 
-    private final Map<Long, ServerPlayer> players;
+    private final Map<String, ServerPlayer> players;
 
     private final int gameID;
 
@@ -83,7 +83,7 @@ public class GameContext {
         return host;
     }
 
-    public Map<Long, ServerPlayer> getPlayers() {
+    public Map<String, ServerPlayer> getPlayers() {
         return players;
     }
 

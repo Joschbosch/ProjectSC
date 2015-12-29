@@ -25,11 +25,15 @@ public class EntityImpl implements Entity {
 
     private final Transform transform;
 
-    private EntityManager entityManager;
+    private transient EntityManager entityManager;
+
+    private int layer;
 
     public EntityImpl(EntityManager entityManager, String uid) {
         entityUID = uid;
         transform = new Transform();
+        this.tag = "";
+        this.layer = 0;
         this.entityManager = entityManager;
     }
 
@@ -58,12 +62,24 @@ public class EntityImpl implements Entity {
         return entityUID;
     }
 
+    @Override
     public String getTag() {
         return tag;
     }
 
+    @Override
     public void setTag(String tag) {
         this.tag = tag;
+    }
+
+    @Override
+    public int getLayer() {
+        return layer;
+    }
+
+    @Override
+    public void setLayer(int layer) {
+        this.layer = layer;
     }
 
     @Override

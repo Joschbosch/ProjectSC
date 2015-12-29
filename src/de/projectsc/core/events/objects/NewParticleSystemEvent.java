@@ -4,9 +4,9 @@
 
 package de.projectsc.core.events.objects;
 
-import de.projectsc.core.data.Event;
+import de.projectsc.core.data.EntityEvent;
 
-public class NewParticleSystemEvent extends Event {
+public class NewParticleSystemEvent extends EntityEvent {
 
     /**
      * ID.

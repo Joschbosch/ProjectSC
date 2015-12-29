@@ -16,7 +16,6 @@ import de.projectsc.modes.client.core.data.NewCommandLineEvent;
 import de.projectsc.modes.client.core.interfaces.InputCommandListener;
 import de.projectsc.modes.client.core.ui.UIManager;
 import de.projectsc.modes.client.game.ui.controls.Console;
-import de.projectsc.modes.client.gui.data.UI;
 import de.projectsc.modes.client.gui.input.InputConsumeManager;
 import de.projectsc.modes.client.gui.ui.View;
 import de.projectsc.modes.client.gui.ui.basic.Container;
@@ -32,7 +31,7 @@ import de.projectsc.modes.client.gui.utils.GUIConstants;
  */
 public class ConsoleView extends View implements InputCommandListener, TextInputConsumer {
 
-    private static final Vector4f POSITION_AND_SIZE = new Vector4f(0, 0.5f, 1f, 0.5f);
+    private static final Vector4f POSITION_AND_SIZE = new Vector4f(0, 0.0f, 1f, 0.5f);
 
     private static final int MAXIMAL_LINES = 23;
 
@@ -54,14 +53,15 @@ public class ConsoleView extends View implements InputCommandListener, TextInput
         textLabel = new Label(consoleContainer, new Vector2f(0, 0));
         textLabel.setFontSize(fontSize);
         textLabel.setTextColor(1, 1, 1);
-        textInput = new TextInput(consoleContainer, new Vector2f(0, POSITION_AND_SIZE.y - 0.02f));
+        textInput =
+            new TextInput(consoleContainer, new Vector2f(0, (float) (1 - 2 * GUIConstants.TEXT_LINE_HEIGHT * fontSize)));
         textInput.setFontSize(fontSize);
-        textInput.setTextColor(1, 1, 1);
+        textInput.setTextColor(1, 0, 0);
         textInput.setPrefix("> ");
         textInput.setSuffix("_");
         textInput.addTextInputConsumer(this);
         consoleContainer.setVisible(false);
-        consoleContainer.setOrder(UI.FOREGROUND);
+        consoleContainer.setZOrder(1);
         InputConsumeManager.getInstance().addListener(this);
     }
 
@@ -84,7 +84,6 @@ public class ConsoleView extends View implements InputCommandListener, TextInput
             consoleContainer.setVisible(true);
             consoleContainer.setActive(true);
         } else {
-            textLabel.setText("");
             consoleContainer.setVisible(false);
             consoleContainer.setActive(false);
 

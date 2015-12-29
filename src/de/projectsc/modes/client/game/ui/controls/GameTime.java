@@ -8,29 +8,27 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import de.projectsc.core.data.utils.Timer;
 import de.projectsc.modes.client.core.ui.UIElement;
 
 public class GameTime extends UIElement {
 
-    private long gameTime;
+    private Timer timer;
 
-    public GameTime() {
+    public GameTime(Timer timer) {
         super("Game Timer", 0);
+        this.timer = timer;
     }
 
     public String getCurrentTimeString() {
-        Date date = new Date(gameTime);
+        Date date = new Date(timer.getGameTime());
         DateFormat formatter = null;
-        if (gameTime < 3600000) {
+        if (timer.getGameTime() < 3600000) {
             formatter = new SimpleDateFormat("mm:ss");
         } else {
             formatter = new SimpleDateFormat("HH:mm:ss");
         }
         return formatter.format(date);
-    }
-
-    public void setGameTime(long gameTime) {
-        this.gameTime = gameTime;
     }
 
 }

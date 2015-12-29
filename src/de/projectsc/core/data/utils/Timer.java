@@ -11,35 +11,41 @@ package de.projectsc.core.data.utils;
  */
 public final class Timer {
 
-    private static long lastSnapshotTime;
+    private long lastSnapshotTime;
 
-    private static long lag;
+    private long lag;
 
-    private static long delta;
+    private long delta;
 
-    private static long snapshotTime;
+    private long snapshotTime;
 
-    private static long frameCount = 0;
+    private long frameCount = 0;
 
-    private static long fpsTimer = 0;
+    private long fpsTimer = 0;
 
-    private static long currentFPS = 0;
+    private long currentFPS = 0;
 
-    private Timer() {}
+    private long tick = 0;
+
+    private long gameTime = 0;
+
+    private long measureMent;
 
     /**
      * Initialize the timer.
      */
-    public static void init() {
+    public void init() {
         lastSnapshotTime = System.currentTimeMillis();
         snapshotTime = lastSnapshotTime;
         lag = 0;
+        tick = 0;
+        gameTime = 0;
     }
 
     /**
      * Update time for the current frame.
      */
-    public static void update() {
+    public void update() {
         snapshotTime = System.currentTimeMillis();
         delta = snapshotTime - lastSnapshotTime;
         lastSnapshotTime = snapshotTime;
@@ -53,24 +59,49 @@ public final class Timer {
         }
     }
 
-    public static long getCurrentFPS() {
+    public long getCurrentFPS() {
         return currentFPS;
     }
 
-    public static long getLag() {
+    public long getLag() {
         return lag;
     }
 
-    public static void setLag(long l) {
+    public void setLag(long l) {
         lag = l;
     }
 
-    public static long getDelta() {
+    public long getDelta() {
         return delta;
     }
 
-    public static long getSnapshotTime() {
+    public long getSnapshotTime() {
         return snapshotTime;
+    }
+
+    public long getTick() {
+        return tick;
+    }
+
+    public long getGameTime() {
+        return gameTime;
+    }
+
+    public void updateGameTimeAndTick(long gameTickTime) {
+        gameTime += gameTickTime;
+        tick++;
+    }
+
+    public void start() {
+        measureMent = System.currentTimeMillis();
+    }
+
+    public long stop() {
+        return System.currentTimeMillis() - measureMent;
+    }
+
+    public void setGameTime(long gameTime) {
+        this.gameTime = gameTime;
     }
 
 }

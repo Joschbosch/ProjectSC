@@ -4,9 +4,9 @@
 
 package de.projectsc.core.events.entities;
 
-import de.projectsc.core.data.Event;
+import de.projectsc.core.data.EntityEvent;
 
-public class ChangeEntitySelectEvent extends Event {
+public class ChangeEntitySelectEvent extends EntityEvent {
 
     /**
      * ID.

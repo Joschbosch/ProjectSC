@@ -4,10 +4,10 @@
 
 package de.projectsc.core.events.components;
 
-import de.projectsc.core.data.Event;
+import de.projectsc.core.data.EntityEvent;
 import de.projectsc.core.interfaces.Component;
 
-public class ComponentRemovedEvent extends Event {
+public class ComponentRemovedEvent extends EntityEvent {
 
     /**
      * ID.

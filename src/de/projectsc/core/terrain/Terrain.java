@@ -6,15 +6,10 @@
 
 package de.projectsc.core.terrain;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
-import de.projectsc.core.data.graph.GraphEdge;
 import de.projectsc.core.data.physics.AxisAlignedBoundingBox;
-import de.projectsc.core.data.physics.Tile;
 import de.projectsc.core.utils.Maths;
 
 /**
@@ -45,8 +40,6 @@ public class Terrain {
 
     private final float worldPositionZ;
 
-    private final Tile[][] tiles;
-
     private AxisAlignedBoundingBox mapBox;
 
     private float worldPositionXMax;
@@ -67,13 +60,6 @@ public class Terrain {
 
     public Terrain(int x, int z, String bgTexture, String rTexture, String gTexture,
         String bTexture) {
-        this.tiles = new Tile[TERRAIN_CHUNK_SIZE][TERRAIN_CHUNK_SIZE];
-        for (int i = 0; i < TERRAIN_CHUNK_SIZE; i++) {
-            for (int j = 0; j < TERRAIN_CHUNK_SIZE; j++) {
-                tiles[i][j] =
-                    new Tile(new Vector2f(x + i * TERRAIN_TILE_SIZE, z + j * TERRAIN_TILE_SIZE), (byte) 0, Tile.WALKABLE, (byte) 0);
-            }
-        }
         this.mapSize = TERRAIN_CHUNK_SIZE;
         this.setMapBox(calculateMapBox());
         this.tileCoordinateX = x;
@@ -120,47 +106,7 @@ public class Terrain {
      * @return height
      */
     public byte getHeight(int x, int z) {
-        if (x >= 0 && x < tiles.length && z >= 0 && z < tiles[0].length && tiles[x][z] != null) {
-            return tiles[x][z].getHeight();
-        }
         return 0;
-    }
-
-    /**
-     * Build up neighborhood for the loaded terrain.
-     */
-    public void buildNeighborhood() {
-        for (int i = 0; i < mapSize; i++) {
-            for (int j = 0; j < mapSize; j++) {
-                List<GraphEdge> neighbors = new LinkedList<>();
-                if (tiles[i][j] != null) {
-                    for (int k = 0 - 1; k < 2; k++) {
-                        for (int l = 0 - 1; l < 2; l++) {
-                            if (!(l == 0 && k == 0)) {
-                                GraphEdge neighbor = getNeightborAt(tiles[i][j], i + k, j + l);
-                                if (neighbor != null) {
-                                    neighbors.add(neighbor);
-                                }
-                            }
-                        }
-                    }
-                    tiles[i][j].setNeighbors(neighbors);
-                }
-            }
-        }
-    }
-
-    private GraphEdge getNeightborAt(Tile source, int i, int j) {
-        GraphEdge result = new GraphEdge(source, null, 0 - 1);
-        if (i >= 0 && j >= 0 && i < mapSize && j < mapSize) {
-            if (tiles[i][j] != null) {
-                result.setTarget(tiles[i][j]);
-                result.setCost(
-                    (float) Math.sqrt((Math.pow(i - source.getCoordinates().x, 2) + Math.pow(j - source.getCoordinates().y, 2))));
-                return result;
-            }
-        }
-        return null;
     }
 
     /**
@@ -171,9 +117,6 @@ public class Terrain {
      * @return height
      */
     public byte getHeightOfTerrain(int x, int z) {
-        if (x >= 0 && x < tiles.length && z >= 0 && z < tiles[0].length && tiles[x][z] != null) {
-            return tiles[x][z].getHeight();
-        }
         return 0;
     }
 
@@ -262,10 +205,6 @@ public class Terrain {
 
     public int getMapSize() {
         return mapSize;
-    }
-
-    public Tile[][] getTerrain() {
-        return tiles;
     }
 
     public AxisAlignedBoundingBox getMapBoundingBox() {

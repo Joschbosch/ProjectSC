@@ -22,5 +22,10 @@ public final class ServerConstants {
      */
     public static final int MAXIMUM_PLAYER_PER_GAME = 10;
 
+    /**
+     * Constant.
+     */
+    public static final int MAXIMUM_STORES_SNAPSHOTS = 10;
+
     private ServerConstants() {}
 }

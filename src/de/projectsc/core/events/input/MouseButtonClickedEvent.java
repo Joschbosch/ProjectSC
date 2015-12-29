@@ -10,6 +10,9 @@ import de.projectsc.core.data.Event;
 
 public class MouseButtonClickedEvent extends Event {
 
+    /**
+     * .
+     */
     public static final String ID = "MousePositionEvent";
 
     private final Vector3f currentRay;
@@ -20,12 +23,16 @@ public class MouseButtonClickedEvent extends Event {
 
     private final boolean repeated;
 
-    public MouseButtonClickedEvent(int button, boolean repeated, Vector3f currentRay, Vector3f currentCameraPosition) {
-        super(ID, "");
+    private final Vector3f terrainPoint;
+
+    public MouseButtonClickedEvent(int button, boolean repeated, Vector3f currentRay, Vector3f currentCameraPosition,
+        Vector3f terrainPoint) {
+        super(ID);
         this.button = button;
         this.repeated = repeated;
         this.currentRay = currentRay;
         this.currentCameraPosition = currentCameraPosition;
+        this.terrainPoint = terrainPoint;
     }
 
     public Vector3f getCurrentRay() {
@@ -42,6 +49,10 @@ public class MouseButtonClickedEvent extends Event {
 
     public boolean isRepeated() {
         return repeated;
+    }
+
+    public Vector3f getTerrainPoint() {
+        return terrainPoint;
     }
 
 }

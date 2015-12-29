@@ -13,6 +13,7 @@ import java.util.UUID;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import de.projectsc.core.component.DefaultComponent;
 import de.projectsc.core.component.impl.physic.TransformComponent;
 import de.projectsc.core.entities.EntityImpl;
 import de.projectsc.core.events.components.ComponentAddedEvent;
@@ -88,6 +89,8 @@ public class EntityManager {
             Component clone = ComponentUtils.cloneComponent(c);
             addComponentToEntity(e, clone);
             clone.setOwner(getEntity(e));
+            DefaultComponent cc = ((DefaultComponent) clone);
+            cc.setEventManager(eventManager);
         }
         getEntity(e).setEntityTypeId(schema.getId());
         return e;
@@ -273,4 +276,7 @@ public class EntityManager {
         return entities;
     }
 
+    public Map<String, Map<String, Component>> getEntityComponents() {
+        return entityComponents;
+    }
 }

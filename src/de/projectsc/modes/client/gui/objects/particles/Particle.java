@@ -3,7 +3,6 @@ package de.projectsc.modes.client.gui.objects.particles;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
-import de.projectsc.core.data.utils.Timer;
 import de.projectsc.modes.client.gui.utils.GUIConstants;
 
 /**
@@ -49,15 +48,14 @@ public class Particle implements Comparable<Particle> {
         ParticleMaster.addParticle(this);
     }
 
-    public boolean update(Vector3f camPosition) {
-        float delta = Timer.getDelta() / 1000.0f;
-        velocity.y += GUIConstants.GRAVITY.y * gravityEffect * delta;
+    public boolean update(float deltaMs, Vector3f camPosition) {
+        velocity.y += GUIConstants.GRAVITY_PARTICLES.y * gravityEffect * deltaMs;
         Vector3f change = new Vector3f(velocity);
-        change.scale(delta);
+        change.scale(deltaMs);
         Vector3f.add(change, position, position);
         distance = Vector3f.sub(camPosition, position, null).lengthSquared();
         updateTextureCoordInfo();
-        elapsedTime += delta;
+        elapsedTime += deltaMs;
         return elapsedTime < lifeLength;
     }
 

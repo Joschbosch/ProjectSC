@@ -7,10 +7,12 @@ package de.projectsc.modes.client.core.interfaces;
 
 import java.util.concurrent.BlockingQueue;
 
+import de.projectsc.core.data.utils.Timer;
 import de.projectsc.core.manager.ComponentManager;
 import de.projectsc.core.manager.EntityManager;
 import de.projectsc.core.manager.EventManager;
 import de.projectsc.modes.client.core.data.ClientMessage;
+import de.projectsc.modes.client.core.manager.ClientSnapshotManger;
 
 /**
  * The states for a Client.
@@ -44,7 +46,7 @@ public interface ClientState {
      * @param entityManager
      */
     void init(BlockingQueue<ClientMessage> networkQueue, EntityManager entityManager, EventManager eventManager,
-        ComponentManager componentManager);
+        ComponentManager componentManager, ClientSnapshotManger snapshotManager, Timer timer);
 
     String getId();
 

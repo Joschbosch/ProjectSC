@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 import de.projectsc.core.component.DefaultComponent;
+import de.projectsc.core.data.EntityEvent;
 import de.projectsc.core.data.Event;
 import de.projectsc.core.data.physics.Transform;
 import de.projectsc.core.events.movement.NewPositionEvent;
@@ -44,6 +45,12 @@ public class RenderingSystem extends DefaultSystem {
 
     @Override
     public void processEvent(Event e) {
+        if (e instanceof EntityEvent) {
+            processEvent((EntityEvent) e);
+        }
+    }
+
+    public void processEvent(EntityEvent e) {
         if (entityManager.hasComponent(e.getEntityId(), MeshRendererComponent.class)) {
             MeshRendererComponent c =
                 ((MeshRendererComponent) entityManager.getComponent(e.getEntityId(), MeshRendererComponent.NAME));
@@ -84,18 +91,11 @@ public class RenderingSystem extends DefaultSystem {
         for (String entity : entities) {
             for (Component comp : entityManager.getAllComponents(entity).values()) {
                 if (comp instanceof GraphicalComponent) {
-                    ((GraphicalComponent) comp).update();
-                }
-            }
-            if (hasComponent(entity, EmittingLightComponent.class)) {
-                EmittingLightComponent c = getComponent(entity, EmittingLightComponent.class);
-                Transform pos = entityManager.getEntity(entity).getTransform();
-                if (c != null && pos != null) {
-                    c.updateLightPositionToEntity(entity, pos.getPosition());
+                    ((GraphicalComponent) comp).update(tick);
                 }
             }
             if (hasComponent(entity, MeshRendererComponent.class)) {
-                getComponent(entity, MeshRendererComponent.class).update();
+                getComponent(entity, MeshRendererComponent.class).update(tick);
             }
 
         }

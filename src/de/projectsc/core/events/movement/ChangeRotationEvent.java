@@ -6,14 +6,14 @@ package de.projectsc.core.events.movement;
 
 import org.lwjgl.util.vector.Vector3f;
 
-import de.projectsc.core.data.Event;
+import de.projectsc.core.data.EntityEvent;
 
 /**
  * Changes the rotation of an entity.
  * 
  * @author Josch Bosch
  */
-public class ChangeRotationEvent extends Event {
+public class ChangeRotationEvent extends EntityEvent {
 
     /**
      * ID.
@@ -24,7 +24,7 @@ public class ChangeRotationEvent extends Event {
 
     private final Vector3f newRotation;
 
-    public ChangeRotationEvent(Vector3f newRotation, String entityId) {
+    public ChangeRotationEvent(String entityId, Vector3f newRotation) {
         super(ID, entityId);
         this.newRotation = newRotation;
     }

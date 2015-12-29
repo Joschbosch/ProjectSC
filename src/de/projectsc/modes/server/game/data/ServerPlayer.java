@@ -17,7 +17,7 @@ public class ServerPlayer {
 
     private final AuthenticatedClient client;
 
-    private final long id;
+    private final String id;
 
     private Entity entity;
 
@@ -34,7 +34,7 @@ public class ServerPlayer {
         return entity;
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 

@@ -12,19 +12,30 @@ import de.projectsc.core.manager.EventManager;
 import de.projectsc.modes.client.core.data.MouseInputCommand;
 import de.projectsc.modes.client.core.manager.ClientEventManager;
 import de.projectsc.modes.client.gui.input.InputConsumeManager;
+import de.projectsc.modes.client.gui.textures.UITexture;
 import de.projectsc.modes.client.gui.ui.GUIElement;
 
-public abstract class BasicGUIElement implements GUIElement {
+public abstract class BasicGUIElement implements GUIElement, Comparable<BasicGUIElement> {
 
     protected InputConsumeManager inputConsumeManager;
 
     protected Vector4f positionAndSize;
 
+    protected int zOrder = 0;
+
+    protected UITexture bg;
+
+    protected String backgroundFile;
+
+    protected boolean visible = true;
+
+    protected boolean active = true;
+
     private EventManager eventManager;
 
-    private boolean visible = true;
+    private boolean highlighted = false;
 
-    private boolean active = true;
+    private boolean consumesClick = false;
 
     public BasicGUIElement() {
         this.eventManager = ClientEventManager.getInstance();
@@ -63,6 +74,14 @@ public abstract class BasicGUIElement implements GUIElement {
         return hit && isActive();
     }
 
+    public boolean consumesClick() {
+        return consumesClick;
+    }
+
+    public void setConsumesClick(boolean consumesClick) {
+        this.consumesClick = consumesClick;
+    }
+
     private int convertHeightToPixel(float y) {
         return (int) (Display.getHeight() * y);
     }
@@ -73,5 +92,26 @@ public abstract class BasicGUIElement implements GUIElement {
 
     public Vector4f getPositionAndSize() {
         return positionAndSize;
+    }
+
+    @Override
+    public int compareTo(BasicGUIElement o) {
+        return new Integer(this.zOrder).compareTo(new Integer(o.zOrder));
+    }
+
+    public int getZOrder() {
+        return zOrder;
+    }
+
+    public void setZOrder(int zOrder) {
+        this.zOrder = zOrder;
+    }
+
+    public boolean isHighlighted() {
+        return highlighted;
+    }
+
+    public void setHighlighted(boolean highlighted) {
+        this.highlighted = highlighted;
     }
 }

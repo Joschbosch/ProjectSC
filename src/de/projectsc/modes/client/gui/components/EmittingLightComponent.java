@@ -41,24 +41,15 @@ public class EmittingLightComponent extends GraphicalComponent {
         setType(ComponentType.GRAPHICS);
     }
 
-    /**
-     * update position of light relative to entity.
-     * 
-     * @param owner to set to
-     * @param position of owner
-     */
-    public void updateLightPositionToEntity(String owner, Vector3f position) {
+    @Override
+    public void render(String entity, GUIScene scene) {
         for (Light l : lights) {
-            Vector3f currentPosition = new Vector3f(position);
+            Vector3f currentPosition = new Vector3f(owner.getTransform().getPosition());
             currentPosition.x += offsets.get(l).getX();
             currentPosition.y += offsets.get(l).getY();
             currentPosition.z += offsets.get(l).getZ();
             l.setPosition(currentPosition);
         }
-    }
-
-    @Override
-    public void render(String entity, GUIScene scene) {
         scene.getLights().addAll(getLights());
     }
 
@@ -156,11 +147,6 @@ public class EmittingLightComponent extends GraphicalComponent {
     @Override
     public boolean isValidForSaving() {
         return true;
-    }
-
-    @Override
-    public void update() {
-
     }
 
     @Override

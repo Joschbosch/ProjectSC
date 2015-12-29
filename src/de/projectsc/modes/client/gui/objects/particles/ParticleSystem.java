@@ -10,8 +10,6 @@ import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
-import de.projectsc.core.data.utils.Timer;
-
 public class ParticleSystem {
 
     private static int idCount = 0;
@@ -83,8 +81,8 @@ public class ParticleSystem {
         this.scaleError = error * averageScale;
     }
 
-    public void generateParticles() {
-        float delta = Timer.getDelta() / 1000.0f;
+    public void generateParticles(long elapsed) {
+        float delta = elapsed / 1000.0f;
         float particlesToCreate = pps * delta;
         int count = (int) Math.floor(particlesToCreate);
         float partialParticle = particlesToCreate % 1;

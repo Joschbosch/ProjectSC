@@ -4,9 +4,9 @@
 
 package de.projectsc.core.events.entities;
 
-import de.projectsc.core.data.Event;
+import de.projectsc.core.data.EntityEvent;
 
-public class DeletedEntityEvent extends Event {
+public class DeletedEntityEvent extends EntityEvent {
 
     private static final String NAME = "DeletedEntityEvent";
 

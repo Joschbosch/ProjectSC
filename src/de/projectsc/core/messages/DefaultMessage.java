@@ -23,10 +23,12 @@ public abstract class DefaultMessage implements Message {
         this.data = data;
     }
 
+    @Override
     public Object[] getData() {
         return data;
     }
 
+    @Override
     public String getMessage() {
         return message;
     }
@@ -36,10 +38,8 @@ public abstract class DefaultMessage implements Message {
         String result = "";
         result += message + " ";
         if (data != null) {
-            for (Object o : data) {
-                result += "Attribut : ";
-                result += o.toString() + ";   ";
-            }
+            result += "Attribut : ";
+            result += data;
         }
         return result;
     }

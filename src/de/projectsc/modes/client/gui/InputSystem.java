@@ -48,6 +48,7 @@ public class InputSystem {
 
     private void getMouseEvents(Queue<InputCommand> currentInputs) {
         while (Mouse.next()) {
+
             int mouseX = Mouse.getEventX();
             int mouseY = Mouse.getEventY();
             int mouseDX = Mouse.getEventDX();
@@ -60,9 +61,9 @@ public class InputSystem {
                 if (buttonsDown[button] && buttonDown) {
                     repeatedDown = true;
                 }
-                keysDown[button] = buttonDown;
+                buttonsDown[button] = buttonDown;
             }
-            currentInputs.offer(new MouseInputCommand(mouseX, mouseY, mouseDX, mouseDY, mouseWheel, button, buttonDown, repeatedDown));
+            currentInputs.offer(new MouseInputCommand(mouseX, mouseY, mouseDX, mouseDY, mouseWheel, button, buttonsDown, repeatedDown));
 
         }
     }

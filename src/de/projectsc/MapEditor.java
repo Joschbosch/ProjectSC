@@ -79,8 +79,8 @@ public class MapEditor extends JFrame {
      */
     public MapEditor() {
         data = new EditorData();
-        this.componentManager = new ComponentManager();
         this.eventManager = new EventManager();
+        this.componentManager = new ComponentManager(eventManager);
         this.entityManager = new EntityManager(componentManager, eventManager);
         loadComponents();
         createContent();

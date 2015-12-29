@@ -38,7 +38,7 @@ public class ColliderComponent extends PhysicsComponent {
     }
 
     @Override
-    public void update() {
+    public void update(long elapsed) {
         if (this.axisAlignedBoundingBox == null) {
             this.axisAlignedBoundingBox = new AxisAlignedBoundingBox(new Vector3f(0, 0, 0), new Vector3f(1, 1, 1));
         }

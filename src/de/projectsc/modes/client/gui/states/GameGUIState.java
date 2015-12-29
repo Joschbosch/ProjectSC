@@ -7,7 +7,7 @@ package de.projectsc.modes.client.gui.states;
 import org.lwjgl.input.Keyboard;
 
 import de.projectsc.core.events.input.MouseButtonClickedEvent;
-import de.projectsc.core.events.input.MousePositionEvent;
+import de.projectsc.core.events.input.MousePositionChangedEvent;
 import de.projectsc.modes.client.core.data.KeyboardInputCommand;
 import de.projectsc.modes.client.core.data.MouseInputCommand;
 import de.projectsc.modes.client.core.interfaces.InputCommandListener;
@@ -16,6 +16,7 @@ import de.projectsc.modes.client.gui.data.UI;
 import de.projectsc.modes.client.gui.input.InputConsumeManager;
 import de.projectsc.modes.client.gui.ui.basic.Container;
 import de.projectsc.modes.client.gui.ui.views.GameTimeView;
+import de.projectsc.modes.client.gui.ui.views.HealthView;
 import de.projectsc.modes.client.gui.utils.MousePicker;
 
 public class GameGUIState implements GUIState, InputCommandListener {
@@ -32,6 +33,7 @@ public class GameGUIState implements GUIState, InputCommandListener {
     public void initialize() {
         container = new Container();
         gameTimeView = new GameTimeView(container);
+        new HealthView(container);
         InputConsumeManager.getInstance().addListener(this);
     }
 
@@ -79,11 +81,12 @@ public class GameGUIState implements GUIState, InputCommandListener {
         if (!isUIElementHit(command)) {
             if (command.getButton() == -1) {
                 ClientEventManager.getInstance().fireEvent(
-                    new MousePositionEvent(mousePicker.getCurrentRay(), mousePicker.getCurrentCameraPosition()));
-            } else if (command.isButtonDown()) {
+                    new MousePositionChangedEvent(mousePicker.getCurrentRay(), mousePicker.getCurrentCameraPosition()));
+            }
+            if (command.isButtonDown(1) || command.isRepeatedDown()) {
                 ClientEventManager.getInstance().fireEvent(
-                    new MouseButtonClickedEvent(command.getButton(), command.isRepeatedDown(), mousePicker.getCurrentRay(),
-                        mousePicker.getCurrentCameraPosition()));
+                    new MouseButtonClickedEvent(1, true, mousePicker.getCurrentRay(),
+                        mousePicker.getCurrentCameraPosition(), mousePicker.getCurrentTerrainPoint()));
             }
         }
     }

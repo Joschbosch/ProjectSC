@@ -6,14 +6,14 @@ package de.projectsc.core.events.movement;
 
 import org.lwjgl.util.vector.Vector3f;
 
-import de.projectsc.core.data.Event;
+import de.projectsc.core.data.EntityEvent;
 
 /**
  * Changes the position of the entity.
  * 
  * @author Josch Bosch
  */
-public class ChangePositionEvent extends Event {
+public class ChangePositionEvent extends EntityEvent {
 
     /**
      * ID.

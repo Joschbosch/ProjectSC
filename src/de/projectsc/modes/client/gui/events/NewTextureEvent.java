@@ -6,14 +6,14 @@ package de.projectsc.modes.client.gui.events;
 
 import java.io.File;
 
-import de.projectsc.core.data.Event;
+import de.projectsc.core.data.EntityEvent;
 
 /**
  * Event if a new texture should be applied.
  * 
  * @author Josch Bosch
  */
-public class NewTextureEvent extends Event {
+public class NewTextureEvent extends EntityEvent {
 
     private static final String NAME = "NewTextureEvent";
 

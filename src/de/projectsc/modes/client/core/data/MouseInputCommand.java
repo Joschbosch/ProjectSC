@@ -4,7 +4,6 @@
 
 package de.projectsc.modes.client.core.data;
 
-
 public class MouseInputCommand implements InputCommand {
 
     private final int mouseX;
@@ -15,7 +14,7 @@ public class MouseInputCommand implements InputCommand {
 
     private final int button;
 
-    private final boolean buttonDown;
+    private final boolean[] buttonDown;
 
     private boolean consumed = false;
 
@@ -25,13 +24,13 @@ public class MouseInputCommand implements InputCommand {
 
     private boolean repeatedDown;
 
-    public MouseInputCommand(int mouseX, int mouseY, int mouseDX, int mouseDY, int mouseWheel, int button, boolean buttonDown,
+    public MouseInputCommand(int mouseX, int mouseY, int mouseDX, int mouseDY, int mouseWheel, int button, boolean[] buttonsDown,
         boolean repeatedDown) {
         this.mouseX = mouseX;
         this.mouseY = mouseY;
         this.mouseWheel = mouseWheel;
         this.button = button;
-        this.buttonDown = buttonDown;
+        this.buttonDown = buttonsDown;
         this.mouseDX = mouseDX;
         this.mouseDY = mouseDY;
         this.repeatedDown = repeatedDown;
@@ -71,8 +70,8 @@ public class MouseInputCommand implements InputCommand {
         return button;
     }
 
-    public boolean isButtonDown() {
-        return buttonDown;
+    public boolean isButtonDown(int buttonID) {
+        return buttonDown[buttonID];
     }
 
     public boolean isRepeatedDown() {

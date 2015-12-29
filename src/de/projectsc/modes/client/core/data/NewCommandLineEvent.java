@@ -13,7 +13,7 @@ public class NewCommandLineEvent extends Event {
     private String command;
 
     public NewCommandLineEvent(String command) {
-        super(ID, null);
+        super(ID);
         this.setCommand(command);
     }
 

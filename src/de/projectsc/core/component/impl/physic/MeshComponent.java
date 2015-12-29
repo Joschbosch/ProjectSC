@@ -42,7 +42,7 @@ public class MeshComponent extends PhysicsComponent {
     }
 
     @Override
-    public void update() {
+    public void update(long elapsed) {
         if (model == null && modelFile != null) {
             loadModel(modelFile);
         }

@@ -113,6 +113,8 @@ public class EditorGraphicsCore implements Runnable {
 
     private InputSystem inputSystem;
 
+    private Timer timer;
+
     public EditorGraphicsCore(Canvas displayParent, int width, int height, BlockingQueue<String> messageQueue,
         ComponentManager componentManager, EntityManager entityManager, EventManager eventManager) {
         incomingQueue = new LinkedBlockingQueue<>();
@@ -123,6 +125,7 @@ public class EditorGraphicsCore implements Runnable {
         this.entityManager = entityManager;
         this.eventManager = eventManager;
         this.inputConsumeManager = new InputConsumeManager();
+        this.timer = new Timer();
     }
 
     @Override
@@ -158,30 +161,29 @@ public class EditorGraphicsCore implements Runnable {
     }
 
     protected void gameLoop() {
-        Timer.init();
-        int timer = 1500;
+        timer.init();
         while (running) {
-            Timer.update();
+            timer.update();
             readMessages();
             inputConsumeManager.processInput(inputSystem.updateInputs());
-            camera.move(Timer.getDelta());
-            ParticleMaster.update(camera.getPosition());
+            camera.move(timer.getDelta());
+            ParticleMaster.update(timer.getDelta(), camera.getPosition());
             if (editorData.isLightAtCameraPostion()) {
                 if (!entityManager.getEntity(entity).getTransform().getPosition().equals(
                     camera.getPosition())) {
                     eventManager.fireEvent(new ChangePositionEvent(new Vector3f(0.1f, 0, 0), sun));
                 }
             }
-            physicsSystem.update(Timer.getDelta());
-            renderSystem.update(Timer.getDelta());
-            timer = cycleTextures(timer, Timer.getDelta());
+            physicsSystem.update(timer.getDelta());
+            renderSystem.update(timer.getDelta());
+            cycleTextures(0, timer.getDelta());
             mousePicker.update(getTerrains(), camera.getPosition(), camera.createViewMatrix());
             if (doRender.get()) {
                 GUIScene s = renderSystem.createScene();
                 physicsSystem.debug(s);
                 s.setTerrains(terrainModels);
                 s.setRenderSkybox(renderSkybox);
-                masterRenderer.renderScene(s, camera, Timer.getDelta(), new Vector4f(0, 100000000, 0, 100000000));
+                masterRenderer.renderScene(s, camera, timer.getDelta(), new Vector4f(0, 100000000, 0, 100000000));
 
             }
             Display.sync(60);
@@ -201,7 +203,7 @@ public class EditorGraphicsCore implements Runnable {
     private void createSun() {
         sun = entityManager.createNewEntity();
         eventManager.fireEvent(new ChangePositionEvent(new Vector3f(0.0f, 100.0f, 100.0f), sun));
-        eventManager.fireEvent(new ChangeRotationEvent(new Vector3f(0, 0, 0), sun));
+        eventManager.fireEvent(new ChangeRotationEvent(sun, new Vector3f(0, 0, 0)));
         EmittingLightComponent lightComponent =
             (EmittingLightComponent) entityManager.addComponentToEntity(sun,
                 GraphicalComponentImplementation.EMMITING_LIGHT_COMPONENT.getName());

@@ -11,6 +11,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.lwjgl.opengl.Display;
 
+import de.projectsc.modes.client.gui.utils.GUIConstants;
+
 /**
  * Provides functionality for getting the values from a font file.
  * 
@@ -169,7 +171,7 @@ public class MetaFile {
     private void loadLineSizes() {
         processNextLine();
         int lineHeightPixels = getValueOfVariable("lineHeight") - paddingHeight;
-        verticalPerPixelSize = TextMeshCreator.LINE_HEIGHT / lineHeightPixels;
+        verticalPerPixelSize = GUIConstants.TEXT_LINE_HEIGHT / lineHeightPixels;
         horizontalPerPixelSize = verticalPerPixelSize / aspectRatio;
     }
 

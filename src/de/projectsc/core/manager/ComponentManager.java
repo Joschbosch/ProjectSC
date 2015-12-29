@@ -11,6 +11,7 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import de.projectsc.core.component.DefaultComponent;
 import de.projectsc.core.interfaces.Component;
 
 /**
@@ -24,6 +25,12 @@ public class ComponentManager {
     private static final Log LOGGER = LogFactory.getLog(ComponentManager.class);
 
     private Map<String, Class<? extends Component>> registeredComponents = new HashMap<>();
+
+    private EventManager eventManager;
+
+    public ComponentManager(EventManager eventManager) {
+        this.eventManager = eventManager;
+    }
 
     /**
      * Register a new component class.
@@ -51,6 +58,7 @@ public class ComponentManager {
         if (componentClass != null) {
             try {
                 Component c = componentClass.newInstance();
+                ((DefaultComponent) c).setEventManager(eventManager);
                 return c;
             } catch (InstantiationException | IllegalAccessException e) {
                 LOGGER.error("Could not create component: ", e);

@@ -10,16 +10,19 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 
+import de.projectsc.core.data.EntityEvent;
 import de.projectsc.core.data.Event;
 import de.projectsc.core.data.Scene;
 import de.projectsc.core.interfaces.Component;
 import de.projectsc.core.interfaces.Entity;
+import de.projectsc.core.manager.EventManager;
 
 /**
  * 
@@ -29,11 +32,9 @@ import de.projectsc.core.interfaces.Entity;
  */
 public abstract class DefaultComponent implements Component {
 
-    private static long uidCount = 0;
-
     protected String componentId;
 
-    protected long uid;
+    protected String uid;
 
     protected ComponentType type;
 
@@ -47,12 +48,22 @@ public abstract class DefaultComponent implements Component {
 
     private boolean isActive = false;
 
+    private EventManager eventManager;
+
     public DefaultComponent() {
         createNewId();
     }
 
     public void setID(String id) {
         this.componentId = id;
+    }
+
+    public void setEventManager(EventManager manager) {
+        this.eventManager = manager;
+    }
+
+    protected void fireEvent(Event e) {
+        eventManager.fireEvent(e);
     }
 
     /**
@@ -86,9 +97,17 @@ public abstract class DefaultComponent implements Component {
      * 
      * @param e to handle
      */
-    public void handleEvent(Event e) {
+    public void handleEvent(EntityEvent e) {
 
     }
+
+    @Override
+    public String serializeForNetwork() {
+        return "";
+    }
+
+    @Override
+    public void deserializeFromNetwork(String serialized) {}
 
     /**
      * Removes a component from the owner.
@@ -141,10 +160,6 @@ public abstract class DefaultComponent implements Component {
 
     }
 
-    public long getUid() {
-        return uid;
-    }
-
     public boolean isActive() {
         return isActive;
     }
@@ -160,12 +175,13 @@ public abstract class DefaultComponent implements Component {
     }
 
     @Override
-    public long getId() {
+    public String getId() {
         return uid;
     }
 
     @Override
     public void createNewId() {
-        uid = uidCount++;
+        uid = UUID.randomUUID().toString();
     }
+
 }

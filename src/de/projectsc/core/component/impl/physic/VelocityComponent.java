@@ -12,7 +12,6 @@ import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.core.component.ComponentType;
 import de.projectsc.core.component.impl.behaviour.EntityStateComponent;
-import de.projectsc.core.data.utils.Timer;
 
 /**
  * Component that handles the movement of an entity.
@@ -30,20 +29,26 @@ public class VelocityComponent extends PhysicsComponent {
 
     private float maximumSpeed = 16f;
 
-    private float turnSpeed = 60;
+    private float maximumTurnSpeed = 1200f;
+
+    private float turnSpeed = maximumTurnSpeed;
 
     private float currentSpeed = 0;
 
     private Vector3f velocity = new Vector3f(0, 0, 0);
 
+    private Vector3f rotationDelta = new Vector3f(0, 0, 0);
+
     public VelocityComponent() {
         setID(NAME);
         setType(ComponentType.PREPHYSICS);
         this.requiredComponents.add(EntityStateComponent.NAME);
+        this.requiredComponents.add(PathComponent.NAME);
+
     }
 
     @Override
-    public void update() {
+    public void update(long elapsed) {
 
     }
 
@@ -51,16 +56,44 @@ public class VelocityComponent extends PhysicsComponent {
      * Update velocity.
      * 
      * @param rotation of the entity.
+     * @param targetRotation that is wanted
      */
-    public void updateVelocity(Vector3f rotation) {
-        currentSpeed += acceleration * Timer.getDelta();
+    public void updateVelocity(long elapsed, Vector3f rotation, Vector3f targetRotation) {
+        currentSpeed += acceleration * elapsed;
         if (currentSpeed >= maximumSpeed) {
             currentSpeed = maximumSpeed;
         }
-        float distance = currentSpeed * Timer.getDelta() / 1000.0f;
+        float distance = currentSpeed * elapsed / 1000.0f;
         float dx = (float) (distance * Math.sin(Math.toRadians(rotation.y)));
         float dz = (float) (distance * Math.cos(Math.toRadians(rotation.y)));
+
+        float dy = 0;
+        float angleDiff = rotation.y - targetRotation.y;
+        if (Math.abs(angleDiff) >= 180) {
+            if (rotation.y > targetRotation.y) {
+                angleDiff = -1 * ((360 - rotation.y) + targetRotation.y);
+            } else {
+                angleDiff = (360 - targetRotation.y) + rotation.y;
+            }
+        }
+        if (angleDiff > 5.E-4f) {
+            if (Math.abs(angleDiff) > 180) {
+                if (rotation.y > targetRotation.y) {
+                    angleDiff = -1 * ((360 - rotation.y) + targetRotation.y);
+                } else {
+                    angleDiff = (360 - targetRotation.y) + rotation.y;
+                }
+            }
+            if (angleDiff > 0) {
+                dy = -maximumTurnSpeed * elapsed / 1000.0f;
+            } else {
+                dy = maximumTurnSpeed * elapsed / 1000.0f;
+            }
+        } else {
+            dy = targetRotation.y - rotation.y;
+        }
         setVelocity(new Vector3f(dx, 0, dz));
+        rotationDelta = new Vector3f(0, dy, 0);
     }
 
     @Override
@@ -80,6 +113,25 @@ public class VelocityComponent extends PhysicsComponent {
     }
 
     @Override
+    public String serializeForNetwork() {
+        return "" + acceleration + ";" + maximumSpeed + ";" + maximumTurnSpeed + ";" + turnSpeed + ";" + currentSpeed + ";" + velocity.x
+            + ";" + velocity.z + ";" + rotationDelta.y;
+    }
+
+    @Override
+    public void deserializeFromNetwork(String serialized) {
+        String[] split = serialized.split(";");
+        acceleration = Float.valueOf(split[0]);
+        maximumSpeed = Float.valueOf(split[1]);
+        maximumTurnSpeed = Float.valueOf(split[2]);
+        turnSpeed = Float.valueOf(split[3]);
+        currentSpeed = Float.valueOf(split[4]);
+        velocity.x = Float.valueOf(split[5]);
+        velocity.y = Float.valueOf(split[6]);
+        velocity.z = Float.valueOf(split[7]);
+    }
+
+    @Override
     public boolean isValidForSaving() {
         return true;
     }
@@ -93,11 +145,15 @@ public class VelocityComponent extends PhysicsComponent {
     }
 
     public Vector3f getRotationDelta() {
-        return new Vector3f(0, 0, 0);
+        return rotationDelta;
     }
 
     public void setCurrentSpeed(float f) {
-        this.currentSpeed = f;
+        if (f == Float.MAX_VALUE) {
+            this.currentSpeed = maximumSpeed;
+        } else {
+            this.currentSpeed = f;
+        }
     }
 
     public void setAcceleration(float acceleration) {
@@ -109,7 +165,12 @@ public class VelocityComponent extends PhysicsComponent {
     }
 
     public void setTurnSpeed(float turnSpeed) {
-        this.turnSpeed = turnSpeed;
+        if (turnSpeed == Float.MAX_VALUE) {
+            this.turnSpeed = maximumTurnSpeed;
+        } else {
+            this.turnSpeed = turnSpeed;
+
+        }
     }
 
     public float getAcceleration() {

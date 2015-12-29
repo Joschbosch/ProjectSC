@@ -6,14 +6,14 @@ package de.projectsc.core.events.movement;
 
 import org.lwjgl.util.vector.Vector3f;
 
-import de.projectsc.core.data.Event;
+import de.projectsc.core.data.EntityEvent;
 
 /**
  * Event if a new position was set.
  * 
  * @author Josch Bosch
  */
-public class NewPositionEvent extends Event {
+public class NewPositionEvent extends EntityEvent {
 
     /**
      * ID.

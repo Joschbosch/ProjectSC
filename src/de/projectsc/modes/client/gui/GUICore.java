@@ -17,6 +17,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector4f;
 
+import de.projectsc.core.data.structure.Snapshot;
 import de.projectsc.core.data.utils.Timer;
 import de.projectsc.core.manager.ComponentManager;
 import de.projectsc.core.manager.EntityManager;
@@ -94,11 +95,14 @@ public class GUICore implements GUI {
 
     private GUIState currentGUIState;
 
-    public GUICore(ComponentManager componentManager, EntityManager entityManager, EventManager eventManager) {
+    private Timer timer;
+
+    public GUICore(ComponentManager componentManager, EntityManager entityManager, EventManager eventManager, Timer timer) {
         this.componentManager = componentManager;
         this.entityManager = entityManager;
         this.eventManager = eventManager;
         this.inputManager = new InputConsumeManager();
+        this.timer = timer;
     }
 
     @Override
@@ -186,17 +190,22 @@ public class GUICore implements GUI {
     }
 
     @Override
+    public void render(Snapshot[] interpolationSnapshots, long interpolationTime) {
+        render();
+    }
+
+    @Override
     public void render() {
         if (Display.isCloseRequested()) {
             LOGGER.debug("Send close request and close down");
             running = false;
         }
         GUIText fps =
-            TextMaster.createAndLoadText("FPS: " + Timer.getCurrentFPS(), 0.7f, FontStore.getFont(Font.CANDARA),
+            TextMaster.createAndLoadText("FPS: " + timer.getCurrentFPS(), 0.7f, FontStore.getFont(Font.CANDARA),
                 new Vector2f(0.0f, 0.0f), 5, false);
-        camera.move(Timer.getDelta());
-        ParticleMaster.update(camera.getPosition());
-        renderingSystem.update(Timer.getDelta());
+        camera.move(timer.getDelta());
+        ParticleMaster.update(timer.getDelta(), camera.getPosition());
+        renderingSystem.update(timer.getDelta());
         currentGUIState.update();
         if (currentGUIState.renderScene()) {
             mousePicker.update(getTerrains(), camera.getPosition(), camera.createViewMatrix());
@@ -204,7 +213,7 @@ public class GUICore implements GUI {
             GUIScene scene = renderingSystem.createScene();
             scene.setTerrains(terrainModels);
             scene.setDebugMode(currentGUIState.isDebugModeActive());
-            masterRenderer.renderScene(scene, camera, Timer.getDelta(), new Vector4f(0,
+            masterRenderer.renderScene(scene, camera, timer.getDelta(), new Vector4f(0,
                 1, 0, CLIPPING_PLANE_NOT_RENDERING));
 
         }

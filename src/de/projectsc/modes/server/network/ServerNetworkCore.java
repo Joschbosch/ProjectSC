@@ -6,6 +6,7 @@
 package de.projectsc.modes.server.network;
 
 import java.io.IOException;
+import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -76,11 +77,11 @@ class ClientConnectedListener extends Listener {
         super.connected(client);
         BlockingQueue<ServerMessage> sendQueue = new LinkedBlockingQueue<>();
         BlockingQueue<ServerMessage> receiveQueue = new LinkedBlockingQueue<>();
-        newClient = new AuthenticatedClient(0, "Josch", sendQueue, receiveQueue);
+        newClient = new AuthenticatedClient(UUID.randomUUID().toString(), "Josch", sendQueue, receiveQueue);
         SendThread thread = new SendThread(client, newClient);
         new Thread(thread).start();
         coreQueue.add(new NewClientConnectedServerMessage(MessageConstants.NEW_CLIENT_CONNECTED, newClient));
-        LOGGER.debug(String.format("New connection accepted: User %s ID %d", newClient.getDisplayName(), newClient.getId()));
+        LOGGER.debug(String.format("New connection accepted: User %s ID %s", newClient.getDisplayName(), newClient.getId()));
     }
 
     @Override
@@ -91,6 +92,7 @@ class ClientConnectedListener extends Listener {
             try {
                 NetworkMessage msg = mapper.readValue((String) arg1, NetworkMessage.class);
                 newClient.received(new ServerMessage(msg.getMsg(), msg.getData()));
+                // LOGGER.debug("Received new message " + msg);
             } catch (IOException e) {
                 LOGGER.error(e.getStackTrace());
             }

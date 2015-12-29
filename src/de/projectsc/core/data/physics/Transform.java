@@ -45,6 +45,12 @@ public class Transform {
         return position;
     }
 
+    @Override
+    public String toString() {
+        return "" + position.x + ";" + position.y + ";" + position.z + ";" + rotation.x + ";" + rotation.y + ";" + rotation.z + ";"
+            + scale.x + ";" + scale.y + ";" + scale.z;
+    }
+
     public void parseTransformValues(Map<String, Map<String, Double>> values) {
         this.position.x = (float) (double) values.get("position").get("x");
         this.position.y = (float) (double) values.get("position").get("y");

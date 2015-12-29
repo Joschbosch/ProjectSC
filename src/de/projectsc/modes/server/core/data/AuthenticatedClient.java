@@ -11,8 +11,7 @@ import de.projectsc.modes.server.core.data.statistics.PlayerStatistics;
 import de.projectsc.modes.server.core.messages.ServerMessage;
 
 /**
- * An instance of the client that is already authenticated in the network. Contains everything neede
- * to identify and contact the client.
+ * An instance of the client that is already authenticated in the network. Contains everything neede to identify and contact the client.
  * 
  * @author Josch Bosch
  */
@@ -20,7 +19,7 @@ public class AuthenticatedClient {
 
     private final String displayName;
 
-    private final long id;
+    private final String id;
 
     private final BlockingQueue<ServerMessage> sendToClientQueue;
 
@@ -28,7 +27,7 @@ public class AuthenticatedClient {
 
     private final PlayerStatistics statistics;
 
-    public AuthenticatedClient(long id, String displayName, BlockingQueue<ServerMessage> sendToClientQueue,
+    public AuthenticatedClient(String id, String displayName, BlockingQueue<ServerMessage> sendToClientQueue,
         BlockingQueue<ServerMessage> receiveFromClientQueue) {
         this.id = id;
         this.displayName = displayName;
@@ -51,7 +50,7 @@ public class AuthenticatedClient {
         sendToClientQueue.offer(msg);
     }
 
-    public long getId() {
+    public String getId() {
         return id;
     }
 

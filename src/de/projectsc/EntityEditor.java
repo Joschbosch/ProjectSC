@@ -166,8 +166,8 @@ public class EntityEditor extends JFrame {
     public EntityEditor() {
         data = new EditorData();
 
-        componentManager = new ComponentManager();
         eventManager = new EventManager();
+        componentManager = new ComponentManager(eventManager);
         entityManager = new EntityManager(componentManager, eventManager);
         loadComponents();
         createContent();

@@ -4,14 +4,14 @@
 
 package de.projectsc.core.events.movement;
 
-import de.projectsc.core.data.Event;
+import de.projectsc.core.data.EntityEvent;
 
 /**
  * Changes the parameters used for movement.
  * 
  * @author Josch Bosch
  */
-public class ChangeMovementParameterEvent extends Event {
+public class ChangeMovementParameterEvent extends EntityEvent {
 
     /**
      * ID.

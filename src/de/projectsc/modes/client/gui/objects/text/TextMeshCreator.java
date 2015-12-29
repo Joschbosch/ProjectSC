@@ -4,14 +4,14 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.projectsc.modes.client.gui.utils.GUIConstants;
+
 /**
  * Generate mesh for a text.
  * 
  * @author Josch Bosch (with TM)
  */
 public class TextMeshCreator {
-
-    protected static final double LINE_HEIGHT = 0.03f;
 
     protected static final int SPACE_ASCII = 32;
 
@@ -89,7 +89,7 @@ public class TextMeshCreator {
                 curserX += metaData.getSpaceWidth() * text.getFontSize();
             }
             curserX = 0;
-            curserY += LINE_HEIGHT * text.getFontSize();
+            curserY += GUIConstants.TEXT_LINE_HEIGHT * text.getFontSize();
         }
         return new TextMeshData(listToArray(vertices), listToArray(textureCoords));
     }

@@ -4,6 +4,8 @@
 
 package de.projectsc.core.systems;
 
+import java.util.UUID;
+
 import de.projectsc.core.data.Event;
 import de.projectsc.core.interfaces.Component;
 import de.projectsc.core.interfaces.EngineSystem;
@@ -17,9 +19,7 @@ import de.projectsc.core.manager.EventManager;
  */
 public abstract class DefaultSystem implements EngineSystem {
 
-    private static long idCount = 0;
-
-    protected final long uID;
+    protected final String uID;
 
     protected final String name;
 
@@ -28,7 +28,7 @@ public abstract class DefaultSystem implements EngineSystem {
     private EventManager eventManager;
 
     public DefaultSystem(String name, EntityManager entityManager, EventManager eventManager) {
-        this.uID = idCount++;
+        this.uID = UUID.randomUUID().toString();
         this.name = name;
         this.entityManager = entityManager;
         this.eventManager = eventManager;
@@ -43,7 +43,7 @@ public abstract class DefaultSystem implements EngineSystem {
         return name;
     }
 
-    public long getUID() {
+    public String getUID() {
         return uID;
     }
 

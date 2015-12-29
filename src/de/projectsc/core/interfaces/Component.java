@@ -77,17 +77,20 @@ public interface Component {
      */
     void deserialize(Map<String, Object> serialized, File schemaDirectory);
 
-    void update();
+    void update(long elapsed);
 
     /**
      * @return name of the component.
      */
     String getComponentName();
 
-    long getId();
+    String getId();
 
     void createNewId();
 
     void setOwner(Entity entity);
 
+    String serializeForNetwork();
+
+    void deserializeFromNetwork(String serial);
 }

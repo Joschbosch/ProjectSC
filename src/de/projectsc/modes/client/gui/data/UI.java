@@ -35,7 +35,7 @@ public class UI {
      * @param order of element
      */
     public void addElement(UITexture uiElement, Integer order) {
-        List<UITexture> orderedTextures = uiElements.get(uiElements);
+        List<UITexture> orderedTextures = uiElements.get(order);
         if (orderedTextures == null) {
             orderedTextures = new LinkedList<>();
             uiElements.put(order, orderedTextures);

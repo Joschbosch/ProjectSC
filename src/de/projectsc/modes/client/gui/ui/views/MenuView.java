@@ -6,6 +6,7 @@ package de.projectsc.modes.client.gui.ui.views;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.util.vector.Vector2f;
+import org.lwjgl.util.vector.Vector4f;
 
 import de.projectsc.modes.client.core.data.KeyboardInputCommand;
 import de.projectsc.modes.client.core.data.MouseInputCommand;
@@ -16,6 +17,7 @@ import de.projectsc.modes.client.gui.input.InputConsumeManager;
 import de.projectsc.modes.client.gui.ui.View;
 import de.projectsc.modes.client.gui.ui.basic.Container;
 import de.projectsc.modes.client.gui.ui.basic.Label;
+import de.projectsc.modes.client.gui.ui.basic.Window;
 
 /**
  * The graphical representation of the {@link Menu}.
@@ -34,13 +36,17 @@ public class MenuView extends View implements InputCommandListener {
 
     private int chosenItem;
 
+    private Window menuWindow;
+
     public MenuView(Container c) {
         super(c);
         this.menu = (Menu) UIManager.getElement(Menu.class);
+        float size = 0.4f;
+        menuWindow = new Window(c, new Vector4f(0.5f - size / 2, 0.5f - size / 2, size, size));
         labels = new Label[menu.getMenuItems().size()];
         int index = 0;
         for (String item : menu.getMenuItems()) {
-            Label label = new Label(c, getPosition(index));
+            Label label = new Label(menuWindow, getPosition(index, size));
             label.setFontSize(fontSize);
             label.setText(item);
             label.setTextColor(0, 1, 0);
@@ -54,8 +60,8 @@ public class MenuView extends View implements InputCommandListener {
 
     }
 
-    private Vector2f getPosition(int i) {
-        return new Vector2f(0, 0.3f + 0.1f * i);
+    private Vector2f getPosition(int i, float size) {
+        return new Vector2f(0, 2 * size / 3f * i + size / 2);
     }
 
     @Override

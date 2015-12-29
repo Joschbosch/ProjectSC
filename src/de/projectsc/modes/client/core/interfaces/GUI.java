@@ -5,6 +5,8 @@
  */
 package de.projectsc.modes.client.core.interfaces;
 
+import de.projectsc.core.data.structure.Snapshot;
+
 /**
  * Interface for GUI implementations.
  * 
@@ -12,11 +14,16 @@ package de.projectsc.modes.client.core.interfaces;
  */
 public interface GUI {
 
+    void render();
+
     /**
      * Render gui.
      * 
+     * @param interpolationTime
+     * @param interpolationSnapshots
+     * 
      */
-    void render();
+    void render(Snapshot[] interpolationSnapshots, long interpolationTime);
 
     /**
      * Read user input.
@@ -48,4 +55,5 @@ public interface GUI {
     void loadTerrain();
 
     void initState(ClientState newState);
+
 }

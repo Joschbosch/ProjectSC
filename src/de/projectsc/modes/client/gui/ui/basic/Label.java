@@ -15,17 +15,13 @@ import de.projectsc.modes.client.gui.objects.text.FontType;
 import de.projectsc.modes.client.gui.objects.text.GUIText;
 import de.projectsc.modes.client.gui.objects.text.TextMaster;
 
-public class Label extends BasicGUIElement {
+public class Label extends ContainerElement {
 
     protected String text = "";
 
     private float fontSize = 1.0f;
 
     private FontType font;
-
-    private Vector2f position = new Vector2f(0, 0);
-
-    private float maxLineLength = 1.0f;
 
     private boolean centered = false;
 
@@ -41,14 +37,10 @@ public class Label extends BasicGUIElement {
 
     private Vector2f shadowOffset = new Vector2f(0.0f, 0.0f);
 
-    private int renderOrder = 0;
-
-    private boolean visible = true;
-
     public Label(Container c, Vector2f position) {
-        c.add(this);
+        super(c, position);
         this.font = FontStore.getFont(Font.CANDARA);
-        this.position = position;
+        c.add(this);
         createNewText();
     }
 
@@ -56,15 +48,15 @@ public class Label extends BasicGUIElement {
         if (guiText != null) {
             TextMaster.removeText(guiText);
         }
-        guiText = new GUIText(text, fontSize, font, position, maxLineLength, centered);
+        guiText = new GUIText(text, fontSize, font, getPosition(), container.getPositionAndSize().z, centered);
         guiText.setColor(color.x, color.y, color.z);
         guiText.setBorderEdge(borderEdge);
         guiText.setBorderWidth(borderWidth);
         guiText.setOutlineColor(outlineColor.x, outlineColor.y, outlineColor.z);
-        guiText.setRenderOrder(renderOrder);
+        guiText.setRenderOrder(zOrder);
         guiText.setShadowOffset(shadowOffset);
         TextMaster.loadText(guiText);
-        this.positionAndSize = new Vector4f(position.x, position.y, guiText.getSize().x, guiText.getSize().y);
+        this.positionAndSize = new Vector4f(getPosition().x, getPosition().y, guiText.getSize().x, guiText.getSize().y);
     }
 
     @Override
@@ -106,30 +98,6 @@ public class Label extends BasicGUIElement {
     public void setCentered(boolean value) {
         this.centered = value;
         createNewText();
-    }
-
-    public void setMaxLineLength(float length) {
-        this.maxLineLength = length;
-        createNewText();
-    }
-
-    public void setRenderOrder(int orderNumber) {
-        this.renderOrder = orderNumber;
-        guiText.setRenderOrder(orderNumber);
-    }
-
-    @Override
-    public boolean isVisible() {
-        return visible;
-    }
-
-    @Override
-    public void setVisible(boolean value) {
-        this.visible = value;
-    }
-
-    public int getRenderOrder() {
-        return renderOrder;
     }
 
     public String getText() {

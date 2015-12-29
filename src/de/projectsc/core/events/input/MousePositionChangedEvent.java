@@ -8,7 +8,7 @@ import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.core.data.Event;
 
-public class MousePositionEvent extends Event {
+public class MousePositionChangedEvent extends Event {
 
     public static final String ID = "MousePositionEvent";
 
@@ -16,8 +16,8 @@ public class MousePositionEvent extends Event {
 
     private final Vector3f currentCameraPosition;
 
-    public MousePositionEvent(Vector3f currentRay, Vector3f currentCameraPosition) {
-        super(ID, "");
+    public MousePositionChangedEvent(Vector3f currentRay, Vector3f currentCameraPosition) {
+        super(ID);
         this.currentRay = currentRay;
         this.currentCameraPosition = currentCameraPosition;
     }
