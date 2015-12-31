@@ -2,7 +2,7 @@
  * Copyright (C) 2015 
  */
 
-package de.projectsc.modes.client.gui.ui;
+package de.projectsc.modes.client.gui.ui.spi;
 
 import de.projectsc.modes.client.gui.data.UI;
 

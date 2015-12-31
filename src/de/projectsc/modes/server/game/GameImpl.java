@@ -17,7 +17,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.lwjgl.util.vector.Vector3f;
 
-import de.projectsc.core.component.ComponentListItem;
+import de.projectsc.core.component.registry.ComponentListItem;
 import de.projectsc.core.data.structure.Snapshot;
 import de.projectsc.core.data.structure.SnapshotDelta;
 import de.projectsc.core.data.utils.Timer;
@@ -36,8 +36,10 @@ import de.projectsc.core.utils.MapLoader;
 import de.projectsc.modes.server.core.ServerCommands;
 import de.projectsc.modes.server.core.ServerConstants;
 import de.projectsc.modes.server.core.data.AuthenticatedClient;
+import de.projectsc.modes.server.core.data.States;
 import de.projectsc.modes.server.core.manager.ServerSnapshotManager;
 import de.projectsc.modes.server.core.messages.ServerMessage;
+import de.projectsc.modes.server.core.spi.Game;
 import de.projectsc.modes.server.game.data.ServerPlayer;
 
 /**
@@ -46,14 +48,14 @@ import de.projectsc.modes.server.game.data.ServerPlayer;
  * 
  * @author Josch Bosch
  */
-public class Game implements Runnable {
+public class GameImpl implements Game {
 
     /**
      * Tick time on the server-.
      */
     public static final long GAME_TICK_TIME = 16;
 
-    private static final Log LOGGER = LogFactory.getLog(Game.class);
+    private static final Log LOGGER = LogFactory.getLog(GameImpl.class);
 
     private static final int ID_START = 1000;
 
@@ -91,7 +93,7 @@ public class Game implements Runnable {
 
     private Timer timer;
 
-    public Game(AuthenticatedClient host, BlockingQueue<ServerMessage> coreQueue) {
+    public GameImpl(AuthenticatedClient host, BlockingQueue<ServerMessage> coreQueue) {
         this.coreQueue = coreQueue;
         this.gameContext = new GameContext(idCounter++, host.getDisplayName() + "'s game", new ServerPlayer(host), this);
         LOGGER.debug(String.format("Created new game: %s (Host: %s, game id: %d)", gameContext.getDisplayName(), host.getDisplayName(),

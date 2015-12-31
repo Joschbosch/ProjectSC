@@ -15,7 +15,7 @@ import de.projectsc.modes.client.core.data.MouseInputCommand;
 import de.projectsc.modes.client.core.interfaces.InputCommandListener;
 import de.projectsc.modes.client.gui.data.UI;
 import de.projectsc.modes.client.gui.textures.UITexture;
-import de.projectsc.modes.client.gui.ui.GUIElement;
+import de.projectsc.modes.client.gui.ui.spi.GUIElement;
 import de.projectsc.modes.client.gui.utils.Loader;
 
 /**

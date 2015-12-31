@@ -38,7 +38,7 @@ public class GameContext {
 
     private Map<Long, Entity> entities;
 
-    public GameContext(int id, String displayName, ServerPlayer host, Game game) {
+    public GameContext(int id, String displayName, ServerPlayer host, GameImpl game) {
         this.gameID = id;
         this.displayName = displayName;
         this.host = host;

@@ -13,7 +13,7 @@ import de.projectsc.modes.client.core.data.MouseInputCommand;
 import de.projectsc.modes.client.core.manager.ClientEventManager;
 import de.projectsc.modes.client.gui.input.InputConsumeManager;
 import de.projectsc.modes.client.gui.textures.UITexture;
-import de.projectsc.modes.client.gui.ui.GUIElement;
+import de.projectsc.modes.client.gui.ui.spi.GUIElement;
 
 /**
  * 

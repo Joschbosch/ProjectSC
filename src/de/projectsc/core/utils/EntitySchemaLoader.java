@@ -16,10 +16,10 @@ import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import de.projectsc.core.CoreConstants;
+import de.projectsc.core.entities.EntitySchema;
 import de.projectsc.core.interfaces.Component;
 import de.projectsc.core.interfaces.Entity;
 import de.projectsc.core.manager.ComponentManager;
-import de.projectsc.editor.EntitySchema;
 
 /**
  * Loader for the entity schemas.

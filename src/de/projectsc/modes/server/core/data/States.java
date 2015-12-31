@@ -3,7 +3,7 @@
  * 
  * 
  */
-package de.projectsc.modes.server.game;
+package de.projectsc.modes.server.core.data;
 
 
 /**

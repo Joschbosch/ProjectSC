@@ -39,6 +39,7 @@ import de.projectsc.core.data.objects.Light;
 import de.projectsc.core.data.physics.Transform;
 import de.projectsc.core.data.physics.WireFrame;
 import de.projectsc.core.data.utils.Timer;
+import de.projectsc.core.entities.EntitySchema;
 import de.projectsc.core.events.entity.movement.UpdatePositionEvent;
 import de.projectsc.core.events.entity.movement.UpdateRotationEvent;
 import de.projectsc.core.events.entity.state.UpdateEntitySelectionEvent;

@@ -6,7 +6,7 @@
 package de.projectsc.core.messages;
 
 /**
- * Constants in a {@link Game} object.
+ * Constants in a {@link GameImpl} object.
  * 
  * @author Josch Bosch
  */

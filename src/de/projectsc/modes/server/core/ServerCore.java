@@ -20,7 +20,8 @@ import de.projectsc.core.messages.MessageConstants;
 import de.projectsc.modes.server.core.data.AuthenticatedClient;
 import de.projectsc.modes.server.core.data.connections.messages.NewClientConnectedServerMessage;
 import de.projectsc.modes.server.core.messages.ServerMessage;
-import de.projectsc.modes.server.game.Game;
+import de.projectsc.modes.server.core.spi.Game;
+import de.projectsc.modes.server.game.GameImpl;
 
 /**
  * Core of server.
@@ -100,7 +101,7 @@ public class ServerCore implements Runnable {
             receiveQueue.offer(new ServerMessage(msg.getMessage(), msg.getData() + ";" + clientsInMainLobby.get(client.getId())
                 .getDisplayName()));
         } else if (msg.getMessage().equals(MessageConstants.CREATE_NEW_GAME_REQUEST)) {
-            Game newGame = new Game(client, receiveQueue);
+            Game newGame = new GameImpl(client, receiveQueue);
             games.put(newGame.getGameID(), newGame);
             toRemove.add(client);
             sendMsgToAllClients(new ServerMessage(MessageConstants.CLIENT_LEFT_LOBBY, client.getId() + ";" + client.getDisplayName()));

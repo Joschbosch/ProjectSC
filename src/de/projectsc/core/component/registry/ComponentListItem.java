@@ -2,8 +2,9 @@
  * Copyright (C) 2015
  */
 
-package de.projectsc.core.component;
+package de.projectsc.core.component.registry;
 
+import de.projectsc.core.component.DefaultComponent;
 import de.projectsc.core.component.collision.ColliderComponent;
 import de.projectsc.core.component.physic.MeshComponent;
 import de.projectsc.core.component.physic.PathComponent;

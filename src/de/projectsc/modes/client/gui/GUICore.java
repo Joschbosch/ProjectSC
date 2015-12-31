@@ -15,16 +15,23 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Vector2f;
+import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
+import de.projectsc.core.component.collision.ColliderComponent;
+import de.projectsc.core.data.objects.Light;
+import de.projectsc.core.data.physics.Transform;
 import de.projectsc.core.data.structure.Snapshot;
 import de.projectsc.core.data.utils.Timer;
+import de.projectsc.core.events.entity.movement.UpdatePositionEvent;
+import de.projectsc.core.events.entity.movement.UpdateRotationEvent;
 import de.projectsc.core.manager.ComponentManager;
 import de.projectsc.core.manager.EntityManager;
 import de.projectsc.core.manager.EventManager;
 import de.projectsc.core.terrain.Terrain;
 import de.projectsc.modes.client.core.interfaces.ClientState;
 import de.projectsc.modes.client.core.interfaces.GUI;
+import de.projectsc.modes.client.gui.components.EmittingLightComponent;
 import de.projectsc.modes.client.gui.components.GraphicalComponentImplementation;
 import de.projectsc.modes.client.gui.data.GUIScene;
 import de.projectsc.modes.client.gui.data.UI;
@@ -97,6 +104,8 @@ public class GUICore implements GUI {
 
     private Timer timer;
 
+    private String sun;
+
     public GUICore(ComponentManager componentManager, EntityManager entityManager, EventManager eventManager, Timer timer) {
         this.componentManager = componentManager;
         this.entityManager = entityManager;
@@ -145,7 +154,22 @@ public class GUICore implements GUI {
 
         // TEsting
         loadWorld();
+        createSun();
         return running;
+    }
+
+    private void createSun() {
+        sun = entityManager.createNewEntity();
+        eventManager.fireEvent(new UpdateRotationEvent(sun, new Vector3f(0, 0, 0)));
+        EmittingLightComponent lightComponent =
+            (EmittingLightComponent) entityManager.addComponentToEntity(sun,
+                GraphicalComponentImplementation.EMMITING_LIGHT_COMPONENT.getName());
+        Transform position = entityManager.getEntity(sun).getTransform();
+        Light light = new Light(new Vector3f(position.getPosition()), new Vector3f(1.0f, 1.0f, 1.0f), "sun");
+        lightComponent.addLight(sun, new Vector3f(position.getPosition()), light);
+        entityManager.addComponentToEntity(sun, ColliderComponent.NAME);
+        eventManager.fireEvent(new UpdatePositionEvent(new Vector3f(0.0f, 100.0f, 100.0f), sun));
+
     }
 
     @Override
@@ -183,6 +207,7 @@ public class GUICore implements GUI {
         if (newState.getId().equals("Game")) {
             currentGUIState = new GameGUIState();
             ((GameGUIState) currentGUIState).setMousePicker(mousePicker);
+
         }
 
         currentGUIState.initialize();
@@ -203,6 +228,10 @@ public class GUICore implements GUI {
         GUIText fps =
             TextMaster.createAndLoadText("FPS: " + timer.getCurrentFPS(), 0.7f, FontStore.getFont(Font.CANDARA),
                 new Vector2f(0.0f, 0.0f), 5, false);
+        if (!entityManager.getEntity(sun).getTransform().getPosition().equals(new Vector3f(0.0f, 100.0f, 100.0f))) {
+            eventManager.fireEvent(new UpdatePositionEvent(new Vector3f(0.0f, 100.0f, 100.0f), sun));
+        }
+
         camera.move(timer.getDelta());
         ParticleMaster.update(timer.getDelta(), camera.getPosition());
         renderingSystem.update(timer.getDelta());

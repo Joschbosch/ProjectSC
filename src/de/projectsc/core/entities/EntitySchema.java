@@ -2,7 +2,7 @@
  * Copyright (C) 2015 
  */
 
-package de.projectsc.editor;
+package de.projectsc.core.entities;
 
 import java.util.LinkedList;
 import java.util.List;

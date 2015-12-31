@@ -16,6 +16,7 @@ import org.apache.commons.logging.LogFactory;
 import de.projectsc.core.component.physic.TransformComponent;
 import de.projectsc.core.component.state.EntityStateComponent;
 import de.projectsc.core.entities.EntityImpl;
+import de.projectsc.core.entities.EntitySchema;
 import de.projectsc.core.events.entity.component.ComponentAddedEvent;
 import de.projectsc.core.events.entity.component.ComponentRemovedEvent;
 import de.projectsc.core.events.entity.objects.NotifyEntityCreatedEvent;
@@ -24,7 +25,6 @@ import de.projectsc.core.interfaces.Component;
 import de.projectsc.core.interfaces.Entity;
 import de.projectsc.core.utils.ComponentUtils;
 import de.projectsc.core.utils.EntitySchemaLoader;
-import de.projectsc.editor.EntitySchema;
 
 /**
  * This is the core class for using {@link Entity}(ies). All entities are created by this class and are stored here. Also, all components
