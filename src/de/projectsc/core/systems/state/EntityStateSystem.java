@@ -23,7 +23,7 @@ import de.projectsc.core.systems.DefaultSystem;
  */
 public class EntityStateSystem extends DefaultSystem {
 
-    private static String NAME = "Entity State System";
+    private static final String NAME = "Entity State System";
 
     public EntityStateSystem(EntityManager entityManager, EventManager eventManager) {
         super(NAME, entityManager, eventManager);

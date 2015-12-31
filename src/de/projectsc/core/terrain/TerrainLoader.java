@@ -134,10 +134,10 @@ public final class TerrainLoader {
         File target = new File(file);
         Map<String, Object> map = new HashMap<>();
         List<Object> terrainList = new LinkedList<>();
-        for (int i = 0; i < terrain.getMapSize(); i++) {
-            for (int j = 0; j < terrain.getMapSize(); j++) {
-            }
-        }
+        // for (int i = 0; i < terrain.getMapSize(); i++) {
+        // for (int j = 0; j < terrain.getMapSize(); j++) {
+        // }
+        // }
 
         map.put(TERRAIN_DATA, terrainList);
         map.put(SIZE, terrain.getMapSize());

@@ -10,6 +10,11 @@ import java.util.Map;
 import de.projectsc.core.interfaces.Component;
 import de.projectsc.core.interfaces.Entity;
 
+/**
+ * Snapshot of the current game state.
+ * 
+ * @author Josch Bosch
+ */
 public class Snapshot {
 
     private long gameTime;
@@ -20,9 +25,18 @@ public class Snapshot {
 
     private Map<String, Map<String, String>> componentsSerialized;
 
-    public void addData(long gameTime, long tick, Map<String, Entity> entities, Map<String, Map<String, Component>> entityComponents) {
-        this.gameTime = gameTime;
-        this.tick = tick;
+    /**
+     * Add new data to the snapshot.
+     * 
+     * @param newGameTime game time to set.
+     * @param newTick to set.
+     * @param entities to set.
+     * @param entityComponents to set.
+     */
+    public void addData(long newGameTime, long newTick, Map<String, Entity> entities,
+        Map<String, Map<String, Component>> entityComponents) {
+        this.gameTime = newGameTime;
+        this.tick = newTick;
         entitiesSerialized = new HashMap<>();
         componentsSerialized = new HashMap<>();
         for (String id : entities.keySet()) {

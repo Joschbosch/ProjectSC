@@ -66,7 +66,7 @@ public abstract class ClientCore implements Runnable {
         player = new ClientPlayer();
         timer = new Timer();
         eventManager = new ClientEventManager();
-        componentManager = new ComponentManager(eventManager);
+        componentManager = new ComponentManager();
         entityManager = new EntityManager(componentManager, eventManager);
         snapshotManager = new ClientSnapshotManger(entityManager, timer);
     }
@@ -182,8 +182,8 @@ public abstract class ClientCore implements Runnable {
         return eventManager;
     }
 
-    public void setGUI(GUI gui) {
-        this.gui = gui;
+    public void setGUI(GUI newGui) {
+        this.gui = newGui;
     }
 
     public Timer getTimer() {

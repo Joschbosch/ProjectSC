@@ -48,6 +48,13 @@ public class Particle implements Comparable<Particle> {
         ParticleMaster.addParticle(this);
     }
 
+    /**
+     * Update particle.
+     * 
+     * @param deltaMs time since last frame.
+     * @param camPosition for calculation.
+     * @return if particle is still alive
+     */
     public boolean update(float deltaMs, Vector3f camPosition) {
         velocity.y += GUIConstants.GRAVITY_PARTICLES.y * gravityEffect * deltaMs;
         Vector3f change = new Vector3f(velocity);

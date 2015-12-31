@@ -73,10 +73,15 @@ public interface Component {
      * Load component.
      * 
      * @param serialized loaded structure
-     * @param schemaDirectory directory to load from
+     * @param schemaFolder directory to load from
      */
-    void deserialize(Map<String, Object> serialized, File schemaDirectory);
+    void deserialize(Map<String, Object> serialized, String schemaFolder);
 
+    /**
+     * Update the current component.
+     * 
+     * @param elapsed time since last update
+     */
     void update(long elapsed);
 
     /**
@@ -84,14 +89,35 @@ public interface Component {
      */
     String getComponentName();
 
+    /**
+     * @return id of the component
+     */
     String getId();
 
+    /**
+     * Creates a new ID for the component (e.g. after cloning).
+     */
     void createNewId();
 
+    /**
+     * Set the owner of the component.
+     * 
+     * @param entity owner
+     */
     void setOwner(Entity entity);
 
+    /**
+     * Create serialized string for the component to send to clients. Should be as small as possible.
+     * 
+     * @return serialized string
+     */
     String serializeForNetwork();
 
+    /**
+     * Deserialize a string for this component.
+     * 
+     * @param serial to read
+     */
     void deserializeFromNetwork(String serial);
 
 }

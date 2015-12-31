@@ -14,13 +14,16 @@ import de.projectsc.core.data.structure.Snapshot;
  */
 public interface GUI {
 
+    /**
+     * Render scene.
+     */
     void render();
 
     /**
      * Render gui.
      * 
-     * @param interpolationTime
-     * @param interpolationSnapshots
+     * @param interpolationTime to render
+     * @param interpolationSnapshots to render in between
      * 
      */
     void render(Snapshot[] interpolationSnapshots, long interpolationTime);
@@ -52,8 +55,16 @@ public interface GUI {
      */
     void cleanUpCore();
 
-    void loadTerrain();
+    /**
+     * Load the world to the GUI.
+     */
+    void loadWorld();
 
+    /**
+     * Initialize the state.
+     * 
+     * @param newState to init.
+     */
     void initState(ClientState newState);
 
 }

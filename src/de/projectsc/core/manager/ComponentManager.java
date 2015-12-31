@@ -25,11 +25,7 @@ public class ComponentManager {
 
     private Map<String, Class<? extends Component>> registeredComponents = new HashMap<>();
 
-    private EventManager eventManager;
-
-    public ComponentManager(EventManager eventManager) {
-        this.eventManager = eventManager;
-    }
+    public ComponentManager() {}
 
     /**
      * Register a new component class.
@@ -54,7 +50,6 @@ public class ComponentManager {
      */
     public Component createComponent(String name) {
         Class<? extends Component> componentClass = registeredComponents.get(name);
-        System.out.println(name);
         if (componentClass != null) {
             try {
                 return componentClass.newInstance();

@@ -25,7 +25,7 @@ public interface ClientState {
      * Handles a new message from the server or internally.
      * 
      * @param msg to handle
-     * @return
+     * @return new state if necessary
      */
     ClientState handleMessage(ClientMessage msg);
 
@@ -40,14 +40,19 @@ public interface ClientState {
     /**
      * Initialize the state.
      * 
-     * @param gameData
-     * @param componentManager
-     * @param eventManager
-     * @param entityManager
+     * @param networkQueue for network msgs.
+     * @param entityManager for managing.
+     * @param eventManager for managing.
+     * @param componentManager for managing.
+     * @param snapshotManager for managing.
+     * @param timer for current deltas.
      */
     void init(BlockingQueue<ClientMessage> networkQueue, EntityManager entityManager, EventManager eventManager,
         ComponentManager componentManager, ClientSnapshotManger snapshotManager, Timer timer);
 
+    /**
+     * @return if of the state
+     */
     String getId();
 
 }

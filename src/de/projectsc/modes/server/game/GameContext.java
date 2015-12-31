@@ -20,8 +20,6 @@ import de.projectsc.modes.server.game.data.ServerPlayer;
  */
 public class GameContext {
 
-    private static final long serialVersionUID = 7971613418627835197L;
-
     private ServerPlayer host;
 
     private final Map<String, ServerPlayer> players;
@@ -40,13 +38,10 @@ public class GameContext {
 
     private Map<Long, Entity> entities;
 
-    private final Game game;
-
     public GameContext(int id, String displayName, ServerPlayer host, Game game) {
         this.gameID = id;
         this.displayName = displayName;
         this.host = host;
-        this.game = game;
         players = new TreeMap<>();
         players.put(this.host.getId(), this.host);
         this.config = new GameConfiguration();

@@ -12,6 +12,11 @@ import de.projectsc.modes.client.gui.ui.View;
 import de.projectsc.modes.client.gui.ui.basic.Container;
 import de.projectsc.modes.client.gui.ui.basic.Label;
 
+/**
+ * View for the game time.
+ * 
+ * @author Josch Bosch
+ */
 public class GameTimeView extends View {
 
     private GameTime gameTime;

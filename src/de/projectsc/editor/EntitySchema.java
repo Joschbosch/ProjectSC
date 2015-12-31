@@ -14,11 +14,16 @@ import de.projectsc.core.interfaces.Component;
 import de.projectsc.core.manager.EntityManager;
 import de.projectsc.core.utils.ComponentUtils;
 
+/**
+ * Schema of an entity created in the editor.
+ * 
+ * @author Josch Bosch
+ */
 public class EntitySchema {
 
     private Long id;
 
-    List<Component> components = new LinkedList<>();
+    private List<Component> components = new LinkedList<>();
 
     public EntitySchema(long id) {
         this.id = id;
@@ -28,6 +33,13 @@ public class EntitySchema {
         return id;
     }
 
+    /**
+     * Create entity from schema.
+     * 
+     * @param oldTransform of mouse position
+     * @param e to add schmea to
+     * @param entityManager manager.
+     */
     public void createNewEntity(Transform oldTransform, String e, EntityManager entityManager) {
         Transform t = entityManager.getEntity(e).getTransform();
         t.setPosition(new Vector3f(oldTransform.getPosition()));

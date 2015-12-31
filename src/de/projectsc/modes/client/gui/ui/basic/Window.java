@@ -7,6 +7,11 @@ package de.projectsc.modes.client.gui.ui.basic;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.util.vector.Vector4f;
 
+/**
+ * A window in the gui.
+ * 
+ * @author Josch Bosch
+ */
 public class Window extends Container {
 
     private static final String WINDOW_FOLDER = "window/";

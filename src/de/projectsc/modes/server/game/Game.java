@@ -172,7 +172,7 @@ public class Game implements Runnable {
                 @Override
                 public void run() {
                     eventManager = new EventManager();
-                    componentManager = new ComponentManager(eventManager);
+                    componentManager = new ComponentManager();
                     entityManager = new EntityManager(componentManager, eventManager);
                     stateSystem = new EntityStateSystem(entityManager, eventManager);
                     physicsSystem = new BasicPhysicsSystem(entityManager, eventManager);

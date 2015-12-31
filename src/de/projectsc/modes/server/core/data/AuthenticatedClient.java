@@ -7,7 +7,6 @@ package de.projectsc.modes.server.core.data;
 
 import java.util.concurrent.BlockingQueue;
 
-import de.projectsc.modes.server.core.data.statistics.PlayerStatistics;
 import de.projectsc.modes.server.core.messages.ServerMessage;
 
 /**
@@ -25,20 +24,13 @@ public class AuthenticatedClient {
 
     private final BlockingQueue<ServerMessage> receiveFromClientQueue;
 
-    private final PlayerStatistics statistics;
-
     public AuthenticatedClient(String id, String displayName, BlockingQueue<ServerMessage> sendToClientQueue,
         BlockingQueue<ServerMessage> receiveFromClientQueue) {
         this.id = id;
         this.displayName = displayName;
         this.sendToClientQueue = sendToClientQueue;
         this.receiveFromClientQueue = receiveFromClientQueue;
-        this.statistics = loadStatistics();
 
-    }
-
-    private PlayerStatistics loadStatistics() {
-        return new PlayerStatistics();
     }
 
     /**

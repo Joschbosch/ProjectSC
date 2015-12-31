@@ -10,6 +10,7 @@ import java.util.Map;
 
 import org.lwjgl.util.vector.Vector3f;
 
+import de.projectsc.core.CoreConstants;
 import de.projectsc.core.component.ComponentType;
 import de.projectsc.core.component.state.EntityStateComponent;
 
@@ -62,7 +63,7 @@ public class VelocityComponent extends PhysicsComponent {
     }
 
     @Override
-    public void deserialize(Map<String, Object> serialized, File loadingLocation) {
+    public void deserialize(Map<String, Object> serialized, String loadingLocation) {
         acceleration = (float) (double) serialized.get("acceleration");
         maximumSpeed = (float) (double) serialized.get("maxSpeed");
         turnSpeed = (float) (double) serialized.get("turnSpeed");
@@ -70,8 +71,10 @@ public class VelocityComponent extends PhysicsComponent {
 
     @Override
     public String serializeForNetwork() {
-        return "" + acceleration + ";" + maximumSpeed + ";" + maximumTurnSpeed + ";" + turnSpeed + ";" + currentSpeed + ";" + velocity.x
-            + ";" + velocity.z + ";" + rotationDelta.y;
+        return "" + acceleration + CoreConstants.SERIALIZATION_SEPARATOR + maximumSpeed + CoreConstants.SERIALIZATION_SEPARATOR
+            + maximumTurnSpeed + CoreConstants.SERIALIZATION_SEPARATOR + turnSpeed + CoreConstants.SERIALIZATION_SEPARATOR
+            + currentSpeed + CoreConstants.SERIALIZATION_SEPARATOR + velocity.x
+            + CoreConstants.SERIALIZATION_SEPARATOR + velocity.z + CoreConstants.SERIALIZATION_SEPARATOR + rotationDelta.y;
     }
 
     @Override

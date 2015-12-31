@@ -5,12 +5,8 @@
  */
 package de.projectsc.modes.client.gui.render;
 
-import java.io.File;
-import java.net.URISyntaxException;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
@@ -31,10 +27,7 @@ import de.projectsc.modes.client.gui.utils.Loader;
  * 
  * @author Josch Bosch
  */
-// TODO Rework representation of bounding box model
 public class WireFrameRenderer {
-
-    private static final Log LOGGER = LogFactory.getLog(WireFrameRenderer.class);
 
     private final WireFrameShader shader;
 
@@ -46,57 +39,52 @@ public class WireFrameRenderer {
 
     public WireFrameRenderer(WireFrameShader shader, Matrix4f projectionMatrix) {
         this.shader = shader;
-        try {
-            ModelData data =
-                OBJFileLoader.loadOBJ(new File(WireFrameRenderer.class.getResource(GUIConstants.BASIC_MESH_PRIMITIVES_SPHERE).toURI()));
-            sphere = Loader.loadToVAO(data.getVertices(), data.getTextureCoords(), data.getNormals(), data.getIndices());
-            float[] verticesCube = {
-                -0.5f, 0, -0.5f,
-                0.5f, 0, -0.5f,
+        ModelData data =
+            OBJFileLoader.loadOBJFromResources(GUIConstants.BASIC_MESH_PRIMITIVES_SPHERE);
+        sphere = Loader.loadToVAO(data.getVertices(), data.getTextureCoords(), data.getNormals(), data.getIndices());
+        float[] verticesCube = {
+            -0.5f, 0, -0.5f,
+            0.5f, 0, -0.5f,
 
-                0.5f, 0, -0.5f,
-                0.5f, 0, 0.5f,
+            0.5f, 0, -0.5f,
+            0.5f, 0, 0.5f,
 
-                0.5f, 0, 0.5f,
-                -0.5f, 0, 0.5f,
+            0.5f, 0, 0.5f,
+            -0.5f, 0, 0.5f,
 
-                -0.5f, 0, 0.5f,
-                -0.5f, 0, -0.5f,
+            -0.5f, 0, 0.5f,
+            -0.5f, 0, -0.5f,
 
-                -0.5f, 1f, -0.5f,
-                0.5f, 1f, -0.5f,
+            -0.5f, 1f, -0.5f,
+            0.5f, 1f, -0.5f,
 
-                0.5f, 1f, -0.5f,
-                0.5f, 1f, 0.5f,
+            0.5f, 1f, -0.5f,
+            0.5f, 1f, 0.5f,
 
-                0.5f, 1f, 0.5f,
-                -0.5f, 1f, 0.5f,
+            0.5f, 1f, 0.5f,
+            -0.5f, 1f, 0.5f,
 
-                -0.5f, 1f, 0.5f,
-                -0.5f, 1f, -0.5f,
+            -0.5f, 1f, 0.5f,
+            -0.5f, 1f, -0.5f,
 
-                -0.5f, 0f, -0.5f,
-                -0.5f, 1f, -0.5f,
+            -0.5f, 0f, -0.5f,
+            -0.5f, 1f, -0.5f,
 
-                0.5f, 0f, -0.5f,
-                0.5f, 1f, -0.5f,
+            0.5f, 0f, -0.5f,
+            0.5f, 1f, -0.5f,
 
-                0.5f, 0f, 0.5f,
-                0.5f, 1f, 0.5f,
+            0.5f, 0f, 0.5f,
+            0.5f, 1f, 0.5f,
 
-                -0.5f, 0f, 0.5f,
-                -0.5f, 1f, 0.5f
-            };
-            cube = Loader.loadToVAO(verticesCube, 3);
+            -0.5f, 0f, 0.5f,
+            -0.5f, 1f, 0.5f
+        };
+        cube = Loader.loadToVAO(verticesCube, 3);
 
-            float[] verticesLine = { -0.5f, 0, -0.5f,
-                0.5f, 0, -0.5f };
+        float[] verticesLine = { -0.5f, 0, -0.5f,
+            0.5f, 0, -0.5f };
 
-            line = Loader.loadToVAO(verticesLine, 3);
-
-        } catch (URISyntaxException e) {
-            LOGGER.error("Could not load sphere model: ", e);
-        }
+        line = Loader.loadToVAO(verticesLine, 3);
 
         shader.start();
         shader.loadProjectionMatrix(projectionMatrix);
@@ -113,9 +101,9 @@ public class WireFrameRenderer {
         prepareModel(sphere);
         for (WireFrame wireframe : wireFrames) {
             if (WireFrame.SPHERE.equals(wireframe.getModelType())) {
-                // prepareInstance(wireframe.getPosition(), wireframe.getRotation(), wireframe.getScale(), wireframe.getColor());
-                // GL11.glLineWidth(wireframe.getLineWidth());
-                // GL11.glDrawElements(GL11.GL_LINE_STRIP, sphere.getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
+                prepareInstance(wireframe.getPosition(), wireframe.getRotation(), wireframe.getScale(), wireframe.getColor());
+                GL11.glLineWidth(wireframe.getLineWidth());
+                GL11.glDrawElements(GL11.GL_LINE_STRIP, sphere.getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
             }
         }
         unbindTexturedModel();

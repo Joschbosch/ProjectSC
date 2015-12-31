@@ -6,14 +6,11 @@
 package de.projectsc.modes.client.gui.components;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -43,7 +40,7 @@ public class MeshRendererComponent extends GraphicalComponent {
 
     private static final Log LOGGER = LogFactory.getLog(MeshRendererComponent.class);
 
-    private File textureFile;
+    private String texturePath;
 
     private RawModel model;
 
@@ -58,13 +55,8 @@ public class MeshRendererComponent extends GraphicalComponent {
         setType(ComponentType.GRAPHICS);
         textureIndex = 0;
         requiredComponents.add(MeshComponent.NAME);
-        try {
-            textureFile =
-                new File(MeshRendererComponent.class.getResource(GUIConstants.TEXTURE_ROOT + GUIConstants.BASIC_TEXTURE_WHITE)
-                    .toURI());
-        } catch (URISyntaxException e) {
-            LOGGER.error("Could not load default texture file: ", e);
-        }
+        texturePath =
+            GUIConstants.TEXTURE_ROOT + GUIConstants.BASIC_TEXTURE_WHITE;
     }
 
     @Override
@@ -75,8 +67,8 @@ public class MeshRendererComponent extends GraphicalComponent {
                 loadModel(mesh);
             }
         }
-        if (modelTexture == null && textureFile != null) {
-            loadAndApplyTexture(textureFile);
+        if (modelTexture == null && texturePath != null) {
+            loadAndApplyTexture(texturePath);
         }
         if (texturedModel == null) {
             texturedModel = getTexturedModel();
@@ -113,12 +105,12 @@ public class MeshRendererComponent extends GraphicalComponent {
     @Override
     public Map<String, Object> serialize(File savingLocation) {
         File savedTextureFile = new File(savingLocation, CoreConstants.TEXTURE_FILENAME);
-        if (textureFile != null && textureFile.exists() && !savedTextureFile.exists()) {
-            try {
-                FileUtils.copyFile(textureFile, savedTextureFile);
-            } catch (IOException e) {
-                LOGGER.error("Could not save texture file: " + e.getMessage());
-            }
+        if (texturePath != null && !savedTextureFile.exists()) {
+            // try {
+            // FileUtils.copyFile(texturePath, savedTextureFile);
+            // } catch (IOException e) {
+            // LOGGER.error("Could not save texture file: " + e.getMessage());
+            // }
         }
         Map<String, Object> serialized = new HashMap<>();
         serialized.put("numColumns", modelTexture.getNumberOfRows());
@@ -128,10 +120,8 @@ public class MeshRendererComponent extends GraphicalComponent {
     }
 
     @Override
-    public void deserialize(Map<String, Object> serialized, File loadingLocation) {
-        if (new File(loadingLocation, CoreConstants.TEXTURE_FILENAME).exists()) {
-            textureFile = new File(loadingLocation, CoreConstants.TEXTURE_FILENAME);
-        }
+    public void deserialize(Map<String, Object> serialized, String loadingLocation) {
+        texturePath = loadingLocation + "/" + CoreConstants.TEXTURE_FILENAME;
         setNumberOfRows((int) serialized.get("numColumns"));
         setReflectivity((float) (double) serialized.get("reflectivity"));
         setShineDamper((float) (double) serialized.get("shineDamper"));
@@ -142,18 +132,20 @@ public class MeshRendererComponent extends GraphicalComponent {
      * 
      * @param incTextureFile to load
      */
-    public void loadAndApplyTexture(File incTextureFile) {
-        if (incTextureFile != null) {
-            this.textureFile = incTextureFile;
-            applyTexture(incTextureFile);
-        } else if (textureFile != null) {
-            applyTexture(textureFile);
+    public void loadAndApplyTexture(String incTextureFile) {
+        this.texturePath = incTextureFile;
+        if (texturePath != null) {
+            applyTexture(texturePath);
         }
     }
 
-    private void applyTexture(File incTextureFile) {
+    private void applyTexture(String incTexturePath) {
         int texture = 0 - 1;
-        texture = Loader.loadTexture(incTextureFile);
+        if (new File(incTexturePath).exists()) {
+            texture = Loader.loadTexture(new File(incTexturePath));
+        } else {
+            texture = Loader.loadTextureFromSchema(incTexturePath);
+        }
         if (modelTexture == null) {
             modelTexture = new ModelTexture(texture);
         } else {

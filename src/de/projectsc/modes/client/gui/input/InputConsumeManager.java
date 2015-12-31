@@ -15,6 +15,11 @@ import de.projectsc.modes.client.core.data.KeyboardInputCommand;
 import de.projectsc.modes.client.core.data.MouseInputCommand;
 import de.projectsc.modes.client.core.interfaces.InputCommandListener;
 
+/**
+ * Manager for consuming the input.
+ * 
+ * @author Josch Bosch
+ */
 public class InputConsumeManager {
 
     private static InputConsumeManager instance;
@@ -25,6 +30,11 @@ public class InputConsumeManager {
         setInstance(this);
     }
 
+    /**
+     * Add a new listener to consume input.
+     * 
+     * @param c to add
+     */
     public void addListener(InputCommandListener c) {
         if (c != null) {
             if (registered.get(c.getInputConsumeLevel()) == null) {
@@ -35,12 +45,22 @@ public class InputConsumeManager {
         }
     }
 
+    /**
+     * Remove listener.
+     * 
+     * @param toRemove listener
+     */
     public void removeListener(InputCommandListener toRemove) {
         if (registered.get(toRemove.getInputConsumeLevel()) != null) {
             registered.get(toRemove.getInputConsumeLevel()).remove(toRemove);
         }
     }
 
+    /**
+     * Process all input.
+     * 
+     * @param readInput the input to process.
+     */
     public void processInput(Queue<InputCommand> readInput) {
         for (InputCommandListener.InputConsumeLevel level : InputCommandListener.InputConsumeLevel.values()) {
             if (registered.get(level) != null) {

@@ -3,6 +3,11 @@ package de.projectsc.modes.client.gui.shaders;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector2f;
 
+/**
+ * Shader for particles.
+ * 
+ * @author Josch Bosch
+ */
 public class ParticleShader extends Shader {
 
     private static final String VERTEX_FILE = "particleShader.vert";
@@ -37,16 +42,30 @@ public class ParticleShader extends Shader {
         super.bindAttribute(0, "position");
     }
 
+    /**
+     * Load texture coords.
+     * 
+     * @param offset1 current texture
+     * @param offset2 next texture
+     * @param numberOfRows of texture
+     * @param blendFactor between textures
+     */
     public void loadTextureCoordinates(Vector2f offset1, Vector2f offset2, float numberOfRows, float blendFactor) {
         super.loadVector(locationTexOffset1, offset1);
         super.loadVector(locationTexOffset2, offset2);
         super.loadVector(locationTexCoordInfo, new Vector2f(numberOfRows, blendFactor));
     }
 
+    /**
+     * @param modelView to load
+     */
     public void loadModelViewMatrix(Matrix4f modelView) {
         super.loadMatrix(locationModelViewMatrix, modelView);
     }
 
+    /**
+     * @param projectionMatrix to load
+     */
     public void loadProjectionMatrix(Matrix4f projectionMatrix) {
         super.loadMatrix(locationProjectionMatrix, projectionMatrix);
     }

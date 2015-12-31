@@ -23,6 +23,11 @@ import de.projectsc.modes.client.gui.ui.basic.Container;
 import de.projectsc.modes.client.gui.ui.views.ConsoleView;
 import de.projectsc.modes.client.gui.ui.views.MenuView;
 
+/**
+ * GUI State for the main menu.
+ * 
+ * @author Josch Bosch
+ */
 public class MenuGUIState implements GUIState, InputCommandListener {
 
     private Container container;

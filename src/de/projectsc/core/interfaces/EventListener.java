@@ -6,6 +6,11 @@ package de.projectsc.core.interfaces;
 
 import de.projectsc.core.data.Event;
 
+/**
+ * Interface that every eventlistener must implements.
+ * 
+ * @author Josch Bosch
+ */
 public interface EventListener {
 
     /**

@@ -4,6 +4,11 @@
 
 package de.projectsc.modes.client.core.data;
 
+/**
+ * Implementation of input command for the mouse.
+ * 
+ * @author Josch Bosch
+ */
 public class MouseInputCommand implements InputCommand {
 
     private final int mouseX;
@@ -70,6 +75,12 @@ public class MouseInputCommand implements InputCommand {
         return button;
     }
 
+    /**
+     * Check if the buttin with given id is pressed.
+     * 
+     * @param buttonID to get
+     * @return true, if it is down
+     */
     public boolean isButtonDown(int buttonID) {
         return buttonDown[buttonID];
     }

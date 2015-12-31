@@ -9,6 +9,11 @@ import org.lwjgl.util.vector.Vector4f;
 import de.projectsc.modes.client.gui.ui.View;
 import de.projectsc.modes.client.gui.ui.basic.Container;
 
+/**
+ * View for players health.
+ * 
+ * @author Josch Bosch
+ */
 public class HealthView extends View {
 
     public HealthView(Container c) {

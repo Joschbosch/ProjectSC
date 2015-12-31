@@ -15,11 +15,12 @@ import de.projectsc.modes.client.core.interfaces.ClientState;
 import de.projectsc.modes.client.core.manager.ClientSnapshotManger;
 import de.projectsc.modes.client.core.ui.UIElement;
 
+/**
+ * Basic implementation for the client states.
+ * 
+ * @author Josch Bosch
+ */
 public abstract class CommonClientState extends UIElement implements ClientState {
-
-    public CommonClientState(String id, int order) {
-        super(id, order);
-    }
 
     protected BlockingQueue<ClientMessage> networkQueue;
 
@@ -33,17 +34,26 @@ public abstract class CommonClientState extends UIElement implements ClientState
 
     protected ClientSnapshotManger snapshotManager;
 
-    @Override
-    public void init(BlockingQueue<ClientMessage> networkQueue, EntityManager entityManager, EventManager eventManager,
-        ComponentManager componentManager, ClientSnapshotManger snapshotmanager, Timer timer) {
-        this.networkQueue = networkQueue;
-        this.entityManager = entityManager;
-        this.componentManager = componentManager;
-        this.eventManager = eventManager;
-        this.snapshotManager = snapshotmanager;
-        this.timer = timer;
+    public CommonClientState(String id, int order) {
+        super(id, order);
     }
 
+    @Override
+    public void init(BlockingQueue<ClientMessage> incNetworkQueue, EntityManager incEntityManager, EventManager incEventManager,
+        ComponentManager incComponentManager, ClientSnapshotManger snapshotmanager, Timer incTimer) {
+        this.networkQueue = incNetworkQueue;
+        this.entityManager = incEntityManager;
+        this.componentManager = incComponentManager;
+        this.eventManager = incEventManager;
+        this.snapshotManager = snapshotmanager;
+        this.timer = incTimer;
+    }
+
+    /**
+     * Send a network message.
+     * 
+     * @param e to send
+     */
     public void sendMessage(ClientMessage e) {
         networkQueue.offer(e);
     }

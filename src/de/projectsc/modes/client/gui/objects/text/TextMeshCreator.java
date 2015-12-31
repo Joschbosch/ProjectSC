@@ -1,6 +1,6 @@
 package de.projectsc.modes.client.gui.objects.text;
 
-import java.io.File;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,8 +19,8 @@ public class TextMeshCreator {
 
     private MetaFile metaData;
 
-    protected TextMeshCreator(File metaFile) {
-        metaData = new MetaFile(metaFile);
+    protected TextMeshCreator(InputStream fontFile) {
+        metaData = new MetaFile(fontFile);
     }
 
     protected TextMeshData createTextMesh(GUIText text) {

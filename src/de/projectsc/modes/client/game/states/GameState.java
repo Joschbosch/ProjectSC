@@ -44,12 +44,13 @@ import de.projectsc.modes.client.gui.components.GraphicalComponentImplementation
  */
 public class GameState extends CommonClientState {
 
-    private static Log LOGGER = LogFactory.getLog(GameState.class);
+    private static final Log LOGGER = LogFactory.getLog(GameState.class);
 
     private boolean loadingDone = false;
 
     private GameConfiguration gameConfig;
 
+    @SuppressWarnings("unused")
     private GamePhysicsSystem physicsSystem;
 
     private String sun;
@@ -107,7 +108,6 @@ public class GameState extends CommonClientState {
             loadingDone = true;
         }
         stateSystem.update(tickTime);
-        // physicsSystem.update(tickTime);
         collisionSystem.update(tickTime);
     }
 

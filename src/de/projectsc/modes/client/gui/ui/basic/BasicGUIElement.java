@@ -15,6 +15,12 @@ import de.projectsc.modes.client.gui.input.InputConsumeManager;
 import de.projectsc.modes.client.gui.textures.UITexture;
 import de.projectsc.modes.client.gui.ui.GUIElement;
 
+/**
+ * 
+ * Basic class for GUI elements in the GUI.
+ * 
+ * @author Josch Bosch
+ */
 public abstract class BasicGUIElement implements GUIElement, Comparable<BasicGUIElement> {
 
     protected InputConsumeManager inputConsumeManager;
@@ -66,6 +72,12 @@ public abstract class BasicGUIElement implements GUIElement, Comparable<BasicGUI
         return active;
     }
 
+    /**
+     * Check if this element is hit by the mouse.
+     * 
+     * @param command to check
+     * @return true, if it is active and hit
+     */
     public boolean hit(MouseInputCommand command) {
         boolean hit = command.getMouseX() >= convertWidthToPixel(positionAndSize.x)
             && command.getMouseX() <= convertWidthToPixel(positionAndSize.x + positionAndSize.z)
@@ -74,6 +86,10 @@ public abstract class BasicGUIElement implements GUIElement, Comparable<BasicGUI
         return hit && isActive();
     }
 
+    /**
+     * 
+     * @return true, if the click should be consumed
+     */
     public boolean consumesClick() {
         return consumesClick;
     }
@@ -103,8 +119,8 @@ public abstract class BasicGUIElement implements GUIElement, Comparable<BasicGUI
         return zOrder;
     }
 
-    public void setZOrder(int zOrder) {
-        this.zOrder = zOrder;
+    public void setZOrder(int incZOrder) {
+        this.zOrder = incZOrder;
     }
 
     public boolean isHighlighted() {

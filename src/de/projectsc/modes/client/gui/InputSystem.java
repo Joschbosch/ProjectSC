@@ -17,6 +17,11 @@ import de.projectsc.modes.client.core.data.InputCommand;
 import de.projectsc.modes.client.core.data.KeyboardInputCommand;
 import de.projectsc.modes.client.core.data.MouseInputCommand;
 
+/**
+ * System for handling input.
+ * 
+ * @author Josch Bosch
+ */
 public class InputSystem {
 
     private static final Log LOGGER = LogFactory.getLog(InputSystem.class);
@@ -39,6 +44,11 @@ public class InputSystem {
         }
     }
 
+    /**
+     * Update all inputs.
+     * 
+     * @return commands from inputs
+     */
     public Queue<InputCommand> updateInputs() {
         Queue<InputCommand> currentInputs = new LinkedList<>();
         getMouseEvents(currentInputs);
@@ -116,6 +126,9 @@ public class InputSystem {
         return !keyDown && isControlKey(key);
     }
 
+    /**
+     * Dispose system.
+     */
     public void dispose() {
         Mouse.destroy();
         Keyboard.destroy();

@@ -4,10 +4,7 @@
 
 package de.projectsc.core.component.state;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-
+import de.projectsc.core.CoreConstants;
 import de.projectsc.core.component.ComponentType;
 import de.projectsc.core.component.DefaultComponent;
 import de.projectsc.core.data.Scene;
@@ -58,17 +55,6 @@ public class EntityStateComponent extends DefaultComponent {
     }
 
     @Override
-    public Map<String, Object> serialize(File savingLocation) {
-        Map<String, Object> serialized = new HashMap<String, Object>();
-        return serialized;
-    }
-
-    @Override
-    public void deserialize(Map<String, Object> input, File loadingLocation) {
-
-    }
-
-    @Override
     public String serializeForNetwork() {
         int selectedInt = 0;
         if (isSelected()) {
@@ -78,12 +64,13 @@ public class EntityStateComponent extends DefaultComponent {
         if (isHighlighted()) {
             highlightedInt = 1;
         }
-        return "" + state.ordinal() + ";" + selectedInt + ";" + highlightedInt;
+        return "" + state.ordinal() + CoreConstants.SERIALIZATION_SEPARATOR
+            + selectedInt + CoreConstants.SERIALIZATION_SEPARATOR + highlightedInt;
     }
 
     @Override
     public void deserializeFromNetwork(String serialized) {
-        String[] split = serialized.split(";");
+        String[] split = serialized.split(CoreConstants.SERIALIZATION_SEPARATOR);
         int ordinal = Integer.parseInt(split[0]);
         if (ordinal == EntityState.MOVING.ordinal()) {
             state = EntityState.MOVING;

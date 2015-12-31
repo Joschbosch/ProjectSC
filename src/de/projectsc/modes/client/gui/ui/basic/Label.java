@@ -15,6 +15,11 @@ import de.projectsc.modes.client.gui.objects.text.FontType;
 import de.projectsc.modes.client.gui.objects.text.GUIText;
 import de.projectsc.modes.client.gui.objects.text.TextMaster;
 
+/**
+ * A label showing a text in the UI.
+ * 
+ * @author Josch Bosch
+ */
 public class Label extends ContainerElement {
 
     protected String text = "";
@@ -68,6 +73,11 @@ public class Label extends ContainerElement {
         }
     }
 
+    /**
+     * Set new text and calculate new position.
+     * 
+     * @param text to set.
+     */
     public void setText(String text) {
         if (this.text == null || !this.text.equals(text)) {
             this.text = text;
@@ -75,26 +85,55 @@ public class Label extends ContainerElement {
         }
     }
 
+    /**
+     * New font size for the label.
+     * 
+     * @param fontSize to set
+     */
     public void setFontSize(float fontSize) {
         this.fontSize = fontSize;
         createNewText();
     }
 
+    /**
+     * new Color.
+     * 
+     * @param r red
+     * @param g green
+     * @param b blue
+     */
     public void setTextColor(float r, float g, float b) {
         this.color = new Vector3f(r, g, b);
         createNewText();
     }
 
+    /**
+     * Width of the border.
+     * 
+     * @param f to set
+     */
     public void setBorderWidth(float f) {
         this.borderWidth = f;
         createNewText();
     }
 
+    /**
+     * new outline Color.
+     * 
+     * @param r red
+     * @param g green
+     * @param b blue
+     */
     public void setOutlineColor(float r, float g, float b) {
         this.outlineColor = new Vector3f(r, g, b);
         createNewText();
     }
 
+    /**
+     * Should the text be centered ?
+     * 
+     * @param value true if it should
+     */
     public void setCentered(boolean value) {
         this.centered = value;
         createNewText();

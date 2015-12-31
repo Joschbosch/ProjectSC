@@ -48,8 +48,6 @@ public class MapEditor extends JFrame {
 
     private static final String COULD_NOT_SET_CURRENT_DIRECTORY = "Could not set current directory.";
 
-    private static final String COMPONENTS = "components";
-
     private static final Log LOGGER = LogFactory.getLog(MapEditor.class);
 
     private static final long serialVersionUID = 3313139728699706144L;
@@ -80,7 +78,7 @@ public class MapEditor extends JFrame {
     public MapEditor() {
         data = new EditorData();
         this.eventManager = new EventManager();
-        this.componentManager = new ComponentManager(eventManager);
+        this.componentManager = new ComponentManager();
         this.entityManager = new EntityManager(componentManager, eventManager);
         loadComponents();
         createContent();

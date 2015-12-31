@@ -24,7 +24,6 @@ public abstract class View extends BasicGUIElement {
     /**
      * Add all elements to render for the current frame.
      * 
-     * @param ui container to add elements
      */
     public abstract void update();
 

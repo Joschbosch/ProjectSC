@@ -99,16 +99,6 @@ public class MenuView extends View implements InputCommandListener {
     }
 
     @Override
-    public void handleMouseCommand(MouseInputCommand command) {
-        // if (container.hit(command)) {
-        // for (int i = 0; i < labels.length; i++) {
-        // System.out.println(command.getMouseX() + "  " + command.getMouseY());
-        // System.out.println("testing: " + labels[i].getPositionAndSize());
-        // if (labels[i].hit(command)) {
-        // System.out.println("hit " + labels[i].getText());
-        // }
-        // }
-        // }
-    }
+    public void handleMouseCommand(MouseInputCommand command) {}
 
 }

@@ -44,6 +44,8 @@ public class EntityRenderer {
      * @param position to render.
      * @param rotations to render.
      * @param scales to render.
+     * @param selected entities
+     * @param highlighted entities
      */
     public void render(Map<TexturedModel, List<String>> entitiesWithModel,
         Map<String, Vector3f> position, Map<String, Vector3f> rotations, Map<String, Vector3f> scales,

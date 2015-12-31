@@ -4,6 +4,7 @@
 
 package de.projectsc.modes.client.gui;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
@@ -68,7 +69,11 @@ public class RenderingSystem extends DefaultSystem {
             } else if (e instanceof UpdateTextureEvent) {
                 UpdateTextureEvent event = (UpdateTextureEvent) e;
                 if (event.getTextureFile() != null) {
-                    c.loadAndApplyTexture(event.getTextureFile());
+                    try {
+                        c.loadAndApplyTexture(event.getTextureFile().getCanonicalPath());
+                    } catch (IOException e1) {
+                        // LOGGER.error(e1.getStackTrace());
+                    }
                 }
             }
         }

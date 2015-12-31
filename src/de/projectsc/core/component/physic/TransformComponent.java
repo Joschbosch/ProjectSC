@@ -61,7 +61,7 @@ public class TransformComponent extends PhysicsComponent {
     }
 
     @Override
-    public void deserialize(Map<String, Object> serialized, File loadingLocation) {
+    public void deserialize(Map<String, Object> serialized, String loadingLocation) {
         owner.getTransform().setPosition(
             new Vector3f((float) (double) serialized.get("positionX"), (float) (double) serialized.get("positionY"),
                 (float) (double) serialized.get("positionZ")));

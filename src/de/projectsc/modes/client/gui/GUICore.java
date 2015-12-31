@@ -144,12 +144,12 @@ public class GUICore implements GUI {
         running = true;
 
         // TEsting
-        loadTerrain();
+        loadWorld();
         return running;
     }
 
     @Override
-    public void loadTerrain() {
+    public void loadWorld() {
         int k = 10;
         int l = 10;
         String texture = "terrain/grass.png";

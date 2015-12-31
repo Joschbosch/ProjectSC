@@ -5,11 +5,9 @@
 package de.projectsc.core.component.physic;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -32,7 +30,7 @@ public class MeshComponent extends PhysicsComponent {
 
     private static final Log LOGGER = LogFactory.getLog(MeshComponent.class);
 
-    private File modelFile;
+    private String modelPath;
 
     private ModelData model;
 
@@ -43,8 +41,8 @@ public class MeshComponent extends PhysicsComponent {
 
     @Override
     public void update(long elapsed) {
-        if (model == null && modelFile != null) {
-            loadModel(modelFile);
+        if (model == null && modelPath != null) {
+            loadModel(modelPath);
         }
     }
 
@@ -56,35 +54,37 @@ public class MeshComponent extends PhysicsComponent {
     /**
      * Load model and texture from given files.
      * 
-     * @param incModelFile model file
+     * @param incModelPath model file
      */
-    public void loadModel(File incModelFile) {
-        if (incModelFile != null) {
-            this.modelFile = incModelFile;
-            model = OBJFileLoader.loadOBJ(incModelFile);
+    public void loadModel(String incModelPath) {
+        if (incModelPath != null) {
+            this.modelPath = incModelPath;
+            if (new File(modelPath).exists()) {
+                model = OBJFileLoader.loadOBJFromFileSystem(incModelPath);
+            } else {
+                model = OBJFileLoader.loadOBJFromSchema(incModelPath);
+            }
         }
     }
 
     @Override
     public Map<String, Object> serialize(File savingLocation) {
         File savedModelFile = new File(savingLocation, CoreConstants.MODEL_FILENAME);
-        if (modelFile != null && modelFile.exists() && !savedModelFile.exists()) {
-            try {
-                FileUtils.copyFile(modelFile, savedModelFile);
-            } catch (IOException e) {
-                LOGGER.error("Could not save model file: " + e.getMessage());
-            }
+        if (modelPath != null && !savedModelFile.exists()) {
+            // try {
+            // FileUtils.copyFile(modelPath, savedModelFile);
+            // } catch (IOException e) {
+            // LOGGER.error("Could not save model file: " + e.getMessage());
+            // }
         }
         return new HashMap<>();
     }
 
     @Override
-    public void deserialize(Map<String, Object> serialized, File loadingLocation) {
-        if (new File(loadingLocation, CoreConstants.MODEL_FILENAME).exists()) {
-            modelFile = new File(loadingLocation, CoreConstants.MODEL_FILENAME);
-        }
-        if (modelFile != null) {
-            loadModel(modelFile);
+    public void deserialize(Map<String, Object> serialized, String loadingLocation) {
+        modelPath = loadingLocation + "/" + CoreConstants.MODEL_FILENAME;
+        if (modelPath != null) {
+            loadModel(modelPath);
         }
     }
 
@@ -98,12 +98,7 @@ public class MeshComponent extends PhysicsComponent {
      * @param newModel to change to.
      */
     public void changeMesh(File newModel) {
-        this.modelFile = newModel;
-        loadModel(newModel);
-    }
-
-    public void setModelFile(File modelFile) {
-        this.modelFile = modelFile;
+        model = OBJFileLoader.loadOBJFromFileSystem(newModel.getAbsolutePath());
     }
 
     public void setModel(ModelData model) {

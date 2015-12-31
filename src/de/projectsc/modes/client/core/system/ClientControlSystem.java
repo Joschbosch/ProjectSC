@@ -16,6 +16,11 @@ import de.projectsc.core.manager.EventManager;
 import de.projectsc.core.systems.DefaultSystem;
 import de.projectsc.modes.client.core.data.ClientMessage;
 
+/**
+ * System for controlling entities by the player.
+ * 
+ * @author Josch Bosch
+ */
 public class ClientControlSystem extends DefaultSystem {
 
     private Set<Entity> controllingEntities;
@@ -40,18 +45,37 @@ public class ClientControlSystem extends DefaultSystem {
         }
     }
 
+    /**
+     * Add a control over an entity.
+     * 
+     * @param e to control
+     */
     public void addEntityToControl(Entity e) {
         controllingEntities.add(e);
     }
 
+    /**
+     * Remove control from en entity.
+     * 
+     * @param e to remove
+     */
     public void removeEntity(Entity e) {
         controllingEntities.remove(e);
     }
 
+    /**
+     * Check if the client controls the given entity.
+     * 
+     * @param e the entity
+     * @return true, if he does
+     */
     public boolean controlsEntity(Entity e) {
         return controllingEntities.contains(e);
     }
 
+    /**
+     * Reset all controls.
+     */
     public void resetControl() {
         controllingEntities.clear();
     }

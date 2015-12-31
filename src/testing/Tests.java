@@ -173,7 +173,6 @@ class City extends GraphNode {
 
     @Override
     public boolean equals(GraphNode other) {
-        System.out.println("equals!" + getName() + ((City) other).getName());
         return name.equals(((City) other).getName());
     }
 

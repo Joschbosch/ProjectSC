@@ -4,9 +4,8 @@
 
 package de.projectsc.core.utils;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,6 +16,11 @@ import org.codehaus.jackson.map.ObjectMapper;
 import de.projectsc.core.data.physics.Transform;
 import de.projectsc.core.manager.EntityManager;
 
+/**
+ * Loader for the map.
+ * 
+ * @author Josch Bosch
+ */
 public final class MapLoader {
 
     protected static final Log LOGGER = LogFactory.getLog(MapLoader.class);
@@ -25,26 +29,28 @@ public final class MapLoader {
 
     }
 
+    /**
+     * load the map.
+     * 
+     * @param mapName to load
+     * @param entityManager for adding entities
+     */
+    @SuppressWarnings("unchecked")
     public static void loadMap(String mapName, EntityManager entityManager) {
         LOGGER.debug("Start loading map " + mapName);
+        InputStream mapStream = MapLoader.class.getResourceAsStream("/level/" + mapName);
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, Object> content;
         try {
-            File mapFolder = new File(MapLoader.class.getResource("/level/").toURI());
-            File mapFile = new File(mapFolder, mapName);
-            if (mapFile.exists()) {
-                ObjectMapper mapper = new ObjectMapper();
-                @SuppressWarnings("unchecked") Map<String, Object> content =
-                    mapper.readValue(mapFile, new HashMap<String, Object>().getClass());
-                loadEntites(entityManager, (Map<String, Object>) content.get("Entities"));
-            } else {
-                LOGGER.debug("Could not load map. It does not exist.");
-            }
-        } catch (URISyntaxException | IOException e) {
-            LOGGER.debug("Failed loading map " + mapName, e);
-
+            content = mapper.readValue(mapStream, new HashMap<String, Object>().getClass());
+            loadEntites(entityManager, (Map<String, Object>) content.get("Entities"));
+            LOGGER.debug("Loading map done.");
+        } catch (IOException e) {
+            LOGGER.error("Error loading map: ", e);
         }
-        LOGGER.debug("Loading map done.");
     }
 
+    @SuppressWarnings("unchecked")
     private static void loadEntites(EntityManager entityManager, Map<String, Object> entities) {
         for (String uid : entities.keySet()) {
             Map<String, Object> entityValues = (Map<String, Object>) entities.get(uid);

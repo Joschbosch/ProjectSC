@@ -38,8 +38,8 @@ public abstract class UIElement {
         return visible;
     }
 
-    public void setActive(boolean visible) {
-        this.visible = visible;
+    public void setActive(boolean visibility) {
+        this.visible = visibility;
     }
 
 }

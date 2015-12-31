@@ -26,19 +26,29 @@ import de.projectsc.modes.client.game.ui.controls.Menu;
  */
 public class MenuState extends CommonClientState {
 
+    /**
+     * Menu constant.
+     */
     public static final int STATE_LOGIN = 0;
 
+    /**
+     * Menu constant.
+     */
     public static final int STATE_MAIN_MENU = 1;
 
+    /**
+     * Menu constant.
+     */
     public static final int STATE_CREATE_GAME_MENU = 2;
 
+    /**
+     * Menu constant.
+     */
     public static final int STATE_JOIN_GAME_MENU = 3;
 
     private static MenuState instance;
 
     private int menuState = STATE_LOGIN;
-
-    private Console console;
 
     private Menu menu;
 
@@ -60,7 +70,7 @@ public class MenuState extends CommonClientState {
         switch (state) {
         case STATE_LOGIN:
             menu = new Menu();
-            console = new Console();
+            new Console();
             break;
         case STATE_MAIN_MENU:
             menu.setActive(false);

@@ -4,9 +4,8 @@
 
 package de.projectsc.core.utils;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -21,23 +20,37 @@ import de.projectsc.core.interfaces.Component;
 import de.projectsc.core.interfaces.Entity;
 import de.projectsc.core.manager.ComponentManager;
 import de.projectsc.editor.EntitySchema;
-import de.projectsc.editor.MapEditorGraphicsCore;
 
-public class EntitySchemaLoader {
+/**
+ * Loader for the entity schemas.
+ * 
+ * @author Josch Bosch
+ */
+public final class EntitySchemaLoader {
 
     private static final Log LOGGER = LogFactory.getLog(EntitySchemaLoader.class);
 
+    private EntitySchemaLoader() {
+
+    }
+
+    /**
+     * Load a schema for the given entity.
+     * 
+     * @param id to load
+     * @param entity to load to
+     * @param componentManager to load components
+     * @return the schema
+     */
     public static EntitySchema loadEntitySchema(long id, Entity entity, ComponentManager componentManager) {
         try {
-            File schemaRoot =
-                new File(MapEditorGraphicsCore.class.getResource(
-                    CoreConstants.SCHEME_DIRECTORY_NAME).toURI());
-            File schemaFolder = new File(schemaRoot, CoreConstants.SCHEME_DIRECTORY_PREFIX + id);
-            if (schemaFolder.exists()) {
-                EntitySchema newSchema = new EntitySchema(Integer.parseInt(schemaFolder.getName().substring(1)));
+            if (id != 0) {
+                String schemaFolder = CoreConstants.SCHEME_DIRECTORY_NAME + "/" + CoreConstants.SCHEME_DIRECTORY_PREFIX + id;
+                InputStream entityFile = EntitySchemaLoader.class.getResourceAsStream(schemaFolder + "/" + CoreConstants.ENTITY_FILENAME);
+                EntitySchema newSchema = new EntitySchema(id);
                 ObjectMapper mapper = new ObjectMapper();
-                File entityFile = new File(schemaFolder, CoreConstants.ENTITY_FILENAME);
-                JsonNode tree = mapper.readTree(entityFile);
+                JsonNode tree;
+                tree = mapper.readTree(entityFile);
                 Iterator<String> componentNamesIterator = tree.get("components").getFieldNames();
                 while (componentNamesIterator.hasNext()) {
                     String name = componentNamesIterator.next();
@@ -51,11 +64,9 @@ public class EntitySchemaLoader {
                     }
                 }
                 return newSchema;
-            } else {
-                LOGGER.error("Schema folder does not exist: " + schemaFolder.getAbsolutePath());
             }
-        } catch (URISyntaxException | IOException e) {
-            LOGGER.error("Failed to load entity schema: ", e);
+        } catch (IOException e) {
+            LOGGER.error("Could not load schema file: ", e);
         }
         return null;
     }

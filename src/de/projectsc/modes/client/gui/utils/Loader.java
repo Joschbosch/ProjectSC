@@ -45,6 +45,8 @@ import de.projectsc.modes.client.gui.textures.TextureData;
  */
 public final class Loader {
 
+    private static final String IMAGE_FILETYPE = "PNG";
+
     private static final float MIPMAP_BIAS = 0.5f;
 
     private static final Log LOGGER = LogFactory.getLog(Loader.class);
@@ -151,6 +153,22 @@ public final class Loader {
     /**
      * Load texture with PNG format.
      * 
+     * @param location of the texture
+     * @return texture index
+     */
+    public static int loadTextureFromSchema(String location) {
+        if (textureMap.containsKey(location)) {
+            return textureMap.get(location);
+        } else {
+            int textureID = loadTexture(Loader.class.getResourceAsStream(location), IMAGE_FILETYPE);
+            textureMap.put(location, textureID);
+            return textureID;
+        }
+    }
+
+    /**
+     * Load texture with PNG format.
+     * 
      * @param filename to load
      * @return location of texture
      */
@@ -158,7 +176,7 @@ public final class Loader {
         if (textureMap.containsKey(filename)) {
             return textureMap.get(filename);
         } else {
-            int textureID = loadTexture(Loader.class.getResourceAsStream(GUIConstants.TEXTURE_ROOT + filename), "PNG");
+            int textureID = loadTexture(Loader.class.getResourceAsStream(GUIConstants.TEXTURE_ROOT + filename), IMAGE_FILETYPE);
             textureMap.put(filename, textureID);
             return textureID;
         }
@@ -175,7 +193,7 @@ public final class Loader {
             return textureMap.get(file.getAbsolutePath());
         } else {
             try {
-                int texId = loadTexture(new FileInputStream(file), "PNG");
+                int texId = loadTexture(new FileInputStream(file), IMAGE_FILETYPE);
                 textureMap.put(file.getAbsolutePath(), texId);
 
                 return texId;

@@ -9,6 +9,11 @@ import de.projectsc.modes.client.core.interfaces.ClientState;
 import de.projectsc.modes.client.core.system.ClientControlSystem;
 import de.projectsc.modes.client.game.states.MenuState;
 
+/**
+ * Game focused implementation of the {@link ClientCore}.
+ * 
+ * @author Josch Bosch
+ */
 public class ClientGameCore extends ClientCore {
 
     @Override

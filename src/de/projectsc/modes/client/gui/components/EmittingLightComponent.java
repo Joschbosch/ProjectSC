@@ -164,7 +164,7 @@ public class EmittingLightComponent extends GraphicalComponent {
 
     @SuppressWarnings("unchecked")
     @Override
-    public void deserialize(Map<String, Object> serialized, File loadingLocation) {
+    public void deserialize(Map<String, Object> serialized, String loadingLocation) {
         for (String lightName : serialized.keySet()) {
             Vector3f position = readVector((Map<String, List<Double>>) serialized.get(lightName), "position");
             Vector3f color = readVector((Map<String, List<Double>>) serialized.get(lightName), "color");

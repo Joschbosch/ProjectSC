@@ -8,10 +8,11 @@ package de.projectsc.core.data.utils;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
-import java.net.URISyntaxException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -22,7 +23,6 @@ import org.apache.commons.logging.LogFactory;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
-import de.projectsc.core.CoreConstants;
 import de.projectsc.core.data.physics.ModelData;
 import de.projectsc.core.data.physics.Vertex;
 
@@ -37,7 +37,7 @@ public final class OBJFileLoader {
 
     private static final String FACE_SEPERATION_CHAR = "/";
 
-    private static Map<File, ModelData> loadedModels = new TreeMap<>();
+    private static Map<String, ModelData> loadedModels = new TreeMap<>();
 
     private OBJFileLoader() {
 
@@ -47,12 +47,35 @@ public final class OBJFileLoader {
      * @param filePath to load obj file from
      * @return data
      */
-    public static ModelData loadOBJ(String filePath) {
+    public static ModelData loadOBJFromSchema(String filePath) {
+        if (new File(filePath).exists()) {
+            return loadOBJFromFileSystem(filePath);
+        } else {
+            InputStream objFile = OBJFileLoader.class.getResourceAsStream(filePath);
+            return loadOBJ(filePath, objFile);
+        }
+    }
+
+    /**
+     * @param filePath to load obj file from
+     * @return data
+     */
+    public static ModelData loadOBJFromResources(String filePath) {
+        InputStream objFile = OBJFileLoader.class.getResourceAsStream(filePath);
+        return loadOBJ(filePath, objFile);
+    }
+
+    /**
+     * @param filePath to load obj file from
+     * @return data
+     */
+    public static ModelData loadOBJFromFileSystem(String filePath) {
+        InputStream objFile;
         try {
-            File objFile = new File(OBJFileLoader.class.getResource(filePath + "/" + CoreConstants.MODEL_FILENAME).toURI());
-            return loadOBJ(objFile);
-        } catch (URISyntaxException e) {
-            LOGGER.error(e);
+            objFile = new FileInputStream(new File(filePath));
+            return loadOBJ(filePath, objFile);
+        } catch (FileNotFoundException e) {
+            LOGGER.error(e.getStackTrace());
         }
         return null;
     }
@@ -60,83 +83,73 @@ public final class OBJFileLoader {
     /**
      * Load given file.
      * 
-     * @param objFile file from obj
+     * @param filePath path to file
+     * @param objInputStream file from obj
      * @return {@link ModelData} with all information
      */
-    public static ModelData loadOBJ(File objFile) {
-        if (loadedModels.containsKey(objFile)) {
-            return loadedModels.get(objFile);
+    public static ModelData loadOBJ(String filePath, InputStream objInputStream) {
+        if (loadedModels.containsKey(filePath)) {
+            return loadedModels.get(filePath);
         }
         BufferedReader reader = null;
+        reader = new BufferedReader(new InputStreamReader(objInputStream));
+        String line;
+        List<Vertex> vertices = new ArrayList<Vertex>();
+        List<Vector2f> textures = new ArrayList<Vector2f>();
+        List<Vector3f> normals = new ArrayList<Vector3f>();
+        List<Integer> indices = new ArrayList<Integer>();
         try {
-            FileReader isr = null;
-            isr = new FileReader(objFile);
-            reader = new BufferedReader(isr);
-        } catch (FileNotFoundException e) {
-            System.err.println("File not found in res; don't use any extention");
-        }
-        if (reader != null) {
-            String line;
-            List<Vertex> vertices = new ArrayList<Vertex>();
-            List<Vector2f> textures = new ArrayList<Vector2f>();
-            List<Vector3f> normals = new ArrayList<Vector3f>();
-            List<Integer> indices = new ArrayList<Integer>();
-            try {
-                while (true) {
-                    line = reader.readLine();
-                    if (line.startsWith("v ")) {
-                        String[] currentLine = line.split("\\s");
-                        Vector3f vertex = new Vector3f(Float.valueOf(currentLine[1]),
-                            Float.valueOf(currentLine[2]),
-                            Float.valueOf(currentLine[3]));
-                        Vertex newVertex = new Vertex(vertices.size(), vertex);
-                        vertices.add(newVertex);
+            while (true) {
+                line = reader.readLine();
+                if (line.startsWith("v ")) {
+                    String[] currentLine = line.split("\\s");
+                    Vector3f vertex = new Vector3f(Float.valueOf(currentLine[1]),
+                        Float.valueOf(currentLine[2]),
+                        Float.valueOf(currentLine[3]));
+                    Vertex newVertex = new Vertex(vertices.size(), vertex);
+                    vertices.add(newVertex);
 
-                    } else if (line.startsWith("vt ")) {
-                        String[] currentLine = line.split(" ");
-                        Vector2f texture = new Vector2f(Float.valueOf(currentLine[1]),
-                            Float.valueOf(currentLine[2]));
-                        textures.add(texture);
-                    } else if (line.startsWith("vn ")) {
-                        String[] currentLine = line.split(" ");
-                        Vector3f normal = new Vector3f(Float.valueOf(currentLine[1]),
-                            Float.valueOf(currentLine[2]),
-                            Float.valueOf(currentLine[3]));
-                        normals.add(normal);
-                    } else if (line.startsWith("f ")) {
-                        break;
-                    }
-                }
-                while (line != null && line.startsWith("f ")) {
+                } else if (line.startsWith("vt ")) {
                     String[] currentLine = line.split(" ");
-                    String[] vertex1 = currentLine[1].split(FACE_SEPERATION_CHAR);
-                    String[] vertex2 = currentLine[2].split(FACE_SEPERATION_CHAR);
-                    String[] vertex3 = currentLine[3].split(FACE_SEPERATION_CHAR);
-                    processVertex(vertex1, vertices, indices);
-                    processVertex(vertex2, vertices, indices);
-                    processVertex(vertex3, vertices, indices);
-                    line = reader.readLine();
+                    Vector2f texture = new Vector2f(Float.valueOf(currentLine[1]),
+                        Float.valueOf(currentLine[2]));
+                    textures.add(texture);
+                } else if (line.startsWith("vn ")) {
+                    String[] currentLine = line.split(" ");
+                    Vector3f normal = new Vector3f(Float.valueOf(currentLine[1]),
+                        Float.valueOf(currentLine[2]),
+                        Float.valueOf(currentLine[3]));
+                    normals.add(normal);
+                } else if (line.startsWith("f ")) {
+                    break;
                 }
-                reader.close();
-
-            } catch (IOException e) {
-                System.err.println("Error reading the file");
             }
-            removeUnusedVertices(vertices);
-            float[] verticesArray = new float[vertices.size() * 3];
-            float[] texturesArray = new float[vertices.size() * 2];
-            float[] normalsArray = new float[vertices.size() * 3];
-            float furthest = convertDataToArrays(vertices, textures, normals, verticesArray,
-                texturesArray, normalsArray);
-            int[] indicesArray = convertIndicesListToArray(indices);
-            ModelData data = new ModelData(verticesArray, texturesArray, normalsArray, indicesArray,
-                furthest);
-            loadedModels.put(objFile, data);
-            return data;
-        } else {
-            LOGGER.error("Could not load model " + objFile.getAbsolutePath());
-            return null;
+            while (line != null && line.startsWith("f ")) {
+                String[] currentLine = line.split(" ");
+                String[] vertex1 = currentLine[1].split(FACE_SEPERATION_CHAR);
+                String[] vertex2 = currentLine[2].split(FACE_SEPERATION_CHAR);
+                String[] vertex3 = currentLine[3].split(FACE_SEPERATION_CHAR);
+                processVertex(vertex1, vertices, indices);
+                processVertex(vertex2, vertices, indices);
+                processVertex(vertex3, vertices, indices);
+                line = reader.readLine();
+            }
+            reader.close();
+
+        } catch (IOException e) {
+            System.err.println("Error reading the file");
         }
+        removeUnusedVertices(vertices);
+        float[] verticesArray = new float[vertices.size() * 3];
+        float[] texturesArray = new float[vertices.size() * 2];
+        float[] normalsArray = new float[vertices.size() * 3];
+        float furthest = convertDataToArrays(vertices, textures, normals, verticesArray,
+            texturesArray, normalsArray);
+        int[] indicesArray = convertIndicesListToArray(indices);
+        ModelData data = new ModelData(verticesArray, texturesArray, normalsArray, indicesArray,
+            furthest);
+        loadedModels.put(filePath, data);
+        return data;
     }
 
     private static void processVertex(String[] vertex, List<Vertex> vertices, List<Integer> indices) {

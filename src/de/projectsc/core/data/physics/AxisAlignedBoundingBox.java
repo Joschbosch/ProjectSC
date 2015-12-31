@@ -43,6 +43,13 @@ public class AxisAlignedBoundingBox {
         this.scale = new Vector3f(1, 1, 1);
     }
 
+    /**
+     * Check if the given ray intersects this AABB.
+     * 
+     * @param ray vector
+     * @param org point
+     * @return intersection range
+     */
     public float intersects(Vector3f ray, Vector3f org) {
         Vector3f lb = Vector3f.add(position, getMin(), null);
         Vector3f rt = Vector3f.add(position, getMax(), null);
@@ -53,6 +60,7 @@ public class AxisAlignedBoundingBox {
     /**
      * Check if the current entity intersects with the picking ray.
      * 
+     * @param transform for the actual location
      * @param org position of camera
      * @param ray to intersect
      * @return true if it intersects

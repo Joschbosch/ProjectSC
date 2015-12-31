@@ -4,7 +4,11 @@
 
 package de.projectsc.modes.client.core.data;
 
-
+/**
+ * Implementation of an input command for the keyboard.
+ * 
+ * @author Josch Bosch
+ */
 public class KeyboardInputCommand implements InputCommand {
 
     private final int key;

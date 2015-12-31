@@ -10,6 +10,7 @@ import java.util.Map;
 
 import org.lwjgl.util.vector.Vector3f;
 
+import de.projectsc.core.CoreConstants;
 import de.projectsc.core.component.ComponentType;
 
 /**
@@ -49,16 +50,12 @@ public class PathComponent extends PhysicsComponent {
     }
 
     @Override
-    public void deserialize(Map<String, Object> serialized, File loadingLocation) {
-
-    }
-
-    @Override
     public String serializeForNetwork() {
         if (currentTarget == null) {
             return "";
         } else {
-            return "" + currentTarget.x + ";" + currentTarget.y + ";" + currentTarget.z + ";" + targetRotation.y;
+            return "" + currentTarget.x + CoreConstants.SERIALIZATION_SEPARATOR + currentTarget.y + CoreConstants.SERIALIZATION_SEPARATOR
+                + currentTarget.z + CoreConstants.SERIALIZATION_SEPARATOR + targetRotation.y;
         }
     }
 
@@ -71,7 +68,7 @@ public class PathComponent extends PhysicsComponent {
                 currentTarget = new Vector3f();
                 targetRotation = new Vector3f();
             }
-            String[] split = serialized.split(";");
+            String[] split = serialized.split(CoreConstants.SERIALIZATION_SEPARATOR);
             currentTarget.x = Float.valueOf(split[0]);
             currentTarget.y = Float.valueOf(split[1]);
             currentTarget.z = Float.valueOf(split[2]);

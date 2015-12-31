@@ -14,10 +14,23 @@ import java.util.Map.Entry;
 
 import org.lwjgl.util.vector.Vector3f;
 
-public class ParticleMaster {
+/**
+ * Managing class for all particles.
+ * 
+ * @author Josch Bosch
+ */
+public final class ParticleMaster {
 
     private static Map<ParticleTexture, List<Particle>> particles = new HashMap<>();
 
+    private ParticleMaster() {}
+
+    /**
+     * Update the particles.
+     * 
+     * @param delta time to update
+     * @param camPosition for calculation
+     */
     public static void update(long delta, Vector3f camPosition) {
         Iterator<Entry<ParticleTexture, List<Particle>>> mapIterator = particles.entrySet().iterator();
         while (mapIterator.hasNext()) {
@@ -37,12 +50,23 @@ public class ParticleMaster {
 
     }
 
+    /**
+     * @return all current particles.
+     */
     public static Map<ParticleTexture, List<Particle>> render() {
         return particles;
     }
 
+    /**
+     * Clean up.
+     */
     public static void dispose() {}
 
+    /**
+     * Add a new particle.
+     * 
+     * @param p to add
+     */
     public static void addParticle(Particle p) {
         List<Particle> list = particles.get(p.getTexture());
         if (list == null) {

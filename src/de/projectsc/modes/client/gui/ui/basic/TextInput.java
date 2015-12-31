@@ -14,6 +14,11 @@ import de.projectsc.modes.client.core.data.KeyboardInputCommand;
 import de.projectsc.modes.client.core.data.MouseInputCommand;
 import de.projectsc.modes.client.core.interfaces.InputCommandListener;
 
+/**
+ * Label with text input listener.
+ * 
+ * @author Josch Bosch
+ */
 public class TextInput extends Label implements InputCommandListener {
 
     private List<TextInputConsumer> consumer = new LinkedList<>();
@@ -90,16 +95,25 @@ public class TextInput extends Label implements InputCommandListener {
 
     @Override
     public void handleMouseCommand(MouseInputCommand command) {
-        // TODO Auto-generated method stub
 
     }
 
-    public void addTextInputConsumer(TextInputConsumer consumer) {
-        this.consumer.add(consumer);
+    /**
+     * Add new input consumer.
+     * 
+     * @param newConsumer to add
+     */
+    public void addTextInputConsumer(TextInputConsumer newConsumer) {
+        this.consumer.add(newConsumer);
     }
 
-    public void removeTextInputConsumer(TextInputConsumer consumer) {
-        this.consumer.remove(consumer);
+    /**
+     * Remove input consumer.
+     * 
+     * @param c to remove
+     */
+    public void removeTextInputConsumer(TextInputConsumer c) {
+        this.consumer.remove(c);
     }
 
     public String getPrefix() {

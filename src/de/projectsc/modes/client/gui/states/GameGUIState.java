@@ -19,6 +19,11 @@ import de.projectsc.modes.client.gui.ui.views.GameTimeView;
 import de.projectsc.modes.client.gui.ui.views.HealthView;
 import de.projectsc.modes.client.gui.utils.MousePicker;
 
+/**
+ * State of the game where the actual game happens.
+ * 
+ * @author Josch Bosch
+ */
 public class GameGUIState implements GUIState, InputCommandListener {
 
     private Container container;

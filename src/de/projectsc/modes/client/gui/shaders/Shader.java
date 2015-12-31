@@ -5,12 +5,11 @@
  */
 package de.projectsc.modes.client.gui.shaders;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.nio.FloatBuffer;
+import java.util.List;
 
-import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.lwjgl.BufferUtils;
@@ -96,8 +95,12 @@ public abstract class Shader {
         String shaderSource = "";
 
         try {
-            shaderSource = FileUtils.readFileToString(new File(Shader.class.getResource("/shader/" + file).toURI()));
-        } catch (IOException | URISyntaxException e) {
+            List<String> lines = IOUtils.readLines(Shader.class.getResourceAsStream("/shader/" + file));
+            shaderSource = "";
+            for (String line : lines) {
+                shaderSource += line + "\n";
+            }
+        } catch (IOException e) {
             LOGGER.error("Couild not load shader: ", e);
         }
         int shaderID = GL20.glCreateShader(type);

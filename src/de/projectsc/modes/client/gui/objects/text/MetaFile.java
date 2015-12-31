@@ -1,9 +1,9 @@
 package de.projectsc.modes.client.gui.objects.text;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -61,11 +61,11 @@ public class MetaFile {
     /**
      * Opens a font file in preparation for reading.
      * 
-     * @param file - the font file.
+     * @param fontFile - the font file.
      */
-    protected MetaFile(File file) {
+    protected MetaFile(InputStream fontFile) {
         this.aspectRatio = (double) Display.getWidth() / (double) Display.getHeight();
-        openFile(file);
+        openFile(fontFile);
         loadPaddingData();
         loadLineSizes();
         int imageWidth = getValueOfVariable("scaleW");
@@ -144,14 +144,10 @@ public class MetaFile {
     /**
      * Opens the font file, ready for reading.
      * 
-     * @param file - the font file.
+     * @param fontFile - the font file.
      */
-    private void openFile(File file) {
-        try {
-            reader = new BufferedReader(new FileReader(file));
-        } catch (IOException e) {
-            LOGGER.error("Could not read file. " + file.getAbsolutePath());
-        }
+    private void openFile(InputStream fontFile) {
+        reader = new BufferedReader(new InputStreamReader(fontFile));
     }
 
     /**

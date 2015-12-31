@@ -4,6 +4,11 @@
 
 package de.projectsc.core.data;
 
+/**
+ * Basic class for all events.
+ * 
+ * @author Josch Bosch
+ */
 public class Event {
 
     protected final String eventId;

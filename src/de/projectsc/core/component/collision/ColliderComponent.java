@@ -4,10 +4,6 @@
 
 package de.projectsc.core.component.collision;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.core.component.ComponentType;
@@ -48,16 +44,6 @@ public class ColliderComponent extends PhysicsComponent {
     @Override
     public boolean isValidForSaving() {
         return true;
-    }
-
-    @Override
-    public Map<String, Object> serialize(File savingLocation) {
-        return new HashMap<>();
-    }
-
-    @Override
-    public void deserialize(Map<String, Object> serialized, File loadingLocation) {
-
     }
 
     @Override

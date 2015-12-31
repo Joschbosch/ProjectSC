@@ -16,6 +16,11 @@ import de.projectsc.modes.client.gui.objects.particles.ParticleTexture;
 import de.projectsc.modes.client.gui.shaders.ParticleShader;
 import de.projectsc.modes.client.gui.utils.Loader;
 
+/**
+ * Renderer for the particles.
+ * 
+ * @author Josch Bosch
+ */
 public class ParticleRenderer {
 
     private static final float[] VERTICES = {
@@ -36,6 +41,12 @@ public class ParticleRenderer {
         shader.stop();
     }
 
+    /**
+     * Render.
+     * 
+     * @param particles to render
+     * @param viewMatrix for view
+     */
     public void render(Map<ParticleTexture, List<Particle>> particles, Matrix4f viewMatrix) {
         prepare();
         for (ParticleTexture texture : particles.keySet()) {
@@ -85,6 +96,9 @@ public class ParticleRenderer {
 
     }
 
+    /**
+     * Dipose renderer.
+     */
     public void dispose() {
         shader.dispose();
     }

@@ -4,6 +4,11 @@
 
 package de.projectsc.modes.client.gui.objects.particles;
 
+/**
+ * Texture of the particles.
+ * 
+ * @author Josch Bosch
+ */
 public class ParticleTexture {
 
     private int textureID;

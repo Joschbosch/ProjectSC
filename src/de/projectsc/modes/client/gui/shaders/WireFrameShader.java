@@ -76,6 +76,9 @@ public class WireFrameShader extends Shader {
         super.loadMatrix(locationTransformationMatrix, transformationMatrix);
     }
 
+    /**
+     * @param color to load.
+     */
     public void loadColor(Vector3f color) {
         super.loadVector(locationColor, color);
     }

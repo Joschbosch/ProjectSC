@@ -7,6 +7,7 @@ package de.projectsc.core.component;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -65,7 +66,9 @@ public abstract class DefaultComponent implements Component {
      * @throws IOException e
      */
     @Override
-    public abstract Map<String, Object> serialize(File savingLocation);
+    public Map<String, Object> serialize(File savingLocation) {
+        return new HashMap<>();
+    }
 
     /**
      * 
@@ -75,7 +78,7 @@ public abstract class DefaultComponent implements Component {
      * @throws IOException e
      */
     @Override
-    public abstract void deserialize(Map<String, Object> serialized, File loadingLocation);
+    public void deserialize(Map<String, Object> serialized, String loadingLocation) {}
 
     /**
      * Default handle event .

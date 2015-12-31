@@ -40,8 +40,6 @@ public class ClientNetworkCore implements Runnable {
 
     private boolean running = false;
 
-    private final boolean connected = false;
-
     private final Client client;
 
     public ClientNetworkCore(BlockingQueue<ClientMessage> networkIncomingQueue, BlockingQueue<ClientMessage> networkOutgoingQueue,

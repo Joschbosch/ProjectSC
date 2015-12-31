@@ -130,8 +130,6 @@ public class MapEditorGraphicsCore implements Runnable {
 
     private Timer timer;
 
-    private EntityStateSystem stateSystem;
-
     private CollisionSystem collisionSystem;
 
     public MapEditorGraphicsCore(Canvas displayParent, int width, int height, BlockingQueue<String> messageQueue,
@@ -160,7 +158,7 @@ public class MapEditorGraphicsCore implements Runnable {
         } catch (LWJGLException e) {
         }
         loadGUIComponents();
-        stateSystem = new EntityStateSystem(entityManager, eventManager);
+        new EntityStateSystem(entityManager, eventManager);
         physicsSystem = new BasicPhysicsSystem(entityManager, eventManager);
         collisionSystem = new CollisionSystem(entityManager, eventManager);
         renderSystem = new RenderingSystem(entityManager, eventManager);
@@ -189,6 +187,7 @@ public class MapEditorGraphicsCore implements Runnable {
 
         try {
             File folder = new File(MapEditorGraphicsCore.class.getResource(SLASHED_MODEL_DIR).toURI());
+            String e = entityManager.createNewEntity();
             for (File schemaDir : folder.listFiles()) {
                 try {
                     if (schemaDir.getName().matches(CoreConstants.SCHEME_DIRECTORY_PREFIX + "\\d{5}")) {
@@ -202,15 +201,16 @@ public class MapEditorGraphicsCore implements Runnable {
                             @SuppressWarnings("unchecked") java.util.Map<String, Object> serialized =
                                 mapper.readValue(tree.get("components").get(name), new HashMap<String, Object>().getClass());
                             Component c = componentManager.createComponent(name);
+                            c.setOwner(entityManager.getEntity(e));
                             if (c != null) {
-                                c.deserialize(serialized, schemaDir);
-                                newSchema.components.add(c);
+                                c.deserialize(serialized, schemaDir.getAbsolutePath());
+                                newSchema.getComponents().add(c);
                             }
                         }
                         entitySchemas.put(newSchema.getId(), newSchema);
                     }
-                } catch (IOException e) {
-                    LOGGER.error(e);
+                } catch (IOException e1) {
+                    LOGGER.error(e1);
                 }
             }
         } catch (URISyntaxException e1) {
@@ -331,7 +331,8 @@ public class MapEditorGraphicsCore implements Runnable {
         }
         for (String e : entityManager.getAllEntites()) {
             ColliderComponent collider = (ColliderComponent) entityManager.getComponent(e, ColliderComponent.class);
-            if (collider.getAABB().intersects(entityManager.getEntity(e).getTransform(), camera.getPosition(),
+
+            if (collider != null && collider.getAABB().intersects(entityManager.getEntity(e).getTransform(), camera.getPosition(),
                 mousePicker.getCurrentRay()) > 0) {
                 eventManager.fireEvent(new UpdateEntitySelectionEvent(e, false, true));
             } else {
@@ -449,6 +450,9 @@ public class MapEditorGraphicsCore implements Runnable {
         }
     }
 
+    /**
+     * Save the map.
+     */
     public void performSave() {
         File levelRootDirectory = null;
         try {

@@ -11,6 +11,11 @@ import java.util.Date;
 import de.projectsc.core.data.utils.Timer;
 import de.projectsc.modes.client.core.ui.UIElement;
 
+/**
+ * Shows the game time in the UI.
+ * 
+ * @author Josch Bosch
+ */
 public class GameTime extends UIElement {
 
     private Timer timer;
@@ -20,6 +25,9 @@ public class GameTime extends UIElement {
         this.timer = timer;
     }
 
+    /**
+     * @return game time as formatted string
+     */
     public String getCurrentTimeString() {
         Date date = new Date(timer.getGameTime());
         DateFormat formatter = null;

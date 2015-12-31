@@ -6,9 +6,17 @@ package de.projectsc.modes.client.core.data;
 
 import de.projectsc.core.data.Event;
 
+/**
+ * Event for a new command.
+ * 
+ * @author Josch Bosch
+ */
 public class NewCommandLineEvent extends Event {
 
-    public static final String ID = "NewCommandLineEvent";
+    /**
+     * ID.
+     */
+    public static final String ID = NewCommandLineEvent.class.getName();
 
     private String command;
 

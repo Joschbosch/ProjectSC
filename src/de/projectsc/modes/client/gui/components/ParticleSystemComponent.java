@@ -4,14 +4,11 @@
 
 package de.projectsc.modes.client.gui.components;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.core.component.ComponentType;
@@ -22,14 +19,17 @@ import de.projectsc.modes.client.gui.objects.particles.ParticleSystem;
 import de.projectsc.modes.client.gui.objects.particles.ParticleTexture;
 import de.projectsc.modes.client.gui.utils.Loader;
 
+/**
+ * Component for particels.
+ * 
+ * @author Josch Bosch
+ */
 public class ParticleSystemComponent extends GraphicalComponent {
 
     /**
      * Name.
      */
     public static final String NAME = "Particle System Component";
-
-    private static final Log LOGGER = LogFactory.getLog(ParticleSystemComponent.class);
 
     private List<ParticleSystem> particleSystems = new LinkedList<>();
 
@@ -70,16 +70,6 @@ public class ParticleSystemComponent extends GraphicalComponent {
     }
 
     @Override
-    public Map<String, Object> serialize(File savingLocation) {
-        return new HashMap<>();
-    }
-
-    @Override
-    public void deserialize(Map<String, Object> serialized, File loadingLocation) {
-
-    }
-
-    @Override
     public void addSceneInformation(Scene scene) {
         for (ParticleSystem s : particleSystems) {
             WireFrame w = new WireFrame(WireFrame.SPHERE, s.getSystemCenter(), new Vector3f(0, 0, 0), new Vector3f(1, 1, 1));
@@ -87,6 +77,9 @@ public class ParticleSystemComponent extends GraphicalComponent {
         }
     }
 
+    /**
+     * Add a new system.
+     */
     public void addNewParticleSystem() {
         ParticleSystem particleSystem = new ParticleSystem(new Vector3f(0, 0, 0), 100, 10, 1, 5, 1, true, new ParticleTexture(Loader
             .loadTexture("particles/particleStar.png"), 1));

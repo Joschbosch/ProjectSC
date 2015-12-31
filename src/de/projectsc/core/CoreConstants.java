@@ -53,7 +53,15 @@ public final class CoreConstants {
      */
     public static final String BOX_FILENAME = "boundingBox.obj";
 
+    /**
+     * Prefix for level.
+     */
     public static final String LEVEL_DIRECTORY_PREFIX = "L";
+
+    /**
+     * Separator for sending serialized strings over the network.
+     */
+    public static final String SERIALIZATION_SEPARATOR = ";";
 
     private CoreConstants() {
 

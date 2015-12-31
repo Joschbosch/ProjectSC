@@ -4,8 +4,7 @@
 
 package de.projectsc.modes.client.gui.objects.text;
 
-import java.io.File;
-import java.net.URISyntaxException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,16 +40,12 @@ public final class FontStore {
     }
 
     private static FontType loadFont(Font font) {
-        try {
-            File fontImageFile = new File(FontStore.class.getResource("/fonts/" + font.getTextureName()).toURI());
-            File fontFile = new File(FontStore.class.getResource("/fonts/" + font.getFontFileName()).toURI());
-            FontType fontType = new FontType(Loader.loadTexture(fontImageFile), fontFile);
-            fontType.setEdge(font.getEdge());
-            fontType.setWidth(font.getWidth());
-            return fontType;
-        } catch (URISyntaxException e) {
-            LOGGER.error("Could not load font " + font.name() + ": " + e.getMessage());
-        }
-        return null;
+        InputStream fontImageFile = FontStore.class.getResourceAsStream("/fonts/" + font.getTextureName());
+        InputStream fontFile = FontStore.class.getResourceAsStream("/fonts/" + font.getFontFileName());
+        FontType fontType = new FontType(Loader.loadTexture(fontImageFile, "png"), fontFile);
+        fontType.setEdge(font.getEdge());
+        fontType.setWidth(font.getWidth());
+        LOGGER.debug("Loaded font " + font.getFontName());
+        return fontType;
     }
 }

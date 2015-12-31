@@ -10,13 +10,30 @@ import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
+/**
+ * A particle source.
+ * 
+ * @author Josch Bosch
+ */
 public class ParticleSystem {
 
     private static int idCount = 0;
 
-    private float pps, averageSpeed, gravityComplient, averageLifeLength, averageScale;
+    private float pps;
 
-    private float speedError, lifeError, scaleError = 0;
+    private float averageSpeed;
+
+    private float gravityComplient;
+
+    private float averageLifeLength;
+
+    private float averageScale;
+
+    private float speedError = 0;
+
+    private float lifeError = 0;
+
+    private float scaleError = 0;
 
     private boolean randomRotation = false;
 
@@ -48,14 +65,17 @@ public class ParticleSystem {
     }
 
     /**
-     * @param direction - The average direction in which particles are emitted.
+     * @param newDirection - The average direction in which particles are emitted.
      * @param deviation - A value between 0 and 1 indicating how far from the chosen direction particles can deviate.
      */
-    public void setDirection(Vector3f direction, float deviation) {
-        this.direction = new Vector3f(direction);
+    public void setDirection(Vector3f newDirection, float deviation) {
+        this.direction = new Vector3f(newDirection);
         this.directionDeviation = (float) (deviation * Math.PI);
     }
 
+    /**
+     * Set that rotation should be randomized.
+     */
     public void randomizeRotation() {
         randomRotation = true;
     }
@@ -81,6 +101,11 @@ public class ParticleSystem {
         this.scaleError = error * averageScale;
     }
 
+    /**
+     * Generate new particles .
+     * 
+     * @param elapsed time elapsed.
+     */
     public void generateParticles(long elapsed) {
         float delta = elapsed / 1000.0f;
         float particlesToCreate = pps * delta;

@@ -69,6 +69,12 @@ public final class TextMaster {
         return size;
     }
 
+    /**
+     * Is the given text already displayed.
+     * 
+     * @param text to check
+     * @return true if it is.
+     */
     public static boolean hasText(GUIText text) {
         List<GUIText> textBatch = texts.get(text.getFont());
         return textBatch.contains(text);
@@ -119,6 +125,9 @@ public final class TextMaster {
         return texts;
     }
 
+    /**
+     * Remove all texts.
+     */
     public static void removeAll() {
         texts.clear();
     }

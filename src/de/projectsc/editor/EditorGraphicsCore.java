@@ -117,8 +117,6 @@ public class EditorGraphicsCore implements Runnable {
 
     private Timer timer;
 
-    private EntityStateSystem stateSystem;
-
     private CollisionSystem collisionSystem;
 
     public EditorGraphicsCore(Canvas displayParent, int width, int height, BlockingQueue<String> messageQueue,
@@ -147,7 +145,7 @@ public class EditorGraphicsCore implements Runnable {
         } catch (LWJGLException e) {
         }
         loadGUIComponents();
-        stateSystem = new EntityStateSystem(entityManager, eventManager);
+        new EntityStateSystem(entityManager, eventManager);
         physicsSystem = new BasicPhysicsSystem(entityManager, eventManager);
         collisionSystem = new CollisionSystem(entityManager, eventManager);
         renderSystem = new RenderingSystem(entityManager, eventManager);
@@ -236,11 +234,11 @@ public class EditorGraphicsCore implements Runnable {
         mousePicker = new MousePicker(masterRenderer.getProjectionMatrix());
     }
 
-    private int cycleTextures(int timer, long delta) {
+    private int cycleTextures(int timing, long delta) {
         if (editorData.isCycleTextures()) {
-            timer -= delta;
-            if (timer <= 0) {
-                timer = 1500;
+            timing -= delta;
+            if (timing <= 0) {
+                timing = 1500;
                 MeshRendererComponent component =
                     (MeshRendererComponent) entityManager.getComponent(entity, MeshRendererComponent.NAME);
                 if (!entity.isEmpty() && component != null) {
@@ -249,7 +247,7 @@ public class EditorGraphicsCore implements Runnable {
                 }
             }
         }
-        return timer;
+        return timing;
     }
 
     protected void initGL() {}
@@ -361,7 +359,7 @@ public class EditorGraphicsCore implements Runnable {
                     addComponent(name);
                     Component c = entityManager.getComponent(getCurrentEntity(), name);
                     if (c != null) {
-                        c.deserialize(serialized, schemaFile);
+                        c.deserialize(serialized, schemaFile.getAbsolutePath());
                     }
                 }
             }

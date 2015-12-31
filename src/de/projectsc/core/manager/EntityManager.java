@@ -61,6 +61,12 @@ public class EntityManager {
         return createNewEntity(uuid);
     }
 
+    /**
+     * Create a new entity with the given UID.
+     * 
+     * @param uid to set
+     * @return entity ID.
+     */
     public String createNewEntity(String uid) {
         if (entities.get(uid) != null) {
             LOGGER.error("Entity with id " + uid + " already exists!");
@@ -75,6 +81,13 @@ public class EntityManager {
         return e.getID();
     }
 
+    /**
+     * Create a new entity using the given schema.
+     * 
+     * @param schemaId to load
+     * @param entityUID to set
+     * @return new entity
+     */
     public String createNewEntityFromSchema(long schemaId, String entityUID) {
         String e = createNewEntity(entityUID);
         if (entitySchemas.get(schemaId) == null) {
@@ -95,6 +108,12 @@ public class EntityManager {
         return e;
     }
 
+    /**
+     * Create a new entity using the given schema.
+     * 
+     * @param schemaId to load
+     * @return new entity
+     */
     public String createNewEntityFromSchema(long schemaId) {
         return createNewEntityFromSchema(schemaId, UUID.randomUUID().toString());
     }
@@ -114,6 +133,13 @@ public class EntityManager {
         return c;
     }
 
+    /**
+     * Adds the specified component to the given entity.
+     * 
+     * @param id of entity
+     * @param c component
+     * @return the component
+     */
     public Component addComponentToEntity(String id, Component c) {
         if (c != null) {
             Map<String, Component> components = entityComponents.get(id);
@@ -266,6 +292,11 @@ public class EntityManager {
         return entities.keySet();
     }
 
+    /**
+     * Remove old entities and set new ones.
+     * 
+     * @param newEntities to set
+     */
     public void addAllEntites(Map<String, Entity> newEntities) {
         entities.clear();
         entities.putAll(newEntities);
