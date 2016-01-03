@@ -45,7 +45,7 @@ public final class FontStore {
         FontType fontType = new FontType(Loader.loadTexture(fontImageFile, "png"), fontFile);
         fontType.setEdge(font.getEdge());
         fontType.setWidth(font.getWidth());
-        LOGGER.debug("Loaded font " + font.getFontName());
+        LOGGER.info("Loaded font " + font.getFontName());
         return fontType;
     }
 }

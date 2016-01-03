@@ -37,14 +37,14 @@ public final class MapLoader {
      */
     @SuppressWarnings("unchecked")
     public static void loadMap(String mapName, EntityManager entityManager) {
-        LOGGER.debug("Start loading map " + mapName);
+        LOGGER.info("Start loading map " + mapName);
         InputStream mapStream = MapLoader.class.getResourceAsStream("/level/" + mapName);
         ObjectMapper mapper = new ObjectMapper();
         Map<String, Object> content;
         try {
             content = mapper.readValue(mapStream, new HashMap<String, Object>().getClass());
             loadEntites(entityManager, (Map<String, Object>) content.get("Entities"));
-            LOGGER.debug("Loading map done.");
+            LOGGER.info("Loading map done.");
         } catch (IOException e) {
             LOGGER.error("Error loading map: ", e);
         }
@@ -58,7 +58,7 @@ public final class MapLoader {
             if (!newEntity.isEmpty()) {
                 Transform t = entityManager.getEntity(newEntity).getTransform();
                 t.parseTransformValues((Map<String, Map<String, Double>>) entityValues.get("transform"));
-                LOGGER.debug(String.format("Added entity %s of type %s with transform %s", newEntity, entityManager.getEntity(newEntity)
+                LOGGER.info(String.format("Added entity %s of type %s with transform %s", newEntity, entityManager.getEntity(newEntity)
                     .getEntityTypeId(), t));
             } else {
                 LOGGER.error("Failed to load entity " + entityValues);

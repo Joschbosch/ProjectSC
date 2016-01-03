@@ -52,6 +52,6 @@ public class EventManager {
             eventListener.put(eventClass, eventList);
         }
         eventList.add(listener);
-        LOGGER.debug("Registered listener for " + eventClass.getName() + " to " + listener.getSource());
+        LOGGER.info("Registered listener for " + eventClass.getName() + " to " + listener.getSource());
     }
 }

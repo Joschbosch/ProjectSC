@@ -35,7 +35,7 @@ public class WireFrameShader extends Shader {
 
     public WireFrameShader() {
         super(VERTEX_FILE, FRAGMENT_FILE);
-        LOGGER.debug("WireFrame shader loaded.");
+        LOGGER.info("WireFrame shader loaded.");
     }
 
     @Override

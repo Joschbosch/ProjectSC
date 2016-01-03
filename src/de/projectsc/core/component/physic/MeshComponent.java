@@ -5,9 +5,11 @@
 package de.projectsc.core.component.physic;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -71,11 +73,12 @@ public class MeshComponent extends PhysicsComponent {
     public Map<String, Object> serialize(File savingLocation) {
         File savedModelFile = new File(savingLocation, CoreConstants.MODEL_FILENAME);
         if (modelPath != null && !savedModelFile.exists()) {
-            // try {
-            // FileUtils.copyFile(modelPath, savedModelFile);
-            // } catch (IOException e) {
-            // LOGGER.error("Could not save model file: " + e.getMessage());
-            // }
+            try {
+                FileUtils.copyFile(new File(modelPath), savedModelFile);
+                LOGGER.info(String.format("Copied mesh file from %s to %s.", modelPath, savedModelFile));
+            } catch (IOException e) {
+                LOGGER.error("Could not save model file: " + e.getMessage());
+            }
         }
         return new HashMap<>();
     }
@@ -98,10 +101,8 @@ public class MeshComponent extends PhysicsComponent {
      * @param newModel to change to.
      */
     public void changeMesh(File newModel) {
+        modelPath = newModel.getAbsolutePath();
         model = OBJFileLoader.loadOBJFromFileSystem(newModel.getAbsolutePath());
     }
 
-    public void setModel(ModelData model) {
-        this.model = model;
-    }
 }

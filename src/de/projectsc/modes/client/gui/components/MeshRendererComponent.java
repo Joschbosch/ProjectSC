@@ -6,11 +6,13 @@
 package de.projectsc.modes.client.gui.components;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -106,11 +108,12 @@ public class MeshRendererComponent extends GraphicalComponent {
     public Map<String, Object> serialize(File savingLocation) {
         File savedTextureFile = new File(savingLocation, CoreConstants.TEXTURE_FILENAME);
         if (texturePath != null && !savedTextureFile.exists()) {
-            // try {
-            // FileUtils.copyFile(texturePath, savedTextureFile);
-            // } catch (IOException e) {
-            // LOGGER.error("Could not save texture file: " + e.getMessage());
-            // }
+            try {
+                FileUtils.copyFile(new File(texturePath), savedTextureFile);
+                LOGGER.info(String.format("Copied texture file from %s to %s.", texturePath, savedTextureFile));
+            } catch (IOException e) {
+                LOGGER.error("Could not save texture file: " + e.getMessage());
+            }
         }
         Map<String, Object> serialized = new HashMap<>();
         serialized.put("numColumns", modelTexture.getNumberOfRows());

@@ -51,7 +51,7 @@ public class ClientNetworkCore implements Runnable {
     }
 
     private void start() {
-        LOGGER.debug("Starting network ...");
+        LOGGER.info("Starting network ...");
         running = true;
         while (running) {
             retreiveCoreMessages();
@@ -68,7 +68,7 @@ public class ClientNetworkCore implements Runnable {
             ClientMessage msg;
             try {
                 msg = sendMessageQueue.take();
-                LOGGER.debug("Got new message for Server: " + msg);
+                LOGGER.info("Got new message for Server: " + msg);
                 if (msg.getMessage().equals(MessageConstants.CONNECT)) {
                     connectToServer();
                 } else {
@@ -87,7 +87,7 @@ public class ClientNetworkCore implements Runnable {
     }
 
     private void connectToServer() {
-        LOGGER.debug("Connecting to server ...");
+        LOGGER.info("Connecting to server ...");
         try {
             client.connect(5000, "localhost", 54555, 54777);
             Kryo kryo = client.getKryo();
@@ -112,7 +112,7 @@ public class ClientNetworkCore implements Runnable {
                 }
 
             });
-            LOGGER.debug("Client connection established");
+            LOGGER.info("Client connection established");
         } catch (IOException e) {
             LOGGER.error("Could not connect: " + e);
         }

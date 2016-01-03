@@ -52,7 +52,7 @@ public class ServerCore implements Runnable {
 
     @Override
     public void run() {
-        LOGGER.debug("Starting core ... ");
+        LOGGER.info("Starting core ... ");
         console = new ServerConsole(receiveQueue);
         console.hashCode();
         while (!shutdown.get()) {
@@ -63,7 +63,7 @@ public class ServerCore implements Runnable {
             }
             workMessages();
         }
-        LOGGER.debug("Server core shut down.");
+        LOGGER.info("Server core shut down.");
     }
 
     private void workMessages() {
@@ -149,7 +149,7 @@ public class ServerCore implements Runnable {
         } else if (msg.getMessage().equals(MessageConstants.CHAT_MESSAGE)) {
             sendMsgToAllClients(msg);
         } else if (msg.getMessage().equals(MessageConstants.NEW_CLIENT_CONNECTED)) {
-            LOGGER.debug("New Client connected to server!");
+            LOGGER.info("New Client connected to server!");
             NewClientConnectedServerMessage newClient = (NewClientConnectedServerMessage) msg;
             clientsInMainLobby.put(newClient.getClient().getId(), newClient.getClient());
             sendMsgToAllClients(new ServerMessage(MessageConstants.CLIENT_JOINED_LOBBY, newClient.getClient().getId(), newClient
@@ -171,7 +171,7 @@ public class ServerCore implements Runnable {
         } else if (msg.getMessage().equals(ServerCommands.LIST_GAMES)) {
             createGameList();
         } else {
-            LOGGER.debug("Message not recognized: " + msg.getMessage());
+            LOGGER.info("Message not recognized: " + msg.getMessage());
         }
     }
 
@@ -184,7 +184,7 @@ public class ServerCore implements Runnable {
                 clientList += String.format("(%d) %s\n", id, clientsInMainLobby.get(id).getDisplayName());
             }
         }
-        LOGGER.debug(clientList);
+        LOGGER.info(clientList);
     }
 
     private void createGameList() {
@@ -198,7 +198,7 @@ public class ServerCore implements Runnable {
                         .get(id).getCurrentState());
             }
         }
-        LOGGER.debug(gameList);
+        LOGGER.info(gameList);
     }
 
     private void sendMsgToAllClients(ServerMessage msg) {

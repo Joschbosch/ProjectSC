@@ -73,7 +73,7 @@ public abstract class ClientCore implements Runnable {
 
     @Override
     public void run() {
-        LOGGER.debug("Starting core ... ");
+        LOGGER.info("Starting core ... ");
         timer.init();
         loadComponents();
         loadSystems();
@@ -81,7 +81,7 @@ public abstract class ClientCore implements Runnable {
         clientRunning = true;
         currentState = getInitialState();
         changeState(currentState);
-        LOGGER.debug(String.format("Client started"));
+        LOGGER.info(String.format("Client started"));
         while (clientRunning) {
             timer.update();
             ClientState newState = null;
@@ -108,14 +108,14 @@ public abstract class ClientCore implements Runnable {
             try {
                 Thread.sleep(sleepTime);
             } catch (InterruptedException e) {
-                LOGGER.debug(e);
+                LOGGER.info(e);
             }
             if (!gui.isRunning()) {
                 clientRunning = false;
                 System.exit(0);
             }
         }
-        LOGGER.debug(String.format("Client terminated"));
+        LOGGER.info(String.format("Client terminated"));
 
     }
 
@@ -124,7 +124,7 @@ public abstract class ClientCore implements Runnable {
     protected abstract void loadSystems();
 
     private void changeState(ClientState newState) {
-        LOGGER.debug("Initialising state " + newState.getId());
+        LOGGER.info("Initialising state " + newState.getId());
         newState.init(networkSendQueue, entityManager, eventManager, componentManager, snapshotManager, timer);
         currentState = newState;
         gui.initState(newState);

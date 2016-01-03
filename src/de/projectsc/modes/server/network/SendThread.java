@@ -38,7 +38,7 @@ public class SendThread implements Runnable {
 
     @Override
     public void run() {
-        LOGGER.debug("Starting send thread for " + client.getDisplayName());
+        LOGGER.info("Starting send thread for " + client.getDisplayName());
         while (true) {
             try {
                 ObjectMapper mapper = new ObjectMapper();

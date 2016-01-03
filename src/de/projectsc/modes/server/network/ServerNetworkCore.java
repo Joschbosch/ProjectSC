@@ -81,7 +81,7 @@ class ClientConnectedListener extends Listener {
         SendThread thread = new SendThread(client, newClient);
         new Thread(thread).start();
         coreQueue.add(new NewClientConnectedServerMessage(MessageConstants.NEW_CLIENT_CONNECTED, newClient));
-        LOGGER.debug(String.format("New connection accepted: User %s ID %s", newClient.getDisplayName(), newClient.getId()));
+        LOGGER.info(String.format("New connection accepted: User %s ID %s", newClient.getDisplayName(), newClient.getId()));
     }
 
     @Override
@@ -92,7 +92,7 @@ class ClientConnectedListener extends Listener {
             try {
                 NetworkMessage msg = mapper.readValue((String) arg1, NetworkMessage.class);
                 newClient.received(new ServerMessage(msg.getMsg(), msg.getData()));
-                // LOGGER.debug("Received new message " + msg);
+                // LOGGER.info("Received new message " + msg);
             } catch (IOException e) {
                 LOGGER.error(e.getStackTrace());
             }

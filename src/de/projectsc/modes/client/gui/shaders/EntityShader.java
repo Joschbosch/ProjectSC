@@ -64,7 +64,7 @@ public class EntityShader extends Shader {
 
     public EntityShader() {
         super(VERTEX_FILE, FRAGMENT_FILE);
-        LOGGER.debug("Static shader loaded.");
+        LOGGER.info("Static shader loaded.");
     }
 
     @Override

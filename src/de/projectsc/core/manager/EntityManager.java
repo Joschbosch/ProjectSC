@@ -74,7 +74,7 @@ public class EntityManager {
         }
         Entity e = new EntityImpl(this, uid);
         entities.put(e.getID(), e);
-        LOGGER.debug("Created new entity " + e.getID());
+        LOGGER.info("Created new entity " + e.getID());
         addComponentToEntity(e.getID(), TransformComponent.NAME);
         addComponentToEntity(e.getID(), EntityStateComponent.NAME);
         eventManager.fireEvent(new NotifyEntityCreatedEvent(e.getID()));
@@ -148,14 +148,14 @@ public class EntityManager {
             }
             components.put(c.getComponentName(), c);
             entityComponents.put(id, components);
-            LOGGER.debug("Added component " + c.getComponentName() + " to entity " + id);
+            LOGGER.info("Added component " + c.getComponentName() + " to entity " + id);
             eventManager.fireEvent(new ComponentAddedEvent(id, c));
             List<String> required = c.getRequiredComponents();
             for (String reqComponent : required) {
                 if (!hasComponent(id, componentManager.getComponentClass(reqComponent))) {
                     Component reqCom = addComponentToEntity(id, reqComponent);
                     reqCom.addRequiredByComponent(c.getComponentName());
-                    LOGGER.debug(String.format("Component %s added because it was required by %s", reqComponent, c.getComponentName()));
+                    LOGGER.info(String.format("Component %s added because it was required by %s", reqComponent, c.getComponentName()));
                 } else {
                     Component reqCom = getComponent(id, reqComponent);
                     reqCom.addRequiredByComponent(c.getComponentName());
@@ -185,10 +185,10 @@ public class EntityManager {
                         c.removeRequiredByComponent(componentName);
                     }
                 }
-                LOGGER.debug("Removed component " + componentName + " from entity " + id);
+                LOGGER.info("Removed component " + componentName + " from entity " + id);
                 eventManager.fireEvent(new ComponentRemovedEvent(id, toRemove));
             } else {
-                LOGGER.debug("Did not remove component " + componentName + " because it is required by following components: "
+                LOGGER.info("Did not remove component " + componentName + " because it is required by following components: "
                     + toRemove.getRequiredBy());
             }
         }
@@ -208,10 +208,10 @@ public class EntityManager {
             if (c != null) {
                 return c;
             } else {
-                LOGGER.debug("Component " + componentName + " not added to entity " + id);
+                LOGGER.info("Component " + componentName + " not added to entity " + id);
             }
         } else {
-            LOGGER.debug("No components were added to entity " + id);
+            LOGGER.info("No components were added to entity " + id);
         }
         return null;
 
@@ -232,9 +232,9 @@ public class EntityManager {
                     return c;
                 }
             }
-            LOGGER.debug("Component " + componentClass + " not added to entity " + entityId);
+            LOGGER.info("Component " + componentClass + " not added to entity " + entityId);
         } else {
-            LOGGER.debug("No components were added to entity " + entityId);
+            LOGGER.info("No components were added to entity " + entityId);
         }
         return null;
     }
@@ -275,7 +275,7 @@ public class EntityManager {
      */
     public void deleteEntity(String id) {
         if (entities.remove(id) != null) {
-            LOGGER.debug("Removed entity " + id);
+            LOGGER.info("Removed entity " + id);
             eventManager.fireEvent(new NotifyEntityDeletedEvent(id));
         }
     }

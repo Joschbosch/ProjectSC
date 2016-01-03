@@ -438,7 +438,7 @@ public class OctTree<T extends Entity> {
      */
     public void removeEntity(String l) {
         if (removeRecursive(l)) {
-            LOGGER.debug("Successfully removed entity from octree: " + l);
+            LOGGER.info("Successfully removed entity from octree: " + l);
             buildTree();
         }
     }

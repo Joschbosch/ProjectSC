@@ -38,7 +38,7 @@ public class ComponentManager {
             LOGGER.error("Component " + name + " already registered");
         } else {
             registeredComponents.put(name, componentClass);
-            LOGGER.debug("Registered component " + name);
+            LOGGER.info("Registered component " + name);
         }
     }
 
@@ -57,7 +57,7 @@ public class ComponentManager {
                 LOGGER.error("Could not create component: ", e);
             }
         } else {
-            LOGGER.debug("Component " + name + " is not registered.");
+            LOGGER.info("Component " + name + " is not registered.");
         }
         return null;
     }

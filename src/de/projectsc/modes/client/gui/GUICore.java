@@ -116,7 +116,7 @@ public class GUICore implements GUI {
 
     @Override
     public boolean init() {
-        LOGGER.debug("Initialize GUI core");
+        LOGGER.info("Initialize GUI core");
         try {
             Display.setDisplayMode(new DisplayMode(WIDTH, HEIGHT));
             Display.setTitle("Project SC");
@@ -126,30 +126,30 @@ public class GUICore implements GUI {
             LOGGER.error(e.getStackTrace());
         }
 
-        LOGGER.debug("Opened window ");
-        LOGGER.debug("OpenGL version: " + GL11.glGetString(GL11.GL_VERSION));
+        LOGGER.info("Opened window ");
+        LOGGER.info("OpenGL version: " + GL11.glGetString(GL11.GL_VERSION));
         inputSystem = new InputSystem();
-        LOGGER.debug("Input system initialized.");
-        LOGGER.debug("Loading renderer ... ");
+        LOGGER.info("Input system initialized.");
+        LOGGER.info("Loading renderer ... ");
         masterRenderer = new MasterRenderer();
-        LOGGER.debug("Master ...");
+        LOGGER.info("Master ...");
         waterfbo = new WaterFrameBuffers();
         waterRenderer = new WaterRenderer(masterRenderer.getProjectionMatrix(), waterfbo);
-        LOGGER.debug("Water ...");
+        LOGGER.info("Water ...");
         uiRenderer = new UIRenderer();
-        LOGGER.debug("UI ...");
-        LOGGER.debug("Loading renderer done");
+        LOGGER.info("UI ...");
+        LOGGER.info("Loading renderer done");
         camera = new Camera();
         inputManager.addListener(camera);
-        LOGGER.debug("Created camera.");
+        LOGGER.info("Created camera.");
         mousePicker = new MousePicker(masterRenderer.getProjectionMatrix());
-        LOGGER.debug("Created mouse picker");
+        LOGGER.info("Created mouse picker");
         TextMaster.init();
         fontRenderer = new FontRenderer();
-        LOGGER.debug("Initialized font rendering");
+        LOGGER.info("Initialized font rendering");
         loadGUIComponents();
         renderingSystem = new RenderingSystem(entityManager, eventManager);
-        LOGGER.debug("GUI components loaded.");
+        LOGGER.info("GUI components loaded.");
         running = true;
 
         // TEsting
@@ -222,7 +222,7 @@ public class GUICore implements GUI {
     @Override
     public void render() {
         if (Display.isCloseRequested()) {
-            LOGGER.debug("Send close request and close down");
+            LOGGER.info("Send close request and close down");
             running = false;
         }
         GUIText fps =

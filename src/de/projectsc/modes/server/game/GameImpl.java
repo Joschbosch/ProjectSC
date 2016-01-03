@@ -96,7 +96,7 @@ public class GameImpl implements Game {
     public GameImpl(AuthenticatedClient host, BlockingQueue<ServerMessage> coreQueue) {
         this.coreQueue = coreQueue;
         this.gameContext = new GameContext(idCounter++, host.getDisplayName() + "'s game", new ServerPlayer(host), this);
-        LOGGER.debug(String.format("Created new game: %s (Host: %s, game id: %d)", gameContext.getDisplayName(), host.getDisplayName(),
+        LOGGER.info(String.format("Created new game: %s (Host: %s, game id: %d)", gameContext.getDisplayName(), host.getDisplayName(),
             gameContext.getGameID()));
         this.currentState = States.LOBBY;
         timer = new Timer();
@@ -106,7 +106,7 @@ public class GameImpl implements Game {
     @Override
     public void run() {
         timer.init();
-        LOGGER.debug(String.format("Game %d started", gameContext.getGameID()));
+        LOGGER.info(String.format("Game %d started", gameContext.getGameID()));
         while (lobbyAlive.get()) {
             timer.update();
             readMessages();
@@ -126,11 +126,11 @@ public class GameImpl implements Game {
                 try {
                     Thread.sleep(sleepTime);
                 } catch (InterruptedException e) {
-                    LOGGER.debug(e);
+                    LOGGER.info(e);
                 }
             }
         }
-        LOGGER.debug(String.format("Game %d terminated", gameContext.getGameID()));
+        LOGGER.info(String.format("Game %d terminated", gameContext.getGameID()));
     }
 
     private void loopGame() {
@@ -197,7 +197,7 @@ public class GameImpl implements Game {
             int percentageLoaded = sumLoading / (playerLoadingProgress.size() + 1);
             final int maximumpercentage = 100;
             if (percentageLoaded >= maximumpercentage && loadingDone.get()) {
-                LOGGER.debug("Loading done! Starting game!");
+                LOGGER.info("Loading done! Starting game!");
                 gameContext.setLoading(false);
                 // finishedLoading
                 loading = false;
@@ -236,7 +236,7 @@ public class GameImpl implements Game {
                         toQuit.add(player);
                         sendMessageToAllPlayer(new ServerMessage(MessageConstants.PLAYER_QUIT_LOBBY_REQUEST, player.getId(),
                             player.getDisplayName()));
-                        LOGGER.debug(String.format("Player left game %s: %s (Game %s)", gameContext.getDisplayName(),
+                        LOGGER.info(String.format("Player left game %s: %s (Game %s)", gameContext.getDisplayName(),
                             player.getDisplayName(), gameContext.getGameID()));
 
                     }
@@ -246,7 +246,7 @@ public class GameImpl implements Game {
 
                         sendMessageToAllPlayer(new ServerMessage(MessageConstants.CLIENT_DISCONNECTED, player.getId(),
                             player.getDisplayName()));
-                        LOGGER.debug(String.format("Player disconnected from game %s: %s (Game %s)", gameContext.getDisplayName(),
+                        LOGGER.info(String.format("Player disconnected from game %s: %s (Game %s)", gameContext.getDisplayName(),
                             player.getDisplayName(),
                             gameContext.getGameID()));
 
@@ -284,13 +284,13 @@ public class GameImpl implements Game {
     private void handleMessagesLoading(ServerPlayer player, ServerMessage msg) {
         if (msg.getMessage().equals(GameMessageConstants.UPDATE_LOADING_PROGRESS) && playerLoadingProgress != null) {
             playerLoadingProgress.put(player.getId(), Byte.parseByte((String) msg.getData()[0]));
-            LOGGER.debug("Map loading completed " + gameContext.getLoadingProgress() + "%");
+            LOGGER.info("Map loading completed " + gameContext.getLoadingProgress() + "%");
             int sumLoading = gameContext.getLoadingProgress();
             for (String id : playerLoadingProgress.keySet()) {
                 sumLoading += playerLoadingProgress.get(id);
             }
             int percentageLoaded = sumLoading / (playerLoadingProgress.size() + 1);
-            LOGGER.debug("Overall loading completed " + percentageLoaded + "%");
+            LOGGER.info("Overall loading completed " + percentageLoaded + "%");
 
         }
 
@@ -325,7 +325,7 @@ public class GameImpl implements Game {
                 String.format("(%4d) %s Affiliation: %d - Character: %s\n", id, players.get(id).getDisplayName(), gameContext.getConfig()
                     .getPlayerAffiliation(id), gameContext.getConfig().getPlayerCharacter(id));
         }
-        LOGGER.debug(gameList);
+        LOGGER.info(gameList);
     }
 
     private void newHost(ServerPlayer remove) {
@@ -369,7 +369,7 @@ public class GameImpl implements Game {
             affiliation = GameAttributes.AFFILIATION_DARK;
         }
         gameContext.getConfig().setPlayerAffiliation(player.getId(), affiliation);
-        LOGGER.debug(String.format("Player joined game %s: %s (Game %s)", gameContext.getDisplayName(), player.getDisplayName(),
+        LOGGER.info(String.format("Player joined game %s: %s (Game %s)", gameContext.getDisplayName(), player.getDisplayName(),
             gameContext.getGameID()));
     }
 

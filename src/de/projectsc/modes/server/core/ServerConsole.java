@@ -33,12 +33,12 @@ public class ServerConsole implements Runnable {
     public ServerConsole(BlockingQueue<ServerMessage> coreQueue) {
         new Thread(this).start();
         this.coreQueue = coreQueue;
-        LOGGER.debug("Console started.");
+        LOGGER.info("Console started.");
     }
 
     @Override
     public void run() {
-        LOGGER.debug(String.format("Server console started"));
+        LOGGER.info(String.format("Server console started"));
 
         while (!shutdown.get()) {
             try {
@@ -46,7 +46,7 @@ public class ServerConsole implements Runnable {
                 try {
                     BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
                     String s = bufferRead.readLine();
-                    LOGGER.debug("Got console command: " + s);
+                    LOGGER.info("Got console command: " + s);
                     if (s.equals(MessageConstants.SHUTDOWN)) {
                         coreQueue.offer(new ServerMessage(MessageConstants.SHUTDOWN));
                         shutdown.set(true);
@@ -59,7 +59,7 @@ public class ServerConsole implements Runnable {
             } catch (InterruptedException e) {
             }
         }
-        LOGGER.debug(String.format("Server console stopped"));
+        LOGGER.info(String.format("Server console stopped"));
 
     }
 

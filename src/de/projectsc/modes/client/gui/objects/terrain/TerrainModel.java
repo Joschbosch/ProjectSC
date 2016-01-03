@@ -54,7 +54,7 @@ public class TerrainModel {
 
     private RawModel generateTerrainModel() {
 
-        LOGGER.debug("Start generating terrain.");
+        LOGGER.info("Start generating terrain.");
         int vertCountX = Terrain.TERRAIN_CHUNK_SIZE;
         int count = vertCountX * vertCountX;
         float[] vertices = new float[count * 3];
@@ -92,7 +92,7 @@ public class TerrainModel {
                 indices[pointer++] = bottomRight;
             }
         }
-        LOGGER.debug("Terrain generated");
+        LOGGER.info("Terrain generated");
         return Loader.loadToVAO(vertices, textureCoords, normals, indices);
     }
 

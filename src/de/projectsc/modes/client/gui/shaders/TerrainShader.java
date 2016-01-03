@@ -63,7 +63,7 @@ public class TerrainShader extends Shader {
 
     public TerrainShader() {
         super(VERTEX_FILE, FRAGMENT_FILE);
-        LOGGER.debug("Terrain shader loaded.");
+        LOGGER.info("Terrain shader loaded.");
     }
 
     @Override
