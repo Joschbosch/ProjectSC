@@ -11,6 +11,7 @@ import de.projectsc.core.component.physic.PathComponent;
 import de.projectsc.core.component.physic.TransformComponent;
 import de.projectsc.core.component.physic.VelocityComponent;
 import de.projectsc.core.component.state.EntityStateComponent;
+import de.projectsc.modes.client.game.component.JumpingComponent;
 
 /**
  * These are all (non GUI) components that are known in the engine.
@@ -41,7 +42,11 @@ public enum ComponentListItem {
     /**
     *
     */
-    PATH_COMPONENT(PathComponent.NAME, PathComponent.class, false);
+    PATH_COMPONENT(PathComponent.NAME, PathComponent.class, false),
+    /**
+    * 
+    */
+    JUMPING_COMPONENT(JumpingComponent.NAME, JumpingComponent.class, false);
 
     private String name;
 

@@ -30,6 +30,7 @@ import de.projectsc.core.interfaces.Component;
 import de.projectsc.core.manager.EntityManager;
 import de.projectsc.core.manager.EventManager;
 import de.projectsc.core.systems.DefaultSystem;
+import de.projectsc.modes.client.game.component.JumpingComponent;
 
 /**
  * System that does all the work of positioning and moving.
@@ -98,6 +99,37 @@ public class BasicPhysicsSystem extends DefaultSystem {
                     velocityComp.setVelocity(new Vector3f());
                     fireEvent(new NotifyVelocityUpdateEvent(entity));
                 }
+            }
+            if (hasComponent(entity, JumpingComponent.class)) {
+                JumpingComponent jump = getComponent(entity, JumpingComponent.class);
+
+                float jumpTime = jump.getJumpTime();
+
+                jumpTime += tick / 1000f * 2f;
+                jumpTime %= 1;
+                jump.setJumpTime(jumpTime);
+                float offset = (float) Math.sin(Math.PI * 2 * jumpTime);
+                offset = (offset + 1);
+                if (offset > jump.getPreviousOffset()) {
+                    if (!jump.isGoingUp()) {
+                        // emitter.playSound(EFFECT);
+                    }
+                    jump.setGoingUp(true);
+                } else {
+                    jump.setGoingUp(false);
+                }
+                jump.setPreviousOffset(offset);
+                Transform transform = entityManager.getEntity(entity).getTransform();
+
+                transform.setRotation(Vector3f.add(new Vector3f(0, tick / 1000f * 20, 0), transform.getRotation(),
+                    null));
+                float speed = tick / 1000f * 10;
+                float dx = speed * (float) Math.sin(Math.toRadians(transform.getRotation().y - 90));
+                float dz = speed * (float) Math.cos(Math.toRadians(transform.getRotation().y - 90));
+                transform.getPosition().x += dx;
+                transform.getPosition().z += dz;
+                transform.getPosition().y = offset;
+                transform.setScale(new Vector3f(0.8f, 0.8f, 0.8f));
             }
         }
 
