@@ -11,7 +11,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -30,6 +29,7 @@ import org.lwjgl.opengl.GL14;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
+import org.lwjgl.opengl.GL33;
 import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureLoader;
 
@@ -115,21 +115,6 @@ public final class Loader {
     }
 
     /**
-     * Creates a VBO for streaming data.
-     * 
-     * @param buffer to create VBO from
-     * @return id of vbo
-     */
-    public static int createStreamVBO(Buffer buffer) {
-        int vboID = GL15.glGenBuffers();
-        VBOS.add(vboID);
-        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vboID);
-        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, buffer.capacity(), GL15.GL_STREAM_DRAW);
-        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
-        return vboID;
-    }
-
-    /**
      * Loads just a vertex positions array to a VAO and returns the model for it.
      * 
      * @param positions to load
@@ -148,6 +133,58 @@ public final class Loader {
         VAOS.add(vaoID);
         GL30.glBindVertexArray(vaoID);
         return vaoID;
+    }
+
+    /**
+     * Creates a VBO for streaming data.
+     * 
+     * @param floatCount size
+     * @return id of vbo
+     */
+    public static int createEmptyVBO(int floatCount) {
+        int vbo = GL15.glGenBuffers();
+        VBOS.add(vbo);
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbo);
+        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, floatCount * 4, GL15.GL_STREAM_DRAW);
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+        return vbo;
+    }
+
+    /**
+     * Add instances in VBO.
+     * 
+     * @param vao in which the vbo is
+     * @param vbo to add to
+     * @param attribute to add
+     * @param dataSize size to add
+     * @param instanceDataLength length
+     * @param offset of data
+     */
+    public static void addInstancesAttribute(int vao, int vbo, int attribute, int dataSize, int instanceDataLength, int offset) {
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbo);
+        GL30.glBindVertexArray(vao);
+        GL20.glVertexAttribPointer(attribute, dataSize, GL11.GL_FLOAT, false, instanceDataLength * 4, offset * 4);
+        GL33.glVertexAttribDivisor(attribute, 1);
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+        GL30.glBindVertexArray(0);
+    }
+
+    /**
+     * Updates the given VBO.
+     * 
+     * @param vbo to update
+     * @param data to write
+     * @param buffer to write to.
+     */
+    public static void updateVbo(int vbo, float[] data, FloatBuffer buffer) {
+        buffer.clear();
+        buffer.put(data);
+        buffer.flip();
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbo);
+        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, buffer.capacity() * 4, GL15.GL_STATIC_DRAW);
+        GL15.glBufferSubData(GL15.GL_ARRAY_BUFFER, 0, buffer);
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+
     }
 
     /**

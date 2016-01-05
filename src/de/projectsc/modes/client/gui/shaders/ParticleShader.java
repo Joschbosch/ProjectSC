@@ -1,7 +1,6 @@
 package de.projectsc.modes.client.gui.shaders;
 
 import org.lwjgl.util.vector.Matrix4f;
-import org.lwjgl.util.vector.Vector2f;
 
 /**
  * Shader for particles.
@@ -14,15 +13,9 @@ public class ParticleShader extends Shader {
 
     private static final String FRAGMENT_FILE = "particleShader.frag";
 
-    private int locationModelViewMatrix;
-
     private int locationProjectionMatrix;
 
-    private int locationTexOffset1;
-
-    private int locationTexOffset2;
-
-    private int locationTexCoordInfo;
+    private int locationNumberOfRows;
 
     public ParticleShader() {
         super(VERTEX_FILE, FRAGMENT_FILE);
@@ -30,37 +23,24 @@ public class ParticleShader extends Shader {
 
     @Override
     protected void getAllUniformLocations() {
-        locationModelViewMatrix = super.getUniformLocation("modelViewMatrix");
         locationProjectionMatrix = super.getUniformLocation("projectionMatrix");
-        locationTexOffset1 = super.getUniformLocation("texOffset1");
-        locationTexOffset2 = super.getUniformLocation("texOffset2");
-        locationTexCoordInfo = super.getUniformLocation("texCoordInfo");
+        locationNumberOfRows = super.getUniformLocation("number OfRows");
     }
 
     @Override
     protected void bindAttributes() {
         super.bindAttribute(0, "position");
+        super.bindAttribute(1, "modelViewMatrix");
+        super.bindAttribute(5, "texOffset");
+        super.bindAttribute(6, "blendFactor");
+
     }
 
     /**
-     * Load texture coords.
-     * 
-     * @param offset1 current texture
-     * @param offset2 next texture
-     * @param numberOfRows of texture
-     * @param blendFactor between textures
+     * @param numberOfRows to load
      */
-    public void loadTextureCoordinates(Vector2f offset1, Vector2f offset2, float numberOfRows, float blendFactor) {
-        super.loadVector(locationTexOffset1, offset1);
-        super.loadVector(locationTexOffset2, offset2);
-        super.loadVector(locationTexCoordInfo, new Vector2f(numberOfRows, blendFactor));
-    }
-
-    /**
-     * @param modelView to load
-     */
-    public void loadModelViewMatrix(Matrix4f modelView) {
-        super.loadMatrix(locationModelViewMatrix, modelView);
+    public void loadNumberOfRows(float numberOfRows) {
+        super.loadFloat(locationNumberOfRows, numberOfRows);
     }
 
     /**
