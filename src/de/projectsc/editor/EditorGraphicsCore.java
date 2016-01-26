@@ -174,12 +174,6 @@ public class EditorGraphicsCore implements Runnable {
             inputConsumeManager.processInput(inputSystem.updateInputs());
             camera.move(timer.getDelta());
             ParticleMaster.update(timer.getDelta(), camera.getPosition());
-            if (editorData.isLightAtCameraPostion()) {
-                if (!entityManager.getEntity(entity).getTransform().getPosition().equals(
-                    camera.getPosition())) {
-                    eventManager.fireEvent(new UpdatePositionEvent(new Vector3f(0.1f, 0, 0), sun));
-                }
-            }
             physicsSystem.update(timer.getDelta());
             collisionSystem.update(timer.getDelta());
             renderSystem.update(timer.getDelta());
@@ -208,13 +202,14 @@ public class EditorGraphicsCore implements Runnable {
 
     private void createSun() {
         sun = entityManager.createNewEntity();
-        eventManager.fireEvent(new UpdatePositionEvent(new Vector3f(0.0f, 100.0f, 100.0f), sun));
+        eventManager.fireEvent(new UpdatePositionEvent(new Vector3f(100000.0f, 100000.0f, 100000.0f), sun));
         eventManager.fireEvent(new UpdateRotationEvent(sun, new Vector3f(0, 0, 0)));
         EmittingLightComponent lightComponent =
             (EmittingLightComponent) entityManager.addComponentToEntity(sun,
                 GraphicalComponentImplementation.EMMITING_LIGHT_COMPONENT.getName());
         Transform position = entityManager.getEntity(sun).getTransform();
         Light light = new Light(new Vector3f(position.getPosition()), new Vector3f(1.0f, 1.0f, 1.0f), "sun");
+        light.setAttenuation(new Vector3f(1, 0, 0));
         lightComponent.addLight(sun, new Vector3f(position.getPosition()), light);
         entityManager.addComponentToEntity(sun, ColliderComponent.NAME);
     }

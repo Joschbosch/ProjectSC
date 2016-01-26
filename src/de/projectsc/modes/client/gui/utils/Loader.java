@@ -104,6 +104,28 @@ public final class Loader {
      * 
      * @param positions to load
      * @param textureCoordinates to apply to the model
+     * @param normals of each face
+     * @param tangents of the faces
+     * @param indices for vao
+     * 
+     * @return the model with the vao
+     */
+    public static RawModel loadToVAO(float[] positions, float[] textureCoordinates, float[] normals, float[] tangents, int[] indices) {
+        int vaoID = createVAO();
+        bindIndicesBuffer(indices);
+        storeDataInAttributeList(0, 3, positions);
+        storeDataInAttributeList(1, 2, textureCoordinates);
+        storeDataInAttributeList(2, 3, normals);
+        storeDataInAttributeList(3, 3, tangents);
+        unbind();
+        return new RawModel(vaoID, indices.length);
+    }
+
+    /**
+     * Loading given data positions into a VAO.
+     * 
+     * @param positions to load
+     * @param textureCoordinates to apply to the model
      * @return the model with the vao
      */
     public static int loadToVAO(float[] positions, float[] textureCoordinates) {

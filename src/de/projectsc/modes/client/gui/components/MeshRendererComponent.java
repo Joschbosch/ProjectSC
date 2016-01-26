@@ -101,7 +101,7 @@ public class MeshRendererComponent extends GraphicalComponent {
      * @param data of the mesh
      */
     public void loadModel(ModelData data) {
-        model = Loader.loadToVAO(data.getVertices(), data.getTextureCoords(), data.getNormals(), data.getIndices());
+        model = Loader.loadToVAO(data.getVertices(), data.getTextureCoords(), data.getNormals(), data.getTangents(), data.getIndices());
     }
 
     @Override

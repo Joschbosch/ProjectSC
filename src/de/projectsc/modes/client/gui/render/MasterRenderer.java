@@ -10,14 +10,18 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.util.vector.Matrix4f;
+import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
+import de.projectsc.core.data.objects.Light;
 import de.projectsc.modes.client.gui.data.GUIScene;
 import de.projectsc.modes.client.gui.objects.Camera;
 import de.projectsc.modes.client.gui.objects.particles.ParticleMaster;
 import de.projectsc.modes.client.gui.shaders.EntityShader;
 import de.projectsc.modes.client.gui.shaders.TerrainShader;
 import de.projectsc.modes.client.gui.shaders.WireFrameShader;
+import de.projectsc.modes.client.gui.shadows.ShadowMapMasterRenderer;
+import de.projectsc.modes.client.gui.utils.GUIConstants;
 
 /**
  * Coordinates rendering of multiple entites.
@@ -25,12 +29,6 @@ import de.projectsc.modes.client.gui.shaders.WireFrameShader;
  * @author Josch Bosch
  */
 public class MasterRenderer {
-
-    private static final float FOV = 90f;
-
-    private static final float NEAR_PLANE = 0.1f;
-
-    private static final float FAR_PLANE = 1000f;
 
     private static final float SKY_R = 0.54f;
 
@@ -58,6 +56,8 @@ public class MasterRenderer {
 
     private final ParticleRenderer particleRenderer;
 
+    private final ShadowMapMasterRenderer shadowRenderer;
+
     public MasterRenderer() {
         enableCulling();
         GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
@@ -71,7 +71,7 @@ public class MasterRenderer {
         billboardRenderer = new BillboardRenderer(projectionMatrix);
         skyboxRenderer = new SkyboxRenderer(projectionMatrix);
         particleRenderer = new ParticleRenderer(projectionMatrix);
-
+        shadowRenderer = new ShadowMapMasterRenderer();
     }
 
     /**
@@ -120,11 +120,15 @@ public class MasterRenderer {
         } else {
             entityShader.loadSkyColor(scene.getSkyColor().x, scene.getSkyColor().y, scene.getSkyColor().z);
         }
-        entityShader.loadLights(scene.getLights());
+        entityShader.loadLights(scene.getLights(), camera.createViewMatrix());
         entityShader.loadViewMatrix(camera);
         entityRenderer.render(scene.getModels(), scene.getPositions(), scene.getRotations(), scene.getScales(),
             scene.getSelectedEntites(), scene.getHightlightedEntites());
         entityShader.stop();
+        Light sun = new Light(new Vector3f(1000, 1000, 1000), new Vector3f(1, 1, 1), new Vector3f(1, 0, 0), "newSun");
+        if (sun != null) {
+            shadowRenderer.render(scene, sun, camera);
+        }
         if (scene.isDebugMode()) {
             wireframeShader.start();
             wireframeShader.loadViewMatrix(camera);
@@ -151,6 +155,7 @@ public class MasterRenderer {
         }
         billboardRenderer.render(scene.getBillboards());
         particleRenderer.render(ParticleMaster.render(), camera.createViewMatrix());
+
     }
 
     /**
@@ -161,6 +166,12 @@ public class MasterRenderer {
         entityShader.dispose();
         terrainShader.dispose();
         wireframeShader.dispose();
+        shadowRenderer.cleanUp();
+    }
+
+    // Testing
+    public int getShadowMapTexture() {
+        return shadowRenderer.getShadowMap();
     }
 
     /**
@@ -179,18 +190,17 @@ public class MasterRenderer {
     }
 
     private void createProjectionMatrix() {
-        float aspectRatio = (float) Display.getWidth() / (float) Display.getHeight();
-        float yScale = (float) ((1.f / Math.tan(Math.toRadians(FOV / 2f))) * aspectRatio);
-        float xScale = yScale / aspectRatio;
-        float frustrumLength = FAR_PLANE - NEAR_PLANE;
-
         projectionMatrix = new Matrix4f();
+        float aspectRatio = (float) Display.getWidth() / (float) Display.getHeight();
+        float yScale = (float) ((1f / Math.tan(Math.toRadians(GUIConstants.FOV / 2f))));
+        float xScale = yScale / aspectRatio;
+        float frustumLength = GUIConstants.FAR_PLANE - GUIConstants.NEAR_PLANE;
 
         projectionMatrix.m00 = xScale;
         projectionMatrix.m11 = yScale;
-        projectionMatrix.m22 = -((FAR_PLANE + NEAR_PLANE) / frustrumLength);
-        projectionMatrix.m23 = 0 - 1;
-        projectionMatrix.m32 = -((2 * NEAR_PLANE * FAR_PLANE) / frustrumLength);
+        projectionMatrix.m22 = -((GUIConstants.FAR_PLANE + GUIConstants.NEAR_PLANE) / frustumLength);
+        projectionMatrix.m23 = -1;
+        projectionMatrix.m32 = -((2 * GUIConstants.NEAR_PLANE * GUIConstants.FAR_PLANE) / frustumLength);
         projectionMatrix.m33 = 0;
     }
 

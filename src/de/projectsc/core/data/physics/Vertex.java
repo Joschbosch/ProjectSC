@@ -5,6 +5,9 @@
  */
 package de.projectsc.core.data.physics;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.lwjgl.util.vector.Vector3f;
 
 /**
@@ -28,10 +31,53 @@ public class Vertex {
 
     private final float length;
 
+    private List<Vector3f> tangents = new ArrayList<Vector3f>();
+
+    private Vector3f averagedTangent = new Vector3f(0, 0, 0);
+
     public Vertex(int index, Vector3f position) {
         this.index = index;
         this.position = position;
         this.length = position.length();
+    }
+
+    /**
+     * Clone vertex.
+     * 
+     * @param newIndex of vertex
+     * @return new vertex
+     */
+    public Vertex duplicate(int newIndex) {
+        Vertex vertex = new Vertex(newIndex, position);
+        vertex.tangents = this.tangents;
+        return vertex;
+    }
+
+    /**
+     * Calc average.
+     */
+    public void averageTangents() {
+        if (tangents.isEmpty()) {
+            return;
+        }
+        for (Vector3f tangent : tangents) {
+            Vector3f.add(averagedTangent, tangent, averagedTangent);
+        }
+        if (averagedTangent.length() > 0) {
+            averagedTangent.normalise();
+        }
+    }
+
+    /**
+     * 
+     * @param tangent to add
+     */
+    public void addTangent(Vector3f tangent) {
+        tangents.add(tangent);
+    }
+
+    public Vector3f getAverageTangent() {
+        return averagedTangent;
     }
 
     public int getIndex() {

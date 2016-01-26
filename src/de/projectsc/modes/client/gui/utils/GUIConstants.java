@@ -59,9 +59,24 @@ public final class GUIConstants {
     public static final Vector3f GRAVITY_PARTICLES = new Vector3f(0.0f, -50f, 0.0f);
 
     /**
-     * Standard gravity.
+     * Standard line height.
      */
     public static final double TEXT_LINE_HEIGHT = 0.03f;
+
+    /**
+     * FOV.
+     */
+    public static final float FOV = 70f;
+
+    /**
+     * Frustrum near plane.
+     */
+    public static final float NEAR_PLANE = 0.1f;
+
+    /**
+     * Frustum far plane.
+     */
+    public static final float FAR_PLANE = 1000f;
 
     private GUIConstants() {
 

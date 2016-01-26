@@ -1,14 +1,14 @@
 #version 400 core
 const int lightSources = 6;
 in vec2 pass_textureCoords;
-in vec3 surfaceNormal;
 in vec3 toLightVector[lightSources];
 in vec3 toCameraVector;
 in float visibility; 
-
+in vec3 surfaceNormal;
 out vec4 out_Color;
 
 uniform sampler2D textureSampler;
+uniform sampler2D normalMap;
 uniform vec3 lightColor[lightSources];
 uniform float shineDamper;
 uniform float reflectivity;
@@ -16,8 +16,17 @@ uniform vec3 skyColor;
 uniform vec3 attenuation[lightSources];
 uniform bool selected;
 uniform bool highlighted;
+uniform bool hasNormalMap;
+
 void main(void){
-   vec3 normalUnit = normalize(surfaceNormal);
+ 
+   vec4 normalMapValue = 2.0 * texture(normalMap, pass_textureCoords) - 1.0; 
+   vec3 normalUnit;
+   if (hasNormalMap){
+	   normalUnit = normalize(normalMapValue.rgb);
+   } else {
+   	   normalUnit = normalize(surfaceNormal);
+   }
    vec3 toCamUnit = normalize(toCameraVector);
 
    vec3 totalDiffuse = vec3 (0.0);
@@ -37,7 +46,7 @@ void main(void){
 	    totalSpecular = totalSpecular + (dampedFac * reflectivity * lightColor[i])/attFactor;
 		totalDiffuse = totalDiffuse + (brightness * lightColor[i])/attFactor; 
     }
-     totalDiffuse = max(totalDiffuse, 0.0);
+     totalDiffuse = max(totalDiffuse, 0.2);
 	
 	vec4 textureColor =  texture(textureSampler, pass_textureCoords);
 	if (textureColor.a < 0.5){
@@ -52,5 +61,4 @@ void main(void){
    if (selected){
    	 out_Color = mix(vec4(1.0, 0, 0, 1.0), out_Color, 0.7);
    }
-   
  }

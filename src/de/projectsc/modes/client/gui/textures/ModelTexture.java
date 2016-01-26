@@ -26,6 +26,8 @@ public class ModelTexture {
 
     private int activeTextureIndex;
 
+    private int normalMap = -1;
+
     public ModelTexture(int textureID) {
         super();
         this.textureID = textureID;
@@ -85,5 +87,13 @@ public class ModelTexture {
 
     public int getActiveTextureIndex() {
         return activeTextureIndex;
+    }
+
+    public int getNormalMap() {
+        return normalMap;
+    }
+
+    public void setNormalMap(int normalMap) {
+        this.normalMap = normalMap;
     }
 }

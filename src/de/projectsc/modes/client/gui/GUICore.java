@@ -23,8 +23,6 @@ import de.projectsc.core.data.objects.Light;
 import de.projectsc.core.data.physics.Transform;
 import de.projectsc.core.data.structure.Snapshot;
 import de.projectsc.core.data.utils.Timer;
-import de.projectsc.core.events.entity.movement.UpdatePositionEvent;
-import de.projectsc.core.events.entity.movement.UpdateRotationEvent;
 import de.projectsc.core.manager.ComponentManager;
 import de.projectsc.core.manager.EntityManager;
 import de.projectsc.core.manager.EventManager;
@@ -51,6 +49,7 @@ import de.projectsc.modes.client.gui.render.WaterRenderer;
 import de.projectsc.modes.client.gui.states.GUIState;
 import de.projectsc.modes.client.gui.states.GameGUIState;
 import de.projectsc.modes.client.gui.states.MenuGUIState;
+import de.projectsc.modes.client.gui.textures.UITexture;
 import de.projectsc.modes.client.gui.utils.MousePicker;
 
 /**
@@ -160,16 +159,16 @@ public class GUICore implements GUI {
 
     private void createSun() {
         sun = entityManager.createNewEntity();
-        eventManager.fireEvent(new UpdateRotationEvent(sun, new Vector3f(0, 0, 0)));
+
         EmittingLightComponent lightComponent =
             (EmittingLightComponent) entityManager.addComponentToEntity(sun,
                 GraphicalComponentImplementation.EMMITING_LIGHT_COMPONENT.getName());
         Transform position = entityManager.getEntity(sun).getTransform();
+        position.setPosition(new Vector3f(10000, 10000, 10000));
         Light light = new Light(new Vector3f(position.getPosition()), new Vector3f(1.0f, 1.0f, 1.0f), "sun");
+        light.setAttenuation(new Vector3f(1, 0, 0));
         lightComponent.addLight(sun, new Vector3f(position.getPosition()), light);
         entityManager.addComponentToEntity(sun, ColliderComponent.NAME);
-        eventManager.fireEvent(new UpdatePositionEvent(new Vector3f(0.0f, 100.0f, 100.0f), sun));
-
     }
 
     @Override
@@ -228,9 +227,6 @@ public class GUICore implements GUI {
         GUIText fps =
             TextMaster.createAndLoadText("FPS: " + timer.getCurrentFPS(), 0.7f, FontStore.getFont(Font.CANDARA),
                 new Vector2f(0.0f, 0.0f), 5, false);
-        if (!entityManager.getEntity(sun).getTransform().getPosition().equals(new Vector3f(0.0f, 100.0f, 100.0f))) {
-            eventManager.fireEvent(new UpdatePositionEvent(new Vector3f(0.0f, 100.0f, 100.0f), sun));
-        }
 
         camera.move(timer.getDelta());
         ParticleMaster.update(timer.getDelta(), camera.getPosition());
@@ -244,9 +240,10 @@ public class GUICore implements GUI {
             scene.setDebugMode(currentGUIState.isDebugModeActive());
             masterRenderer.renderScene(scene, camera, timer.getDelta(), new Vector4f(0,
                 1, 0, CLIPPING_PLANE_NOT_RENDERING));
-
         }
         UI ui = new UI();
+        UITexture shadowMap = new UITexture(masterRenderer.getShadowMapTexture(), new Vector2f(0.5f, 0.5f), new Vector2f(0.5f, 0.5f));
+        ui.addElement(shadowMap, UI.FOREGROUND);
         currentGUIState.getUIElements(ui);
         uiRenderer.render(ui.getUIElements(UI.BACKGROUND));
         fontRenderer.render(TextMaster.render(), UI.BACKGROUND);
