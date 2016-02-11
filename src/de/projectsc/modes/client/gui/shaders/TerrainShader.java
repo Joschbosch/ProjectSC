@@ -61,6 +61,12 @@ public class TerrainShader extends Shader {
 
     private int locationPlane;
 
+    private int locationToShadowMapSpace;
+
+    private int locationShadowMap;
+
+    private int locationShadowDistance;
+
     public TerrainShader() {
         super(VERTEX_FILE, FRAGMENT_FILE);
         LOGGER.info("Terrain shader loaded.");
@@ -88,6 +94,9 @@ public class TerrainShader extends Shader {
         locationBTexture = super.getUniformLocation("bTexture");
         locationBlendMap = super.getUniformLocation("blendMap");
         locationPlane = super.getUniformLocation("plane");
+        locationToShadowMapSpace = super.getUniformLocation("toShadowMapSpace");
+        locationShadowMap = super.getUniformLocation("shadowMap");
+        locationShadowDistance = super.getUniformLocation("shadowDistance");
         locationLightPosition = new int[MAX_LIGHTS];
         locationLightColor = new int[MAX_LIGHTS];
         locationAttenuation = new int[MAX_LIGHTS];
@@ -108,6 +117,7 @@ public class TerrainShader extends Shader {
         super.loadInt(locationGTexture, 2);
         super.loadInt(locationBTexture, 3);
         super.loadInt(locationBlendMap, 4);
+        super.loadInt(locationShadowMap, 5);
     }
 
     /**
@@ -117,6 +127,14 @@ public class TerrainShader extends Shader {
      */
     public void loadClipPlane(Vector4f plane) {
         loadVector(locationPlane, plane);
+    }
+
+    public void loadToShadowSpaceMatrix(Matrix4f matrix) {
+        super.loadMatrix(locationToShadowMapSpace, matrix);
+    }
+
+    public void loadlocationShadowDistance(float distance) {
+        super.loadFloat(locationShadowDistance, distance);
     }
 
     /**

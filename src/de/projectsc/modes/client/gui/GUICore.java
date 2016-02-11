@@ -49,7 +49,6 @@ import de.projectsc.modes.client.gui.render.WaterRenderer;
 import de.projectsc.modes.client.gui.states.GUIState;
 import de.projectsc.modes.client.gui.states.GameGUIState;
 import de.projectsc.modes.client.gui.states.MenuGUIState;
-import de.projectsc.modes.client.gui.textures.UITexture;
 import de.projectsc.modes.client.gui.utils.MousePicker;
 
 /**
@@ -242,8 +241,8 @@ public class GUICore implements GUI {
                 1, 0, CLIPPING_PLANE_NOT_RENDERING));
         }
         UI ui = new UI();
-        UITexture shadowMap = new UITexture(masterRenderer.getShadowMapTexture(), new Vector2f(0.5f, 0.5f), new Vector2f(0.5f, 0.5f));
-        ui.addElement(shadowMap, UI.FOREGROUND);
+        // UITexture shadowMap = new UITexture(masterRenderer.getShadowMapTexture(), new Vector2f(0.5f, 0.5f), new Vector2f(0.5f, 0.5f));
+        // ui.addElement(shadowMap, UI.FOREGROUND);
         currentGUIState.getUIElements(ui);
         uiRenderer.render(ui.getUIElements(UI.BACKGROUND));
         fontRenderer.render(TextMaster.render(), UI.BACKGROUND);

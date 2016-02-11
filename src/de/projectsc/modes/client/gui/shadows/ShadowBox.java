@@ -19,7 +19,7 @@ import de.projectsc.modes.client.gui.utils.GUIConstants;
  */
 public class ShadowBox {
 
-    private static final float OFFSET = 10;
+    private static final float OFFSET = 15;
 
     private static final Vector4f UP = new Vector4f(0, 1, 0, 0);
 
@@ -228,6 +228,10 @@ public class ShadowBox {
      */
     private float getAspectRatio() {
         return (float) Display.getWidth() / (float) Display.getHeight();
+    }
+
+    public float getShadowDistance() {
+        return SHADOW_DISTANCE;
     }
 
 }

@@ -43,7 +43,9 @@ public class TerrainRenderer {
      * 
      * @param terrains to render
      */
-    public void render(List<TerrainModel> terrains) {
+    public void render(List<TerrainModel> terrains, Matrix4f toShadowSpace, float shadowDistance) {
+        shader.loadToShadowSpaceMatrix(toShadowSpace);
+        shader.loadlocationShadowDistance(shadowDistance);
         for (TerrainModel terrain : terrains) {
             prepareTerrain(terrain);
             loadModelMatrix(terrain);
