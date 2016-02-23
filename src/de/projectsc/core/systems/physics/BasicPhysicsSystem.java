@@ -111,9 +111,6 @@ public class BasicPhysicsSystem extends DefaultSystem {
                 float offset = (float) Math.sin(Math.PI * 2 * jumpTime);
                 offset = (offset + 1);
                 if (offset > jump.getPreviousOffset()) {
-                    if (!jump.isGoingUp()) {
-                        // emitter.playSound(EFFECT);
-                    }
                     jump.setGoingUp(true);
                 } else {
                     jump.setGoingUp(false);

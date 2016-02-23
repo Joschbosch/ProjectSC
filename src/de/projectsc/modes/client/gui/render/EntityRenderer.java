@@ -68,11 +68,12 @@ public class EntityRenderer {
         if (barrels == null) {
             barrels = new LinkedList<>();
         }
-        barrels.add("0");
+        final String zero = "0";
+        barrels.add(zero);
         entitiesWithModel.put(barrel, barrels);
-        position.put("0", new Vector3f(0, 20, 0));
-        rotations.put("0", new Vector3f());
-        scales.put("0", new Vector3f(0.8f, 0.8f, 0.8f));
+        position.put(zero, new Vector3f(0, 20, 0));
+        rotations.put(zero, new Vector3f());
+        scales.put(zero, new Vector3f(0.8f, 0.8f, 0.8f));
 
         for (TexturedModel model : entitiesWithModel.keySet()) {
             prepareTexturedModel(model);

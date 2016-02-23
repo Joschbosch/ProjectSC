@@ -129,10 +129,20 @@ public class TerrainShader extends Shader {
         loadVector(locationPlane, plane);
     }
 
+    /**
+     * Load up matrix for shadows.
+     * 
+     * @param matrix to load.
+     */
     public void loadToShadowSpaceMatrix(Matrix4f matrix) {
         super.loadMatrix(locationToShadowMapSpace, matrix);
     }
 
+    /**
+     * Load up shadow distance.
+     * 
+     * @param distance to load
+     */
     public void loadlocationShadowDistance(float distance) {
         super.loadFloat(locationShadowDistance, distance);
     }

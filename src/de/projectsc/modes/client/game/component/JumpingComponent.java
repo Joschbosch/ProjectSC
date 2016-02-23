@@ -6,7 +6,10 @@ package de.projectsc.modes.client.game.component;
 
 import de.projectsc.core.component.ComponentType;
 import de.projectsc.core.component.physic.PhysicsComponent;
-
+/**
+ * Testing class.
+ * @author Josch Bosch
+ */
 public class JumpingComponent extends PhysicsComponent {
 
     /**
