@@ -1,0 +1,25 @@
+{
+  "components" : {
+    "Mesh Renderer Component" : {
+      "shineDamper" : 1.0,
+      "reflectivity" : 0.0,
+      "numColumns" : 1
+    },
+    "Mesh Component" : { },
+    "Transform Component" : {
+      "positionY" : 0.0,
+      "scaleX" : 0.6,
+      "positionZ" : 0.0,
+      "scaleY" : 0.6,
+      "rotationX" : 0.0,
+      "rotationY" : 0.0,
+      "rotationZ" : 0.0,
+      "scaleZ" : 0.6,
+      "positionX" : 0.0
+    },
+    "Entity State Component" : { },
+    "Jumping Component" : {}
+  },
+  "schemaId" : 10002,
+  "schemaName" : "EntitySchema0"
+}

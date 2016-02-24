@@ -24,7 +24,7 @@ uniform float reflectivity;
 uniform vec3 skyColor;
 uniform vec3 attenuation[lightSources];
 
-const int pcfCount = 2;
+const int pcfCount = 3;
 
 void main(void){
    

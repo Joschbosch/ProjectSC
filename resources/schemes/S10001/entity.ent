@@ -1,0 +1,27 @@
+{
+  "components" : {
+    "Collider Component" : { },
+    "Emitting light component" : { },
+    "Mesh Renderer Component" : {
+      "shineDamper" : 1.0,
+      "reflectivity" : 0.0,
+      "numColumns" : 1
+    },
+    "Particle System Component" : { },
+    "Mesh Component" : { },
+    "Transform Component" : {
+      "positionY" : 0.0,
+      "scaleX" : 0.5,
+      "positionZ" : 0.0,
+      "scaleY" : 0.5,
+      "rotationX" : 0.0,
+      "rotationY" : 0.0,
+      "rotationZ" : 0.0,
+      "scaleZ" : 0.5,
+      "positionX" : 0.0
+    },
+    "Entity State Component" : { }
+  },
+  "schemaId" : 10001,
+  "schemaName" : "EntitySchema0"
+}
