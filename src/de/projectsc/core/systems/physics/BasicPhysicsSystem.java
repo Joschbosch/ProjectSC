@@ -4,18 +4,19 @@
 
 package de.projectsc.core.systems.physics;
 
+import java.util.Set;
+
 import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.core.component.physic.MeshComponent;
 import de.projectsc.core.component.physic.PathComponent;
-import de.projectsc.core.component.physic.PhysicsComponent;
 import de.projectsc.core.component.physic.TransformComponent;
 import de.projectsc.core.component.physic.VelocityComponent;
 import de.projectsc.core.component.state.EntityStateComponent;
 import de.projectsc.core.data.EntityEvent;
 import de.projectsc.core.data.Event;
 import de.projectsc.core.data.physics.Transform;
-import de.projectsc.core.entities.states.EntityState;
+import de.projectsc.core.entities.states.EntityStates;
 import de.projectsc.core.events.entity.actions.MoveEntityToTargetAction;
 import de.projectsc.core.events.entity.movement.NotifyRotationTargetUpdateEvent;
 import de.projectsc.core.events.entity.movement.NotifyTransformUpdateEvent;
@@ -26,7 +27,6 @@ import de.projectsc.core.events.entity.movement.UpdateScaleEvent;
 import de.projectsc.core.events.entity.movement.UpdateVelocityEvent;
 import de.projectsc.core.events.entity.objects.UpdateMeshEvent;
 import de.projectsc.core.events.entity.state.UpdateEntityStateEvent;
-import de.projectsc.core.interfaces.Component;
 import de.projectsc.core.manager.EntityManager;
 import de.projectsc.core.manager.EventManager;
 import de.projectsc.core.systems.DefaultSystem;
@@ -55,81 +55,94 @@ public class BasicPhysicsSystem extends DefaultSystem {
 
     @Override
     public void update(long tick) {
-        for (String entity : entityManager.getAllEntites()) {
-            for (Component c : entityManager.getAllComponents(entity).values()) {
-                if (c instanceof PhysicsComponent) {
-                    ((PhysicsComponent) c).update(tick);
-                }
-            }
-            EntityState entityState = getComponent(entity, EntityStateComponent.class).getState();
-            TransformComponent transformComp =
-                (TransformComponent) entityManager.getComponent(entity, TransformComponent.class);
-            if (hasComponent(entity, VelocityComponent.class) && hasComponent(entity, PathComponent.class)) {
-                PathComponent pathComponent = getComponent(entity, PathComponent.class);
-                VelocityComponent velocityComp = getComponent(entity, VelocityComponent.class);
-                Vector3f currentTarget = pathComponent.getCurrentTarget();
-                if (currentTarget != null
-                    && !isAtTarget(transformComp.getTransform().getPosition(), currentTarget)) {
-                    fireEvent(new UpdateEntityStateEvent(entity, EntityState.MOVING));
-                    velocityComp.setCurrentSpeed(velocityComp.getMaximumSpeed());
+        movementSystem(tick);
+        jumpingSystem(tick);
 
-                    float newAngle =
-                        (float) Math.atan2(currentTarget.x - transformComp.getTransform().getPosition().x, currentTarget.z
-                            - transformComp.getTransform().getPosition().z);
-                    newAngle = (float) (newAngle * (180 / Math.PI));
-                    if (newAngle != transformComp.getRotation().y) {
-                        pathComponent.setTargetRotation(new Vector3f(0, newAngle, 0));
-                        velocityComp.setTurnSpeed(velocityComp.getMaximumTurnSpeed());
-                        fireEvent(new NotifyRotationTargetUpdateEvent(entity));
+    }
+
+    private void movementSystem(long tick) {
+        Set<String> entities = entityManager.getEntitiesWithComponent(VelocityComponent.class);
+        for (String entity : entities) {
+            EntityStates entityState = getComponent(entity, EntityStateComponent.class).getState();
+            if (canMove(entityState)) {
+                TransformComponent transformComp =
+                    (TransformComponent) entityManager.getComponent(entity, TransformComponent.class);
+                if (hasComponent(entity, PathComponent.class)) {
+                    PathComponent pathComponent = getComponent(entity, PathComponent.class);
+                    VelocityComponent velocityComp = getComponent(entity, VelocityComponent.class);
+                    Vector3f currentTarget = pathComponent.getCurrentTarget();
+                    if (currentTarget != null
+                        && !isAtTarget(transformComp.getTransform().getPosition(), currentTarget)) {
+                        if (entityState != EntityStates.MOVING) {
+                            fireEvent(new UpdateEntityStateEvent(entity, EntityStates.MOVING));
+                        }
+                        velocityComp.setCurrentSpeed(velocityComp.getMaximumSpeed());
+
+                        float newAngle =
+                            (float) Math.atan2(currentTarget.x - transformComp.getTransform().getPosition().x, currentTarget.z
+                                - transformComp.getTransform().getPosition().z);
+                        newAngle = (float) (newAngle * (180 / Math.PI));
+                        if (newAngle != transformComp.getRotation().y) {
+                            pathComponent.setTargetRotation(new Vector3f(0, newAngle, 0));
+                            velocityComp.setTurnSpeed(velocityComp.getMaximumTurnSpeed());
+                            fireEvent(new NotifyRotationTargetUpdateEvent(entity));
+                        }
+                    } else if (entityState != EntityStates.IDLING && entityState != EntityStates.DEAD) {
+                        fireEvent(new UpdateEntityStateEvent(entity, EntityStates.IDLING));
+                        pathComponent.setCurrentTarget(null);
                     }
-                } else {
-                    fireEvent(new UpdateEntityStateEvent(entity, EntityState.STANDING));
 
+                    if (entityState == EntityStates.MOVING) {
+                        updateVelocity(tick, transformComp.getRotation(), pathComponent, velocityComp);
+                        fireEvent(new NotifyVelocityUpdateEvent(entity));
+                        transformComp.updatePosition(entity, velocityComp.getVelocity(), velocityComp.getRotationDelta());
+                        fireEvent(new NotifyTransformUpdateEvent(entity));
+                    } else if (velocityComp.getCurrentSpeed() != 0 || velocityComp.getTurnSpeed() != 0) {
+                        velocityComp.setCurrentSpeed(0f);
+                        velocityComp.setTurnSpeed(0f);
+                        velocityComp.setRotationDelta(new Vector3f());
+                        velocityComp.setVelocity(new Vector3f());
+                        fireEvent(new NotifyVelocityUpdateEvent(entity));
+                    }
                 }
-
-                if (entityState == EntityState.MOVING) {
-                    updateVelocity(tick, transformComp.getRotation(), pathComponent, velocityComp);
-                    fireEvent(new NotifyVelocityUpdateEvent(entity));
-                    transformComp.updatePosition(entity, velocityComp.getVelocity(), velocityComp.getRotationDelta());
-                    fireEvent(new NotifyTransformUpdateEvent(entity));
-                } else if (velocityComp.getCurrentSpeed() != 0 || velocityComp.getTurnSpeed() != 0) {
-                    velocityComp.setCurrentSpeed(0f);
-                    velocityComp.setTurnSpeed(0f);
-                    velocityComp.setRotationDelta(new Vector3f());
-                    velocityComp.setVelocity(new Vector3f());
-                    fireEvent(new NotifyVelocityUpdateEvent(entity));
-                }
-            }
-            if (hasComponent(entity, JumpingComponent.class)) {
-                JumpingComponent jump = getComponent(entity, JumpingComponent.class);
-
-                float jumpTime = jump.getJumpTime();
-
-                jumpTime += tick / 1000f * 2f;
-                jumpTime %= 1;
-                jump.setJumpTime(jumpTime);
-                float offset = (float) Math.sin(Math.PI * 2 * jumpTime);
-                offset = (offset + 1);
-                if (offset > jump.getPreviousOffset()) {
-                    jump.setGoingUp(true);
-                } else {
-                    jump.setGoingUp(false);
-                }
-                jump.setPreviousOffset(offset);
-                Transform transform = entityManager.getEntity(entity).getTransform();
-
-                transform.setRotation(Vector3f.add(new Vector3f(0, tick / 1000f * 20, 0), transform.getRotation(),
-                    null));
-                float speed = tick / 1000f * 10;
-                float dx = speed * (float) Math.sin(Math.toRadians(transform.getRotation().y - 90));
-                float dz = speed * (float) Math.cos(Math.toRadians(transform.getRotation().y - 90));
-                transform.getPosition().x += dx;
-                transform.getPosition().z += dz;
-                transform.getPosition().y = offset;
-                transform.setScale(new Vector3f(0.8f, 0.8f, 0.8f));
             }
         }
+    }
 
+    private boolean canMove(EntityStates entityState) {
+        return entityState != EntityStates.DYING && entityState != EntityStates.DEAD;
+    }
+
+    private void jumpingSystem(long tick) {
+        Set<String> entities = entityManager.getEntitiesWithComponent(JumpingComponent.class);
+        for (String entity : entities) {
+            JumpingComponent jump = getComponent(entity, JumpingComponent.class);
+
+            float jumpTime = jump.getJumpTime();
+
+            jumpTime += tick / 1000f * 2f;
+            jumpTime %= 1;
+            jump.setJumpTime(jumpTime);
+            float offset = (float) Math.sin(Math.PI * 2 * jumpTime);
+            offset = (offset + 1);
+            if (offset > jump.getPreviousOffset()) {
+                jump.setGoingUp(true);
+            } else {
+                jump.setGoingUp(false);
+            }
+            jump.setPreviousOffset(offset);
+            Transform transform = getComponent(entity, TransformComponent.class).getTransform();
+
+            // transform.setRotation(Vector3f.add(new Vector3f(0, tick / 1000f * 20, 0), transform.getRotation(),
+            // null));
+            // float speed = tick / 1000f * 10;
+            // float dx = speed * (float) Math.sin(Math.toRadians(transform.getRotation().y - 90));
+            // float dz = speed * (float) Math.cos(Math.toRadians(transform.getRotation().y - 90));
+            // transform.getPosition().x += dx;
+            // transform.getPosition().z += dz;
+            transform.getPosition().y = offset;
+            transform.setScale(new Vector3f(0.8f, 0.8f, 0.8f));
+        }
     }
 
     private boolean isAtTarget(Vector3f position, Vector3f target) {
@@ -152,14 +165,12 @@ public class BasicPhysicsSystem extends DefaultSystem {
      * @param e to process
      */
     public void processEvent(EntityEvent e) {
+        Transform transform = getComponent(e.getEntityId(), TransformComponent.class).getTransform();
         if (e instanceof UpdatePositionEvent) {
-            Transform transform = entityManager.getEntity(e.getEntityId()).getTransform();
             handlePositionEvent((UpdatePositionEvent) e, transform);
         } else if (e instanceof UpdateRotationEvent) {
-            Transform transform = entityManager.getEntity(e.getEntityId()).getTransform();
             handleRotateEvent((UpdateRotationEvent) e, transform);
         } else if (e instanceof UpdateScaleEvent) {
-            Transform transform = entityManager.getEntity(e.getEntityId()).getTransform();
             handleScaleEvent((UpdateScaleEvent) e, transform);
         } else if (e instanceof UpdateVelocityEvent) {
             handleVelocityChangeEvent((UpdateVelocityEvent) e, getComponent(e.getEntityId(), VelocityComponent.class));
@@ -168,7 +179,9 @@ public class BasicPhysicsSystem extends DefaultSystem {
                 .getNewMeshFile());
         } else if (e instanceof MoveEntityToTargetAction) {
             PathComponent component = (PathComponent) entityManager.getComponent(e.getEntityId(), PathComponent.class);
-            component.setCurrentTarget(((MoveEntityToTargetAction) e).getTarget());
+            if (component != null) {
+                component.setCurrentTarget(((MoveEntityToTargetAction) e).getTarget());
+            }
         }
     }
 

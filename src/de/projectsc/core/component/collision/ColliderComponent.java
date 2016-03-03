@@ -37,11 +37,6 @@ public class ColliderComponent extends PhysicsComponent {
     }
 
     @Override
-    public void update(long elapsed) {
-
-    }
-
-    @Override
     public boolean isValidForSaving() {
         return true;
     }

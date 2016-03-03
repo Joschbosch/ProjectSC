@@ -35,11 +35,6 @@ public class PathComponent extends PhysicsComponent {
     }
 
     @Override
-    public void update(long elapsed) {
-
-    }
-
-    @Override
     public boolean isValidForSaving() {
         return true;
     }
@@ -51,7 +46,7 @@ public class PathComponent extends PhysicsComponent {
 
     @Override
     public String serializeForNetwork() {
-        if (currentTarget == null) {
+        if (currentTarget == null || targetRotation == null) {
             return "";
         } else {
             return "" + currentTarget.x + CoreConstants.SERIALIZATION_SEPARATOR + currentTarget.y + CoreConstants.SERIALIZATION_SEPARATOR

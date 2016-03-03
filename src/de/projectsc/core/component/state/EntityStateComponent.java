@@ -8,7 +8,7 @@ import de.projectsc.core.CoreConstants;
 import de.projectsc.core.component.ComponentType;
 import de.projectsc.core.component.DefaultComponent;
 import de.projectsc.core.data.Scene;
-import de.projectsc.core.entities.states.EntityState;
+import de.projectsc.core.entities.states.EntityStates;
 
 /**
  * Component that represents the state of an entity.
@@ -22,7 +22,7 @@ public class EntityStateComponent extends DefaultComponent {
      */
     public static final String NAME = "Entity State Component";
 
-    private EntityState state = EntityState.STANDING;
+    private EntityStates state = EntityStates.IDLING;
 
     private boolean moved = false;
 
@@ -37,11 +37,6 @@ public class EntityStateComponent extends DefaultComponent {
     public EntityStateComponent() {
         setType(ComponentType.PREPHYSICS);
         setComponentName(NAME);
-    }
-
-    @Override
-    public void update(long elapsed) {
-
     }
 
     @Override
@@ -72,10 +67,11 @@ public class EntityStateComponent extends DefaultComponent {
     public void deserializeFromNetwork(String serialized) {
         String[] split = serialized.split(CoreConstants.SERIALIZATION_SEPARATOR);
         int ordinal = Integer.parseInt(split[0]);
-        if (ordinal == EntityState.MOVING.ordinal()) {
-            state = EntityState.MOVING;
+        EntityStates[] values = EntityStates.values();
+        if (ordinal >= values.length) {
+            state = EntityStates.UNKNOWN;
         } else {
-            state = EntityState.STANDING;
+            state = values[ordinal];
         }
         int selectedInt = Integer.parseInt(split[1]);
         int highlightedInt = Integer.parseInt(split[2]);
@@ -93,11 +89,11 @@ public class EntityStateComponent extends DefaultComponent {
      * 
      * @param newState to change to
      */
-    public void changeState(EntityState newState) {
+    public void changeState(EntityStates newState) {
         setState(newState);
     }
 
-    public EntityState getState() {
+    public EntityStates getState() {
         return state;
     }
 
@@ -105,12 +101,12 @@ public class EntityStateComponent extends DefaultComponent {
      * @param newState to set
      * @return the new state.
      */
-    public EntityState setState(EntityState newState) {
+    public EntityStates setState(EntityStates newState) {
         this.state = newState;
         return newState;
     }
 
-    public boolean isMoved() {
+    public boolean hasMoved() {
         return moved;
     }
 

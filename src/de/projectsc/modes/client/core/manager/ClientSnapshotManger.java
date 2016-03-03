@@ -16,6 +16,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 
 import com.rits.cloning.Cloner;
 
+import de.projectsc.core.component.physic.TransformComponent;
 import de.projectsc.core.data.structure.Snapshot;
 import de.projectsc.core.data.structure.SnapshotDelta;
 import de.projectsc.core.data.utils.Timer;
@@ -119,7 +120,8 @@ public class ClientSnapshotManger {
                     String e = entityManager.createNewEntityFromSchema(Long.parseLong(values[1]), values[0]);
                     @SuppressWarnings("unchecked") Map<String, Map<String, Double>> transformInfo =
                         mapper.readValue(values[2], new HashMap<String, Map<String, Double>>().getClass());
-                    entityManager.getEntity(e).getTransform().parseTransformValues(transformInfo);
+                    ((TransformComponent) entityManager.getComponent(e, TransformComponent.class)).getTransform().parseTransformValues(
+                        transformInfo);
                 }
             }
         }

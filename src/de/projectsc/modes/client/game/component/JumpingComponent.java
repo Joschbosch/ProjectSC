@@ -6,8 +6,10 @@ package de.projectsc.modes.client.game.component;
 
 import de.projectsc.core.component.ComponentType;
 import de.projectsc.core.component.physic.PhysicsComponent;
+
 /**
  * Testing class.
+ * 
  * @author Josch Bosch
  */
 public class JumpingComponent extends PhysicsComponent {
@@ -26,11 +28,6 @@ public class JumpingComponent extends PhysicsComponent {
     public JumpingComponent() {
         setComponentName(NAME);
         setType(ComponentType.PHYSICS);
-    }
-
-    @Override
-    public void update(long elapsed) {
-
     }
 
     @Override

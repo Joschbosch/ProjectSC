@@ -20,7 +20,7 @@ import de.projectsc.modes.client.gui.objects.particles.ParticleTexture;
 import de.projectsc.modes.client.gui.utils.Loader;
 
 /**
- * Component for particels.
+ * Component for particles.
  * 
  * @author Josch Bosch
  */
@@ -52,7 +52,6 @@ public class ParticleSystemComponent extends GraphicalComponent {
         }
     }
 
-    @Override
     public void update(long elapsed) {
         if (particleSystems.size() == 0) {
             addNewParticleSystem();

@@ -5,6 +5,7 @@
 package de.projectsc.core.manager;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -37,6 +38,8 @@ public class EntityManager {
     private static final Log LOGGER = LogFactory.getLog(EntityManager.class);
 
     private final Map<String, Entity> entities = new HashMap<>();
+
+    private final Map<Class<? extends Component>, Set<String>> componentToEntities = new HashMap<>();
 
     private final Map<String, Map<String, Component>> entityComponents = new HashMap<>();
 
@@ -148,6 +151,12 @@ public class EntityManager {
             }
             components.put(c.getComponentName(), c);
             entityComponents.put(id, components);
+            Set<String> entitiesWithcomponent = componentToEntities.get(c.getClass());
+            if (entitiesWithcomponent == null) {
+                entitiesWithcomponent = new HashSet<>();
+                componentToEntities.put(c.getClass(), entitiesWithcomponent);
+            }
+            entitiesWithcomponent.add(id);
             LOGGER.info("Added component " + c.getComponentName() + " to entity " + id);
             eventManager.fireEvent(new ComponentAddedEvent(id, c));
             List<String> required = c.getRequiredComponents();
@@ -166,6 +175,13 @@ public class EntityManager {
         return null;
     }
 
+    public Set<String> getEntitiesWithComponent(Class<? extends Component> c) {
+        if (componentToEntities.get(c) == null) {
+            return new HashSet<>();
+        }
+        return componentToEntities.get(c);
+    }
+
     /**
      * Removes the given component name from the given entity. This will only work, if there is no more component that requires the
      * component to delete.
@@ -179,6 +195,10 @@ public class EntityManager {
             Component toRemove = components.get(componentName);
             if (toRemove != null && toRemove.getRequiredBy().isEmpty()) {
                 components.remove(componentName);
+                Set<String> entitesWithComponent = componentToEntities.get(toRemove.getClass());
+                if (entitesWithComponent != null) {
+                    entitesWithComponent.remove(id);
+                }
                 for (String reqComponentName : toRemove.getRequiredComponents()) {
                     if (hasComponent(id, componentManager.getComponentClass(reqComponentName))) {
                         Component c = getComponent(id, reqComponentName);

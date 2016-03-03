@@ -6,6 +6,7 @@ package de.projectsc.core.systems.physics.collision;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.lwjgl.util.vector.Vector3f;
 
@@ -55,10 +56,11 @@ public class CollisionSystem extends DefaultSystem {
     @Override
     public void update(long tick) {
         List<Entity> moved = new LinkedList<>();
-        for (String e : entityManager.getAllEntites()) {
-            if (hasComponent(e, ColliderComponent.class) && hasComponent(e, EntityStateComponent.class)) {
+        Set<String> entities = entityManager.getEntitiesWithComponent(ColliderComponent.class);
+        for (String e : entities) {
+            if (hasComponent(e, EntityStateComponent.class)) {
                 EntityStateComponent state = getComponent(e, EntityStateComponent.class);
-                if (state.isMoved()) {
+                if (state.hasMoved()) {
                     moved.add(entityManager.getEntity(e));
                 }
             }
@@ -84,9 +86,6 @@ public class CollisionSystem extends DefaultSystem {
                 if (((MouseButtonClickedAction) e).getButton() == 1) {
                     fireEvent(new MoveToPositionAction(((MouseButtonClickedAction) e).getTerrainPoint()));
                 }
-                // if (((MouseButtonClickedAction) e).getButton() == 0) {
-                // fireEvent(new MoveToPositionAction(((MouseButtonClickedAction) e).getTerrainPoint()));
-                // }
             }
         }
     }
@@ -100,7 +99,6 @@ public class CollisionSystem extends DefaultSystem {
         if (e instanceof ComponentAddedEvent) {
             Component c = ((ComponentAddedEvent) e).getComponent();
             if (c instanceof ColliderComponent) {
-                ((ColliderComponent) c).update(0);
                 octree.addEntity(entityManager.getEntity(e.getEntityId()));
                 octree.recalculateTree();
             }

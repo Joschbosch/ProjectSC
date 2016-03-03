@@ -34,7 +34,7 @@ import de.projectsc.core.component.physic.TransformComponent;
 import de.projectsc.core.data.objects.Light;
 import de.projectsc.core.data.physics.Transform;
 import de.projectsc.core.data.utils.Timer;
-import de.projectsc.core.entities.states.EntityState;
+import de.projectsc.core.entities.states.EntityStates;
 import de.projectsc.core.events.entity.movement.UpdatePositionEvent;
 import de.projectsc.core.events.entity.movement.UpdateRotationEvent;
 import de.projectsc.core.events.entity.movement.UpdateScaleEvent;
@@ -408,9 +408,9 @@ public class EditorGraphicsCore implements Runnable {
      */
     public void moveEntity(boolean value) {
         if (value) {
-            eventManager.fireEvent(new UpdateEntityStateEvent(entity, EntityState.MOVING));
+            eventManager.fireEvent(new UpdateEntityStateEvent(entity, EntityStates.MOVING));
         } else {
-            eventManager.fireEvent(new UpdateEntityStateEvent(entity, EntityState.STANDING));
+            eventManager.fireEvent(new UpdateEntityStateEvent(entity, EntityStates.IDLING));
         }
     }
 

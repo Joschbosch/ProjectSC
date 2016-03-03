@@ -47,7 +47,6 @@ public class SendThread implements Runnable {
                 NetworkMessage sendMessage = new NetworkMessage();
                 sendMessage.setMsg(message.getMessage());
                 sendMessage.setData(mapper.writeValueAsString(message.getData()));
-                // System.x("Senging bytes : " + mapper.writeValueAsString(sendMessage).getBytes().length);
                 connection.sendUDP(mapper.writeValueAsString(sendMessage));
             } catch (InterruptedException | IOException e) {
                 LOGGER.error("Client thread interrupted", e);

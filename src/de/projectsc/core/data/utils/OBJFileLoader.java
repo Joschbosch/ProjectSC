@@ -129,6 +129,11 @@ public final class OBJFileLoader {
                 String[] vertex1 = currentLine[1].split(FACE_SEPERATION_CHAR);
                 String[] vertex2 = currentLine[2].split(FACE_SEPERATION_CHAR);
                 String[] vertex3 = currentLine[3].split(FACE_SEPERATION_CHAR);
+                if (vertex1.length < 3) {
+                    vertex1 = currentLine[1].split("\\s");
+                    vertex2 = currentLine[2].split("\\s");
+                    vertex3 = currentLine[3].split("\\s");
+                }
                 Vertex v0 = processVertex(vertex1, vertices, indices);
                 Vertex v1 = processVertex(vertex2, vertices, indices);
                 Vertex v2 = processVertex(vertex3, vertices, indices);

@@ -30,9 +30,6 @@ public class TransformComponent extends PhysicsComponent {
         setType(ComponentType.PHYSICS);
     }
 
-    @Override
-    public void update(long elapsed) {}
-
     /**
      * Update to a new position determined by the given velocity.
      * 

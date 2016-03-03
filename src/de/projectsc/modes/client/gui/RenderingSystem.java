@@ -21,6 +21,7 @@ import de.projectsc.core.systems.DefaultSystem;
 import de.projectsc.modes.client.gui.components.EmittingLightComponent;
 import de.projectsc.modes.client.gui.components.GraphicalComponent;
 import de.projectsc.modes.client.gui.components.MeshRendererComponent;
+import de.projectsc.modes.client.gui.components.ParticleSystemComponent;
 import de.projectsc.modes.client.gui.data.GUIScene;
 import de.projectsc.modes.client.gui.events.UpdateMeshRendererParameterEvent;
 import de.projectsc.modes.client.gui.events.UpdateTextureEvent;
@@ -96,19 +97,17 @@ public class RenderingSystem extends DefaultSystem {
 
     @Override
     public void update(long tick) {
-        Set<String> entities = entityManager.getAllEntites();
-        for (String entity : entities) {
-            for (Component comp : entityManager.getAllComponents(entity).values()) {
-                if (comp instanceof GraphicalComponent) {
-                    ((GraphicalComponent) comp).update(tick);
-                }
-            }
-            if (hasComponent(entity, MeshRendererComponent.class)) {
-                getComponent(entity, MeshRendererComponent.class).update(tick);
-            }
-
+        Set<String> entities = entityManager.getEntitiesWithComponent(ParticleSystemComponent.class);
+        for (String e : entities) {
+            particleSystem(tick, e);
         }
+    }
 
+    private void particleSystem(long tick, String entity) {
+        if (entityManager.hasComponent(entity, ParticleSystemComponent.class)) {
+            ParticleSystemComponent psc = (ParticleSystemComponent) entityManager.getComponent(entity, ParticleSystemComponent.class);
+            psc.update(tick);
+        }
     }
 
     /**

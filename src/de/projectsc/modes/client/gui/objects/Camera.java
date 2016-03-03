@@ -308,7 +308,7 @@ public class Camera implements InputCommandListener {
             centeringPoint = newCenterPoint;
             bound = false;
         } else {
-            centeringPoint = entity.getTransform().getPosition();
+            // centeringPoint = entity.getTransform().getPosition();
             bound = true;
         }
     }

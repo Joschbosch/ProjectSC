@@ -61,8 +61,7 @@ public class MeshRendererComponent extends GraphicalComponent {
             GUIConstants.TEXTURE_ROOT + GUIConstants.BASIC_TEXTURE_WHITE;
     }
 
-    @Override
-    public void update(long elpased) {
+    public void load() {
         if (owner != null && model == null && owner.hasComponent(MeshComponent.class)) {
             ModelData mesh = ((MeshComponent) owner.getComponent(MeshComponent.class)).getModel();
             if (mesh != null) {
@@ -77,8 +76,15 @@ public class MeshRendererComponent extends GraphicalComponent {
         }
     }
 
+    public boolean isInitialized() {
+        return (texturedModel != null);
+    }
+
     @Override
     public void render(String entity, GUIScene scene) {
+        if (!isInitialized()) {
+            load();
+        }
         TexturedModel m = getTexturedModel();
         if (m != null && m.getRawModel() != null && m.getTexture() != null) {
             if (modelTexture != null) {

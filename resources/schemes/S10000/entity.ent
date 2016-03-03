@@ -11,9 +11,10 @@
     "Mesh Component" : { },
     "Velocity Component" : {
       "acceleration" : 10000.0,
-      "turnSpeed" : 60.0,
+      "turnSpeed" : 1200.0,
       "maxSpeed" : 16.0
     },
+    "Path Component" : { },
     "Transform Component" : {
       "positionY" : 0.0,
       "scaleX" : 1.0,
@@ -25,7 +26,8 @@
       "scaleZ" : 1.0,
       "positionX" : 0.0
     },
-    "Entity State Component" : { }
+    "Entity State Component" : { },
+    "Health Component" : {}
   },
   "schemaId" : 10000,
   "schemaName" : "EntitySchema0"

@@ -22,9 +22,4 @@ public abstract class GraphicalComponent extends DefaultComponent {
      */
     public abstract void render(String entity, GUIScene scene);
 
-    @Override
-    public void update(long elapsed) {
-        // TODO Auto-generated method stub
-
-    }
 }

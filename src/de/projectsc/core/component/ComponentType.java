@@ -15,5 +15,5 @@ public enum ComponentType {
     /**
      * 
      */
-    INPUT, PREPHYSICS, PHYSICS, GRAPHICS
+    INPUT, PREPHYSICS, PHYSICS, GRAPHICS, GAME
 }

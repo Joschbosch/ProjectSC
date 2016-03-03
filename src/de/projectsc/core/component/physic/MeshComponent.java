@@ -42,15 +42,14 @@ public class MeshComponent extends PhysicsComponent {
     }
 
     @Override
-    public void update(long elapsed) {
-        if (model == null && modelPath != null) {
-            loadModel(modelPath);
-        }
-    }
-
-    @Override
     public boolean isValidForSaving() {
         return model != null;
+    }
+
+    public void loadModel() {
+        if (modelPath != null) {
+            loadModel(modelPath);
+        }
     }
 
     /**

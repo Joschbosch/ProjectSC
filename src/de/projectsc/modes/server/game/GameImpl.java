@@ -24,6 +24,8 @@ import de.projectsc.core.data.utils.Timer;
 import de.projectsc.core.events.entity.actions.MoveEntityToTargetAction;
 import de.projectsc.core.game.GameAttributes;
 import de.projectsc.core.game.GameConfiguration;
+import de.projectsc.core.game.systems.FightSystem;
+import de.projectsc.core.game.systems.HealthSystem;
 import de.projectsc.core.manager.ComponentManager;
 import de.projectsc.core.manager.EntityManager;
 import de.projectsc.core.manager.EventManager;
@@ -40,6 +42,7 @@ import de.projectsc.modes.server.core.data.States;
 import de.projectsc.modes.server.core.manager.ServerSnapshotManager;
 import de.projectsc.modes.server.core.messages.ServerMessage;
 import de.projectsc.modes.server.core.spi.Game;
+import de.projectsc.modes.server.game.ai.AISystem;
 import de.projectsc.modes.server.game.data.ServerPlayer;
 
 /**
@@ -80,6 +83,12 @@ public class GameImpl implements Game {
     private EntityStateSystem stateSystem;
 
     private CollisionSystem collisionSystem;
+
+    private AISystem aiSystem;
+
+    private FightSystem fightSystem;
+
+    private HealthSystem healthSystem;
 
     private ComponentManager componentManager;
 
@@ -137,6 +146,9 @@ public class GameImpl implements Game {
         timer.updateGameTimeAndTick(GAME_TICK_TIME);
         stateSystem.update(GAME_TICK_TIME);
         physicsSystem.update(GAME_TICK_TIME);
+        aiSystem.update(GAME_TICK_TIME);
+        fightSystem.update(GAME_TICK_TIME);
+        healthSystem.update(GAME_TICK_TIME);
         collisionSystem.update(GAME_TICK_TIME);
         snapshotManager.createSnapshot(timer);
         for (ServerPlayer player : gameContext.getPlayers().values()) {
@@ -179,6 +191,9 @@ public class GameImpl implements Game {
                     stateSystem = new EntityStateSystem(entityManager, eventManager);
                     physicsSystem = new BasicPhysicsSystem(entityManager, eventManager);
                     collisionSystem = new CollisionSystem(entityManager, eventManager);
+                    aiSystem = new AISystem(entityManager, eventManager);
+                    fightSystem = new FightSystem(entityManager, eventManager);
+                    healthSystem = new HealthSystem(entityManager, eventManager);
                     snapshotManager = new ServerSnapshotManager(entityManager);
                     loadComponents();
                     gameContext.loadData();
@@ -357,6 +372,7 @@ public class GameImpl implements Game {
      * 
      * @param newPlayer that joined.
      */
+    @Override
     public void addPlayerToGameLobby(AuthenticatedClient newPlayer) {
         ServerPlayer player = new ServerPlayer(newPlayer);
         sendMessageToAllPlayer(new ServerMessage(MessageConstants.PLAYER_JOINED_GAME, player.getId(), player.getDisplayName()));
@@ -379,10 +395,12 @@ public class GameImpl implements Game {
         }
     }
 
+    @Override
     public int getPlayerCount() {
         return gameContext.getPlayers().size();
     }
 
+    @Override
     public boolean isAlive() {
         return lobbyAlive.get();
     }
@@ -390,16 +408,19 @@ public class GameImpl implements Game {
     /**
      * Shut down lobby.
      */
+    @Override
     public void shutdown() {
         sendMessageToAllPlayer(new ServerMessage(MessageConstants.SHUTDOWN));
         gameContext.terminate();
         lobbyAlive.set(false);
     }
 
+    @Override
     public long getGameID() {
         return gameContext.getGameID();
     }
 
+    @Override
     public String getDisplayName() {
         return gameContext.getDisplayName();
     }
@@ -413,6 +434,7 @@ public class GameImpl implements Game {
      * 
      * @return true if so.
      */
+    @Override
     public String isJoinable() {
         String returnString = "";
         if (!currentState.equals(States.LOBBY)) {
@@ -421,10 +443,12 @@ public class GameImpl implements Game {
         return returnString;
     }
 
+    @Override
     public GameConfiguration getConfiguration() {
         return gameContext.getConfig();
     }
 
+    @Override
     public States getCurrentState() {
         return currentState;
     }

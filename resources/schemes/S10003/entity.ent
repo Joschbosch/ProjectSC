@@ -1,33 +1,29 @@
 {
   "components" : {
+    "Collider Component" : { },
+    "AI Controlled Component" : { },
     "Mesh Renderer Component" : {
       "shineDamper" : 1.0,
       "reflectivity" : 0.0,
       "numColumns" : 1
     },
+    "Overwatch Component" : { },
+    "Basic Attack Component" : { },
     "Mesh Component" : { },
+    "Health Component" : { },
     "Transform Component" : {
       "positionY" : 0.0,
-      "scaleX" : 0.6,
+      "scaleX" : 5.4,
       "positionZ" : 0.0,
-      "scaleY" : 0.6,
+      "scaleY" : 5.4,
       "rotationX" : 0.0,
       "rotationY" : 0.0,
       "rotationZ" : 0.0,
-      "scaleZ" : 0.6,
+      "scaleZ" : 5.4,
       "positionX" : 0.0
     },
-    "Entity State Component" : { },
-    "Jumping Component" : {},
-    "Particle System Component" : {},
-    "AI Controlled Component" : {},
-    "Velocity Component":{
-      "acceleration" : 10000.0,
-      "turnSpeed" : 60.0,
-      "maxSpeed" : 16.0
-    }, 
-    "Path Component":{}
+    "Entity State Component" : { }
   },
-  "schemaId" : 10002,
+  "schemaId" : 10003,
   "schemaName" : "EntitySchema0"
 }

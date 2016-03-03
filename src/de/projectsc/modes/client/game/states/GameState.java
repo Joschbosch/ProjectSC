@@ -28,6 +28,7 @@ import de.projectsc.modes.client.core.manager.ClientSnapshotManger;
 import de.projectsc.modes.client.core.states.CommonClientState;
 import de.projectsc.modes.client.game.system.GamePhysicsSystem;
 import de.projectsc.modes.client.game.ui.controls.GameTime;
+import de.projectsc.modes.client.game.ui.controls.PlayerHealthBar;
 
 /**
  * State of the client when the game is running.
@@ -59,6 +60,7 @@ public class GameState extends CommonClientState {
         super.init(networkQueue, entityManager, eventManager, componentManager, snapshotManager, timer);
         this.gameConfig = new GameConfiguration();
         new GameTime(timer);
+        new PlayerHealthBar(entityManager);
     }
 
     @Override

@@ -49,11 +49,6 @@ public class VelocityComponent extends PhysicsComponent {
     }
 
     @Override
-    public void update(long elapsed) {
-
-    }
-
-    @Override
     public Map<String, Object> serialize(File savingLocation) {
         Map<String, Object> serialized = new HashMap<>();
         serialized.put("acceleration", acceleration);

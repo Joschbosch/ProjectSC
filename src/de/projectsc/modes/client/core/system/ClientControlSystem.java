@@ -37,7 +37,6 @@ public class ClientControlSystem extends DefaultSystem {
     @Override
     public void processEvent(Event e) {
         controllingEntities.add(entityManager.getEntity(entityManager.getAllEntites().iterator().next()));
-
         if (e instanceof MoveToPositionAction) {
             for (Entity entity : controllingEntities) {
                 networkSendQueue.offer(new ClientMessage("moveToPosition", entity.getID(), ((MoveToPositionAction) e).getTarget()));

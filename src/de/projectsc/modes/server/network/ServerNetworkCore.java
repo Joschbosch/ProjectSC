@@ -38,7 +38,7 @@ public class ServerNetworkCore {
     private static final Log LOGGER = LogFactory.getLog(ServerNetworkCore.class);
 
     public ServerNetworkCore(ServerCore serverCore, BlockingQueue<ServerMessage> coreQueue) {
-        Server server = new Server();
+        Server server = new Server(128000, 100000);
         new Thread(server).start();
         try {
             server.bind(54555, 54777);

@@ -46,7 +46,7 @@ public class ClientNetworkCore implements Runnable {
         BlockingQueue<ClientMessage> serverNetworkReceiveQueueFake) {
         this.sendMessageQueue = networkIncomingQueue;
         this.retreiveMessageQueue = networkOutgoingQueue;
-        client = new Client();
+        client = new Client(32000, 8000);
         new Thread(client).start();
     }
 

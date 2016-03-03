@@ -82,7 +82,7 @@ public interface Component {
      * 
      * @param elapsed time since last update
      */
-    void update(long elapsed);
+    // void update(long elapsed);
 
     /**
      * @return name of the component.

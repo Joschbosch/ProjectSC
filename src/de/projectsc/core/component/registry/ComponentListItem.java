@@ -11,7 +11,12 @@ import de.projectsc.core.component.physic.PathComponent;
 import de.projectsc.core.component.physic.TransformComponent;
 import de.projectsc.core.component.physic.VelocityComponent;
 import de.projectsc.core.component.state.EntityStateComponent;
+import de.projectsc.core.game.components.AffiliationComponent;
+import de.projectsc.core.game.components.BasicAttackComponent;
+import de.projectsc.core.game.components.HealthComponent;
 import de.projectsc.modes.client.game.component.JumpingComponent;
+import de.projectsc.modes.server.game.ai.AIControlledComponent;
+import de.projectsc.modes.server.game.ai.OverwatchComponent;
 
 /**
  * These are all (non GUI) components that are known in the engine.
@@ -46,7 +51,27 @@ public enum ComponentListItem {
     /**
     * 
     */
-    JUMPING_COMPONENT(JumpingComponent.NAME, JumpingComponent.class, false);
+    JUMPING_COMPONENT(JumpingComponent.NAME, JumpingComponent.class, true),
+    /**
+    * 
+    */
+    HEALTH_COMPONENT(HealthComponent.NAME, HealthComponent.class, true),
+    /**
+     * 
+     */
+    AFFILIATION_COMPONENT(AffiliationComponent.NAME, AffiliationComponent.class, true),
+    /**
+      * 
+      */
+    ATTACK_COMPONENT(BasicAttackComponent.NAME, BasicAttackComponent.class, true),
+    /**
+     * 
+     */
+    OVERWATCH_COMPONENT(OverwatchComponent.NAME, OverwatchComponent.class, true),
+    /**
+     * 
+     */
+    AI_CONTROLLED_COMPONENT(AIControlledComponent.NAME, AIControlledComponent.class, true);
 
     private String name;
 

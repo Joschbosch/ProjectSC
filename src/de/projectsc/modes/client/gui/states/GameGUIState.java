@@ -17,6 +17,7 @@ import de.projectsc.modes.client.gui.input.InputConsumeManager;
 import de.projectsc.modes.client.gui.ui.basic.Container;
 import de.projectsc.modes.client.gui.ui.views.GameTimeView;
 import de.projectsc.modes.client.gui.ui.views.HealthView;
+import de.projectsc.modes.client.gui.ui.views.PlayerHealthBarView;
 import de.projectsc.modes.client.gui.utils.MousePicker;
 
 /**
@@ -30,6 +31,8 @@ public class GameGUIState implements GUIState, InputCommandListener {
 
     private GameTimeView gameTimeView;
 
+    private PlayerHealthBarView playerHealthBarView;
+
     private MousePicker mousePicker;
 
     private boolean debugMode;
@@ -38,6 +41,7 @@ public class GameGUIState implements GUIState, InputCommandListener {
     public void initialize() {
         container = new Container();
         gameTimeView = new GameTimeView(container);
+        playerHealthBarView = new PlayerHealthBarView(container);
         new HealthView(container);
         InputConsumeManager.getInstance().addListener(this);
     }
@@ -45,6 +49,7 @@ public class GameGUIState implements GUIState, InputCommandListener {
     @Override
     public void update() {
         gameTimeView.update();
+        playerHealthBarView.update();
     }
 
     @Override
