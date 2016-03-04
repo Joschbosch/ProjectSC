@@ -11,6 +11,7 @@ import de.projectsc.core.component.physic.PhysicsComponent;
 import de.projectsc.core.data.Scene;
 import de.projectsc.core.data.physics.AxisAlignedBoundingBox;
 import de.projectsc.core.data.physics.WireFrame;
+import de.projectsc.core.interfaces.Component;
 
 /**
  * When this component is attached to an entity, it will be able to collide with the world or being able to be selected.
@@ -37,7 +38,7 @@ public class ColliderComponent extends PhysicsComponent {
     }
 
     @Override
-    public boolean isValidForSaving() {
+    public boolean isValidForEntitySaving() {
         return true;
     }
 
@@ -48,6 +49,12 @@ public class ColliderComponent extends PhysicsComponent {
                 axisAlignedBoundingBox.getSize());
         wf.setColor(new Vector3f(1.0f, 0, 0));
         scene.getWireFrames().add(wf);
+    }
+
+    @Override
+    public Component cloneComponent() {
+        System.out.println("TO DO");
+        return new ColliderComponent();
     }
 
     public AxisAlignedBoundingBox getAABB() {

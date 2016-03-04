@@ -6,6 +6,7 @@
       "numColumns" : 1
     },
     "Mesh Component" : { },
+    "Health Component" :  {},
     "Transform Component" : {
       "positionY" : 0.0,
       "scaleX" : 0.6,
@@ -18,8 +19,7 @@
       "positionX" : 0.0
     },
     "Entity State Component" : { },
-    "Jumping Component" : {},
-    "Particle System Component" : {},
+    "Follow Path Component" : {},
     "AI Controlled Component" : {},
     "Velocity Component":{
       "acceleration" : 10000.0,

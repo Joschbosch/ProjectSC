@@ -9,6 +9,7 @@ import de.projectsc.core.component.ComponentType;
 import de.projectsc.core.component.DefaultComponent;
 import de.projectsc.core.data.Scene;
 import de.projectsc.core.entities.states.EntityStates;
+import de.projectsc.core.interfaces.Component;
 
 /**
  * Component that represents the state of an entity.
@@ -80,7 +81,19 @@ public class EntityStateComponent extends DefaultComponent {
     }
 
     @Override
-    public boolean isValidForSaving() {
+    public Component cloneComponent() {
+        EntityStateComponent esc = new EntityStateComponent();
+        esc.setEntitySelected(selected);
+        esc.setHighlightAble(highlightAble);
+        esc.setHighlighted(highlighted);
+        esc.setSelectAble(selectAble);
+        esc.setMoved(moved);
+        esc.setState(state);
+        return esc;
+    }
+
+    @Override
+    public boolean isValidForEntitySaving() {
         return true;
     }
 

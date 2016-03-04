@@ -7,6 +7,7 @@ package de.projectsc.core.game.components;
 import de.projectsc.core.CoreConstants;
 import de.projectsc.core.component.ComponentType;
 import de.projectsc.core.component.DefaultComponent;
+import de.projectsc.core.interfaces.Component;
 
 public class HealthComponent extends DefaultComponent {
 
@@ -27,11 +28,6 @@ public class HealthComponent extends DefaultComponent {
     }
 
     @Override
-    public boolean isValidForSaving() {
-        return true;
-    }
-
-    @Override
     public String serializeForNetwork() {
         return "" + currentHealth + CoreConstants.SERIALIZATION_SEPARATOR + currentRegenerationRate + CoreConstants.SERIALIZATION_SEPARATOR
             + maxHealth;
@@ -43,6 +39,23 @@ public class HealthComponent extends DefaultComponent {
         currentHealth = Double.valueOf(values[0]);
         currentRegenerationRate = Double.valueOf(values[1]);
         maxHealth = Double.valueOf(values[2]);
+    }
+
+    @Override
+    public Component cloneComponent() {
+        HealthComponent hc = new HealthComponent();
+        hc.setCurrentHealth(currentHealth);
+        hc.setMaximumHealth(maxHealth);
+        hc.setCurrentRegenerationRate(currentRegenerationRate);
+        return hc;
+    }
+
+    private void setCurrentRegenerationRate(double newRegenerationRate) {
+        this.currentRegenerationRate = newRegenerationRate;
+    }
+
+    private void setMaximumHealth(double maximumHealth) {
+        this.maxHealth = maximumHealth;
     }
 
     public double getMaxHealth() {

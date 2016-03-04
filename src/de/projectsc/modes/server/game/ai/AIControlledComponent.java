@@ -6,6 +6,7 @@ package de.projectsc.modes.server.game.ai;
 
 import de.projectsc.core.component.ComponentType;
 import de.projectsc.core.component.DefaultComponent;
+import de.projectsc.core.interfaces.Component;
 
 public class AIControlledComponent extends DefaultComponent {
 
@@ -20,8 +21,12 @@ public class AIControlledComponent extends DefaultComponent {
     }
 
     @Override
-    public boolean isValidForSaving() {
+    public boolean isValidForEntitySaving() {
         return true;
     }
 
+    @Override
+    public Component cloneComponent() {
+        return new AIControlledComponent();
+    }
 }

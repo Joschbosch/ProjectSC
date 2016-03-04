@@ -14,6 +14,7 @@ import org.lwjgl.util.vector.Vector3f;
 import de.projectsc.core.component.ComponentType;
 import de.projectsc.core.data.Scene;
 import de.projectsc.core.data.physics.WireFrame;
+import de.projectsc.core.interfaces.Component;
 import de.projectsc.modes.client.gui.data.GUIScene;
 import de.projectsc.modes.client.gui.objects.particles.ParticleSystem;
 import de.projectsc.modes.client.gui.objects.particles.ParticleTexture;
@@ -64,7 +65,7 @@ public class ParticleSystemComponent extends GraphicalComponent {
     }
 
     @Override
-    public boolean isValidForSaving() {
+    public boolean isValidForEntitySaving() {
         return true;
     }
 
@@ -84,5 +85,15 @@ public class ParticleSystemComponent extends GraphicalComponent {
             .loadTexture("particles/particleStar.png"), 1));
         particleSystems.add(particleSystem);
         offsets.put(particleSystem.getId(), new Vector3f(0, 0, 0));
+    }
+
+    // TODO: make right
+    @Override
+    public Component cloneComponent() {
+        ParticleSystemComponent target = new ParticleSystemComponent();
+        for (ParticleSystem ps : particleSystems) {
+            target.addNewParticleSystem();
+        }
+        return target;
     }
 }

@@ -13,7 +13,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.map.ObjectMapper;
 
-import de.projectsc.core.data.physics.Transform;
+import de.projectsc.core.interfaces.Component;
 import de.projectsc.core.manager.EntityManager;
 
 /**
@@ -56,10 +56,13 @@ public final class MapLoader {
             Map<String, Object> entityValues = (Map<String, Object>) entities.get(uid);
             String newEntity = entityManager.createNewEntityFromSchema((int) entityValues.get("type"), uid);
             if (!newEntity.isEmpty()) {
-                Transform t = entityManager.getEntity(newEntity).getTransform();
-                t.parseTransformValues((Map<String, Map<String, Double>>) entityValues.get("transform"));
+                for (Component c : entityManager.getAllComponents(newEntity).values()) {
+                    if (entityValues.get(c.getComponentName()) != null) {
+                        c.loadConfiguration((Map<String, Object>) entityValues.get(c.getComponentName()));
+                    }
+                }
                 LOGGER.info(String.format("Added entity %s of type %s with transform %s", newEntity, entityManager.getEntity(newEntity)
-                    .getEntityTypeId(), t));
+                    .getEntityTypeId(), entityManager.getEntity(newEntity).getTransform()));
             } else {
                 LOGGER.error("Failed to load entity " + entityValues);
             }

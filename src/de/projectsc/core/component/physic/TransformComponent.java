@@ -4,7 +4,6 @@
 
 package de.projectsc.core.component.physic;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,6 +11,7 @@ import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.core.component.ComponentType;
 import de.projectsc.core.data.physics.Transform;
+import de.projectsc.core.interfaces.Component;
 
 /**
  * This component manages the {@link transform} of an entity. It can not be removed.
@@ -43,7 +43,7 @@ public class TransformComponent extends PhysicsComponent {
     }
 
     @Override
-    public Map<String, Object> serialize(File savingLocation) {
+    public Map<String, Object> getConfiguration() {
         Map<String, Object> serialized = new HashMap<>();
         serialized.put("positionX", owner.getTransform().getPosition().x);
         serialized.put("positionY", owner.getTransform().getPosition().y);
@@ -58,7 +58,7 @@ public class TransformComponent extends PhysicsComponent {
     }
 
     @Override
-    public void deserialize(Map<String, Object> serialized, String loadingLocation) {
+    public void loadConfiguration(Map<String, Object> serialized) {
         owner.getTransform().setPosition(
             new Vector3f((float) (double) serialized.get("positionX"), (float) (double) serialized.get("positionY"),
                 (float) (double) serialized.get("positionZ")));
@@ -83,7 +83,16 @@ public class TransformComponent extends PhysicsComponent {
     }
 
     @Override
-    public boolean isValidForSaving() {
+    public Component cloneComponent() {
+        TransformComponent tc = new TransformComponent();
+        tc.setPosition(new Vector3f(getPosition()));
+        tc.setRotation(new Vector3f(getRotation()));
+        tc.setScale(new Vector3f(getScale()));
+        return tc;
+    }
+
+    @Override
+    public boolean isValidForEntitySaving() {
         return true;
     }
 
@@ -95,7 +104,9 @@ public class TransformComponent extends PhysicsComponent {
      * @param position to set
      */
     public void setPosition(Vector3f position) {
-        owner.getTransform().getPosition().set(position);
+        if (owner != null) {
+            owner.getTransform().getPosition().set(position);
+        }
     }
 
     public Vector3f getRotation() {
@@ -106,7 +117,9 @@ public class TransformComponent extends PhysicsComponent {
      * @param rotation to set
      */
     public void setRotation(Vector3f rotation) {
-        owner.getTransform().getRotation().set(rotation);
+        if (owner != null) {
+            owner.getTransform().getRotation().set(rotation);
+        }
     }
 
     public Vector3f getScale() {
@@ -117,7 +130,9 @@ public class TransformComponent extends PhysicsComponent {
      * @param scale to set
      */
     public void setScale(Vector3f scale) {
-        owner.getTransform().getScale().set(scale);
+        if (owner != null) {
+            owner.getTransform().getScale().set(scale);
+        }
     }
 
     public Transform getTransform() {

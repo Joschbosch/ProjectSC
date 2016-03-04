@@ -6,6 +6,7 @@ package de.projectsc.modes.client.game.component;
 
 import de.projectsc.core.component.ComponentType;
 import de.projectsc.core.component.physic.PhysicsComponent;
+import de.projectsc.core.interfaces.Component;
 
 /**
  * Testing class.
@@ -31,7 +32,12 @@ public class JumpingComponent extends PhysicsComponent {
     }
 
     @Override
-    public boolean isValidForSaving() {
+    public Component cloneComponent() {
+        return new JumpingComponent();
+    }
+
+    @Override
+    public boolean isValidForEntitySaving() {
         return true;
     }
 

@@ -1,20 +1,11 @@
 {
   "components" : {
-    "Collider Component" : { },
-    "Emitting light component" : { },
     "Mesh Renderer Component" : {
       "shineDamper" : 1.0,
       "reflectivity" : 0.0,
       "numColumns" : 1
     },
     "Mesh Component" : { },
-    "Controlable Component" : {},
-    "Velocity Component" : {
-      "acceleration" : 10000.0,
-      "turnSpeed" : 1200.0,
-      "maxSpeed" : 16.0
-    },
-    "Path Component" : { },
     "Transform Component" : {
       "positionY" : 0.0,
       "scaleX" : 1.0,
@@ -26,9 +17,12 @@
       "scaleZ" : 1.0,
       "positionX" : 0.0
     },
-    "Entity State Component" : { },
-    "Health Component" : {}
+    "Path Point Component" : {
+      "groupOrderNumber" : -1,
+      "pathID" : -1
+    },
+    "Entity State Component" : { }
   },
-  "schemaId" : 10000,
-  "schemaName" : "EntitySchema0"
+  "schemaId" : 10004,
+  "schemaName" : "Path Point"
 }

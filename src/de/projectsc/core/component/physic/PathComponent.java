@@ -12,6 +12,7 @@ import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.core.CoreConstants;
 import de.projectsc.core.component.ComponentType;
+import de.projectsc.core.interfaces.Component;
 
 /**
  * Component for the path of an entity.
@@ -35,7 +36,7 @@ public class PathComponent extends PhysicsComponent {
     }
 
     @Override
-    public boolean isValidForSaving() {
+    public boolean isValidForEntitySaving() {
         return true;
     }
 
@@ -69,6 +70,12 @@ public class PathComponent extends PhysicsComponent {
             currentTarget.z = Float.valueOf(split[2]);
             targetRotation.y = Float.valueOf(split[3]);
         }
+    }
+
+    @Override
+    public Component cloneComponent() {
+        PathComponent pc = new PathComponent();
+        return pc;
     }
 
     public Vector3f getCurrentTarget() {

@@ -66,7 +66,6 @@ public class EntityStateSystem extends DefaultSystem {
             } else {
                 component.setMoved(false);
             }
-            System.out.println("CHANGED STATE TO : " + component.getState());
             fireEvent(new NotifyEntityStateChangedEvent(e.getEntityId()));
         }
     }

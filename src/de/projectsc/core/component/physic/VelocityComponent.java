@@ -13,6 +13,7 @@ import org.lwjgl.util.vector.Vector3f;
 import de.projectsc.core.CoreConstants;
 import de.projectsc.core.component.ComponentType;
 import de.projectsc.core.component.state.EntityStateComponent;
+import de.projectsc.core.interfaces.Component;
 
 /**
  * Component that handles the movement of an entity.
@@ -86,7 +87,20 @@ public class VelocityComponent extends PhysicsComponent {
     }
 
     @Override
-    public boolean isValidForSaving() {
+    public Component cloneComponent() {
+        VelocityComponent vc = new VelocityComponent();
+        vc.setAcceleration(acceleration);
+        vc.setMaximumSpeed(maximumSpeed);
+        vc.setMaximumTurnSpeed(maximumTurnSpeed);
+        vc.setTurnSpeed(turnSpeed);
+        vc.setCurrentSpeed(currentSpeed);
+        vc.setVelocity(new Vector3f(velocity));
+        vc.setRotationDelta(new Vector3f(rotationDelta));
+        return vc;
+    }
+
+    @Override
+    public boolean isValidForEntitySaving() {
         return true;
     }
 

@@ -6,17 +6,14 @@ package de.projectsc.modes.client.core.manager;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
-import org.codehaus.jackson.map.ObjectMapper;
 
 import com.rits.cloning.Cloner;
 
-import de.projectsc.core.component.physic.TransformComponent;
 import de.projectsc.core.data.structure.Snapshot;
 import de.projectsc.core.data.structure.SnapshotDelta;
 import de.projectsc.core.data.utils.Timer;
@@ -101,7 +98,6 @@ public class ClientSnapshotManger {
      * @throws IOException e
      */
     public void applyNewSnapshotDelta(SnapshotDelta snapshot) throws JsonParseException, JsonMappingException, IOException {
-        ObjectMapper mapper = new ObjectMapper();
         Snapshot old = getCurrentSnapshot();
         Snapshot newShot = Cloner.standard().deepClone(old);
         newShot.setGameTime(snapshot.getGameTime());
@@ -115,13 +111,9 @@ public class ClientSnapshotManger {
         }
         if (snapshot.getCreated() != null) {
             for (String newEntity : snapshot.getCreated()) {
-                String[] values = newEntity.split(";");
+                String[] values = newEntity.split("/");
                 if (entityManager.getEntity(values[0]) == null) {
-                    String e = entityManager.createNewEntityFromSchema(Long.parseLong(values[1]), values[0]);
-                    @SuppressWarnings("unchecked") Map<String, Map<String, Double>> transformInfo =
-                        mapper.readValue(values[2], new HashMap<String, Map<String, Double>>().getClass());
-                    ((TransformComponent) entityManager.getComponent(e, TransformComponent.class)).getTransform().parseTransformValues(
-                        transformInfo);
+                    entityManager.createNewEntityFromSchema(Long.parseLong(values[1]), values[0]);
                 }
             }
         }
@@ -129,11 +121,18 @@ public class ClientSnapshotManger {
             for (String entity : snapshot.getChanged().keySet()) {
                 Map<String, String> components = snapshot.getChanged().get(entity);
                 Map<String, Component> entityComponents = entityManager.getAllComponents(entity);
-                for (Component c : entityComponents.values()) {
-                    if (components.containsKey(c.getComponentName())) {
-                        c.deserializeFromNetwork(components.get(c.getComponentName()));
+                if (entityComponents != null) {
+                    for (Component c : entityComponents.values()) {
+                        if (components.containsKey(c.getComponentName())) {
+                            c.deserializeFromNetwork(components.get(c.getComponentName()));
+                        }
                     }
                 }
+            }
+        }
+        if (snapshot.getRemoved() != null) {
+            for (String removedEntity : snapshot.getRemoved()) {
+                entityManager.deleteEntity(removedEntity);
             }
         }
         currentSnapshots.add(newShot);

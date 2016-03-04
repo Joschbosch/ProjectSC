@@ -17,6 +17,7 @@ import de.projectsc.core.CoreConstants;
 import de.projectsc.core.component.ComponentType;
 import de.projectsc.core.data.physics.ModelData;
 import de.projectsc.core.data.utils.OBJFileLoader;
+import de.projectsc.core.interfaces.Component;
 
 /**
  * Component that represents the mesh an entity uses.
@@ -42,7 +43,7 @@ public class MeshComponent extends PhysicsComponent {
     }
 
     @Override
-    public boolean isValidForSaving() {
+    public boolean isValidForEntitySaving() {
         return model != null;
     }
 
@@ -88,6 +89,22 @@ public class MeshComponent extends PhysicsComponent {
         if (modelPath != null) {
             loadModel(modelPath);
         }
+    }
+
+    @Override
+    public Component cloneComponent() {
+        MeshComponent mc = new MeshComponent();
+        mc.setModel(model);
+        mc.setModelPath(modelPath);
+        return mc;
+    }
+
+    public void setModelPath(String modelPath) {
+        this.modelPath = modelPath;
+    }
+
+    public void setModel(ModelData model) {
+        this.model = model;
     }
 
     public ModelData getModel() {

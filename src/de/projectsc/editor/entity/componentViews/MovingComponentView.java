@@ -3,7 +3,7 @@
  * 
  * 
  */
-package de.projectsc.editor.componentViews;
+package de.projectsc.editor.entity.componentViews;
 
 import javax.swing.JLabel;
 import javax.swing.JSlider;
@@ -14,7 +14,7 @@ import javax.swing.event.ChangeListener;
 import de.projectsc.core.component.physic.VelocityComponent;
 import de.projectsc.core.events.entity.movement.UpdateVelocityEvent;
 import de.projectsc.core.interfaces.Component;
-import de.projectsc.editor.ComponentView;
+import de.projectsc.editor.entity.ComponentView;
 
 /**
  * Editor view for the {@link VelocityComponent}.

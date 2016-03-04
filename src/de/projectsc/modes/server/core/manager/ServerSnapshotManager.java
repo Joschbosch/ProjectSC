@@ -67,7 +67,7 @@ public class ServerSnapshotManager {
     /**
      * Returns the current snapshot.
      * 
-     * @return curren sn
+     * @return current sn
      */
     public Snapshot getLastSnapshot() {
         if (snapshots[lastSnapshot] != null) {
@@ -112,6 +112,16 @@ public class ServerSnapshotManager {
         SnapshotDelta delta = new SnapshotDelta();
         delta.setGameTime(currentSnapshot.getGameTime());
         delta.setTick(currentSnapshot.getTick());
+        for (String entity : currentSnapshot.getEntitiesSerialized().keySet()) {
+            if (!lastSnapshotSend.getEntitiesSerialized().containsKey(entity)) {
+                delta.addCreated(entity + "/" + enitityManager.getEntity(entity).getEntityTypeId());
+            }
+        }
+        for (String entity : lastSnapshotSend.getEntitiesSerialized().keySet()) {
+            if (!currentSnapshot.getEntitiesSerialized().containsKey(entity)) {
+                delta.addRemoved(entity);
+            }
+        }
         for (String entityId : currentSnapshot.getComponentsSerialized().keySet()) {
             Map<String, String> components = currentSnapshot.getComponentsSerialized().get(entityId);
             Map<String, String> componentsOld = lastSnapshotSend.getComponentsSerialized().get(entityId);

@@ -20,6 +20,7 @@ import de.projectsc.core.CoreConstants;
 import de.projectsc.core.component.ComponentType;
 import de.projectsc.core.component.physic.MeshComponent;
 import de.projectsc.core.data.physics.ModelData;
+import de.projectsc.core.interfaces.Component;
 import de.projectsc.modes.client.gui.data.GUIScene;
 import de.projectsc.modes.client.gui.models.RawModel;
 import de.projectsc.modes.client.gui.models.TexturedModel;
@@ -59,6 +60,33 @@ public class MeshRendererComponent extends GraphicalComponent {
         requiredComponents.add(MeshComponent.NAME);
         texturePath =
             GUIConstants.TEXTURE_ROOT + GUIConstants.BASIC_TEXTURE_WHITE;
+    }
+
+    @Override
+    public Component cloneComponent() {
+        MeshRendererComponent mrc = new MeshRendererComponent();
+        mrc.setTexturePath(texturePath);
+        mrc.setModel(model);
+        mrc.setModelTexture(modelTexture);
+        mrc.setTexturedModel(texturedModel);
+        mrc.setTextureIndex(textureIndex);
+        return mrc;
+    }
+
+    public void setModel(RawModel model) {
+        this.model = model;
+    }
+
+    public void setModelTexture(ModelTexture modelTexture) {
+        this.modelTexture = modelTexture;
+    }
+
+    public void setTexturePath(String texturePath) {
+        this.texturePath = texturePath;
+    }
+
+    public void setTexturedModel(TexturedModel texturedModel) {
+        this.texturedModel = texturedModel;
     }
 
     public void load() {
@@ -233,7 +261,7 @@ public class MeshRendererComponent extends GraphicalComponent {
     }
 
     @Override
-    public boolean isValidForSaving() {
+    public boolean isValidForEntitySaving() {
         return model != null;
     }
 

@@ -2,10 +2,10 @@
  * Copyright (C) 2015 
  */
 
-package de.projectsc.editor.componentViews;
+package de.projectsc.editor.entity.componentViews;
 
 import de.projectsc.core.component.physic.VelocityComponent;
-import de.projectsc.editor.ComponentView;
+import de.projectsc.editor.entity.ComponentView;
 import de.projectsc.modes.client.gui.components.EmittingLightComponent;
 
 /**

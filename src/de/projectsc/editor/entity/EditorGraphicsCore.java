@@ -3,7 +3,7 @@
  * 
  * 
  */
-package de.projectsc.editor;
+package de.projectsc.editor.entity;
 
 import java.awt.Canvas;
 import java.io.File;
@@ -48,6 +48,7 @@ import de.projectsc.core.systems.physics.BasicPhysicsSystem;
 import de.projectsc.core.systems.physics.collision.CollisionSystem;
 import de.projectsc.core.systems.state.EntityStateSystem;
 import de.projectsc.core.terrain.Terrain;
+import de.projectsc.editor.EditorCamera;
 import de.projectsc.modes.client.gui.InputSystem;
 import de.projectsc.modes.client.gui.RenderingSystem;
 import de.projectsc.modes.client.gui.components.EmittingLightComponent;

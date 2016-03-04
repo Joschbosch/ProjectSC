@@ -7,6 +7,7 @@ package de.projectsc.core.game.components;
 import de.projectsc.core.CoreConstants;
 import de.projectsc.core.component.ComponentType;
 import de.projectsc.core.component.DefaultComponent;
+import de.projectsc.core.interfaces.Component;
 
 public class ManaComponent extends DefaultComponent {
 
@@ -19,7 +20,7 @@ public class ManaComponent extends DefaultComponent {
 
     public double currentMana = 100;
 
-    public double currentRegenerationRate = 5; // HP/s
+    public double currentRegenerationRate = 5; // Mana/s
 
     public ManaComponent() {
         setComponentName(NAME);
@@ -27,14 +28,18 @@ public class ManaComponent extends DefaultComponent {
     }
 
     @Override
-    public boolean isValidForSaving() {
-        return true;
-    }
-
-    @Override
     public String serializeForNetwork() {
         return "" + currentMana + CoreConstants.SERIALIZATION_SEPARATOR + currentRegenerationRate + CoreConstants.SERIALIZATION_SEPARATOR
             + maxMana;
+    }
+
+    @Override
+    public Component cloneComponent() {
+        ManaComponent mc = new ManaComponent();
+        mc.setMaxMana(maxMana);
+        mc.setCurrentRegenerationRate(currentRegenerationRate);
+        return mc;
+
     }
 
     @Override
@@ -45,16 +50,24 @@ public class ManaComponent extends DefaultComponent {
         maxMana = Double.valueOf(values[2]);
     }
 
-    public double getMaxHealth() {
+    public void setMaxMana(double maxMana) {
+        this.maxMana = maxMana;
+    }
+
+    public double getMaxMana() {
         return maxMana;
     }
 
-    public double getCurrentHealth() {
+    public double getCurrentMana() {
         return currentMana;
     }
 
-    public void setCurrentHealth(double newHealth) {
-        this.currentMana = newHealth;
+    public void setCurrentRegenerationRate(double currentRegenerationRate) {
+        this.currentRegenerationRate = currentRegenerationRate;
+    }
+
+    public void setCurrentMana(double newMana) {
+        this.currentMana = newMana;
     }
 
 }

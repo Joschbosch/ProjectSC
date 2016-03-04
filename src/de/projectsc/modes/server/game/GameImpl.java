@@ -24,7 +24,7 @@ import de.projectsc.core.data.utils.Timer;
 import de.projectsc.core.events.entity.actions.MoveEntityToTargetAction;
 import de.projectsc.core.game.GameAttributes;
 import de.projectsc.core.game.GameConfiguration;
-import de.projectsc.core.game.systems.FightSystem;
+import de.projectsc.core.game.systems.CombatSystem;
 import de.projectsc.core.game.systems.HealthSystem;
 import de.projectsc.core.manager.ComponentManager;
 import de.projectsc.core.manager.EntityManager;
@@ -86,7 +86,7 @@ public class GameImpl implements Game {
 
     private AISystem aiSystem;
 
-    private FightSystem fightSystem;
+    private CombatSystem fightSystem;
 
     private HealthSystem healthSystem;
 
@@ -191,8 +191,8 @@ public class GameImpl implements Game {
                     stateSystem = new EntityStateSystem(entityManager, eventManager);
                     physicsSystem = new BasicPhysicsSystem(entityManager, eventManager);
                     collisionSystem = new CollisionSystem(entityManager, eventManager);
-                    aiSystem = new AISystem(entityManager, eventManager);
-                    fightSystem = new FightSystem(entityManager, eventManager);
+                    aiSystem = new AISystem(entityManager, eventManager, collisionSystem);
+                    fightSystem = new CombatSystem(entityManager, eventManager);
                     healthSystem = new HealthSystem(entityManager, eventManager);
                     snapshotManager = new ServerSnapshotManager(entityManager);
                     loadComponents();

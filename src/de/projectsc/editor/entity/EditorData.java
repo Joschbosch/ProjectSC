@@ -3,7 +3,7 @@
  * 
  * 
  */
-package de.projectsc.editor;
+package de.projectsc.editor.entity;
 
 import java.io.File;
 import java.util.HashSet;

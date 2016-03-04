@@ -29,5 +29,10 @@ public enum EntityStates {
     /**
      * State.
      */
-    DEAD, UNKNOWN
+    DEAD,
+    MOVE_TO_BASIC_ATTACK,
+
+    FOLLOWING_PATH,
+
+    UNKNOWN
 }

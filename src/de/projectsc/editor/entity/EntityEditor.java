@@ -3,7 +3,7 @@
  * 
  * 
  */
-package de.projectsc;
+package de.projectsc.editor.entity;
 
 import java.awt.BorderLayout;
 import java.awt.Canvas;
@@ -63,10 +63,7 @@ import de.projectsc.core.interfaces.Component;
 import de.projectsc.core.manager.ComponentManager;
 import de.projectsc.core.manager.EntityManager;
 import de.projectsc.core.manager.EventManager;
-import de.projectsc.editor.ComponentView;
-import de.projectsc.editor.EditorData;
-import de.projectsc.editor.EditorGraphicsCore;
-import de.projectsc.editor.componentViews.ComponentViewType;
+import de.projectsc.editor.entity.componentViews.ComponentViewType;
 
 /**
  * Entity editor.
@@ -759,7 +756,7 @@ public class EntityEditor extends JFrame {
                     }
                     Map<String, Object> componentsSerialization = new HashMap<>();
                     for (Component c : entityManager.getAllComponents(editor3dCore.getCurrentEntity()).values()) {
-                        if (c.isValidForSaving()) {
+                        if (c.isValidForEntitySaving()) {
                             componentsSerialization.put(c.getComponentName(), c.serialize(schemaFolder));
                         }
                     }

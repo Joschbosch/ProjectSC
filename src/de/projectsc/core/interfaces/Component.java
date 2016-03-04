@@ -59,7 +59,7 @@ public interface Component {
     /**
      * @return true, if the component can be saved at the moment.
      */
-    boolean isValidForSaving();
+    boolean isValidForEntitySaving();
 
     /**
      * Save component.
@@ -119,5 +119,13 @@ public interface Component {
      * @param serial to read
      */
     void deserializeFromNetwork(String serial);
+
+    Component cloneComponent();
+
+    boolean configurationValid();
+
+    Map<String, Object> getConfiguration();
+
+    void loadConfiguration(Map<String, Object> loadedConfiguration);
 
 }

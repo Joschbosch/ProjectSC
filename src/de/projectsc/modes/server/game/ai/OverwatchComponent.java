@@ -9,6 +9,7 @@ import java.util.List;
 
 import de.projectsc.core.component.ComponentType;
 import de.projectsc.core.component.DefaultComponent;
+import de.projectsc.core.interfaces.Component;
 
 public class OverwatchComponent extends DefaultComponent {
 
@@ -19,15 +20,26 @@ public class OverwatchComponent extends DefaultComponent {
 
     private double radius = 10;
 
+    private boolean useBasicAttackRange = true;
+
     private List<String> entitesInRange = new LinkedList<>();
 
     public OverwatchComponent() {
         setType(ComponentType.PREPHYSICS);
         setComponentName(NAME);
+        getRequiredComponents().add("Basic Attack Component");
     }
 
     @Override
-    public boolean isValidForSaving() {
+    public Component cloneComponent() {
+        OverwatchComponent oc = new OverwatchComponent();
+        oc.setRadius(radius);
+        oc.setUseBasicAttackRange(useBasicAttackRange);
+        return oc;
+    }
+
+    @Override
+    public boolean isValidForEntitySaving() {
         return true;
     }
 
@@ -51,8 +63,16 @@ public class OverwatchComponent extends DefaultComponent {
         this.radius = radius;
     }
 
-    public List<String> getEntitesInRange() {
+    public List<String> getEntitiesInRange() {
         return entitesInRange;
+    }
+
+    public boolean useBasicAttackRange() {
+        return useBasicAttackRange;
+    }
+
+    public void setUseBasicAttackRange(boolean useBasicAttackRange) {
+        this.useBasicAttackRange = useBasicAttackRange;
     }
 
 }

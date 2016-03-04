@@ -2,7 +2,7 @@
  * Copyright (C) 2015
  */
 
-package de.projectsc.editor;
+package de.projectsc.editor.entity;
 
 import javax.swing.JDialog;
 

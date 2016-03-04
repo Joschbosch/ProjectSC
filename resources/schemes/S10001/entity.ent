@@ -7,7 +7,6 @@
       "reflectivity" : 0.0,
       "numColumns" : 1
     },
-    "Particle System Component" : { },
     "Mesh Component" : { },
     "Transform Component" : {
       "positionY" : 0.0,

@@ -12,7 +12,6 @@ import org.lwjgl.util.vector.Vector3f;
 import de.projectsc.core.data.physics.Transform;
 import de.projectsc.core.interfaces.Component;
 import de.projectsc.core.manager.EntityManager;
-import de.projectsc.core.utils.ComponentUtils;
 
 /**
  * Schema of an entity created in the editor.
@@ -46,7 +45,7 @@ public class EntitySchema {
         t.setRotation(new Vector3f(oldTransform.getRotation()));
         t.setScale(new Vector3f(oldTransform.getScale()));
         for (Component c : components) {
-            Component clone = ComponentUtils.cloneComponent(c);
+            Component clone = c.cloneComponent();
             entityManager.addComponentToEntity(e, clone);
             clone.setOwner(entityManager.getEntity(e));
         }

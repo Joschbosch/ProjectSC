@@ -6,6 +6,7 @@ package de.projectsc.core.game.components;
 
 import de.projectsc.core.component.ComponentType;
 import de.projectsc.core.component.DefaultComponent;
+import de.projectsc.core.interfaces.Component;
 
 public class BasicAttackComponent extends DefaultComponent {
 
@@ -14,13 +15,18 @@ public class BasicAttackComponent extends DefaultComponent {
      */
     public static final String NAME = "Basic Attack Component";
 
+    /**
+     * Range for a melee attack.
+     */
+    public static final double MELEE_ATTACK_RANGE = 11;
+
     private double basicAttackDamage = 10;
 
     private double basicAttackDuration = 1500;
 
     private double basicAttackDamageTime = 1000;
 
-    private double basicAttackRange = 10;
+    private double basicAttackRange = 50; // < x = Melee
 
     private long attackTime = 0;
 
@@ -28,14 +34,41 @@ public class BasicAttackComponent extends DefaultComponent {
 
     private boolean damageApplied;
 
+    private long rangedAttackMissleID = 10005;
+
     public BasicAttackComponent() {
         setComponentName(NAME);
         setType(ComponentType.GAME);
     }
 
     @Override
-    public boolean isValidForSaving() {
-        return true;
+    public Component cloneComponent() {
+        BasicAttackComponent bac = new BasicAttackComponent();
+        bac.setAttackTime(attackTime);
+        bac.setDamageApplied(damageApplied);
+        bac.setRangedAttackMissleID(rangedAttackMissleID);
+        bac.setTarget(target);
+        bac.setBasicAttackDamage(basicAttackDamage);
+        bac.setBasicAttackDamageTime(basicAttackDamageTime);
+        bac.setBasicAttackDuration(basicAttackDuration);
+        bac.setBasicAttackRange(basicAttackRange);
+        return bac;
+    }
+
+    public void setBasicAttackDamage(double basicAttackDamage) {
+        this.basicAttackDamage = basicAttackDamage;
+    }
+
+    public void setBasicAttackDuration(double basicAttackDuration) {
+        this.basicAttackDuration = basicAttackDuration;
+    }
+
+    public void setBasicAttackDamageTime(double basicAttackDamageTime) {
+        this.basicAttackDamageTime = basicAttackDamageTime;
+    }
+
+    public void setBasicAttackRange(double basicAttackRange) {
+        this.basicAttackRange = basicAttackRange;
     }
 
     public double getBasicAttackDamage() {
@@ -77,6 +110,14 @@ public class BasicAttackComponent extends DefaultComponent {
 
     public void setDamageApplied(boolean damageApplied) {
         this.damageApplied = damageApplied;
+    }
+
+    public long getRangedAttackMissleID() {
+        return rangedAttackMissleID;
+    }
+
+    public void setRangedAttackMissleID(long rangedAttackMissleID) {
+        this.rangedAttackMissleID = rangedAttackMissleID;
     }
 
 }

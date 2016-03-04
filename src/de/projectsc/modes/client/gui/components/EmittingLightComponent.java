@@ -18,6 +18,7 @@ import de.projectsc.core.data.Scene;
 import de.projectsc.core.data.objects.Light;
 import de.projectsc.core.data.physics.WireFrame;
 import de.projectsc.core.data.utils.LightSerializationUtils;
+import de.projectsc.core.interfaces.Component;
 import de.projectsc.modes.client.gui.data.GUIScene;
 
 /**
@@ -145,8 +146,17 @@ public class EmittingLightComponent extends GraphicalComponent {
     }
 
     @Override
-    public boolean isValidForSaving() {
+    public boolean isValidForEntitySaving() {
         return true;
+    }
+
+    @Override
+    public Component cloneComponent() {
+        EmittingLightComponent elc = new EmittingLightComponent();
+        for (Light l : lights) {
+            System.out.println("Todo");
+        }
+        return elc;
     }
 
     @Override

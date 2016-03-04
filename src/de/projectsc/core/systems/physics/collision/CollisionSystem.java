@@ -85,6 +85,8 @@ public class CollisionSystem extends DefaultSystem {
                 ((MouseButtonClickedAction) e).getCurrentCameraPosition()).isEmpty()) {
                 if (((MouseButtonClickedAction) e).getButton() == 1) {
                     fireEvent(new MoveToPositionAction(((MouseButtonClickedAction) e).getTerrainPoint()));
+                } else if (((MouseButtonClickedAction) e).getButton() == 0) {
+                    // fireEvent(new BasicAttackPoint(((MouseButtonClickedAction) e).getTerrainPoint()));
                 }
             }
         }

@@ -3,7 +3,7 @@
  * 
  * 
  */
-package de.projectsc.editor.componentViews;
+package de.projectsc.editor.entity.componentViews;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -24,7 +24,7 @@ import org.lwjgl.util.vector.Vector3f;
 import de.projectsc.core.data.objects.Light;
 import de.projectsc.core.events.entity.objects.CreateLightEvent;
 import de.projectsc.core.interfaces.Component;
-import de.projectsc.editor.ComponentView;
+import de.projectsc.editor.entity.ComponentView;
 import de.projectsc.modes.client.gui.components.EmittingLightComponent;
 
 /**

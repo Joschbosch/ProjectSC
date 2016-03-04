@@ -1,4 +1,4 @@
-package de.projectsc;
+package de.projectsc.editor.map;
 
 import java.awt.BorderLayout;
 import java.awt.Canvas;
@@ -9,12 +9,15 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.net.URISyntaxException;
+import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -28,11 +31,12 @@ import org.apache.commons.logging.LogFactory;
 
 import de.projectsc.core.CoreConstants;
 import de.projectsc.core.component.registry.ComponentListItem;
+import de.projectsc.core.interfaces.Component;
 import de.projectsc.core.manager.ComponentManager;
 import de.projectsc.core.manager.EntityManager;
 import de.projectsc.core.manager.EventManager;
-import de.projectsc.editor.EditorData;
-import de.projectsc.editor.MapEditorGraphicsCore;
+import de.projectsc.editor.entity.EditorData;
+import de.projectsc.editor.map.componentConfigurations.ComponentConfigurationTypes;
 
 /**
  * Entity editor.
@@ -71,6 +75,8 @@ public class MapEditor extends JFrame {
     private EntityManager entityManager;
 
     private EventManager eventManager;
+
+    private JPanel configurationPanel;
 
     /**
      * Create the frame.
@@ -114,7 +120,7 @@ public class MapEditor extends JFrame {
 
     private void createContent() {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setBounds(100, 100, 1100, 950);
+        setBounds(100, 100, 1600, 950);
 
         this.addWindowListener(new WindowAdapter() {
 
@@ -198,6 +204,14 @@ public class MapEditor extends JFrame {
             }
         });
         contentPane.add(selectButton);
+
+        configurationPanel = new JPanel();
+        configurationPanel.setLayout(new BorderLayout());
+        configurationPanel.setBorder(new TitledBorder(null, "Entity Configuration", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+        configurationPanel.setBounds(1024 + 10, 87, 530, 768);
+        contentPane.add(configurationPanel);
+        selectionChanged(null);
+
     }
 
     private void createMenue() {
@@ -265,7 +279,7 @@ public class MapEditor extends JFrame {
     public void startLWJGL() {
         messageQueue = new LinkedBlockingQueue<String>();
         graphicsCore =
-            new MapEditorGraphicsCore(displayParent, 1024, 768, messageQueue, componentManager, entityManager, eventManager);
+            new MapEditorGraphicsCore(this, displayParent, 1024, 768, messageQueue, componentManager, entityManager, eventManager);
         gameThread = new Thread(graphicsCore);
         gameThread.start();
     }
@@ -282,4 +296,41 @@ public class MapEditor extends JFrame {
         }
     }
 
+    public void selectionChanged(String e) {
+        configurationPanel.removeAll();
+        if (e == null || e.isEmpty()) {
+            JLabel noEntity = new JLabel("No entity selected");
+            configurationPanel.add(noEntity);
+        } else {
+            Map<String, Component> components = entityManager.getAllComponents(e);
+            createConfigurationView(e, components);
+        }
+        this.repaint();
+    }
+
+    private void createConfigurationView(String e, Map<String, Component> components) {
+        JComboBox<String> componentsCombo = new JComboBox<>();
+
+        for (String component : components.keySet()) {
+            for (ComponentConfigurationTypes v : ComponentConfigurationTypes.values()) {
+                if (v.getComponentName().equals(component)) {
+                    componentsCombo.addItem(component);
+                }
+            }
+        }
+        JPanel configPanel = new JPanel();
+        if (componentsCombo.getItemCount() > 0) {
+            configurationPanel.add(componentsCombo, BorderLayout.PAGE_START);
+        } else {
+            JLabel noConfig = new JLabel("Entity has no configuration.");
+            configurationPanel.add(noConfig, BorderLayout.PAGE_START);
+        }
+        configurationPanel.add(configPanel, BorderLayout.CENTER);
+        componentsCombo.addActionListener(new ComponentConfigurationChosenListener(e, components, configPanel, entityManager));
+        if (componentsCombo.getItemCount() > 0) {
+            componentsCombo.setSelectedItem(componentsCombo.getItemAt(0));
+        }
+        this.repaint();
+        this.revalidate();
+    }
 }

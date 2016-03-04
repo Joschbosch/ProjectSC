@@ -10,13 +10,17 @@ import de.projectsc.core.component.physic.MeshComponent;
 import de.projectsc.core.component.physic.PathComponent;
 import de.projectsc.core.component.physic.TransformComponent;
 import de.projectsc.core.component.physic.VelocityComponent;
+import de.projectsc.core.component.state.ControlableComponent;
 import de.projectsc.core.component.state.EntityStateComponent;
 import de.projectsc.core.game.components.AffiliationComponent;
 import de.projectsc.core.game.components.BasicAttackComponent;
 import de.projectsc.core.game.components.HealthComponent;
+import de.projectsc.core.game.components.ProjectileComponent;
 import de.projectsc.modes.client.game.component.JumpingComponent;
 import de.projectsc.modes.server.game.ai.AIControlledComponent;
+import de.projectsc.modes.server.game.ai.FollowPathComponent;
 import de.projectsc.modes.server.game.ai.OverwatchComponent;
+import de.projectsc.modes.server.game.ai.PathPointComponent;
 
 /**
  * These are all (non GUI) components that are known in the engine.
@@ -31,7 +35,7 @@ public enum ComponentListItem {
     /**
      * Represents the state of an entity.
      */
-    ENTITY_STATE_COMPONENT(EntityStateComponent.NAME, EntityStateComponent.class, true),
+    ENTITY_STATE_COMPONENT(EntityStateComponent.NAME, EntityStateComponent.class, false),
     /**
      * The mesh of a component (which might not be used only in the GUI).
      */
@@ -43,7 +47,7 @@ public enum ComponentListItem {
     /**
      *
      */
-    TRANSFORM_COMPONENT(TransformComponent.NAME, TransformComponent.class, true),
+    TRANSFORM_COMPONENT(TransformComponent.NAME, TransformComponent.class, false),
     /**
     *
     */
@@ -68,6 +72,22 @@ public enum ComponentListItem {
      * 
      */
     OVERWATCH_COMPONENT(OverwatchComponent.NAME, OverwatchComponent.class, true),
+    /**
+     * 
+     */
+    PROJECTILE_COMPONENT(ProjectileComponent.NAME, ProjectileComponent.class, true),
+    /**
+     * 
+     */
+    CONTROLABLE_COMPONENT(ControlableComponent.NAME, ControlableComponent.class, true),
+    /**
+     * 
+     */
+    FOLLOW_PATH_COMPONENT(FollowPathComponent.NAME, FollowPathComponent.class, true),
+    /**
+     * 
+     */
+    PATH_POINT_COMPONENT(PathPointComponent.NAME, PathPointComponent.class, true),
     /**
      * 
      */

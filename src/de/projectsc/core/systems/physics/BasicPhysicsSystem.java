@@ -17,6 +17,7 @@ import de.projectsc.core.data.EntityEvent;
 import de.projectsc.core.data.Event;
 import de.projectsc.core.data.physics.Transform;
 import de.projectsc.core.entities.states.EntityStates;
+import de.projectsc.core.events.entity.actions.MoveEntityToAttackTargetEvent;
 import de.projectsc.core.events.entity.actions.MoveEntityToTargetAction;
 import de.projectsc.core.events.entity.movement.NotifyRotationTargetUpdateEvent;
 import de.projectsc.core.events.entity.movement.NotifyTransformUpdateEvent;
@@ -51,6 +52,7 @@ public class BasicPhysicsSystem extends DefaultSystem {
         eventManager.registerForEvent(UpdateScaleEvent.class, this);
         eventManager.registerForEvent(UpdateMeshEvent.class, this);
         eventManager.registerForEvent(MoveEntityToTargetAction.class, this);
+        eventManager.registerForEvent(MoveEntityToAttackTargetEvent.class, this);
     }
 
     @Override
@@ -132,16 +134,7 @@ public class BasicPhysicsSystem extends DefaultSystem {
             }
             jump.setPreviousOffset(offset);
             Transform transform = getComponent(entity, TransformComponent.class).getTransform();
-
-            // transform.setRotation(Vector3f.add(new Vector3f(0, tick / 1000f * 20, 0), transform.getRotation(),
-            // null));
-            // float speed = tick / 1000f * 10;
-            // float dx = speed * (float) Math.sin(Math.toRadians(transform.getRotation().y - 90));
-            // float dz = speed * (float) Math.cos(Math.toRadians(transform.getRotation().y - 90));
-            // transform.getPosition().x += dx;
-            // transform.getPosition().z += dz;
             transform.getPosition().y = offset;
-            transform.setScale(new Vector3f(0.8f, 0.8f, 0.8f));
         }
     }
 
@@ -165,12 +158,14 @@ public class BasicPhysicsSystem extends DefaultSystem {
      * @param e to process
      */
     public void processEvent(EntityEvent e) {
-        Transform transform = getComponent(e.getEntityId(), TransformComponent.class).getTransform();
         if (e instanceof UpdatePositionEvent) {
+            Transform transform = getComponent(e.getEntityId(), TransformComponent.class).getTransform();
             handlePositionEvent((UpdatePositionEvent) e, transform);
         } else if (e instanceof UpdateRotationEvent) {
+            Transform transform = getComponent(e.getEntityId(), TransformComponent.class).getTransform();
             handleRotateEvent((UpdateRotationEvent) e, transform);
         } else if (e instanceof UpdateScaleEvent) {
+            Transform transform = getComponent(e.getEntityId(), TransformComponent.class).getTransform();
             handleScaleEvent((UpdateScaleEvent) e, transform);
         } else if (e instanceof UpdateVelocityEvent) {
             handleVelocityChangeEvent((UpdateVelocityEvent) e, getComponent(e.getEntityId(), VelocityComponent.class));
@@ -181,6 +176,11 @@ public class BasicPhysicsSystem extends DefaultSystem {
             PathComponent component = (PathComponent) entityManager.getComponent(e.getEntityId(), PathComponent.class);
             if (component != null) {
                 component.setCurrentTarget(((MoveEntityToTargetAction) e).getTarget());
+            }
+        } else if (e instanceof MoveEntityToAttackTargetEvent) {
+            PathComponent component = (PathComponent) entityManager.getComponent(e.getEntityId(), PathComponent.class);
+            if (component != null) {
+                component.setCurrentTarget(((MoveEntityToAttackTargetEvent) e).getTarget());
             }
         }
     }

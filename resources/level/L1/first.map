@@ -1,165 +1,160 @@
 {
   "Terrain" : { },
   "Entities" : {
-    "1008" : {
-      "transform" : {
-        "position" : {
-          "x" : -202.86478,
-          "y" : -7.6293945E-6,
-          "z" : -630.1311
-        },
-        "rotation" : {
-          "x" : 0.0,
-          "y" : 403.0,
-          "z" : 0.0
-        },
-        "scale" : {
-          "x" : 2.5,
-          "y" : 2.5,
-          "z" : 2.5
-        }
-      },
-      "type" : 10000
-    },
-    "1000" : {
-      "transform" : {
-        "position" : {
-          "x" : -36.660004,
-          "y" : 86.0,
-          "z" : -397.86005
-        },
-        "rotation" : {
-          "x" : 0.0,
-          "y" : 0.0,
-          "z" : 0.0
-        },
-        "scale" : {
-          "x" : 1.0,
-          "y" : 1.0,
-          "z" : 1.0
-        }
-      },
-      "type" : 0
-    },
-    "1002" : {
-      "transform" : {
-        "position" : {
-          "x" : -36.22386,
-          "y" : 0.0,
-          "z" : -95.86452
-        },
-        "rotation" : {
-          "x" : 0.0,
-          "y" : 219.5,
-          "z" : 0.0
-        },
-        "scale" : {
-          "x" : 6.0,
-          "y" : 6.0,
-          "z" : 6.0
-        }
+    "1c90f807-35ec-49a4-bc3e-7819e71fe148" : {
+      "Transform Component" : {
+        "positionY" : -7.6293945E-6,
+        "scaleX" : 2.5,
+        "positionZ" : -143.37408,
+        "scaleY" : 2.5,
+        "rotationX" : 0.0,
+        "rotationY" : 189.5,
+        "rotationZ" : 0.0,
+        "scaleZ" : 2.5,
+        "positionX" : -70.95479
       },
       "type" : 10001
     },
-    "1003" : {
-      "transform" : {
-        "position" : {
-          "x" : 23.952724,
-          "y" : -7.6293945E-6,
-          "z" : -97.07857
-        },
-        "rotation" : {
-          "x" : 0.0,
-          "y" : 146.0,
-          "z" : 0.0
-        },
-        "scale" : {
-          "x" : 6.0,
-          "y" : 6.0,
-          "z" : 6.0
-        }
+    "2b7b3ad7-6932-4d34-a827-4548a63ccf7c" : {
+      "Transform Component" : {
+        "positionY" : -7.6293945E-6,
+        "scaleX" : 1.5,
+        "positionZ" : -113.807144,
+        "scaleY" : 1.5,
+        "rotationX" : 0.0,
+        "rotationY" : 132.5,
+        "rotationZ" : 0.0,
+        "scaleZ" : 1.5,
+        "positionX" : 74.54913
+      },
+      "Path Point Component" : {
+        "groupOrderNumber" : 2,
+        "pathID" : 0
+      },
+      "type" : 10004
+    },
+    "bdabedb0-7140-4068-b3f0-833024b6a9b2" : {
+      "Transform Component" : {
+        "positionY" : -7.6293945E-6,
+        "scaleX" : 1.5,
+        "positionZ" : -129.80763,
+        "scaleY" : 1.5,
+        "rotationX" : 0.0,
+        "rotationY" : 132.5,
+        "rotationZ" : 0.0,
+        "scaleZ" : 1.5,
+        "positionX" : 46.247135
+      },
+      "Path Point Component" : {
+        "groupOrderNumber" : 1,
+        "pathID" : 0
+      },
+      "type" : 10004
+    },
+    "fd627373-e0ca-4a72-a920-6ff89dcf1d28" : {
+      "Transform Component" : {
+        "positionY" : -7.6293945E-6,
+        "scaleX" : 1.5,
+        "positionZ" : -128.34087,
+        "scaleY" : 1.5,
+        "rotationX" : 0.0,
+        "rotationY" : 132.5,
+        "rotationZ" : 0.0,
+        "scaleZ" : 1.5,
+        "positionX" : -22.162119
+      },
+      "Path Point Component" : {
+        "groupOrderNumber" : 0,
+        "pathID" : 0
+      },
+      "type" : 10004
+    },
+    "d527f0c5-ba27-43ae-93d0-4437e1ba3a38" : {
+      "Transform Component" : {
+        "positionY" : 0.0,
+        "scaleX" : 2.5,
+        "positionZ" : -140.10023,
+        "scaleY" : 2.5,
+        "rotationX" : 0.0,
+        "rotationY" : 171.0,
+        "rotationZ" : 0.0,
+        "scaleZ" : 2.5,
+        "positionX" : -21.051403
       },
       "type" : 10001
     },
-    "1004" : {
-      "transform" : {
-        "position" : {
-          "x" : -46.81922,
-          "y" : 0.0,
-          "z" : -41.818344
-        },
-        "rotation" : {
-          "x" : 0.0,
-          "y" : 315.0,
-          "z" : 0.0
-        },
-        "scale" : {
-          "x" : 6.0,
-          "y" : 6.0,
-          "z" : 6.0
-        }
+    "635f576b-04a1-494e-b53a-523140ab5b73" : {
+      "Transform Component" : {
+        "positionY" : 0.0,
+        "scaleX" : 0.5,
+        "positionZ" : -103.70329,
+        "scaleY" : 0.5,
+        "rotationX" : 0.0,
+        "rotationY" : 132.5,
+        "rotationZ" : 0.0,
+        "scaleZ" : 0.5,
+        "positionX" : -101.97227
+      },
+      "Follow Path Component": {
+      	"pathIDToFollow" : 0
+      },
+      "type" : 10002
+    },
+    "28ebab8f-c04c-4810-8a63-0888e1c968ac" : {
+      "Transform Component" : {
+        "positionY" : 0.0,
+        "scaleX" : 2.5,
+        "positionZ" : -142.2727,
+        "scaleY" : 2.5,
+        "rotationX" : 0.0,
+        "rotationY" : 182.0,
+        "rotationZ" : 0.0,
+        "scaleZ" : 2.5,
+        "positionX" : 47.659157
       },
       "type" : 10001
     },
-    "1005" : {
-      "transform" : {
-        "position" : {
-          "x" : 11.676201,
-          "y" : -7.6293945E-6,
-          "z" : -38.399033
-        },
-        "rotation" : {
-          "x" : 0.0,
-          "y" : 403.0,
-          "z" : 0.0
-        },
-        "scale" : {
-          "x" : 6.0,
-          "y" : 6.0,
-          "z" : 6.0
-        }
-      },
-      "type" : 10001
-    },
-    "1017" : {
-      "transform" : {
-        "position" : {
-          "x" : -21.525446,
-          "y" : 0.0,
-          "z" : -84.568695
-        },
-        "rotation" : {
-          "x" : 0.0,
-          "y" : 403.0,
-          "z" : 0.0
-        },
-        "scale" : {
-          "x" : 2.5,
-          "y" : 2.5,
-          "z" : 2.5
-        }
+    "c5e4a39f-ceff-4c72-9be6-6b7f53bf5b99" : {
+      "Transform Component" : {
+        "positionY" : 0.0,
+        "scaleX" : 21.0,
+        "positionZ" : -34.306934,
+        "scaleY" : 21.0,
+        "rotationX" : 0.0,
+        "rotationY" : 132.5,
+        "rotationZ" : 0.0,
+        "scaleZ" : 21.0,
+        "positionX" : 50.28475
       },
       "type" : 10003
     },
-    "1018" : {
-      "transform" : {
-        "position" : {
-          "x" : -21.525446,
-          "y" : 0.0,
-          "z" : -84.568695
-        },
-        "rotation" : {
-          "x" : 0.0,
-          "y" : 403.0,
-          "z" : 0.0
-        },
-        "scale" : {
-          "x" : 2.5,
-          "y" : 2.5,
-          "z" : 2.5
-        }
+    "5e7d5d76-416e-43ef-beb8-508d872728df" : {
+      "Transform Component" : {
+        "positionY" : -7.6293945E-6,
+        "scaleX" : 1.0,
+        "positionZ" : -92.453705,
+        "scaleY" : 1.0,
+        "rotationX" : 0.0,
+        "rotationY" : 12.0,
+        "rotationZ" : 0.0,
+        "scaleZ" : 1.0,
+        "positionX" : -29.951853
       },
-      "type" : 10002
+      "type" : 10000
+    },
+    "d2dade15-ac1b-42dc-9e94-c1929df7ce79" : {
+      "Transform Component" : {
+        "positionY" : 0.0,
+        "scaleX" : 2.5,
+        "positionZ" : -121.74116,
+        "scaleY" : 2.5,
+        "rotationX" : 0.0,
+        "rotationY" : 132.5,
+        "rotationZ" : 0.0,
+        "scaleZ" : 2.5,
+        "positionX" : 82.360756
+      },
+      "type" : 10001
     }
   }
 }

@@ -6,6 +6,7 @@ package de.projectsc.core.manager;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -24,7 +25,6 @@ import de.projectsc.core.events.entity.objects.NotifyEntityCreatedEvent;
 import de.projectsc.core.events.entity.objects.NotifyEntityDeletedEvent;
 import de.projectsc.core.interfaces.Component;
 import de.projectsc.core.interfaces.Entity;
-import de.projectsc.core.utils.ComponentUtils;
 import de.projectsc.core.utils.EntitySchemaLoader;
 
 /**
@@ -61,7 +61,9 @@ public class EntityManager {
      */
     public String createNewEntity() {
         String uuid = UUID.randomUUID().toString();
-        return createNewEntity(uuid);
+        String newEntity = createNewEntity(uuid);
+        eventManager.fireEvent(new NotifyEntityCreatedEvent(newEntity));
+        return newEntity;
     }
 
     /**
@@ -80,7 +82,6 @@ public class EntityManager {
         LOGGER.info("Created new entity " + e.getID());
         addComponentToEntity(e.getID(), TransformComponent.NAME);
         addComponentToEntity(e.getID(), EntityStateComponent.NAME);
-        eventManager.fireEvent(new NotifyEntityCreatedEvent(e.getID()));
         return e.getID();
     }
 
@@ -103,11 +104,12 @@ public class EntityManager {
         }
         EntitySchema schema = entitySchemas.get(schemaId);
         for (Component c : schema.getComponents()) {
-            Component clone = ComponentUtils.cloneComponent(c);
+            Component clone = c.cloneComponent();
             addComponentToEntity(e, clone);
             clone.setOwner(getEntity(e));
         }
         getEntity(e).setEntityTypeId(schema.getId());
+        eventManager.fireEvent(new NotifyEntityCreatedEvent(e));
         return e;
     }
 
@@ -253,6 +255,11 @@ public class EntityManager {
                 }
             }
             LOGGER.info("Component " + componentClass + " not added to entity " + entityId);
+            try {
+                throw new RuntimeException();
+            } catch (RuntimeException e) {
+                LOGGER.debug("Error getting component: ", e);
+            }
         } else {
             LOGGER.info("No components were added to entity " + entityId);
         }
@@ -294,7 +301,12 @@ public class EntityManager {
      * @param id of entity to remove
      */
     public void deleteEntity(String id) {
-        if (entities.remove(id) != null) {
+        Entity removed = entities.remove(id);
+        if (removed != null) {
+            List<Component> remove = new LinkedList<>(getAllComponents(removed.getID()).values());
+            for (Component c : remove) {
+                removeComponentFromEntity(removed.getID(), c.getComponentName());
+            }
             LOGGER.info("Removed entity " + id);
             eventManager.fireEvent(new NotifyEntityDeletedEvent(id));
         }

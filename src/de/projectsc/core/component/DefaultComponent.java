@@ -56,7 +56,22 @@ public abstract class DefaultComponent implements Component {
      * @return true, if the component has all attributes to be saved.
      */
     @Override
-    public abstract boolean isValidForSaving();
+    public boolean isValidForEntitySaving() {
+        return true;
+    }
+
+    @Override
+    public boolean configurationValid() {
+        return true;
+    }
+
+    @Override
+    public Map<String, Object> getConfiguration() {
+        return new HashMap<>();
+    }
+
+    @Override
+    public void loadConfiguration(Map<String, Object> loadedConfiguration) {}
 
     /**
      * 

@@ -3,7 +3,7 @@
  * 
  * 
  */
-package de.projectsc.editor;
+package de.projectsc.editor.map;
 
 import java.awt.Canvas;
 import java.io.File;
@@ -32,7 +32,6 @@ import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
-import de.projectsc.EntityEditor;
 import de.projectsc.core.CoreConstants;
 import de.projectsc.core.component.collision.ColliderComponent;
 import de.projectsc.core.data.objects.Light;
@@ -51,6 +50,7 @@ import de.projectsc.core.systems.physics.BasicPhysicsSystem;
 import de.projectsc.core.systems.physics.collision.CollisionSystem;
 import de.projectsc.core.systems.state.EntityStateSystem;
 import de.projectsc.core.terrain.Terrain;
+import de.projectsc.editor.entity.EntityEditor;
 import de.projectsc.modes.client.gui.InputSystem;
 import de.projectsc.modes.client.gui.RenderingSystem;
 import de.projectsc.modes.client.gui.components.EmittingLightComponent;
@@ -133,7 +133,11 @@ public class MapEditorGraphicsCore implements Runnable {
 
     private CollisionSystem collisionSystem;
 
-    public MapEditorGraphicsCore(Canvas displayParent, int width, int height, BlockingQueue<String> messageQueue,
+    private boolean rightDown = false;
+
+    private MapEditor parentEditor;
+
+    public MapEditorGraphicsCore(MapEditor mapEditor, Canvas displayParent, int width, int height, BlockingQueue<String> messageQueue,
         ComponentManager componentManager, EntityManager entityManager, EventManager eventManager) {
         incomingQueue = new LinkedBlockingQueue<>();
         this.displayParent = displayParent;
@@ -144,6 +148,7 @@ public class MapEditorGraphicsCore implements Runnable {
         this.eventManager = eventManager;
         this.inputConsumeManager = new InputConsumeManager();
         this.timer = new Timer();
+        this.parentEditor = mapEditor;
     }
 
     @Override
@@ -233,7 +238,7 @@ public class MapEditorGraphicsCore implements Runnable {
                 eventManager.fireEvent(new UpdatePositionEvent(camera.getPosition(), sun));
             }
 
-            physicsSystem.update(timer.getDelta());
+            // physicsSystem.update(timer.getDelta());
             collisionSystem.update(timer.getDelta());
             renderSystem.update(timer.getDelta());
 
@@ -244,7 +249,8 @@ public class MapEditorGraphicsCore implements Runnable {
                 mousePicker.update(getTerrains(), camera.getPosition(), camera.createViewMatrix());
                 readInput();
 
-                if (!entityAtCursor.isEmpty() && mousePicker.getCurrentTerrainPoint() != null) {
+                if (!entityAtCursor.isEmpty() && mousePicker.getCurrentTerrainPoint() != null
+                    && entityManager.getEntity(entityAtCursor) != null) {
                     entityManager.getEntity(entityAtCursor).getTransform().setPosition(mousePicker.getCurrentTerrainPoint());
                 }
 
@@ -253,7 +259,7 @@ public class MapEditorGraphicsCore implements Runnable {
                     collisionSystem.debug(s);
                     s.setTerrains(terrainModels);
                     s.setRenderSkybox(true);
-                    if (!entityAtCursor.isEmpty()) {
+                    if (!entityAtCursor.isEmpty() && entityManager.getEntity(entityAtCursor) != null) {
                         s.getWireFrames().add(
                             new WireFrame(WireFrame.SPHERE, entityManager.getEntity(entityAtCursor).getTransform().getPosition(),
                                 new Vector3f(), new Vector3f(0.5f, 0.5f,
@@ -309,9 +315,10 @@ public class MapEditorGraphicsCore implements Runnable {
         if (!Mouse.isButtonDown(0)) {
             alreadyClicked = false;
         }
-        while (Keyboard.next()) {
-            if (Keyboard.getEventKey() == Keyboard.KEY_RIGHT) {
-                if (Keyboard.getEventKeyState()) {
+        if (Keyboard.isKeyDown(Keyboard.KEY_RIGHT)) {
+            if (Keyboard.getEventKeyState()) {
+                if (!rightDown) {
+                    rightDown = true;
                     long id = entityManager.getEntity(entityAtCursor).getEntityTypeId();
                     id = (id + 1) % 1000000;
                     while (entitySchemas.get(id) == null) {
@@ -322,6 +329,8 @@ public class MapEditorGraphicsCore implements Runnable {
                     entityManager.deleteEntity(oldEntity);
                 }
             }
+        } else {
+            rightDown = false;
         }
 
     }
@@ -331,13 +340,15 @@ public class MapEditorGraphicsCore implements Runnable {
             eventManager.fireEvent(new UpdateEntitySelectionEvent(selectedEntity, false, false));
         }
         for (String e : entityManager.getAllEntites()) {
-            ColliderComponent collider = (ColliderComponent) entityManager.getComponent(e, ColliderComponent.class);
+            if (entityManager.hasComponent(e, ColliderComponent.class)) {
+                ColliderComponent collider = (ColliderComponent) entityManager.getComponent(e, ColliderComponent.class);
 
-            if (collider != null && collider.getAABB().intersects(entityManager.getEntity(e).getTransform(), camera.getPosition(),
-                mousePicker.getCurrentRay()) > 0) {
-                eventManager.fireEvent(new UpdateEntitySelectionEvent(e, false, true));
-            } else {
-                eventManager.fireEvent(new UpdateEntitySelectionEvent(e, false, false));
+                if (collider != null && collider.getAABB().intersects(entityManager.getEntity(e).getTransform(), camera.getPosition(),
+                    mousePicker.getCurrentRay()) > 0) {
+                    eventManager.fireEvent(new UpdateEntitySelectionEvent(e, false, true));
+                } else {
+                    eventManager.fireEvent(new UpdateEntitySelectionEvent(e, false, false));
+                }
             }
         }
         if (Mouse.isButtonDown(0) && mode == 1 && !alreadyClicked) {
@@ -366,7 +377,11 @@ public class MapEditorGraphicsCore implements Runnable {
         }
 
         entityAtCursor = e;
+        selectionChanged(e);
+    }
 
+    private void selectionChanged(String e) {
+        parentEditor.selectionChanged(e);
     }
 
     private void createSun() {
@@ -456,19 +471,31 @@ public class MapEditorGraphicsCore implements Runnable {
      */
     public void performSave() {
         File levelRootDirectory = null;
+        long idAtCursor = entityManager.getEntity(entityAtCursor).getEntityTypeId();
+        entityManager.deleteEntity(entityAtCursor);
+        entityAtCursor = "";
+
         try {
+
             levelRootDirectory = new File(EntityEditor.class.getResource("/level/").toURI());
 
             File levelFolder =
-                new File(levelRootDirectory, CoreConstants.LEVEL_DIRECTORY_PREFIX + 1);
+                new File(levelRootDirectory, CoreConstants.LEVEL_DIRECTORY_PREFIX + 3);
             levelFolder.mkdir();
             Map<String, Object> complete = new HashMap<>();
             Map<String, Object> entities = new HashMap<>();
             for (String e : entityManager.getAllEntites()) {
-                Map<String, Object> props = new HashMap<>();
-                props.put("type", entityManager.getEntity(e).getEntityTypeId());
-                props.put("transform", entityManager.getEntity(e).getTransform());
-                entities.put(e, props);
+                if (entityManager.getEntity(e).getEntityTypeId() >= 10000) {
+                    Map<String, Object> props = new HashMap<>();
+                    props.put("type", entityManager.getEntity(e).getEntityTypeId());
+                    for (Component c : entityManager.getAllComponents(e).values()) {
+                        Map<String, Object> config = c.getConfiguration();
+                        if (!config.isEmpty()) {
+                            props.put(c.getComponentName(), c.getConfiguration());
+                        }
+                    }
+                    entities.put(e, props);
+                }
             }
             complete.put("Terrain", new HashMap<String, Object>());
             complete.put("Entities", entities);
@@ -477,5 +504,6 @@ public class MapEditorGraphicsCore implements Runnable {
         } catch (URISyntaxException | IOException e) {
             LOGGER.error(e);
         }
+        newMouseEntity(idAtCursor);
     }
 }
