@@ -35,11 +35,11 @@ public class TransformComponent extends PhysicsComponent {
      * 
      * @param entity to change the position
      * @param velocity to change
-     * @param rotation of the entity
+     * @param angle of the entity
      */
-    public void updatePosition(String entity, Vector3f velocity, Vector3f rotation) {
+    public void updatePosition(String entity, Vector3f velocity, float angle) {
         Vector3f.add(owner.getTransform().getPosition(), velocity, owner.getTransform().getPosition());
-        Vector3f.add(owner.getTransform().getRotation(), rotation, owner.getTransform().getRotation());
+        owner.getTransform().getRotation().y = angle;
     }
 
     @Override

@@ -46,7 +46,7 @@ import de.projectsc.core.interfaces.Component;
 import de.projectsc.core.manager.ComponentManager;
 import de.projectsc.core.manager.EntityManager;
 import de.projectsc.core.manager.EventManager;
-import de.projectsc.core.systems.physics.BasicPhysicsSystem;
+import de.projectsc.core.systems.physics.MovementSystem;
 import de.projectsc.core.systems.physics.collision.CollisionSystem;
 import de.projectsc.core.systems.state.EntityStateSystem;
 import de.projectsc.core.terrain.Terrain;
@@ -115,7 +115,7 @@ public class MapEditorGraphicsCore implements Runnable {
 
     private RenderingSystem renderSystem;
 
-    private BasicPhysicsSystem physicsSystem;
+    private MovementSystem physicsSystem;
 
     private ComponentManager componentManager;
 
@@ -165,7 +165,7 @@ public class MapEditorGraphicsCore implements Runnable {
         }
         loadGUIComponents();
         new EntityStateSystem(entityManager, eventManager);
-        physicsSystem = new BasicPhysicsSystem(entityManager, eventManager);
+        physicsSystem = new MovementSystem(entityManager, eventManager);
         collisionSystem = new CollisionSystem(entityManager, eventManager);
         renderSystem = new RenderingSystem(entityManager, eventManager);
         inputSystem = new InputSystem();

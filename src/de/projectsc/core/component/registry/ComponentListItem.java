@@ -21,6 +21,7 @@ import de.projectsc.modes.server.game.ai.AIControlledComponent;
 import de.projectsc.modes.server.game.ai.FollowPathComponent;
 import de.projectsc.modes.server.game.ai.OverwatchComponent;
 import de.projectsc.modes.server.game.ai.PathPointComponent;
+import de.projectsc.modes.server.game.elementComponents.SpawnEntitiesComponent;
 
 /**
  * These are all (non GUI) components that are known in the engine.
@@ -88,6 +89,10 @@ public enum ComponentListItem {
      * 
      */
     PATH_POINT_COMPONENT(PathPointComponent.NAME, PathPointComponent.class, true),
+    /**
+     * 
+     */
+    SPAWN_ENTITIES_COMPONENT(SpawnEntitiesComponent.NAME, SpawnEntitiesComponent.class, true),
     /**
      * 
      */

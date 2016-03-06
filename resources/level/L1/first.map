@@ -1,67 +1,17 @@
 {
   "Terrain" : { },
   "Entities" : {
-    "1c90f807-35ec-49a4-bc3e-7819e71fe148" : {
+    "17be5539-5cae-450c-9a9d-c676c6b6c7f1" : {
       "Transform Component" : {
-        "positionY" : -7.6293945E-6,
-        "scaleX" : 2.5,
-        "positionZ" : -143.37408,
-        "scaleY" : 2.5,
+        "positionY" : 0.0,
+        "scaleX" : 0.5,
+        "positionZ" : -110.26083,
+        "scaleY" : 0.5,
         "rotationX" : 0.0,
-        "rotationY" : 189.5,
+        "rotationY" : 0.0,
         "rotationZ" : 0.0,
-        "scaleZ" : 2.5,
-        "positionX" : -70.95479
-      },
-      "type" : 10001
-    },
-    "2b7b3ad7-6932-4d34-a827-4548a63ccf7c" : {
-      "Transform Component" : {
-        "positionY" : -7.6293945E-6,
-        "scaleX" : 1.5,
-        "positionZ" : -113.807144,
-        "scaleY" : 1.5,
-        "rotationX" : 0.0,
-        "rotationY" : 132.5,
-        "rotationZ" : 0.0,
-        "scaleZ" : 1.5,
-        "positionX" : 74.54913
-      },
-      "Path Point Component" : {
-        "groupOrderNumber" : 2,
-        "pathID" : 0
-      },
-      "type" : 10004
-    },
-    "bdabedb0-7140-4068-b3f0-833024b6a9b2" : {
-      "Transform Component" : {
-        "positionY" : -7.6293945E-6,
-        "scaleX" : 1.5,
-        "positionZ" : -129.80763,
-        "scaleY" : 1.5,
-        "rotationX" : 0.0,
-        "rotationY" : 132.5,
-        "rotationZ" : 0.0,
-        "scaleZ" : 1.5,
-        "positionX" : 46.247135
-      },
-      "Path Point Component" : {
-        "groupOrderNumber" : 1,
-        "pathID" : 0
-      },
-      "type" : 10004
-    },
-    "fd627373-e0ca-4a72-a920-6ff89dcf1d28" : {
-      "Transform Component" : {
-        "positionY" : -7.6293945E-6,
-        "scaleX" : 1.5,
-        "positionZ" : -128.34087,
-        "scaleY" : 1.5,
-        "rotationX" : 0.0,
-        "rotationY" : 132.5,
-        "rotationZ" : 0.0,
-        "scaleZ" : 1.5,
-        "positionX" : -22.162119
+        "scaleZ" : 0.5,
+        "positionX" : -17.365408
       },
       "Path Point Component" : {
         "groupOrderNumber" : 0,
@@ -69,92 +19,151 @@
       },
       "type" : 10004
     },
-    "d527f0c5-ba27-43ae-93d0-4437e1ba3a38" : {
+    "77a248fe-0993-47cb-935c-553acb72b281" : {
       "Transform Component" : {
         "positionY" : 0.0,
-        "scaleX" : 2.5,
-        "positionZ" : -140.10023,
-        "scaleY" : 2.5,
+        "scaleX" : 4.0,
+        "positionZ" : -9.09667,
+        "scaleY" : 4.0,
         "rotationX" : 0.0,
-        "rotationY" : 171.0,
+        "rotationY" : 0.0,
         "rotationZ" : 0.0,
-        "scaleZ" : 2.5,
-        "positionX" : -21.051403
+        "scaleZ" : 4.0,
+        "positionX" : -50.084263
       },
       "type" : 10001
     },
-    "635f576b-04a1-494e-b53a-523140ab5b73" : {
+    "bc0f2ca9-5cd2-4671-bd8f-d1f01ed87c2c" : {
       "Transform Component" : {
-        "positionY" : 0.0,
-        "scaleX" : 0.5,
-        "positionZ" : -103.70329,
-        "scaleY" : 0.5,
+        "positionY" : -7.6293945E-6,
+        "scaleX" : 13.0,
+        "positionZ" : -65.48883,
+        "scaleY" : 13.0,
         "rotationX" : 0.0,
-        "rotationY" : 132.5,
+        "rotationY" : 0.0,
         "rotationZ" : 0.0,
-        "scaleZ" : 0.5,
-        "positionX" : -101.97227
-      },
-      "Follow Path Component": {
-      	"pathIDToFollow" : 0
-      },
-      "type" : 10002
-    },
-    "28ebab8f-c04c-4810-8a63-0888e1c968ac" : {
-      "Transform Component" : {
-        "positionY" : 0.0,
-        "scaleX" : 2.5,
-        "positionZ" : -142.2727,
-        "scaleY" : 2.5,
-        "rotationX" : 0.0,
-        "rotationY" : 182.0,
-        "rotationZ" : 0.0,
-        "scaleZ" : 2.5,
-        "positionX" : 47.659157
-      },
-      "type" : 10001
-    },
-    "c5e4a39f-ceff-4c72-9be6-6b7f53bf5b99" : {
-      "Transform Component" : {
-        "positionY" : 0.0,
-        "scaleX" : 21.0,
-        "positionZ" : -34.306934,
-        "scaleY" : 21.0,
-        "rotationX" : 0.0,
-        "rotationY" : 132.5,
-        "rotationZ" : 0.0,
-        "scaleZ" : 21.0,
-        "positionX" : 50.28475
+        "scaleZ" : 13.0,
+        "positionX" : 77.1449
       },
       "type" : 10003
     },
-    "5e7d5d76-416e-43ef-beb8-508d872728df" : {
+    "7dce5bc9-335a-4034-80e1-c300ea209ca1" : {
       "Transform Component" : {
         "positionY" : -7.6293945E-6,
         "scaleX" : 1.0,
-        "positionZ" : -92.453705,
+        "positionZ" : -79.15233,
         "scaleY" : 1.0,
         "rotationX" : 0.0,
-        "rotationY" : 12.0,
+        "rotationY" : 0.0,
         "rotationZ" : 0.0,
         "scaleZ" : 1.0,
-        "positionX" : -29.951853
+        "positionX" : -45.364674
+      },
+      "type" : 10006
+    },
+    "f1b1b0b5-2aa8-4ff2-85c7-cec776131abb" : {
+      "Transform Component" : {
+        "positionY" : -7.6293945E-6,
+        "scaleX" : 1.0,
+        "positionZ" : -41.043156,
+        "scaleY" : 1.0,
+        "rotationX" : 0.0,
+        "rotationY" : 0.0,
+        "rotationZ" : 0.0,
+        "scaleZ" : 1.0,
+        "positionX" : -49.896935
       },
       "type" : 10000
     },
-    "d2dade15-ac1b-42dc-9e94-c1929df7ce79" : {
+    "d485cf0f-72e7-4399-910d-8f5222f2ff97" : {
+      "Transform Component" : {
+        "positionY" : -7.6293945E-6,
+        "scaleX" : 0.5,
+        "positionZ" : -56.151623,
+        "scaleY" : 0.5,
+        "rotationX" : 0.0,
+        "rotationY" : 0.0,
+        "rotationZ" : 0.0,
+        "scaleZ" : 0.5,
+        "positionX" : -17.85778
+      },
+      "Path Point Component" : {
+        "groupOrderNumber" : 1,
+        "pathID" : 0
+      },
+      "type" : 10004
+    },
+    "6d2789f5-8430-4c08-9ebe-bed727bf64fc" : {
+      "Transform Component" : {
+        "positionY" : -1.5258789E-5,
+        "scaleX" : 0.5,
+        "positionZ" : -62.36768,
+        "scaleY" : 0.5,
+        "rotationX" : 0.0,
+        "rotationY" : 0.0,
+        "rotationZ" : 0.0,
+        "scaleZ" : 0.5,
+        "positionX" : 60.737335
+      },
+      "Path Point Component" : {
+        "groupOrderNumber" : 4,
+        "pathID" : 0
+      },
+      "type" : 10004
+    },
+    "6fd6f7f2-f3fa-4820-bee1-b94b76804335" : {
       "Transform Component" : {
         "positionY" : 0.0,
-        "scaleX" : 2.5,
-        "positionZ" : -121.74116,
-        "scaleY" : 2.5,
+        "scaleX" : 0.5,
+        "positionZ" : -80.63309,
+        "scaleY" : 0.5,
         "rotationX" : 0.0,
-        "rotationY" : 132.5,
+        "rotationY" : 0.0,
         "rotationZ" : 0.0,
-        "scaleZ" : 2.5,
-        "positionX" : 82.360756
+        "scaleZ" : 0.5,
+        "positionX" : 23.175365
       },
-      "type" : 10001
+      "Path Point Component" : {
+        "groupOrderNumber" : 2,
+        "pathID" : 0
+      },
+      "type" : 10004
+    },
+    "6be34378-0ecf-4abb-9724-ee2788e72313" : {
+      "Transform Component" : {
+        "positionY" : 0.0,
+        "scaleX" : 0.5,
+        "positionZ" : -106.37462,
+        "scaleY" : 0.5,
+        "rotationX" : 0.0,
+        "rotationY" : 0.0,
+        "rotationZ" : 0.0,
+        "scaleZ" : 0.5,
+        "positionX" : 99.82398
+      },
+      "Path Point Component" : {
+        "groupOrderNumber" : 5,
+        "pathID" : 0
+      },
+      "type" : 10004
+    },
+    "23185c1b-8d7f-4b6b-9484-a5b869408329" : {
+      "Transform Component" : {
+        "positionY" : -7.6293945E-6,
+        "scaleX" : 0.5,
+        "positionZ" : -36.20884,
+        "scaleY" : 0.5,
+        "rotationX" : 0.0,
+        "rotationY" : 0.0,
+        "rotationZ" : 0.0,
+        "scaleZ" : 0.5,
+        "positionX" : 30.670475
+      },
+      "Path Point Component" : {
+        "groupOrderNumber" : 3,
+        "pathID" : 0
+      },
+      "type" : 10004
     }
   }
 }

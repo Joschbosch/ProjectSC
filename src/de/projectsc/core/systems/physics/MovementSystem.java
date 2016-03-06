@@ -19,7 +19,6 @@ import de.projectsc.core.data.physics.Transform;
 import de.projectsc.core.entities.states.EntityStates;
 import de.projectsc.core.events.entity.actions.MoveEntityToAttackTargetEvent;
 import de.projectsc.core.events.entity.actions.MoveEntityToTargetAction;
-import de.projectsc.core.events.entity.movement.NotifyRotationTargetUpdateEvent;
 import de.projectsc.core.events.entity.movement.NotifyTransformUpdateEvent;
 import de.projectsc.core.events.entity.movement.NotifyVelocityUpdateEvent;
 import de.projectsc.core.events.entity.movement.UpdatePositionEvent;
@@ -38,14 +37,14 @@ import de.projectsc.modes.client.game.component.JumpingComponent;
  * 
  * @author Josch Bosch
  */
-public class BasicPhysicsSystem extends DefaultSystem {
+public class MovementSystem extends DefaultSystem {
 
-    private static final String NAME = "Physics System";
+    private static final String NAME = "Movement System";
 
     private static final float DISTANCE_TO_TARGET = 2f;
 
-    public BasicPhysicsSystem(EntityManager entityManager, EventManager eventManager) {
-        super(BasicPhysicsSystem.NAME, entityManager, eventManager);
+    public MovementSystem(EntityManager entityManager, EventManager eventManager) {
+        super(MovementSystem.NAME, entityManager, eventManager);
         eventManager.registerForEvent(UpdateRotationEvent.class, this);
         eventManager.registerForEvent(UpdatePositionEvent.class, this);
         eventManager.registerForEvent(UpdateVelocityEvent.class, this);
@@ -70,44 +69,39 @@ public class BasicPhysicsSystem extends DefaultSystem {
                 TransformComponent transformComp =
                     (TransformComponent) entityManager.getComponent(entity, TransformComponent.class);
                 if (hasComponent(entity, PathComponent.class)) {
-                    PathComponent pathComponent = getComponent(entity, PathComponent.class);
-                    VelocityComponent velocityComp = getComponent(entity, VelocityComponent.class);
-                    Vector3f currentTarget = pathComponent.getCurrentTarget();
-                    if (currentTarget != null
-                        && !isAtTarget(transformComp.getTransform().getPosition(), currentTarget)) {
-                        if (entityState != EntityStates.MOVING) {
-                            fireEvent(new UpdateEntityStateEvent(entity, EntityStates.MOVING));
-                        }
-                        velocityComp.setCurrentSpeed(velocityComp.getMaximumSpeed());
-
-                        float newAngle =
-                            (float) Math.atan2(currentTarget.x - transformComp.getTransform().getPosition().x, currentTarget.z
-                                - transformComp.getTransform().getPosition().z);
-                        newAngle = (float) (newAngle * (180 / Math.PI));
-                        if (newAngle != transformComp.getRotation().y) {
-                            pathComponent.setTargetRotation(new Vector3f(0, newAngle, 0));
-                            velocityComp.setTurnSpeed(velocityComp.getMaximumTurnSpeed());
-                            fireEvent(new NotifyRotationTargetUpdateEvent(entity));
-                        }
-                    } else if (entityState != EntityStates.IDLING && entityState != EntityStates.DEAD) {
-                        fireEvent(new UpdateEntityStateEvent(entity, EntityStates.IDLING));
-                        pathComponent.setCurrentTarget(null);
-                    }
-
-                    if (entityState == EntityStates.MOVING) {
-                        updateVelocity(tick, transformComp.getRotation(), pathComponent, velocityComp);
-                        fireEvent(new NotifyVelocityUpdateEvent(entity));
-                        transformComp.updatePosition(entity, velocityComp.getVelocity(), velocityComp.getRotationDelta());
-                        fireEvent(new NotifyTransformUpdateEvent(entity));
-                    } else if (velocityComp.getCurrentSpeed() != 0 || velocityComp.getTurnSpeed() != 0) {
-                        velocityComp.setCurrentSpeed(0f);
-                        velocityComp.setTurnSpeed(0f);
-                        velocityComp.setRotationDelta(new Vector3f());
-                        velocityComp.setVelocity(new Vector3f());
-                        fireEvent(new NotifyVelocityUpdateEvent(entity));
-                    }
+                    moveToTarget(tick, entity, entityState, transformComp);
                 }
             }
+        }
+    }
+
+    private void moveToTarget(long tick, String entity, EntityStates entityState, TransformComponent transformComp) {
+        PathComponent pathComponent = getComponent(entity, PathComponent.class);
+        VelocityComponent velocityComp = getComponent(entity, VelocityComponent.class);
+        Vector3f currentTarget = pathComponent.getCurrentTarget();
+        if (currentTarget != null
+            && !isAtTarget(transformComp.getTransform().getPosition(), currentTarget)) {
+            if (entityState != EntityStates.MOVING) {
+                fireEvent(new UpdateEntityStateEvent(entity, EntityStates.MOVING));
+            }
+            velocityComp.setCurrentSpeed(velocityComp.getMaximumSpeed());
+
+        } else if (entityState != EntityStates.IDLING && entityState != EntityStates.DEAD) {
+            fireEvent(new UpdateEntityStateEvent(entity, EntityStates.IDLING));
+            pathComponent.setCurrentTarget(null);
+        }
+
+        if (entityState == EntityStates.MOVING) {
+            updateVelocity(tick, transformComp.getTransform(), pathComponent, velocityComp);
+            fireEvent(new NotifyVelocityUpdateEvent(entity));
+            float angle = (float) Math.toDegrees(Math.atan2(velocityComp.getVelocity().x, velocityComp.getVelocity().z));
+            transformComp.updatePosition(entity, velocityComp.getVelocity(), angle);
+            fireEvent(new NotifyTransformUpdateEvent(entity));
+        } else if (velocityComp.getCurrentSpeed() != 0 || velocityComp.getTurnSpeed() != 0) {
+            velocityComp.setCurrentSpeed(0f);
+            velocityComp.setTurnSpeed(0f);
+            velocityComp.setVelocity(new Vector3f());
+            fireEvent(new NotifyVelocityUpdateEvent(entity));
         }
     }
 
@@ -235,44 +229,34 @@ public class BasicPhysicsSystem extends DefaultSystem {
         fireEvent(new NotifyTransformUpdateEvent(e.getEntityId()));
     }
 
-    private void updateVelocity(long tick, Vector3f rotation, PathComponent pathComponent, VelocityComponent velocityComp) {
+    private void updateVelocity(long tick, Transform transform, PathComponent pathComponent, VelocityComponent velocityComp) {
+        if (pathComponent.getCurrentTarget() != null) {
+            float newSpeed = velocityComp.getCurrentSpeed() + velocityComp.getAcceleration() * tick;
+            if (newSpeed >= velocityComp.getMaximumSpeed()) {
+                newSpeed = velocityComp.getMaximumSpeed();
+            }
+            float distance = newSpeed * tick / 1000.0f;
+            Vector3f currentVelocity = velocityComp.getVelocity();
+            if (currentVelocity.length() == 0) {
+                currentVelocity.x = (float) Math.cos(transform.getRotation().y);
+                currentVelocity.z = (float) Math.sin(transform.getRotation().y);
+                currentVelocity.scale(0.01f);
+            }
+            Vector3f desiredVelocity = Vector3f.sub(pathComponent.getCurrentTarget(), transform.getPosition(), null);
+            desiredVelocity.normalise();
+            desiredVelocity.scale(distance);
 
-        float newSpeed = velocityComp.getCurrentSpeed() + velocityComp.getAcceleration() * tick;
-        if (newSpeed >= velocityComp.getMaximumSpeed()) {
-            newSpeed = velocityComp.getMaximumSpeed();
-        }
-        float distance = newSpeed * tick / 1000.0f;
-        float dx = (float) (distance * Math.sin(Math.toRadians(rotation.y)));
-        float dz = (float) (distance * Math.cos(Math.toRadians(rotation.y)));
-        float dy = 0;
-        float targetRotation = pathComponent.getTargetRotation().y;
-        float angleDiff = rotation.y - targetRotation;
-        if (Math.abs(angleDiff) >= 180) {
-            if (rotation.y > targetRotation) {
-                angleDiff = -1 * ((360 - rotation.y) + targetRotation);
-            } else {
-                angleDiff = (360 - targetRotation) + rotation.y;
+            Vector3f steering = Vector3f.sub(desiredVelocity, currentVelocity, null);
+            steering.y = 0;
+            if (velocityComp.getMaximumTurnSpeed() / steering.length() < 1) {
+                steering.scale(velocityComp.getMaximumTurnSpeed() / steering.length());
             }
-        }
-        if (angleDiff > 5.E-4f) {
-            if (Math.abs(angleDiff) > 180) {
-                if (rotation.y > targetRotation) {
-                    angleDiff = -1 * ((360 - rotation.y) + targetRotation);
-                } else {
-                    angleDiff = (360 - targetRotation) + rotation.y;
-                }
+            Vector3f newVelocity = Vector3f.add(currentVelocity, steering, null);
+            if (velocityComp.getMaximumSpeed() / newVelocity.length() < 1) {
+                newVelocity.scale(velocityComp.getMaximumSpeed() / newVelocity.length());
             }
-            if (angleDiff > 0) {
-                dy = -velocityComp.getMaximumTurnSpeed() * tick / 1000.0f;
-            } else {
-                dy = velocityComp.getMaximumTurnSpeed() * tick / 1000.0f;
-            }
-        } else {
-            dy = targetRotation - rotation.y;
+            newVelocity.y = 0;
+            velocityComp.setVelocity(newVelocity);
         }
-
-        velocityComp.setVelocity(new Vector3f(dx, 0, dz));
-        velocityComp.setRotationDelta(new Vector3f(0, dy, 0));
     }
-
 }

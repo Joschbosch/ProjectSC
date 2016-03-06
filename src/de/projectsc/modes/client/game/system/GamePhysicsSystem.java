@@ -7,14 +7,14 @@ package de.projectsc.modes.client.game.system;
 import de.projectsc.core.data.EntityEvent;
 import de.projectsc.core.manager.EntityManager;
 import de.projectsc.core.manager.EventManager;
-import de.projectsc.core.systems.physics.BasicPhysicsSystem;
+import de.projectsc.core.systems.physics.MovementSystem;
 
 /**
  * Game implementation of the basic physics.
  * 
  * @author Josch Bosch
  */
-public class GamePhysicsSystem extends BasicPhysicsSystem {
+public class GamePhysicsSystem extends MovementSystem {
 
     public GamePhysicsSystem(EntityManager entityManager, EventManager eventManager) {
         super(entityManager, eventManager);

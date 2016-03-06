@@ -31,7 +31,7 @@ import de.projectsc.core.manager.EntityManager;
 import de.projectsc.core.manager.EventManager;
 import de.projectsc.core.messages.GameMessageConstants;
 import de.projectsc.core.messages.MessageConstants;
-import de.projectsc.core.systems.physics.BasicPhysicsSystem;
+import de.projectsc.core.systems.physics.MovementSystem;
 import de.projectsc.core.systems.physics.collision.CollisionSystem;
 import de.projectsc.core.systems.state.EntityStateSystem;
 import de.projectsc.core.utils.MapLoader;
@@ -78,7 +78,7 @@ public class GameImpl implements Game {
 
     private boolean loading = false;
 
-    private BasicPhysicsSystem physicsSystem;
+    private MovementSystem physicsSystem;
 
     private EntityStateSystem stateSystem;
 
@@ -91,6 +91,8 @@ public class GameImpl implements Game {
     private HealthSystem healthSystem;
 
     private ComponentManager componentManager;
+
+    private GameSystem gameSystem;
 
     private EntityManager entityManager;
 
@@ -150,6 +152,7 @@ public class GameImpl implements Game {
         fightSystem.update(GAME_TICK_TIME);
         healthSystem.update(GAME_TICK_TIME);
         collisionSystem.update(GAME_TICK_TIME);
+        gameSystem.update(GAME_TICK_TIME);
         snapshotManager.createSnapshot(timer);
         for (ServerPlayer player : gameContext.getPlayers().values()) {
             long lastSendSnapshotTick = snapshotManager.getLastSendSnapshotTick(player.getId());
@@ -189,11 +192,12 @@ public class GameImpl implements Game {
                     componentManager = new ComponentManager();
                     entityManager = new EntityManager(componentManager, eventManager);
                     stateSystem = new EntityStateSystem(entityManager, eventManager);
-                    physicsSystem = new BasicPhysicsSystem(entityManager, eventManager);
+                    physicsSystem = new MovementSystem(entityManager, eventManager);
                     collisionSystem = new CollisionSystem(entityManager, eventManager);
                     aiSystem = new AISystem(entityManager, eventManager, collisionSystem);
                     fightSystem = new CombatSystem(entityManager, eventManager);
                     healthSystem = new HealthSystem(entityManager, eventManager);
+                    gameSystem = new GameSystem(entityManager, eventManager);
                     snapshotManager = new ServerSnapshotManager(entityManager);
                     loadComponents();
                     gameContext.loadData();

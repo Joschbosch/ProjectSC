@@ -23,6 +23,7 @@ import de.projectsc.core.events.entity.state.NotifyEntityStateChangedEvent;
 import de.projectsc.core.events.entity.state.UpdateEntityStateEvent;
 import de.projectsc.core.game.components.BasicAttackComponent;
 import de.projectsc.core.game.components.HealthComponent;
+import de.projectsc.core.game.components.ProjectileComponent;
 import de.projectsc.core.manager.EntityManager;
 import de.projectsc.core.manager.EventManager;
 import de.projectsc.core.systems.DefaultSystem;
@@ -98,17 +99,44 @@ public class AISystem extends DefaultSystem {
         EntityStateComponent stateCmp = getComponent(e, EntityStateComponent.class);
         if (owc != null) {
             if (stateCmp.getState() == EntityStates.IDLING) {
-                List<String> entitiesInRange = owc.getEntitiesInRange();
-                boolean attackingEntity = false;
-                for (String target : entitiesInRange) {
-                    if (hasComponent(target, HealthComponent.class)) {
-                        EntityStateComponent escTarget = getComponent(target, EntityStateComponent.class);
-                        if (!attackingEntity && escTarget != null && canAttack(target, escTarget.getState())) {
-                            fireEvent(new BasicAttackEntityAction(e, target));
-                            attackingEntity = true;
-                        }
+                findEnemyToAttack(e, owc);
+            } else if (stateCmp.getState() == EntityStates.AUTO_ATTACKING) {
+                BasicAttackComponent bac = getComponent(e, BasicAttackComponent.class);
+                if (entityManager.getEntity(bac.getTarget()) == null
+                    || getComponent(bac.getTarget(), EntityStateComponent.class).getState() == EntityStates.DEAD
+                    || getComponent(bac.getTarget(), EntityStateComponent.class).getState() == EntityStates.DYING) {
+                    owc.removeOtherEntity(bac.getTarget());
+                    bac.setTarget(null);
+                    fireEvent(new UpdateEntityStateEvent(e, EntityStates.IDLING));
+
+                }
+            }
+        }
+    }
+
+    private void findEnemyToAttack(String e, OverwatchComponent owc) {
+        List<String> entitiesInRange = owc.getEntitiesInRange();
+        String entityToAttack = "";
+        for (String target : entitiesInRange) {
+            if (hasComponent(target, HealthComponent.class)) {
+                if (entityToAttack.isEmpty()) {
+                    entityToAttack = target;
+                } else {
+                    Transform t1 = getComponent(entityToAttack, TransformComponent.class).getTransform();
+                    Transform t2 = getComponent(target, TransformComponent.class).getTransform();
+                    Transform source = getComponent(e, TransformComponent.class).getTransform();
+                    if (Vector3f.sub(t1.getPosition(), source.getPosition(), null).lengthSquared() > Vector3f.sub(t2.getPosition(),
+                        source.getPosition(), null).lengthSquared()) {
+                        entityToAttack = target;
                     }
                 }
+
+            }
+        }
+        if (!entityToAttack.isEmpty()) {
+            EntityStateComponent escTarget = getComponent(entityToAttack, EntityStateComponent.class);
+            if (escTarget != null && canAttack(entityToAttack, escTarget.getState())) {
+                fireEvent(new BasicAttackEntityAction(e, entityToAttack));
             }
         }
     }
@@ -131,7 +159,7 @@ public class AISystem extends DefaultSystem {
                 String otherEntityId = ((NotifyTransformUpdateEvent) e).getEntityId();
                 Transform other = getComponent(otherEntityId, TransformComponent.class).getTransform();
                 if (Vector3f.sub(t.getPosition(), other.getPosition(), null).length() < range) {
-                    if (!owc.isInRange(otherEntityId)) {
+                    if (!owc.isInRange(otherEntityId) && shouldNotBeWatched(otherEntityId)) {
                         owc.addEntityInRange(otherEntityId);
                     }
                 } else {
@@ -155,6 +183,10 @@ public class AISystem extends DefaultSystem {
                 }
             }
         }
+    }
+
+    private boolean shouldNotBeWatched(String otherEntityId) {
+        return !hasComponent(otherEntityId, ProjectileComponent.class);
     }
 
 }

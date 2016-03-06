@@ -4,10 +4,6 @@
 
 package de.projectsc.core.component.physic;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.core.CoreConstants;
@@ -31,15 +27,13 @@ public class VelocityComponent extends PhysicsComponent {
 
     private float maximumSpeed = 16f;
 
-    private float maximumTurnSpeed = 1200f;
+    private float maximumTurnSpeed = 1f;
 
     private float turnSpeed = maximumTurnSpeed;
 
     private float currentSpeed = 0;
 
     private Vector3f velocity = new Vector3f(0, 0, 0);
-
-    private Vector3f rotationDelta = new Vector3f(0, 0, 0);
 
     public VelocityComponent() {
         setComponentName(NAME);
@@ -49,28 +43,29 @@ public class VelocityComponent extends PhysicsComponent {
 
     }
 
-    @Override
-    public Map<String, Object> serialize(File savingLocation) {
-        Map<String, Object> serialized = new HashMap<>();
-        serialized.put("acceleration", acceleration);
-        serialized.put("maxSpeed", maximumSpeed);
-        serialized.put("turnSpeed", turnSpeed);
-        return serialized;
-    }
-
-    @Override
-    public void deserialize(Map<String, Object> serialized, String loadingLocation) {
-        acceleration = (float) (double) serialized.get("acceleration");
-        maximumSpeed = (float) (double) serialized.get("maxSpeed");
-        turnSpeed = (float) (double) serialized.get("turnSpeed");
-    }
+    //
+    // @Override
+    // public Map<String, Object> serialize(File savingLocation) {
+    // Map<String, Object> serialized = new HashMap<>();
+    // serialized.put("acceleration", acceleration);
+    // serialized.put("maxSpeed", maximumSpeed);
+    // serialized.put("turnSpeed", turnSpeed);
+    // return serialized;
+    // }
+    //
+    // @Override
+    // public void deserialize(Map<String, Object> serialized, String loadingLocation) {
+    // acceleration = (float) (double) serialized.get("acceleration");
+    // maximumSpeed = (float) (double) serialized.get("maxSpeed");
+    // turnSpeed = (float) (double) serialized.get("turnSpeed");
+    // }
 
     @Override
     public String serializeForNetwork() {
         return "" + acceleration + CoreConstants.SERIALIZATION_SEPARATOR + maximumSpeed + CoreConstants.SERIALIZATION_SEPARATOR
             + maximumTurnSpeed + CoreConstants.SERIALIZATION_SEPARATOR + turnSpeed + CoreConstants.SERIALIZATION_SEPARATOR
-            + currentSpeed + CoreConstants.SERIALIZATION_SEPARATOR + velocity.x
-            + CoreConstants.SERIALIZATION_SEPARATOR + velocity.z + CoreConstants.SERIALIZATION_SEPARATOR + rotationDelta.y;
+            + currentSpeed + CoreConstants.SERIALIZATION_SEPARATOR + velocity.x + CoreConstants.SERIALIZATION_SEPARATOR + velocity.y
+            + CoreConstants.SERIALIZATION_SEPARATOR + velocity.z;
     }
 
     @Override
@@ -95,7 +90,6 @@ public class VelocityComponent extends PhysicsComponent {
         vc.setTurnSpeed(turnSpeed);
         vc.setCurrentSpeed(currentSpeed);
         vc.setVelocity(new Vector3f(velocity));
-        vc.setRotationDelta(new Vector3f(rotationDelta));
         return vc;
     }
 
@@ -110,10 +104,6 @@ public class VelocityComponent extends PhysicsComponent {
 
     public void setVelocity(Vector3f velocity) {
         this.velocity = velocity;
-    }
-
-    public Vector3f getRotationDelta() {
-        return rotationDelta;
     }
 
     public void setCurrentSpeed(float f) {
@@ -150,10 +140,6 @@ public class VelocityComponent extends PhysicsComponent {
 
     public float getMaximumTurnSpeed() {
         return maximumTurnSpeed;
-    }
-
-    public void setRotationDelta(Vector3f newRotationSpeed) {
-        this.rotationDelta = newRotationSpeed;
     }
 
     public void setMaximumTurnSpeed(float maximumTurnSpeed) {

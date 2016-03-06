@@ -28,8 +28,6 @@ public class PathComponent extends PhysicsComponent {
 
     private Vector3f currentTarget = null;
 
-    private Vector3f targetRotation;
-
     public PathComponent() {
         setComponentName(NAME);
         setType(ComponentType.PHYSICS);
@@ -47,11 +45,11 @@ public class PathComponent extends PhysicsComponent {
 
     @Override
     public String serializeForNetwork() {
-        if (currentTarget == null || targetRotation == null) {
+        if (currentTarget == null) {
             return "";
         } else {
             return "" + currentTarget.x + CoreConstants.SERIALIZATION_SEPARATOR + currentTarget.y + CoreConstants.SERIALIZATION_SEPARATOR
-                + currentTarget.z + CoreConstants.SERIALIZATION_SEPARATOR + targetRotation.y;
+                + currentTarget.z;
         }
     }
 
@@ -62,13 +60,11 @@ public class PathComponent extends PhysicsComponent {
         } else {
             if (currentTarget == null) {
                 currentTarget = new Vector3f();
-                targetRotation = new Vector3f();
             }
             String[] split = serialized.split(CoreConstants.SERIALIZATION_SEPARATOR);
             currentTarget.x = Float.valueOf(split[0]);
             currentTarget.y = Float.valueOf(split[1]);
             currentTarget.z = Float.valueOf(split[2]);
-            targetRotation.y = Float.valueOf(split[3]);
         }
     }
 
@@ -84,14 +80,6 @@ public class PathComponent extends PhysicsComponent {
 
     public void setCurrentTarget(Vector3f currentTarget) {
         this.currentTarget = currentTarget;
-    }
-
-    public Vector3f getTargetRotation() {
-        return targetRotation;
-    }
-
-    public void setTargetRotation(Vector3f targetRotation) {
-        this.targetRotation = targetRotation;
     }
 
 }

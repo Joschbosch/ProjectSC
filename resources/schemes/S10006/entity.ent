@@ -1,0 +1,19 @@
+{
+  "components" : {
+    "Mesh Renderer Component" : {
+      "shineDamper" : 1.0,
+      "reflectivity" : 0.0,
+      "numColumns" : 1
+    },
+    "Mesh Component" : { },
+    "Spawn Entities Component" : {
+      "entitySpawnLocations" : { },
+      "spawnIntervall" : 30000.0,
+      "numberOfSpawns" : -1
+    },
+    "Transform Component" : { },
+    "Entity State Component" : { }
+  },
+  "schemaId" : 10006,
+  "schemaName" : "EntitySchema0"
+}
