@@ -155,6 +155,7 @@ public class EmittingLightComponent extends GraphicalComponent {
         EmittingLightComponent elc = new EmittingLightComponent();
         for (Light l : lights) {
             System.out.println("Todo");
+            l.getAttenuation();
         }
         return elc;
     }

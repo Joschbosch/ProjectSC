@@ -11,7 +11,10 @@ import de.projectsc.modes.client.game.ui.controls.PlayerHealthBar;
 import de.projectsc.modes.client.gui.ui.View;
 import de.projectsc.modes.client.gui.ui.basic.Container;
 import de.projectsc.modes.client.gui.ui.basic.Label;
-
+/**
+ * View for the player health bar.
+ * @author Josch Bosch
+ */
 public class PlayerHealthBarView extends View {
 
     private PlayerHealthBar playerHealthBar;

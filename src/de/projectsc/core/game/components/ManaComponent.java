@@ -9,6 +9,11 @@ import de.projectsc.core.component.ComponentType;
 import de.projectsc.core.component.DefaultComponent;
 import de.projectsc.core.interfaces.Component;
 
+/**
+ * Component for managing mana.
+ * 
+ * @author Josch Bosch
+ */
 public class ManaComponent extends DefaultComponent {
 
     /**
@@ -16,11 +21,11 @@ public class ManaComponent extends DefaultComponent {
      */
     public static final String NAME = "Mana Component";
 
-    public double maxMana = 100;
+    private double maxMana = 100;
 
-    public double currentMana = 100;
+    private double currentMana = 100;
 
-    public double currentRegenerationRate = 5; // Mana/s
+    private double currentRegenerationRate = 5; // Mana/s
 
     public ManaComponent() {
         setComponentName(NAME);

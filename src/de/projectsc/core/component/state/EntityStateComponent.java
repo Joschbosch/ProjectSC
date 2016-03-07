@@ -8,7 +8,7 @@ import de.projectsc.core.CoreConstants;
 import de.projectsc.core.component.ComponentType;
 import de.projectsc.core.component.DefaultComponent;
 import de.projectsc.core.data.Scene;
-import de.projectsc.core.entities.states.EntityStates;
+import de.projectsc.core.entities.states.EntityState;
 import de.projectsc.core.interfaces.Component;
 
 /**
@@ -23,7 +23,7 @@ public class EntityStateComponent extends DefaultComponent {
      */
     public static final String NAME = "Entity State Component";
 
-    private EntityStates state = EntityStates.IDLING;
+    private EntityState state = EntityState.IDLING;
 
     private boolean moved = false;
 
@@ -68,9 +68,9 @@ public class EntityStateComponent extends DefaultComponent {
     public void deserializeFromNetwork(String serialized) {
         String[] split = serialized.split(CoreConstants.SERIALIZATION_SEPARATOR);
         int ordinal = Integer.parseInt(split[0]);
-        EntityStates[] values = EntityStates.values();
+        EntityState[] values = EntityState.values();
         if (ordinal >= values.length) {
-            state = EntityStates.UNKNOWN;
+            state = EntityState.UNKNOWN;
         } else {
             state = values[ordinal];
         }
@@ -102,11 +102,11 @@ public class EntityStateComponent extends DefaultComponent {
      * 
      * @param newState to change to
      */
-    public void changeState(EntityStates newState) {
+    public void changeState(EntityState newState) {
         setState(newState);
     }
 
-    public EntityStates getState() {
+    public EntityState getState() {
         return state;
     }
 
@@ -114,11 +114,13 @@ public class EntityStateComponent extends DefaultComponent {
      * @param newState to set
      * @return the new state.
      */
-    public EntityStates setState(EntityStates newState) {
+    public EntityState setState(EntityState newState) {
         this.state = newState;
         return newState;
     }
-
+    /**
+     * @return has entity moved?
+     */
     public boolean hasMoved() {
         return moved;
     }

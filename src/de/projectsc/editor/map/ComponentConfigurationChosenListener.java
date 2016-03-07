@@ -11,12 +11,19 @@ import java.util.Map;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import de.projectsc.core.interfaces.Component;
 import de.projectsc.core.manager.EntityManager;
 import de.projectsc.editor.map.componentConfigurations.ComponentConfigurationTypes;
-
+/**
+ * Listener if a new component was chosen and should show a configuration.
+ * @author Josch Bosch
+ */
 public class ComponentConfigurationChosenListener implements ActionListener {
 
+    private static final Log LOGGER = LogFactory.getLog(ComponentConfigurationChosenListener.class);
     private String entity;
 
     private Map<String, Component> components;
@@ -34,6 +41,7 @@ public class ComponentConfigurationChosenListener implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent arg0) {
+        @SuppressWarnings("rawtypes")
         String chosen = (String) ((JComboBox) arg0.getSource()).getSelectedItem();
         configurationPanel.removeAll();
         ComponentConfigurationTypes chosenType = null;
@@ -44,14 +52,14 @@ public class ComponentConfigurationChosenListener implements ActionListener {
         }
         if (chosenType != null) {
             try {
-                ComponentConfiguration config = chosenType.getComponentClass().newInstance();
+                ComponentConfigurationPanel config = chosenType.getComponentClass().newInstance();
                 config.setEntityManager(entityManager);
                 config.setEntity(entity);
                 config.setComponent(components.get(chosen));
                 config.init();
                 configurationPanel.add(config);
             } catch (InstantiationException | IllegalAccessException e) {
-                e.printStackTrace();
+                LOGGER.error(e);
             }
         }
         configurationPanel.getParent().repaint();

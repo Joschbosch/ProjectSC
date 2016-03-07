@@ -10,9 +10,14 @@ import de.projectsc.core.component.ComponentType;
 import de.projectsc.core.component.DefaultComponent;
 import de.projectsc.core.game.ProjectileType;
 import de.projectsc.core.interfaces.Component;
-
+/**
+ * Component that defines an entity as projectile.
+ * @author Josch Bosch
+ */
 public class ProjectileComponent extends DefaultComponent {
-
+    /**
+     * Component name.
+     */
     public static final String NAME = "Projectile Component";
 
     // configuration members

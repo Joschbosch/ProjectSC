@@ -16,6 +16,11 @@ import de.projectsc.core.component.ComponentType;
 import de.projectsc.core.component.DefaultComponent;
 import de.projectsc.core.interfaces.Component;
 
+/**
+ * Add ability to spawn entities to the component.
+ * 
+ * @author Josch Bosch
+ */
 public class SpawnEntitiesComponent extends DefaultComponent {
 
     /**
@@ -47,12 +52,12 @@ public class SpawnEntitiesComponent extends DefaultComponent {
         return result;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void deserialize(Map<String, Object> serialized, String loadingLocation) {
         spawnIntervall = (double) serialized.get("spawnIntervall");
         numberOfSpawns = (int) serialized.get("numberOfSpawns");
         entitySpawnLocations = (Map<Long, List<Vector3f>>) serialized.get("entitySpawnLocations");
-        System.out.println("Deserialized: " + entitySpawnLocations);
         List<Vector3f> location = new LinkedList<>();
         location.add(new Vector3f());
         entitySpawnLocations.put(10002L, location);
@@ -66,7 +71,11 @@ public class SpawnEntitiesComponent extends DefaultComponent {
         sec.setSpawnIntervall(spawnIntervall);
         return sec;
     }
-
+    /**
+     * New spawn point for entities. 
+     * @param schemaId to load
+     * @param location to spawn.
+     */
     public void addEntitySpawnPoint(Long schemaId, Vector3f location) {
         List<Vector3f> locations = entitySpawnLocations.get(schemaId);
         if (locations == null) {

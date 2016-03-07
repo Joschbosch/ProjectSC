@@ -11,9 +11,12 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.lwjgl.LWJGLException;
+import org.lwjgl.opengl.ContextAttribs;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL13;
+import org.lwjgl.opengl.PixelFormat;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
@@ -57,6 +60,10 @@ import de.projectsc.modes.client.gui.utils.MousePicker;
  * @author Josch Bosch
  */
 public class GUICore implements GUI {
+
+    private static final boolean ENABLE_MSAA = true;
+
+    private static final int ANTI_ALIAILISING_MULTISAMPLE_RATE = 4;
 
     private static final int MAX_FRAME_RATE = 60;
 
@@ -115,11 +122,15 @@ public class GUICore implements GUI {
     @Override
     public boolean init() {
         LOGGER.info("Initialize GUI core");
+        ContextAttribs attribs = new ContextAttribs(3, 3).withForwardCompatible(true).withProfileCore(true);
         try {
             Display.setDisplayMode(new DisplayMode(WIDTH, HEIGHT));
             Display.setTitle("Project SC");
             Display.setVSyncEnabled(true);
-            Display.create();
+            Display.create(new PixelFormat().withSamples(ANTI_ALIAILISING_MULTISAMPLE_RATE), attribs);
+            if (ENABLE_MSAA) {
+                GL11.glEnable(GL13.GL_MULTISAMPLE);
+            }
         } catch (LWJGLException e) {
             LOGGER.error(e.getStackTrace());
         }

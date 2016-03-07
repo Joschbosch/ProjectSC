@@ -5,7 +5,7 @@
 package de.projectsc.core.events.entity.state;
 
 import de.projectsc.core.data.EntityEvent;
-import de.projectsc.core.entities.states.EntityStates;
+import de.projectsc.core.entities.states.EntityState;
 
 /**
  * Changes the state of an entity.
@@ -19,14 +19,14 @@ public class UpdateEntityStateEvent extends EntityEvent {
      */
     public static final String ID = UpdateEntityStateEvent.class.getName();
 
-    private final EntityStates entityState;
+    private final EntityState entityState;
 
-    public UpdateEntityStateEvent(String entityId, EntityStates newState) {
+    public UpdateEntityStateEvent(String entityId, EntityState newState) {
         super(ID, entityId);
         entityState = newState;
     }
 
-    public EntityStates getEntityState() {
+    public EntityState getEntityState() {
         return entityState;
     }
 

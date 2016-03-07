@@ -7,7 +7,10 @@ package de.projectsc.modes.server.game.ai;
 import de.projectsc.core.component.ComponentType;
 import de.projectsc.core.component.DefaultComponent;
 import de.projectsc.core.interfaces.Component;
-
+/**
+ * Component to add an AI control.
+ * @author Josch Bosch
+ */
 public class AIControlledComponent extends DefaultComponent {
 
     /**

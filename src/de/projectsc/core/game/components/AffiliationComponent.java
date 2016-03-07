@@ -7,7 +7,10 @@ package de.projectsc.core.game.components;
 import de.projectsc.core.component.DefaultComponent;
 import de.projectsc.core.game.Affiliation;
 import de.projectsc.core.interfaces.Component;
-
+/**
+ * Component to set affiliation of a unit. 
+ * @author Josch Bosch
+ */
 public class AffiliationComponent extends DefaultComponent {
 
     /**

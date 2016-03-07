@@ -11,6 +11,11 @@ import de.projectsc.core.component.ComponentType;
 import de.projectsc.core.component.DefaultComponent;
 import de.projectsc.core.interfaces.Component;
 
+/**
+ * Component that lets an entity follow a given path.
+ * 
+ * @author Josch Bosch
+ */
 public class FollowPathComponent extends DefaultComponent {
 
     /**

@@ -5,7 +5,7 @@
 package de.projectsc.core.game.systems;
 
 import de.projectsc.core.data.Event;
-import de.projectsc.core.entities.states.EntityStates;
+import de.projectsc.core.entities.states.EntityState;
 import de.projectsc.core.events.entity.game.ApplyDamageEvent;
 import de.projectsc.core.events.entity.game.DamageTakenEvent;
 import de.projectsc.core.events.entity.state.UpdateEntityStateEvent;
@@ -14,6 +14,11 @@ import de.projectsc.core.manager.EntityManager;
 import de.projectsc.core.manager.EventManager;
 import de.projectsc.core.systems.DefaultSystem;
 
+/**
+ * System for managing the all that has to do with health of entities (also armor etc.).
+ * 
+ * @author Josch Bosch
+ */
 public class HealthSystem extends DefaultSystem {
 
     private static final String NAME = "Health System";
@@ -39,7 +44,7 @@ public class HealthSystem extends DefaultSystem {
                 double currentHealth = hCmp.getCurrentHealth();
                 double newHealth = currentHealth - event.getDamage();
                 if (newHealth <= 0) {
-                    fireEvent(new UpdateEntityStateEvent(damagedEntity, EntityStates.DEAD));
+                    fireEvent(new UpdateEntityStateEvent(damagedEntity, EntityState.DEAD));
                 } else {
                     fireEvent(new DamageTakenEvent(damagedEntity, event.getEntityId(), newHealth, event.getDamage()));
                 }

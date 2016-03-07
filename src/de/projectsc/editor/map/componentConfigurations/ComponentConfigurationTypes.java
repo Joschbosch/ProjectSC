@@ -4,7 +4,7 @@
 
 package de.projectsc.editor.map.componentConfigurations;
 
-import de.projectsc.editor.map.ComponentConfiguration;
+import de.projectsc.editor.map.ComponentConfigurationPanel;
 import de.projectsc.modes.server.game.ai.PathPointComponent;
 
 /**
@@ -16,13 +16,13 @@ public enum ComponentConfigurationTypes {
     /**
      * Configuration of path points.
      */
-    PATH_POINT_COMPONENT_CONFIGURATION(PathPointComponent.NAME, PathPointComponentConfiguration.class);
+    PATH_POINT_COMPONENT_CONFIGURATION(PathPointComponent.NAME, PathPointComponentConfigurationPanel.class);
 
-    private Class<? extends ComponentConfiguration> clazz;
+    private Class<? extends ComponentConfigurationPanel> clazz;
 
     private String componentName;
 
-    ComponentConfigurationTypes(String componentName, Class<? extends ComponentConfiguration> viewClass) {
+    ComponentConfigurationTypes(String componentName, Class<? extends ComponentConfigurationPanel> viewClass) {
         this.componentName = componentName;
         this.clazz = viewClass;
     }
@@ -31,7 +31,7 @@ public enum ComponentConfigurationTypes {
         return componentName;
     }
 
-    public Class<? extends ComponentConfiguration> getComponentClass() {
+    public Class<? extends ComponentConfigurationPanel> getComponentClass() {
         return clazz;
     }
 }

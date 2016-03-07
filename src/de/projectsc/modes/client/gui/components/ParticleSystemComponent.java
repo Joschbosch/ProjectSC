@@ -52,7 +52,10 @@ public class ParticleSystemComponent extends GraphicalComponent {
             }
         }
     }
-
+    /**
+     * Update system.
+     * @param elapsed time
+     */
     public void update(long elapsed) {
         if (particleSystems.size() == 0) {
             addNewParticleSystem();
@@ -87,12 +90,13 @@ public class ParticleSystemComponent extends GraphicalComponent {
         offsets.put(particleSystem.getId(), new Vector3f(0, 0, 0));
     }
 
-    // TODO: make right
     @Override
     public Component cloneComponent() {
         ParticleSystemComponent target = new ParticleSystemComponent();
         for (ParticleSystem ps : particleSystems) {
             target.addNewParticleSystem();
+            ps.getSystemCenter();
+            System.out.println("TODO");
         }
         return target;
     }

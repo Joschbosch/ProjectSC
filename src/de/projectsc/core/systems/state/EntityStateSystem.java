@@ -7,7 +7,7 @@ package de.projectsc.core.systems.state;
 import de.projectsc.core.component.state.EntityStateComponent;
 import de.projectsc.core.data.EntityEvent;
 import de.projectsc.core.data.Event;
-import de.projectsc.core.entities.states.EntityStates;
+import de.projectsc.core.entities.states.EntityState;
 import de.projectsc.core.events.entity.state.NotifyEntitySelectionChangedEvent;
 import de.projectsc.core.events.entity.state.NotifyEntityStateChangedEvent;
 import de.projectsc.core.events.entity.state.UpdateEntitySelectionEvent;
@@ -61,7 +61,7 @@ public class EntityStateSystem extends DefaultSystem {
         EntityStateComponent component = getComponent(e.getEntityId(), EntityStateComponent.class);
         if (canChangeTo(e.getEntityState(), component)) {
             component.changeState(e.getEntityState());
-            if (component.getState() == EntityStates.MOVING) {
+            if (component.getState() == EntityState.MOVING) {
                 component.setMoved(true);
             } else {
                 component.setMoved(false);
@@ -70,7 +70,7 @@ public class EntityStateSystem extends DefaultSystem {
         }
     }
 
-    private boolean canChangeTo(EntityStates entityState, EntityStateComponent component) {
+    private boolean canChangeTo(EntityState entityState, EntityStateComponent component) {
         return true;
     }
 }

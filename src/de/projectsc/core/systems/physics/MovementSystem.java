@@ -16,7 +16,7 @@ import de.projectsc.core.component.state.EntityStateComponent;
 import de.projectsc.core.data.EntityEvent;
 import de.projectsc.core.data.Event;
 import de.projectsc.core.data.physics.Transform;
-import de.projectsc.core.entities.states.EntityStates;
+import de.projectsc.core.entities.states.EntityState;
 import de.projectsc.core.events.entity.actions.MoveEntityToAttackTargetEvent;
 import de.projectsc.core.events.entity.actions.MoveEntityToTargetAction;
 import de.projectsc.core.events.entity.movement.NotifyTransformUpdateEvent;
@@ -64,7 +64,7 @@ public class MovementSystem extends DefaultSystem {
     private void movementSystem(long tick) {
         Set<String> entities = entityManager.getEntitiesWithComponent(VelocityComponent.class);
         for (String entity : entities) {
-            EntityStates entityState = getComponent(entity, EntityStateComponent.class).getState();
+            EntityState entityState = getComponent(entity, EntityStateComponent.class).getState();
             if (canMove(entityState)) {
                 TransformComponent transformComp =
                     (TransformComponent) entityManager.getComponent(entity, TransformComponent.class);
@@ -75,23 +75,23 @@ public class MovementSystem extends DefaultSystem {
         }
     }
 
-    private void moveToTarget(long tick, String entity, EntityStates entityState, TransformComponent transformComp) {
+    private void moveToTarget(long tick, String entity, EntityState entityState, TransformComponent transformComp) {
         PathComponent pathComponent = getComponent(entity, PathComponent.class);
         VelocityComponent velocityComp = getComponent(entity, VelocityComponent.class);
         Vector3f currentTarget = pathComponent.getCurrentTarget();
         if (currentTarget != null
             && !isAtTarget(transformComp.getTransform().getPosition(), currentTarget)) {
-            if (entityState != EntityStates.MOVING) {
-                fireEvent(new UpdateEntityStateEvent(entity, EntityStates.MOVING));
+            if (entityState != EntityState.MOVING) {
+                fireEvent(new UpdateEntityStateEvent(entity, EntityState.MOVING));
             }
             velocityComp.setCurrentSpeed(velocityComp.getMaximumSpeed());
 
-        } else if (entityState != EntityStates.IDLING && entityState != EntityStates.DEAD) {
-            fireEvent(new UpdateEntityStateEvent(entity, EntityStates.IDLING));
+        } else if (entityState != EntityState.IDLING && entityState != EntityState.DEAD) {
+            fireEvent(new UpdateEntityStateEvent(entity, EntityState.IDLING));
             pathComponent.setCurrentTarget(null);
         }
 
-        if (entityState == EntityStates.MOVING) {
+        if (entityState == EntityState.MOVING) {
             updateVelocity(tick, transformComp.getTransform(), pathComponent, velocityComp);
             fireEvent(new NotifyVelocityUpdateEvent(entity));
             float angle = (float) Math.toDegrees(Math.atan2(velocityComp.getVelocity().x, velocityComp.getVelocity().z));
@@ -105,8 +105,8 @@ public class MovementSystem extends DefaultSystem {
         }
     }
 
-    private boolean canMove(EntityStates entityState) {
-        return entityState != EntityStates.DYING && entityState != EntityStates.DEAD;
+    private boolean canMove(EntityState entityState) {
+        return entityState != EntityState.DYING && entityState != EntityState.DEAD;
     }
 
     private void jumpingSystem(long tick) {

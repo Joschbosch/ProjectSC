@@ -119,13 +119,25 @@ public interface Component {
      * @param serial to read
      */
     void deserializeFromNetwork(String serial);
-
+    /**
+     * Make a clone of the current component. 
+     * @return the cloned component.
+     */
     Component cloneComponent();
-
+    /**
+     * Is the configuration for this component valid for saving. 
+     * @return true, if it is, false otherwise.
+     */
     boolean configurationValid();
-
+    /**
+     * Get the individual configuration of a component. 
+     * @return config
+     */
     Map<String, Object> getConfiguration();
-
+    /**
+     * Load the configuration of a component. 
+     * @param loadedConfiguration 
+     */
     void loadConfiguration(Map<String, Object> loadedConfiguration);
 
 }

@@ -176,7 +176,11 @@ public class EntityManager {
         }
         return null;
     }
-
+    /**
+     * Returns all entites that have the given component. 
+     * @param c component that an entity must have.
+     * @return set of entities.
+     */
     public Set<String> getEntitiesWithComponent(Class<? extends Component> c) {
         if (componentToEntities.get(c) == null) {
             return new HashSet<>();

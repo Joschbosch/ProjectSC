@@ -14,7 +14,7 @@ import de.projectsc.core.component.physic.VelocityComponent;
 import de.projectsc.core.component.state.EntityStateComponent;
 import de.projectsc.core.data.Event;
 import de.projectsc.core.data.physics.Transform;
-import de.projectsc.core.entities.states.EntityStates;
+import de.projectsc.core.entities.states.EntityState;
 import de.projectsc.core.events.entity.actions.BasicAttackEntityAction;
 import de.projectsc.core.events.entity.actions.MoveEntityToTargetAction;
 import de.projectsc.core.events.entity.game.ApplyDamageEvent;
@@ -25,6 +25,11 @@ import de.projectsc.core.manager.EntityManager;
 import de.projectsc.core.manager.EventManager;
 import de.projectsc.core.systems.DefaultSystem;
 
+/**
+ * System that defines the combat of the game. Might have subsystems.
+ * 
+ * @author Josch Bosch
+ */
 public class CombatSystem extends DefaultSystem {
 
     private static final String NAME = "Combat System";
@@ -64,8 +69,8 @@ public class CombatSystem extends DefaultSystem {
         }
     }
 
-    private boolean canAttack(EntityStates targetState) {
-        return targetState != EntityStates.DEAD && targetState != EntityStates.DYING;
+    private boolean canAttack(EntityState targetState) {
+        return targetState != EntityState.DEAD && targetState != EntityState.DYING;
     }
 
     private void calculateBasicAttack(long tick, String e, BasicAttackComponent attCmp) {
@@ -74,7 +79,7 @@ public class CombatSystem extends DefaultSystem {
         Transform targetTransform = getComponent(attCmp.getTarget(), TransformComponent.class).getTransform();
         boolean inAttackRange = Vector3f.sub(eTransform.getPosition(), targetTransform.getPosition(), null).length() < attCmp
             .getBasicAttackRange();
-        if (stateCmp.getState() == EntityStates.AUTO_ATTACKING) {
+        if (stateCmp.getState() == EntityState.AUTO_ATTACKING) {
             EntityStateComponent targetState = getComponent(attCmp.getTarget(), EntityStateComponent.class);
             long newAttackTime = attCmp.getAttackTime() + tick;
             if (newAttackTime >= attCmp.getBasicAttackDamageTime() && !attCmp.isDamageApplied()) {
@@ -87,27 +92,27 @@ public class CombatSystem extends DefaultSystem {
             }
 
             if (newAttackTime >= attCmp.getBasicAttackDuration()) {
-                if (targetState.getState() != EntityStates.DEAD) {
+                if (targetState.getState() != EntityState.DEAD) {
                     if (inAttackRange) {
                         newAttackTime -= attCmp.getBasicAttackDuration();
                         attCmp.setDamageApplied(false);
                     } else if (hasComponent(e, VelocityComponent.class)) {
-                        fireEvent(new UpdateEntityStateEvent(e, EntityStates.MOVE_TO_BASIC_ATTACK));
+                        fireEvent(new UpdateEntityStateEvent(e, EntityState.MOVING_TO_BASIC_ATTACK));
                         fireEvent(new MoveEntityToTargetAction(e, targetTransform.getPosition()));
                     } else {
-                        fireEvent(new UpdateEntityStateEvent(e, EntityStates.IDLING));
+                        fireEvent(new UpdateEntityStateEvent(e, EntityState.IDLING));
                     }
                 } else {
-                    fireEvent(new UpdateEntityStateEvent(e, EntityStates.IDLING));
+                    fireEvent(new UpdateEntityStateEvent(e, EntityState.IDLING));
                     attCmp.setTarget(null);
                 }
             }
             attCmp.setAttackTime(newAttackTime);
         }
 
-        if (stateCmp.getState() == EntityStates.MOVE_TO_BASIC_ATTACK) {
-            if (inAttackRange && (stateCmp.getState() == EntityStates.IDLING || stateCmp.getState() == EntityStates.MOVING)) {
-                fireEvent(new UpdateEntityStateEvent(e, EntityStates.AUTO_ATTACKING));
+        if (stateCmp.getState() == EntityState.MOVING_TO_BASIC_ATTACK) {
+            if (inAttackRange && (stateCmp.getState() == EntityState.IDLING || stateCmp.getState() == EntityState.MOVING)) {
+                fireEvent(new UpdateEntityStateEvent(e, EntityState.AUTO_ATTACKING));
                 attCmp.setAttackTime(0);
                 attCmp.setDamageApplied(false);
             }
@@ -148,17 +153,17 @@ public class CombatSystem extends DefaultSystem {
                 boolean inAttackRange =
                     Vector3f.sub(entityTransform.getPosition(), attackedEntityTransform.getPosition(), null).length() < attCmp
                         .getBasicAttackRange();
-                if (inAttackRange && (stateCmp.getState() == EntityStates.IDLING || stateCmp.getState() == EntityStates.MOVING)) {
-                    fireEvent(new UpdateEntityStateEvent(entityId, EntityStates.AUTO_ATTACKING));
+                if (inAttackRange && (stateCmp.getState() == EntityState.IDLING || stateCmp.getState() == EntityState.MOVING)) {
+                    fireEvent(new UpdateEntityStateEvent(entityId, EntityState.AUTO_ATTACKING));
                     attCmp.setAttackTime(0);
                     attCmp.setDamageApplied(false);
                     attCmp.setTarget(attackedEntityId);
                 } else if (!inAttackRange && hasComponent(entityId, VelocityComponent.class)) {
-                    fireEvent(new UpdateEntityStateEvent(entityId, EntityStates.MOVE_TO_BASIC_ATTACK));
+                    fireEvent(new UpdateEntityStateEvent(entityId, EntityState.MOVING_TO_BASIC_ATTACK));
                     fireEvent(new MoveEntityToTargetAction(entityId, attackedEntityTransform.getPosition()));
                     attCmp.setTarget(attackedEntityId);
                 } else if (!inAttackRange) {
-                    fireEvent(new UpdateEntityStateEvent(entityId, EntityStates.IDLING));
+                    fireEvent(new UpdateEntityStateEvent(entityId, EntityState.IDLING));
                     attCmp.setTarget(null);
                 }
             }

@@ -8,6 +8,11 @@ import de.projectsc.core.component.ComponentType;
 import de.projectsc.core.component.DefaultComponent;
 import de.projectsc.core.interfaces.Component;
 
+/**
+ * Component to add a basic attack (melee/ranged) to a unit.
+ * 
+ * @author Josch Bosch
+ */
 public class BasicAttackComponent extends DefaultComponent {
 
     /**

@@ -6,6 +6,11 @@ package de.projectsc.core.events.entity.game;
 
 import de.projectsc.core.data.EntityEvent;
 
+/**
+ * Event that damage should be applied.
+ * 
+ * @author Josch Bosch
+ */
 public class ApplyDamageEvent extends EntityEvent {
 
     /**

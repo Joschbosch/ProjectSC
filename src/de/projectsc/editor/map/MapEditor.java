@@ -296,6 +296,11 @@ public class MapEditor extends JFrame {
         }
     }
 
+    /**
+     * Change selection of entity.
+     * 
+     * @param e new selection.
+     */
     public void selectionChanged(String e) {
         configurationPanel.removeAll();
         if (e == null || e.isEmpty()) {

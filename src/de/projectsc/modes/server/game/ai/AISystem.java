@@ -15,7 +15,7 @@ import de.projectsc.core.component.physic.VelocityComponent;
 import de.projectsc.core.component.state.EntityStateComponent;
 import de.projectsc.core.data.Event;
 import de.projectsc.core.data.physics.Transform;
-import de.projectsc.core.entities.states.EntityStates;
+import de.projectsc.core.entities.states.EntityState;
 import de.projectsc.core.events.entity.actions.BasicAttackEntityAction;
 import de.projectsc.core.events.entity.actions.MoveEntityToTargetAction;
 import de.projectsc.core.events.entity.movement.NotifyTransformUpdateEvent;
@@ -29,18 +29,20 @@ import de.projectsc.core.manager.EventManager;
 import de.projectsc.core.systems.DefaultSystem;
 import de.projectsc.core.systems.physics.collision.CollisionSystem;
 
+/**
+ * Main class for the AI in the game. May have sub classes (for basic AI/Game dependent AI).
+ * 
+ * @author Josch Bosch
+ */
 public class AISystem extends DefaultSystem {
 
     private static final String NAME = "AI System";
-
-    private CollisionSystem collisionSystem;
 
     public AISystem(EntityManager entityManager, EventManager eventManager, CollisionSystem collisionSystem) {
         super(NAME, entityManager, eventManager);
         eventManager.registerForEvent(NotifyTransformUpdateEvent.class, this);
         // should not be here
         eventManager.registerForEvent(NotifyEntityStateChangedEvent.class, this);
-        this.collisionSystem = collisionSystem;
     }
 
     @Override
@@ -80,17 +82,17 @@ public class AISystem extends DefaultSystem {
                 Transform pointTransform = getComponent(pathPoint, TransformComponent.class).getTransform();
                 EntityStateComponent esc = getComponent(e, EntityStateComponent.class);
                 if (Vector3f.sub(followerTransform.getPosition(), pointTransform.getPosition(), null).length() < 2
-                    && esc.getState() == EntityStates.MOVING) {
-                    fireEvent(new UpdateEntityStateEvent(e, EntityStates.IDLING));
+                    && esc.getState() == EntityState.MOVING) {
+                    fireEvent(new UpdateEntityStateEvent(e, EntityState.IDLING));
                     fpc.setNextPathPoint(fpc.getNextPathPoint() + 1);
                 }
-                if (esc.getState() == EntityStates.IDLING) {
+                if (esc.getState() == EntityState.IDLING) {
                     fireEvent(new MoveEntityToTargetAction(e, pointTransform.getPosition()));
                 }
             }
         }
         if (!foundNext) {
-            fireEvent(new UpdateEntityStateEvent(e, EntityStates.IDLING));
+            fireEvent(new UpdateEntityStateEvent(e, EntityState.IDLING));
         }
     }
 
@@ -98,16 +100,16 @@ public class AISystem extends DefaultSystem {
         OverwatchComponent owc = getComponent(e, OverwatchComponent.class);
         EntityStateComponent stateCmp = getComponent(e, EntityStateComponent.class);
         if (owc != null) {
-            if (stateCmp.getState() == EntityStates.IDLING) {
+            if (stateCmp.getState() == EntityState.IDLING) {
                 findEnemyToAttack(e, owc);
-            } else if (stateCmp.getState() == EntityStates.AUTO_ATTACKING) {
+            } else if (stateCmp.getState() == EntityState.AUTO_ATTACKING) {
                 BasicAttackComponent bac = getComponent(e, BasicAttackComponent.class);
                 if (entityManager.getEntity(bac.getTarget()) == null
-                    || getComponent(bac.getTarget(), EntityStateComponent.class).getState() == EntityStates.DEAD
-                    || getComponent(bac.getTarget(), EntityStateComponent.class).getState() == EntityStates.DYING) {
+                    || getComponent(bac.getTarget(), EntityStateComponent.class).getState() == EntityState.DEAD
+                    || getComponent(bac.getTarget(), EntityStateComponent.class).getState() == EntityState.DYING) {
                     owc.removeOtherEntity(bac.getTarget());
                     bac.setTarget(null);
-                    fireEvent(new UpdateEntityStateEvent(e, EntityStates.IDLING));
+                    fireEvent(new UpdateEntityStateEvent(e, EntityState.IDLING));
 
                 }
             }
@@ -141,8 +143,8 @@ public class AISystem extends DefaultSystem {
         }
     }
 
-    private boolean canAttack(String target, EntityStates state) {
-        return state != EntityStates.DYING && state != EntityStates.DEAD;
+    private boolean canAttack(String target, EntityState state) {
+        return state != EntityState.DYING && state != EntityState.DEAD;
     }
 
     @Override
@@ -173,13 +175,13 @@ public class AISystem extends DefaultSystem {
             String entityId = ((NotifyEntityStateChangedEvent) e).getEntityId();
             EntityStateComponent entityStateComp =
                 getComponent(entityId, EntityStateComponent.class);
-            if (entityStateComp.getState() == EntityStates.DEAD) {
+            if (entityStateComp.getState() == EntityState.DEAD) {
                 entityManager.deleteEntity(entityId);
 
             }
-            if (entityStateComp.getState() == EntityStates.IDLING) {
+            if (entityStateComp.getState() == EntityState.IDLING) {
                 if (hasComponent(entityId, BasicAttackComponent.class)) {
-                    // checkEntitiesInRange();
+                    getComponent(entityId, BasicAttackComponent.class);
                 }
             }
         }

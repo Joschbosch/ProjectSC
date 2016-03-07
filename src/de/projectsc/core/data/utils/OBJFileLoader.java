@@ -33,6 +33,8 @@ import de.projectsc.core.data.physics.Vertex;
  */
 public final class OBJFileLoader {
 
+    private static final String ESCAPE_WHITSPACE_CHAR = "\\s";
+
     private static final Log LOGGER = LogFactory.getLog(OBJFileLoader.class);
 
     private static final String FACE_SEPERATION_CHAR = "/";
@@ -102,7 +104,7 @@ public final class OBJFileLoader {
             while (true) {
                 line = reader.readLine();
                 if (line.startsWith("v ")) {
-                    String[] currentLine = line.split("\\s");
+                    String[] currentLine = line.split(ESCAPE_WHITSPACE_CHAR);
                     Vector3f vertex = new Vector3f(Float.valueOf(currentLine[1]),
                         Float.valueOf(currentLine[2]),
                         Float.valueOf(currentLine[3]));
@@ -130,9 +132,9 @@ public final class OBJFileLoader {
                 String[] vertex2 = currentLine[2].split(FACE_SEPERATION_CHAR);
                 String[] vertex3 = currentLine[3].split(FACE_SEPERATION_CHAR);
                 if (vertex1.length < 3) {
-                    vertex1 = currentLine[1].split("\\s");
-                    vertex2 = currentLine[2].split("\\s");
-                    vertex3 = currentLine[3].split("\\s");
+                    vertex1 = currentLine[1].split(ESCAPE_WHITSPACE_CHAR);
+                    vertex2 = currentLine[2].split(ESCAPE_WHITSPACE_CHAR);
+                    vertex3 = currentLine[3].split(ESCAPE_WHITSPACE_CHAR);
                 }
                 Vertex v0 = processVertex(vertex1, vertices, indices);
                 Vertex v1 = processVertex(vertex2, vertices, indices);

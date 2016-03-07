@@ -46,7 +46,9 @@ public class MeshComponent extends PhysicsComponent {
     public boolean isValidForEntitySaving() {
         return model != null;
     }
-
+    /**
+     * Load up the model of a mesh.
+     */
     public void loadModel() {
         if (modelPath != null) {
             loadModel(modelPath);

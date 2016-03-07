@@ -88,7 +88,9 @@ public class MeshRendererComponent extends GraphicalComponent {
     public void setTexturedModel(TexturedModel texturedModel) {
         this.texturedModel = texturedModel;
     }
-
+    /**
+     * Load a mesh model and its texture.
+     */
     public void load() {
         if (owner != null && model == null && owner.hasComponent(MeshComponent.class)) {
             ModelData mesh = ((MeshComponent) owner.getComponent(MeshComponent.class)).getModel();

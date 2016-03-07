@@ -46,7 +46,6 @@ import de.projectsc.core.interfaces.Component;
 import de.projectsc.core.manager.ComponentManager;
 import de.projectsc.core.manager.EntityManager;
 import de.projectsc.core.manager.EventManager;
-import de.projectsc.core.systems.physics.MovementSystem;
 import de.projectsc.core.systems.physics.collision.CollisionSystem;
 import de.projectsc.core.systems.state.EntityStateSystem;
 import de.projectsc.core.terrain.Terrain;
@@ -115,8 +114,6 @@ public class MapEditorGraphicsCore implements Runnable {
 
     private RenderingSystem renderSystem;
 
-    private MovementSystem physicsSystem;
-
     private ComponentManager componentManager;
 
     private FontRenderer fontRenderer;
@@ -136,6 +133,8 @@ public class MapEditorGraphicsCore implements Runnable {
     private boolean rightDown = false;
 
     private MapEditor parentEditor;
+
+    private EntityStateSystem entityStateSystem;
 
     public MapEditorGraphicsCore(MapEditor mapEditor, Canvas displayParent, int width, int height, BlockingQueue<String> messageQueue,
         ComponentManager componentManager, EntityManager entityManager, EventManager eventManager) {
@@ -164,8 +163,7 @@ public class MapEditorGraphicsCore implements Runnable {
         } catch (LWJGLException e) {
         }
         loadGUIComponents();
-        new EntityStateSystem(entityManager, eventManager);
-        physicsSystem = new MovementSystem(entityManager, eventManager);
+        entityStateSystem = new EntityStateSystem(entityManager, eventManager);
         collisionSystem = new CollisionSystem(entityManager, eventManager);
         renderSystem = new RenderingSystem(entityManager, eventManager);
         inputSystem = new InputSystem();
@@ -241,7 +239,7 @@ public class MapEditorGraphicsCore implements Runnable {
             // physicsSystem.update(timer.getDelta());
             collisionSystem.update(timer.getDelta());
             renderSystem.update(timer.getDelta());
-
+            entityStateSystem.update(timer.getDelta());
             GUIText fps =
                 TextMaster.createAndLoadText("FPS: " + timer.getCurrentFPS(), 0.7f, FontStore.getFont(Font.CANDARA),
                     new Vector2f(0.0f, 0.0f), 5, false);

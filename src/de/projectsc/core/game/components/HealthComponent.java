@@ -9,6 +9,11 @@ import de.projectsc.core.component.ComponentType;
 import de.projectsc.core.component.DefaultComponent;
 import de.projectsc.core.interfaces.Component;
 
+/**
+ * Component to add health to an entity (that makes if attackable and more..).
+ * 
+ * @author Josch Bosch
+ */
 public class HealthComponent extends DefaultComponent {
 
     /**
@@ -16,11 +21,11 @@ public class HealthComponent extends DefaultComponent {
      */
     public static final String NAME = "Health Component";
 
-    public double maxHealth = 100;
+    private double maxHealth = 100;
 
-    public double currentHealth = 100;
+    private double currentHealth = 100;
 
-    public double currentRegenerationRate = 5; // HP/s
+    private double currentRegenerationRate = 5; // HP/s
 
     public HealthComponent() {
         setComponentName(NAME);

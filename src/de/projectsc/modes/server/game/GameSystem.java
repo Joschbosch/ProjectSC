@@ -16,6 +16,11 @@ import de.projectsc.core.systems.DefaultSystem;
 import de.projectsc.modes.server.game.ai.FollowPathComponent;
 import de.projectsc.modes.server.game.elementComponents.SpawnEntitiesComponent;
 
+/**
+ * System to handle everything that has to do with the game mechanics. Might have sub systems.
+ * 
+ * @author Josch Bosch
+ */
 public class GameSystem extends DefaultSystem {
 
     private static final String NAME = "Game System";

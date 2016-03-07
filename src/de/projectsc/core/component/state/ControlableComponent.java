@@ -8,6 +8,11 @@ import de.projectsc.core.component.ComponentType;
 import de.projectsc.core.component.DefaultComponent;
 import de.projectsc.core.interfaces.Component;
 
+/**
+ * Component that flags, if an entity can be controlled by the player.
+ * 
+ * @author Josch Bosch
+ */
 public class ControlableComponent extends DefaultComponent {
 
     /**

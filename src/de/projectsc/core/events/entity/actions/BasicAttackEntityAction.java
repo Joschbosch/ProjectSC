@@ -6,6 +6,11 @@ package de.projectsc.core.events.entity.actions;
 
 import de.projectsc.core.data.EntityEvent;
 
+/**
+ * Action that a basic attack started.
+ * 
+ * @author Josch Bosch
+ */
 public class BasicAttackEntityAction extends EntityEvent {
 
     /**

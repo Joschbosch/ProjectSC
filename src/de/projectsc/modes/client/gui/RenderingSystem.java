@@ -121,13 +121,13 @@ public class RenderingSystem extends DefaultSystem {
         GUIScene scene = new GUIScene();
         for (String entity : entities) {
             Map<String, Component> allComponents = entityManager.getAllComponents(entity);
-            for (Component c : allComponents.values()) {
+            allComponents.values().forEach((Component c) -> {
                 if (c instanceof GraphicalComponent) {
                     GraphicalComponent gc = (GraphicalComponent) c;
                     gc.render(entity, scene);
                 }
                 c.addSceneInformation(scene);
-            }
+            });
             Transform pc = entityManager.getEntity(entity).getTransform();
             scene.getPositions().put(entity, pc.getPosition());
             scene.getRotations().put(entity, pc.getRotation());

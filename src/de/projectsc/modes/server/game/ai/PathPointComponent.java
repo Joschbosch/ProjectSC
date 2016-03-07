@@ -10,7 +10,10 @@ import java.util.Map;
 import de.projectsc.core.component.ComponentType;
 import de.projectsc.core.component.DefaultComponent;
 import de.projectsc.core.interfaces.Component;
-
+/**
+ * Component that defines this entity as a path point. 
+ * @author Josch Bosch
+ */
 public class PathPointComponent extends DefaultComponent {
 
     /**

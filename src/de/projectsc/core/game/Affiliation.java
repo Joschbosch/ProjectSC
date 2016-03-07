@@ -3,7 +3,13 @@
  */
 
 package de.projectsc.core.game;
-
+/**
+ * Enum for the affiliation a unit can have.
+ * @author Josch Bosch
+ */
 public enum Affiliation {
-    RED, BLUE, NEUTRAL, ALL
+    /**
+     * Affialiations.
+     */
+    RED, BLUE, NEUTRAL, ALL, NONE
 }
