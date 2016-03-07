@@ -10,6 +10,7 @@ import java.util.Map;
 import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.core.component.ComponentType;
+import de.projectsc.core.component.DefaultComponent;
 import de.projectsc.core.data.physics.Transform;
 import de.projectsc.core.interfaces.Component;
 
@@ -18,7 +19,7 @@ import de.projectsc.core.interfaces.Component;
  * 
  * @author Josch Bosch
  */
-public class TransformComponent extends PhysicsComponent {
+public class TransformComponent extends DefaultComponent {
 
     /**
      * ID.

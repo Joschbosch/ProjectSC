@@ -86,14 +86,13 @@ public class SkyboxShader extends Shader {
     }
 
     /**
-     * Load up view matrix which is altered before so that the skybox is always relative to the
-     * camera and rotates a bit.
+     * Load up view matrix which is altered before so that the skybox is always relative to the camera and rotates a bit.
      * 
      * @param camera cam
      * @param delta time elapsed
      */
     public void loadViewMatrix(Camera camera, long delta) {
-        Matrix4f matrix = camera.createViewMatrix();
+        Matrix4f matrix = new Matrix4f(camera.getViewMatrix());
         matrix.m30 = 0;
         matrix.m31 = 0;
         matrix.m32 = 0;

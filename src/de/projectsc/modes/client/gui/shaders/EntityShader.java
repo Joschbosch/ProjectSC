@@ -6,6 +6,7 @@
 package de.projectsc.modes.client.gui.shaders;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -198,21 +199,24 @@ public class EntityShader extends Shader {
      * @param camera for information
      */
     public void loadViewMatrix(Camera camera) {
-        super.loadMatrix(locationViewMatrix, camera.createViewMatrix());
+        super.loadMatrix(locationViewMatrix, camera.getViewMatrix());
     }
 
     /**
      * Loads up lights to the shader.
      *
      * @param lights to load
+     * @param entityPositions to calculate real position
      * @param viewMatrix for calculation
      */
-    public void loadLights(List<Light> lights, Matrix4f viewMatrix) {
+    public void loadLights(List<Light> lights, Map<String, Vector3f> entityPositions, Matrix4f viewMatrix) {
         for (int i = 0; i < MAX_LIGHTS; i++) {
             if (i < lights.size()) {
-                loadVector(locationLightPositionEyeSpace[i], getEyeSpacePosition(lights.get(i), viewMatrix));
-                loadVector(locationLightColor[i], lights.get(i).getColor());
-                loadVector(locationAttenuation[i], lights.get(i).getAttenuation());
+                Light light = lights.get(i);
+                loadVector(locationLightPositionEyeSpace[i],
+                    getEyeSpacePosition(light, entityPositions.get(light.getEntity()), viewMatrix));
+                loadVector(locationLightColor[i], light.getColor());
+                loadVector(locationAttenuation[i], light.getAttenuation());
             } else {
                 loadVector(locationLightPositionEyeSpace[i], new Vector3f(0.0f, 0.0f, 0.0f));
                 loadVector(locationLightColor[i], new Vector3f(0.0f, 0.0f, 0.0f));
@@ -222,8 +226,8 @@ public class EntityShader extends Shader {
 
     }
 
-    private Vector3f getEyeSpacePosition(Light light, Matrix4f viewMatrix) {
-        Vector3f position = light.getPosition();
+    private Vector3f getEyeSpacePosition(Light light, Vector3f entityPosition, Matrix4f viewMatrix) {
+        Vector3f position = Vector3f.add(light.getPosition(), entityPosition, null);
         Vector4f eyeSpacePos = new Vector4f(position.x, position.y, position.z, 1f);
         Matrix4f.transform(viewMatrix, eyeSpacePos, eyeSpacePos);
         return new Vector3f(eyeSpacePos);

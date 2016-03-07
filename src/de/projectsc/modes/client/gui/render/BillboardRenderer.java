@@ -63,7 +63,7 @@ public class BillboardRenderer {
         for (Billboard board : billboards) {
             GL13.glActiveTexture(GL13.GL_TEXTURE0);
             GL11.glBindTexture(GL11.GL_TEXTURE_2D, board.getTexture());
-            shader.loadPositionAttributes(camera.createViewMatrix(), projectionMatrix);
+            shader.loadPositionAttributes(camera.getViewMatrix(), projectionMatrix);
             shader.loadBillboardAttributes(board.getPosition(), board.getSize());
             GL11.glDrawArrays(GL11.GL_TRIANGLE_STRIP, 0, quad.getVertexCount());
         }

@@ -11,8 +11,8 @@ import java.util.Map;
 
 import org.lwjgl.util.vector.Vector3f;
 
-import de.projectsc.core.data.Scene;
 import de.projectsc.core.data.objects.Light;
+import de.projectsc.core.data.physics.WireFrame;
 import de.projectsc.modes.client.gui.models.TexturedModel;
 import de.projectsc.modes.client.gui.objects.billboards.Billboard;
 import de.projectsc.modes.client.gui.objects.terrain.TerrainModel;
@@ -23,7 +23,7 @@ import de.projectsc.modes.client.gui.objects.terrain.TerrainModel;
  * 
  * @author Josch Bosch
  */
-public class GUIScene extends Scene {
+public class GUIScene {
 
     private List<TerrainModel> terrains;
 
@@ -44,6 +44,16 @@ public class GUIScene extends Scene {
     private Vector3f fogColor = null;
 
     private Vector3f skyColor = null;
+
+    private boolean wireframeEnabled = true;
+
+    private boolean isDebugMode = true;
+
+    private List<WireFrame> wireFrames = new LinkedList<>();
+
+    private List<String> selectedEntites = new LinkedList<>();
+
+    private List<String> highlightedEntities = new LinkedList<>();
 
     public GUIScene() {
         super();
@@ -140,6 +150,50 @@ public class GUIScene extends Scene {
 
     public void setSkyColor(Vector3f skyColor) {
         this.skyColor = skyColor;
+    }
+
+    public boolean isWireframeEnabled() {
+        return wireframeEnabled;
+    }
+
+    public void setWireframeEnabled(boolean wireframeEnabled) {
+        this.wireframeEnabled = wireframeEnabled;
+    }
+
+    public boolean isDebugMode() {
+        return isDebugMode;
+    }
+
+    public void setDebugMode(boolean debugMode) {
+        this.isDebugMode = debugMode;
+    }
+
+    public List<WireFrame> getWireFrames() {
+        return wireFrames;
+    }
+
+    public void setWireFrames(List<WireFrame> wireFrames) {
+        this.wireFrames = wireFrames;
+    }
+
+    public List<String> getSelectedEntites() {
+        return selectedEntites;
+    }
+
+    public void setSelectedEntites(List<String> selectedEntites) {
+        this.selectedEntites = selectedEntites;
+    }
+
+    public List<String> getHightlightedEntites() {
+        return highlightedEntities;
+    }
+
+    public void setHighlightedEntities(List<String> highlightedEntities) {
+        this.highlightedEntities = highlightedEntities;
+    }
+
+    public boolean isRenderSkybox() {
+        return renderSkybox;
     }
 
 }

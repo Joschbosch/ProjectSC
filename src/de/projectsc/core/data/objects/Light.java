@@ -22,19 +22,24 @@ public class Light implements Comparable<Light> {
 
     private String name;
 
-    public Light(Vector3f position, Vector3f color, String name) {
+    private String entity;
+
+    public Light(String entity, Vector3f position, Vector3f color, String name) {
         super();
         this.position = position;
         this.color = color;
         this.setName(name);
+        this.setEntity(entity);
+
     }
 
-    public Light(Vector3f position, Vector3f color, Vector3f attenuation, String name) {
+    public Light(String entity, Vector3f position, Vector3f color, Vector3f attenuation, String name) {
         super();
         this.position = position;
         this.color = color;
         this.setAttenuation(attenuation);
         this.name = name;
+        this.setEntity(entity);
     }
 
     public Vector3f getPosition() {
@@ -77,6 +82,14 @@ public class Light implements Comparable<Light> {
     @Override
     public int compareTo(Light o) {
         return getName().compareTo(o.getName());
+    }
+
+    public String getEntity() {
+        return entity;
+    }
+
+    public void setEntity(String entity) {
+        this.entity = entity;
     }
 
 }

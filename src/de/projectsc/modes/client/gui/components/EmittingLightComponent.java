@@ -14,19 +14,16 @@ import java.util.Map;
 import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.core.component.ComponentType;
-import de.projectsc.core.data.Scene;
+import de.projectsc.core.component.DefaultComponent;
 import de.projectsc.core.data.objects.Light;
-import de.projectsc.core.data.physics.WireFrame;
-import de.projectsc.core.data.utils.LightSerializationUtils;
 import de.projectsc.core.interfaces.Component;
-import de.projectsc.modes.client.gui.data.GUIScene;
 
 /**
  * Entity component to allow entities having lights.
  * 
  * @author Josch Bosch
  */
-public class EmittingLightComponent extends GraphicalComponent {
+public class EmittingLightComponent extends DefaultComponent {
 
     /**
      * Name.
@@ -35,31 +32,9 @@ public class EmittingLightComponent extends GraphicalComponent {
 
     private final List<Light> lights = new LinkedList<>();
 
-    private final Map<Light, Vector3f> offsets = new HashMap<>();
-
     public EmittingLightComponent() {
         setComponentName(NAME);
         setType(ComponentType.GRAPHICS);
-    }
-
-    @Override
-    public void render(String entity, GUIScene scene) {
-        for (Light l : lights) {
-            Vector3f currentPosition = new Vector3f(owner.getTransform().getPosition());
-            currentPosition.x += offsets.get(l).getX();
-            currentPosition.y += offsets.get(l).getY();
-            currentPosition.z += offsets.get(l).getZ();
-            l.setPosition(currentPosition);
-        }
-        scene.getLights().addAll(getLights());
-    }
-
-    @Override
-    public void addSceneInformation(Scene scene) {
-        for (Light l : lights) {
-            WireFrame w = new WireFrame(WireFrame.SPHERE, l.getPosition(), new Vector3f(0, 0, 0), new Vector3f(1, 1, 1));
-            scene.getWireFrames().add(w);
-        }
     }
 
     /**
@@ -89,7 +64,6 @@ public class EmittingLightComponent extends GraphicalComponent {
      * @param light to add
      */
     public void addLight(String entity, Vector3f position, Light light) {
-        offsets.put(light, light.getPosition());
         light.setPosition(Vector3f.add(new Vector3f(position), new Vector3f(light.getPosition()), null));
         lights.add(light);
     }
@@ -100,7 +74,7 @@ public class EmittingLightComponent extends GraphicalComponent {
      * @param color of the light
      * @param name of the light
      */
-    public void createAndAddLight(long entity, Vector3f position, Vector3f color, String name) {
+    public void createAndAddLight(String entity, Vector3f position, Vector3f color, String name) {
         createAndAddLight(entity, new Vector3f(position), new Vector3f(0, 0, 0), color, new Vector3f(1.0f, 0, 0), name);
     }
 
@@ -111,7 +85,7 @@ public class EmittingLightComponent extends GraphicalComponent {
      * @param offset position.
      * @param name of the light
      */
-    public void createAndAddLight(long entity, Vector3f position, Vector3f offset, Vector3f color, String name) {
+    public void createAndAddLight(String entity, Vector3f position, Vector3f offset, Vector3f color, String name) {
         createAndAddLight(entity, new Vector3f(position), offset, color, new Vector3f(1.0f, 0, 0), name);
     }
 
@@ -123,10 +97,9 @@ public class EmittingLightComponent extends GraphicalComponent {
      * @param attenuation for the light
      * @param name of the light
      */
-    public void createAndAddLight(long entity, Vector3f position, Vector3f offset, Vector3f color, Vector3f attenuation, String name) {
-        Light l = new Light(Vector3f.add(new Vector3f(position), offset, null), color, attenuation, name);
+    public void createAndAddLight(String entity, Vector3f position, Vector3f offset, Vector3f color, Vector3f attenuation, String name) {
+        Light l = new Light(entity, Vector3f.add(new Vector3f(position), offset, null), color, attenuation, name);
         lights.add(l);
-        offsets.put(l, offset);
     }
 
     /**
@@ -134,7 +107,6 @@ public class EmittingLightComponent extends GraphicalComponent {
      */
     public void removeLight(Light l) {
         lights.remove(l);
-        offsets.remove(l);
     }
 
     private Vector3f readVector(Map<String, List<Double>> map, String name) {
@@ -161,16 +133,8 @@ public class EmittingLightComponent extends GraphicalComponent {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Map<String, Object> serialize(File savingLocation) {
-        Map<String, Object> serializedLights = LightSerializationUtils.createSerializableMap(lights);
-        for (Light l : offsets.keySet()) {
-            Map<String, Float[]> values = (Map<String, Float[]>) serializedLights.get(l.getName());
-            if (values != null) {
-                values.put("offset", new Float[] { offsets.get(l).x, offsets.get(l).y, offsets.get(l).z });
-            }
-        }
-        return serializedLights;
+        return new HashMap<>();
     }
 
     @SuppressWarnings("unchecked")
@@ -180,9 +144,8 @@ public class EmittingLightComponent extends GraphicalComponent {
             Vector3f position = readVector((Map<String, List<Double>>) serialized.get(lightName), "position");
             Vector3f color = readVector((Map<String, List<Double>>) serialized.get(lightName), "color");
             Vector3f attenuation = readVector((Map<String, List<Double>>) serialized.get(lightName), "attenuation");
-            Light l = new Light(position, color, attenuation, lightName);
+            Light l = new Light(owner.getID(), position, color, attenuation, lightName);
             lights.add(l);
-            offsets.put(l, readVector((Map<String, List<Double>>) serialized.get(lightName), "offset"));
         }
     }
 

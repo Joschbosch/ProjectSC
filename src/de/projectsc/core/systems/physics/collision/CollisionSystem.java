@@ -14,9 +14,7 @@ import de.projectsc.core.component.collision.ColliderComponent;
 import de.projectsc.core.component.state.EntityStateComponent;
 import de.projectsc.core.data.EntityEvent;
 import de.projectsc.core.data.Event;
-import de.projectsc.core.data.Scene;
 import de.projectsc.core.data.physics.AxisAlignedBoundingBox;
-import de.projectsc.core.data.physics.WireFrame;
 import de.projectsc.core.events.entity.component.ComponentAddedEvent;
 import de.projectsc.core.events.entity.component.ComponentRemovedEvent;
 import de.projectsc.core.events.entity.objects.NotifyEntityDeletedEvent;
@@ -116,21 +114,7 @@ public class CollisionSystem extends DefaultSystem {
         }
     }
 
-    /**
-     * Add debug information to scene.
-     * 
-     * @param scene to add to
-     */
-    public void debug(Scene scene) {
-        List<AxisAlignedBoundingBox> boxes = octree.getBoxes();
-        for (AxisAlignedBoundingBox box : boxes) {
-            Vector3f size = new Vector3f(box.getSize());
-            size.scale(0.5f);
-            Vector3f position = new Vector3f(box.getCenter());
-            position.y = position.y - size.y;
-            WireFrame wf = new WireFrame(WireFrame.CUBE, position, new Vector3f(), box.getSize());
-            wf.setColor(new Vector3f(0.0f, 1f, 0));
-            scene.getWireFrames().add(wf);
-        }
+    public OctTree<Entity> getOctree() {
+        return octree;
     }
 }

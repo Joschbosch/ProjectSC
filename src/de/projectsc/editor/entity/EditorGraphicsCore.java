@@ -179,9 +179,9 @@ public class EditorGraphicsCore implements Runnable {
             collisionSystem.update(timer.getDelta());
             renderSystem.update(timer.getDelta());
             cycleTextures(0, timer.getDelta());
-            mousePicker.update(getTerrains(), camera.getPosition(), camera.createViewMatrix());
+            mousePicker.update(getTerrains(), camera.getPosition(), camera.getViewMatrix());
             if (doRender.get()) {
-                GUIScene s = renderSystem.createScene();
+                GUIScene s = renderSystem.createScene(collisionSystem.getOctree());
                 s.setTerrains(terrainModels);
                 s.setRenderSkybox(renderSkybox);
                 masterRenderer.renderScene(s, camera, timer.getDelta(), new Vector4f(0, 100000000, 0, 100000000));
@@ -209,7 +209,7 @@ public class EditorGraphicsCore implements Runnable {
             (EmittingLightComponent) entityManager.addComponentToEntity(sun,
                 GraphicalComponentImplementation.EMMITING_LIGHT_COMPONENT.getName());
         Transform position = entityManager.getEntity(sun).getTransform();
-        Light light = new Light(new Vector3f(position.getPosition()), new Vector3f(1.0f, 1.0f, 1.0f), "sun");
+        Light light = new Light(sun, new Vector3f(position.getPosition()), new Vector3f(1.0f, 1.0f, 1.0f), "sun");
         light.setAttenuation(new Vector3f(1, 0, 0));
         lightComponent.addLight(sun, new Vector3f(position.getPosition()), light);
         entityManager.addComponentToEntity(sun, ColliderComponent.NAME);

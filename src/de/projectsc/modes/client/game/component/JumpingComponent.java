@@ -5,7 +5,7 @@
 package de.projectsc.modes.client.game.component;
 
 import de.projectsc.core.component.ComponentType;
-import de.projectsc.core.component.physic.PhysicsComponent;
+import de.projectsc.core.component.DefaultComponent;
 import de.projectsc.core.interfaces.Component;
 
 /**
@@ -13,7 +13,7 @@ import de.projectsc.core.interfaces.Component;
  * 
  * @author Josch Bosch
  */
-public class JumpingComponent extends PhysicsComponent {
+public class JumpingComponent extends DefaultComponent {
 
     /**
      * ID.

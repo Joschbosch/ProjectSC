@@ -12,10 +12,8 @@ import java.util.Map;
 import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.core.component.ComponentType;
-import de.projectsc.core.data.Scene;
-import de.projectsc.core.data.physics.WireFrame;
+import de.projectsc.core.component.DefaultComponent;
 import de.projectsc.core.interfaces.Component;
-import de.projectsc.modes.client.gui.data.GUIScene;
 import de.projectsc.modes.client.gui.objects.particles.ParticleSystem;
 import de.projectsc.modes.client.gui.objects.particles.ParticleTexture;
 import de.projectsc.modes.client.gui.utils.Loader;
@@ -25,7 +23,7 @@ import de.projectsc.modes.client.gui.utils.Loader;
  * 
  * @author Josch Bosch
  */
-public class ParticleSystemComponent extends GraphicalComponent {
+public class ParticleSystemComponent extends DefaultComponent {
 
     /**
      * Name.
@@ -39,32 +37,6 @@ public class ParticleSystemComponent extends GraphicalComponent {
     public ParticleSystemComponent() {
         setComponentName(NAME);
         setType(ComponentType.GRAPHICS);
-
-    }
-
-    @Override
-    public void render(String entity, GUIScene scene) {
-        for (ParticleSystem s : particleSystems) {
-            if (offsets.get(s.getId()) != null && owner.getTransform() != null) {
-                Vector3f position =
-                    Vector3f.add(owner.getTransform().getPosition(), offsets.get(s.getId()), null);
-                s.setSystemCenter(position);
-            }
-        }
-    }
-    /**
-     * Update system.
-     * @param elapsed time
-     */
-    public void update(long elapsed) {
-        if (particleSystems.size() == 0) {
-            addNewParticleSystem();
-        }
-        for (ParticleSystem s : particleSystems) {
-            if (offsets.get(s.getId()) != null) {
-                s.generateParticles(elapsed);
-            }
-        }
     }
 
     @Override
@@ -72,22 +44,14 @@ public class ParticleSystemComponent extends GraphicalComponent {
         return true;
     }
 
-    @Override
-    public void addSceneInformation(Scene scene) {
-        for (ParticleSystem s : particleSystems) {
-            WireFrame w = new WireFrame(WireFrame.SPHERE, s.getSystemCenter(), new Vector3f(0, 0, 0), new Vector3f(1, 1, 1));
-            scene.getWireFrames().add(w);
-        }
-    }
-
     /**
      * Add a new system.
      */
     public void addNewParticleSystem() {
-        ParticleSystem particleSystem = new ParticleSystem(new Vector3f(0, 0, 0), 100, 10, 1, 5, 1, true, new ParticleTexture(Loader
-            .loadTexture("particles/particleStar.png"), 1));
+        ParticleSystem particleSystem = new ParticleSystem(new Vector3f(), 100, 1, -1, 5, 1, true, new ParticleTexture(Loader
+            .loadTexture("particles/smoke.png"), 1));
         particleSystems.add(particleSystem);
-        offsets.put(particleSystem.getId(), new Vector3f(0, 0, 0));
+        offsets.put(particleSystem.getId(), new Vector3f(0, 10, 0));
     }
 
     @Override
@@ -98,6 +62,15 @@ public class ParticleSystemComponent extends GraphicalComponent {
             ps.getSystemCenter();
             System.out.println("TODO");
         }
+        addNewParticleSystem();
         return target;
+    }
+
+    public List<ParticleSystem> getParticleSystems() {
+        return particleSystems;
+    }
+
+    public Map<Integer, Vector3f> getOffsets() {
+        return offsets;
     }
 }

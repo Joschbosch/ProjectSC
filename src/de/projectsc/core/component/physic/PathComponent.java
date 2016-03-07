@@ -12,6 +12,7 @@ import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.core.CoreConstants;
 import de.projectsc.core.component.ComponentType;
+import de.projectsc.core.component.DefaultComponent;
 import de.projectsc.core.interfaces.Component;
 
 /**
@@ -19,7 +20,7 @@ import de.projectsc.core.interfaces.Component;
  * 
  * @author Josch Bosch
  */
-public class PathComponent extends PhysicsComponent {
+public class PathComponent extends DefaultComponent {
 
     /**
      * ID.

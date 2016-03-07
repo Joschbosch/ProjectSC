@@ -6,6 +6,7 @@
 package de.projectsc.modes.client.gui.shaders;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -182,20 +183,22 @@ public class TerrainShader extends Shader {
      * @param camera for information
      */
     public void loadViewMatrix(Camera camera) {
-        super.loadMatrix(locationViewMatrix, camera.createViewMatrix());
+        super.loadMatrix(locationViewMatrix, camera.getViewMatrix());
     }
 
     /**
      * Loads up lights to the shader.
      *
      * @param lights to load
+     * @param entityPositions for the current position
      */
-    public void loadLights(List<Light> lights) {
+    public void loadLights(List<Light> lights, Map<String, Vector3f> entityPositions) {
         for (int i = 0; i < MAX_LIGHTS; i++) {
             if (i < lights.size()) {
-                loadVector(locationLightPosition[i], lights.get(i).getPosition());
-                loadVector(locationLightColor[i], lights.get(i).getColor());
-                loadVector(locationAttenuation[i], lights.get(i).getAttenuation());
+                Light light = lights.get(i);
+                loadVector(locationLightPosition[i], Vector3f.add(light.getPosition(), entityPositions.get(light.getEntity()), null));
+                loadVector(locationLightColor[i], light.getColor());
+                loadVector(locationAttenuation[i], light.getAttenuation());
 
             } else {
                 loadVector(locationLightPosition[i], new Vector3f(0.0f, 0.0f, 0.0f));

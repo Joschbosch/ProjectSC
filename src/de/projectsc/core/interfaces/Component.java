@@ -8,8 +8,6 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 
-import de.projectsc.core.data.Scene;
-
 /**
  * Basic class for all components in the world.
  * 
@@ -46,15 +44,6 @@ public interface Component {
      * @param active if the component is current active (which can have different meanings in editor and game).
      */
     void setActive(boolean active);
-
-    /**
-     * Adds everything to the scene that is needed for debugging mode. Might not be used.
-     * 
-     * @param entity
-     * 
-     * @param scene to add to.
-     */
-    void addSceneInformation(Scene scene);
 
     /**
      * @return true, if the component can be saved at the moment.
@@ -119,24 +108,32 @@ public interface Component {
      * @param serial to read
      */
     void deserializeFromNetwork(String serial);
+
     /**
-     * Make a clone of the current component. 
+     * Make a clone of the current component.
+     * 
      * @return the cloned component.
      */
     Component cloneComponent();
+
     /**
-     * Is the configuration for this component valid for saving. 
+     * Is the configuration for this component valid for saving.
+     * 
      * @return true, if it is, false otherwise.
      */
     boolean configurationValid();
+
     /**
-     * Get the individual configuration of a component. 
+     * Get the individual configuration of a component.
+     * 
      * @return config
      */
     Map<String, Object> getConfiguration();
+
     /**
-     * Load the configuration of a component. 
-     * @param loadedConfiguration 
+     * Load the configuration of a component.
+     * 
+     * @param loadedConfiguration that was stored
      */
     void loadConfiguration(Map<String, Object> loadedConfiguration);
 

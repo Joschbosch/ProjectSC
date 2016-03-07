@@ -33,6 +33,7 @@ public class EditorCamera extends Camera {
         }
         this.yaw = (0.0f - angleAroundPlayer);
         calculateCameraPosition(centeringPoint, distanceFromCenterPoint, angleAroundPlayer);
+        viewMatrix = createViewMatrix();
     }
 
     @Override

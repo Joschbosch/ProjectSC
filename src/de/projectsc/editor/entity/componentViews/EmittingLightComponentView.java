@@ -231,7 +231,7 @@ public class EmittingLightComponentView extends ComponentView {
         Vector3f attenuation =
             new Vector3f(Float.parseFloat(attenuation1Text.getText()), Float.parseFloat(attenuation2Text.getText()), Float
                 .parseFloat(attenuation3Text.getText()));
-        Light light = new Light(position, color, attenuation, name);
+        Light light = new Light(entity.getID(), position, color, attenuation, name);
         return light;
     }
 

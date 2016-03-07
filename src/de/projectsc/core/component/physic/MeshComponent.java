@@ -15,6 +15,7 @@ import org.apache.commons.logging.LogFactory;
 
 import de.projectsc.core.CoreConstants;
 import de.projectsc.core.component.ComponentType;
+import de.projectsc.core.component.DefaultComponent;
 import de.projectsc.core.data.physics.ModelData;
 import de.projectsc.core.data.utils.OBJFileLoader;
 import de.projectsc.core.interfaces.Component;
@@ -24,7 +25,7 @@ import de.projectsc.core.interfaces.Component;
  * 
  * @author Josch Bosch
  */
-public class MeshComponent extends PhysicsComponent {
+public class MeshComponent extends DefaultComponent {
 
     /**
      * ID.
@@ -46,6 +47,7 @@ public class MeshComponent extends PhysicsComponent {
     public boolean isValidForEntitySaving() {
         return model != null;
     }
+
     /**
      * Load up the model of a mesh.
      */

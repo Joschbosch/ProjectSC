@@ -68,6 +68,8 @@ public class Camera implements InputCommandListener {
 
     protected Vector3f centeringPoint = new Vector3f(0, 0, 0);
 
+    protected Matrix4f viewMatrix;
+
     private float currentSpeedXKeys;
 
     private float currentSpeedZKeys;
@@ -129,6 +131,7 @@ public class Camera implements InputCommandListener {
                 calculateCameraPosition(centeringPoint, horizontalDistance, verticalDistance);
             }
         }
+        viewMatrix = createViewMatrix();
     }
 
     @Override
@@ -232,15 +235,15 @@ public class Camera implements InputCommandListener {
      * @return the current view matrix.
      */
     public Matrix4f createViewMatrix() {
-        Matrix4f viewMatrix = new Matrix4f();
-        viewMatrix.setIdentity();
-        Matrix4f.rotate(((float) Math.toRadians(pitch)), new Vector3f(1, 0, 0), viewMatrix, viewMatrix);
-        Matrix4f.rotate(((float) Math.toRadians(yaw)), new Vector3f(0, 1, 0), viewMatrix, viewMatrix);
-        Matrix4f.rotate(((float) Math.toRadians(roll)), new Vector3f(0, 0, 1), viewMatrix, viewMatrix);
+        Matrix4f newViewMatrix = new Matrix4f();
+        newViewMatrix.setIdentity();
+        Matrix4f.rotate(((float) Math.toRadians(pitch)), new Vector3f(1, 0, 0), newViewMatrix, newViewMatrix);
+        Matrix4f.rotate(((float) Math.toRadians(yaw)), new Vector3f(0, 1, 0), newViewMatrix, newViewMatrix);
+        Matrix4f.rotate(((float) Math.toRadians(roll)), new Vector3f(0, 0, 1), newViewMatrix, newViewMatrix);
 
         Vector3f negCameraPos = new Vector3f(-position.x, -position.y, -position.z);
-        Matrix4f.translate(negCameraPos, viewMatrix, viewMatrix);
-        return viewMatrix;
+        Matrix4f.translate(negCameraPos, newViewMatrix, newViewMatrix);
+        return newViewMatrix;
     }
 
     protected void calculateZoom() {
@@ -365,5 +368,17 @@ public class Camera implements InputCommandListener {
 
     public Vector3f getPosition() {
         return position;
+    }
+
+    /**
+     * lazy init getter.
+     * 
+     * @return current view matrix
+     */
+    public Matrix4f getViewMatrix() {
+        if (viewMatrix == null) {
+            createViewMatrix();
+        }
+        return viewMatrix;
     }
 }

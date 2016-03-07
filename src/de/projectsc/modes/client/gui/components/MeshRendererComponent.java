@@ -7,9 +7,7 @@ package de.projectsc.modes.client.gui.components;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
@@ -18,10 +16,10 @@ import org.apache.commons.logging.LogFactory;
 
 import de.projectsc.core.CoreConstants;
 import de.projectsc.core.component.ComponentType;
+import de.projectsc.core.component.DefaultComponent;
 import de.projectsc.core.component.physic.MeshComponent;
 import de.projectsc.core.data.physics.ModelData;
 import de.projectsc.core.interfaces.Component;
-import de.projectsc.modes.client.gui.data.GUIScene;
 import de.projectsc.modes.client.gui.models.RawModel;
 import de.projectsc.modes.client.gui.models.TexturedModel;
 import de.projectsc.modes.client.gui.textures.ModelTexture;
@@ -34,7 +32,7 @@ import de.projectsc.modes.client.gui.utils.Loader;
  * @author Josch Bosch
  * 
  */
-public class MeshRendererComponent extends GraphicalComponent {
+public class MeshRendererComponent extends DefaultComponent {
 
     /**
      * Name.
@@ -88,6 +86,7 @@ public class MeshRendererComponent extends GraphicalComponent {
     public void setTexturedModel(TexturedModel texturedModel) {
         this.texturedModel = texturedModel;
     }
+
     /**
      * Load a mesh model and its texture.
      */
@@ -108,27 +107,6 @@ public class MeshRendererComponent extends GraphicalComponent {
 
     public boolean isInitialized() {
         return (texturedModel != null);
-    }
-
-    @Override
-    public void render(String entity, GUIScene scene) {
-        if (!isInitialized()) {
-            load();
-        }
-        TexturedModel m = getTexturedModel();
-        if (m != null && m.getRawModel() != null && m.getTexture() != null) {
-            if (modelTexture != null) {
-                modelTexture.setActiveTextureIndex(textureIndex);
-            }
-            List<String> batch = scene.getModels().get(m);
-            if (batch != null) {
-                batch.add(entity);
-            } else {
-                List<String> newBatch = new ArrayList<>();
-                newBatch.add(entity);
-                scene.getModels().put(m, newBatch);
-            }
-        }
     }
 
     /**

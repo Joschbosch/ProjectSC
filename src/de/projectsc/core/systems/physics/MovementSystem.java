@@ -119,7 +119,7 @@ public class MovementSystem extends DefaultSystem {
             jumpTime += tick / 1000f * 2f;
             jumpTime %= 1;
             jump.setJumpTime(jumpTime);
-            float offset = (float) Math.sin(Math.PI * 2 * jumpTime);
+            float offset = (float) Math.sin(Math.PI * 2 * jumpTime) * 10 + 10;
             offset = (offset + 1);
             if (offset > jump.getPreviousOffset()) {
                 jump.setGoingUp(true);

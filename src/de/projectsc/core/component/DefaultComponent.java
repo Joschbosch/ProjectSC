@@ -18,7 +18,6 @@ import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.map.JsonMappingException;
 
 import de.projectsc.core.data.EntityEvent;
-import de.projectsc.core.data.Scene;
 import de.projectsc.core.interfaces.Component;
 import de.projectsc.core.interfaces.Entity;
 
@@ -170,11 +169,6 @@ public abstract class DefaultComponent implements Component {
     @Override
     public void setActive(boolean active) {
         this.isActive = active;
-    }
-
-    @Override
-    public void addSceneInformation(Scene scene) {
-
     }
 
     @Override

@@ -175,7 +175,7 @@ public class GUICore implements GUI {
                 GraphicalComponentImplementation.EMMITING_LIGHT_COMPONENT.getName());
         Transform position = entityManager.getEntity(sun).getTransform();
         position.setPosition(new Vector3f(10000, 10000, 10000));
-        Light light = new Light(new Vector3f(position.getPosition()), new Vector3f(1.0f, 1.0f, 1.0f), "sun");
+        Light light = new Light(sun, new Vector3f(position.getPosition()), new Vector3f(1.0f, 1.0f, 1.0f), "sun");
         light.setAttenuation(new Vector3f(1, 0, 0));
         lightComponent.addLight(sun, new Vector3f(position.getPosition()), light);
         entityManager.addComponentToEntity(sun, ColliderComponent.NAME);
@@ -243,9 +243,9 @@ public class GUICore implements GUI {
         renderingSystem.update(timer.getDelta());
         currentGUIState.update();
         if (currentGUIState.renderScene()) {
-            mousePicker.update(getTerrains(), camera.getPosition(), camera.createViewMatrix());
+            mousePicker.update(getTerrains(), camera.getPosition(), camera.getViewMatrix());
             renderWater();
-            GUIScene scene = renderingSystem.createScene();
+            GUIScene scene = renderingSystem.createScene(null);
             scene.setTerrains(terrainModels);
             scene.setDebugMode(currentGUIState.isDebugModeActive());
             masterRenderer.renderScene(scene, camera, timer.getDelta(), new Vector4f(0,

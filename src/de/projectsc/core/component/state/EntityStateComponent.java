@@ -7,7 +7,6 @@ package de.projectsc.core.component.state;
 import de.projectsc.core.CoreConstants;
 import de.projectsc.core.component.ComponentType;
 import de.projectsc.core.component.DefaultComponent;
-import de.projectsc.core.data.Scene;
 import de.projectsc.core.entities.states.EntityState;
 import de.projectsc.core.interfaces.Component;
 
@@ -38,16 +37,6 @@ public class EntityStateComponent extends DefaultComponent {
     public EntityStateComponent() {
         setType(ComponentType.PREPHYSICS);
         setComponentName(NAME);
-    }
-
-    @Override
-    public void addSceneInformation(Scene scene) {
-        if (selectAble && selected) {
-            scene.getSelectedEntites().add(owner.getID());
-        }
-        if (highlightAble && highlighted) {
-            scene.getHightlightedEntites().add(owner.getID());
-        }
     }
 
     @Override
@@ -118,6 +107,7 @@ public class EntityStateComponent extends DefaultComponent {
         this.state = newState;
         return newState;
     }
+
     /**
      * @return has entity moved?
      */

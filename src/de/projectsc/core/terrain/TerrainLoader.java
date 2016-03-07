@@ -25,8 +25,6 @@ import org.codehaus.jackson.node.ArrayNode;
 import org.codehaus.jackson.node.ObjectNode;
 import org.lwjgl.util.vector.Vector3f;
 
-import de.projectsc.core.data.objects.Light;
-import de.projectsc.core.data.utils.LightSerializationUtils;
 import de.projectsc.core.interfaces.Entity;
 
 /**
@@ -99,8 +97,6 @@ public final class TerrainLoader {
             String bTexture = mapper.readValue(tree.get(B_TEXTURE), String.class);
 
             ObjectNode lightsNode = (ObjectNode) tree.get(STATIC_LIGHTS);
-
-            List<Light> staticLights = LightSerializationUtils.deserializeLights(mapper, lightsNode);
 
             ArrayNode staticObjectsNode = (ArrayNode) tree.get(STATIC_OBJECTS);
             Map<Integer, Entity> staticObjects = new TreeMap<>();

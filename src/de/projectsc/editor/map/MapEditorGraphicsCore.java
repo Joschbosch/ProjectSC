@@ -244,7 +244,7 @@ public class MapEditorGraphicsCore implements Runnable {
                 TextMaster.createAndLoadText("FPS: " + timer.getCurrentFPS(), 0.7f, FontStore.getFont(Font.CANDARA),
                     new Vector2f(0.0f, 0.0f), 5, false);
             if (terrainModels != null) {
-                mousePicker.update(getTerrains(), camera.getPosition(), camera.createViewMatrix());
+                mousePicker.update(getTerrains(), camera.getPosition(), camera.getViewMatrix());
                 readInput();
 
                 if (!entityAtCursor.isEmpty() && mousePicker.getCurrentTerrainPoint() != null
@@ -253,8 +253,7 @@ public class MapEditorGraphicsCore implements Runnable {
                 }
 
                 if (doRender.get()) {
-                    GUIScene s = renderSystem.createScene();
-                    collisionSystem.debug(s);
+                    GUIScene s = renderSystem.createScene(collisionSystem.getOctree());
                     s.setTerrains(terrainModels);
                     s.setRenderSkybox(true);
                     if (!entityAtCursor.isEmpty() && entityManager.getEntity(entityAtCursor) != null) {
@@ -390,7 +389,7 @@ public class MapEditorGraphicsCore implements Runnable {
             (EmittingLightComponent) entityManager.addComponentToEntity(sun,
                 GraphicalComponentImplementation.EMMITING_LIGHT_COMPONENT.getName());
         Transform position = entityManager.getEntity(sun).getTransform();
-        Light light = new Light(new Vector3f(position.getPosition()), new Vector3f(1.0f, 1.0f, 1.0f), "sun");
+        Light light = new Light(sun, new Vector3f(position.getPosition()), new Vector3f(1.0f, 1.0f, 1.0f), "sun");
         lightComponent.addLight(sun, new Vector3f(position.getPosition()), light);
         entityManager.addComponentToEntity(sun, ColliderComponent.NAME);
     }
