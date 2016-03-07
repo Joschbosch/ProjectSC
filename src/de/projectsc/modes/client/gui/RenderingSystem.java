@@ -160,18 +160,26 @@ public class RenderingSystem extends DefaultSystem {
             if (hasComponent(entity, ColliderComponent.class)) {
                 ColliderComponent cc = getComponent(entity, ColliderComponent.class);
                 WireFrame wf =
-                    new WireFrame(WireFrame.CUBE, cc.getAABB().getCenterWithPosition(), new Vector3f(),
+                    new WireFrame(WireFrame.CUBE, cc.getAABB().getPosition(), new Vector3f(),
                         cc.getAxisAlignedBoundingBox().getSize());
                 wf.setColor(new Vector3f(1.0f, 0, 0));
                 scene.getWireFrames().add(wf);
             }
-            if (hasComponent(entity, EntityStateComponent.class)) {
+            if (hasComponent(entity, EntityStateComponent.class) && hasComponent(entity, ColliderComponent.class)) {
                 EntityStateComponent esc = getComponent(entity, EntityStateComponent.class);
-                if (esc.isSelectAble() && esc.isSelected()) {
-                    scene.getSelectedEntites().add(entity);
-                }
+                ColliderComponent cc = getComponent(entity, ColliderComponent.class);
+                // if (esc.isSelectAble() && esc.isSelected()) {
+                // commented out for testing!
+                scene.getSelectedEntites().add(new Vector3f(
+                    transform.getPosition().x,
+                    transform.getPosition().z,
+                    cc.getAABB().getSize().x));
+                // }
                 if (esc.isHighlightAble() && esc.isHighlighted()) {
-                    scene.getHightlightedEntites().add(entity);
+                    scene.getHightlightedEntites().add(new Vector3f(
+                        transform.getPosition().x,
+                        transform.getPosition().z,
+                        cc.getAABB().getSize().x));
                 }
             }
             if (hasComponent(entity, ParticleSystemComponent.class)) {

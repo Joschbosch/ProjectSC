@@ -49,12 +49,9 @@ public class EntityRenderer {
      * @param position to render.
      * @param rotations to render.
      * @param scales to render.
-     * @param selected entities
-     * @param highlighted entities
      */
     public void render(Map<TexturedModel, List<String>> entitiesWithModel,
-        Map<String, Vector3f> position, Map<String, Vector3f> rotations, Map<String, Vector3f> scales,
-        List<String> selected, List<String> highlighted) {
+        Map<String, Vector3f> position, Map<String, Vector3f> rotations, Map<String, Vector3f> scales) {
         ModelData loadOBJFromResources = OBJFileLoader.loadOBJFromResources("/meshes/objects/boulder.obj");
         TexturedModel barrel =
             new TexturedModel(Loader.loadToVAO(loadOBJFromResources.getVertices(), loadOBJFromResources.getTextureCoords(),
@@ -80,8 +77,7 @@ public class EntityRenderer {
             List<String> batch = entitiesWithModel.get(model);
             for (String e : batch) {
                 if (position.get(e) != null && rotations.get(e) != null && scales.get(e) != null) {
-                    prepareInstance(model.getTexture(), position.get(e), rotations.get(e), scales.get(e), highlighted.contains(e),
-                        selected.contains(e));
+                    prepareInstance(model.getTexture(), position.get(e), rotations.get(e), scales.get(e));
                     GL11.glDrawElements(GL11.GL_TRIANGLES, model.getRawModel().getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
                 }
             }
@@ -122,13 +118,11 @@ public class EntityRenderer {
         MasterRenderer.enableCulling();
     }
 
-    private void prepareInstance(ModelTexture modelTexture, Vector3f position, Vector3f rotation, Vector3f scale, boolean isSelected,
-        boolean isHighlighted) {
+    private void prepareInstance(ModelTexture modelTexture, Vector3f position, Vector3f rotation, Vector3f scale) {
         Matrix4f transformationMatrix =
             Maths.createTransformationMatrix(position, rotation.x, rotation.y, rotation.z, scale);
         shader.loadTransformationMatrix(transformationMatrix);
         shader.loadOffset(getTextureOffsetX(modelTexture), getTextureOffsetY(modelTexture));
-        shader.loadSelected(isHighlighted, isSelected);
 
     }
 

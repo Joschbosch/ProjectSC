@@ -59,10 +59,6 @@ public class EntityShader extends Shader {
 
     private int locationPlane;
 
-    private int locationSelected;
-
-    private int locationHighlighted;
-
     private int locationTextureSampler;
 
     private int locationNormalMap;
@@ -106,8 +102,6 @@ public class EntityShader extends Shader {
             locationLightColor[i] = getUniformLocation(String.format("lightColor[%s]", i));
             locationAttenuation[i] = getUniformLocation(String.format("attenuation[%s]", i));
         }
-        locationSelected = super.getUniformLocation("selected");
-        locationHighlighted = super.getUniformLocation("highlighted");
     }
 
     /**
@@ -244,12 +238,4 @@ public class EntityShader extends Shader {
         super.loadFloat(locationReflectivity, reflectivity);
     }
 
-    /**
-     * @param highlighted entity
-     * @param selected true, if entity is selected
-     */
-    public void loadSelected(boolean highlighted, boolean selected) {
-        super.loadBoolean(locationHighlighted, highlighted);
-        super.loadBoolean(locationSelected, selected);
-    }
 }

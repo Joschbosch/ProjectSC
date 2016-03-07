@@ -51,9 +51,9 @@ public class GUIScene {
 
     private List<WireFrame> wireFrames = new LinkedList<>();
 
-    private List<String> selectedEntites = new LinkedList<>();
+    private List<Vector3f> selectedEntites = new LinkedList<>();
 
-    private List<String> highlightedEntities = new LinkedList<>();
+    private List<Vector3f> highlightedEntities = new LinkedList<>();
 
     public GUIScene() {
         super();
@@ -176,19 +176,19 @@ public class GUIScene {
         this.wireFrames = wireFrames;
     }
 
-    public List<String> getSelectedEntites() {
+    public List<Vector3f> getSelectedEntites() {
         return selectedEntites;
     }
 
-    public void setSelectedEntites(List<String> selectedEntites) {
+    public void setSelectedEntites(List<Vector3f> selectedEntites) {
         this.selectedEntites = selectedEntites;
     }
 
-    public List<String> getHightlightedEntites() {
+    public List<Vector3f> getHightlightedEntites() {
         return highlightedEntities;
     }
 
-    public void setHighlightedEntities(List<String> highlightedEntities) {
+    public void setHighlightedEntities(List<Vector3f> highlightedEntities) {
         this.highlightedEntities = highlightedEntities;
     }
 

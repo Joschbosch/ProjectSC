@@ -12,6 +12,7 @@ out vec3 toLightVector[lightSources];
 out vec3 toCameraVector;
 out float visibility;
 out vec4 shadowCoords;
+out vec2 pass_worldPos;
 
 uniform mat4 transformationMatrix;
 uniform mat4 projectionMatrix;
@@ -47,4 +48,5 @@ void main (void){
 	distance = distance - (shadowDistance - transitionDistance);
 	distance = distance / transitionDistance;
 	shadowCoords.w = clamp (1.0 - distance, 0.0, 1.0);
+	pass_worldPos = worldPosition.xz;
 }

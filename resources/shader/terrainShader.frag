@@ -1,6 +1,7 @@
 #version 400 core
 
 const int lightSources = 6;
+const int maxSelectedOrHightlighted = 256;
 
 in vec2 pass_textureCoords;
 in vec3 surfaceNormal;
@@ -8,7 +9,7 @@ in vec3 toLightVector[lightSources];
 in vec3 toCameraVector;
 in float visibility; 
 in vec4 shadowCoords;
-
+in vec2 pass_worldPos;
 out vec4 out_Color;
 
 uniform sampler2D backgroundTexture;
@@ -23,8 +24,28 @@ uniform float shineDamper;
 uniform float reflectivity;
 uniform vec3 skyColor;
 uniform vec3 attenuation[lightSources];
+uniform vec3 highlightedPositions[maxSelectedOrHightlighted];
+uniform vec3 selectedPositions[maxSelectedOrHightlighted];
+uniform int highlightedCount;
+uniform int selectedCount;
 
 const int pcfCount = 3;
+const float highlightThickness = 1.4;
+const float highlightAlpha = 0.5;
+const vec3 highlightColor = vec3(1,0,0);
+const vec3 selectColor = vec3(0,1,0);
+
+float smoothlyStep(float edge0, float edge1, float x){
+    float t = clamp((x - edge0) / (edge1 - edge0), 0.0, 1.0);
+    return t * t * (3.0 - 2.0 * t);
+}
+
+float getHighlightAlpha(vec3 info, vec2 worldPos){
+	float distance = length(info.xy - worldPos);
+	float inner = 1.0 - smoothlyStep(info.z, 1+0.05, distance);
+	float outer = 1.0 - smoothlyStep(info.z * highlightThickness, info.z * highlightThickness + 0.05, distance);
+	return (outer - inner) * highlightAlpha;
+}
 
 void main(void){
    
@@ -78,6 +99,15 @@ void main(void){
 	   totalDiffuse = totalDiffuse + (brightness * lightColor[i])/attFactor; 
    }
    totalDiffuse = max (totalDiffuse * lightFactor, 0.4);
-   	out_Color = vec4(totalDiffuse, 1.0) * totalColor + vec4(totalSpecular, 1.0);
-    out_Color = mix(vec4(skyColor, 1.0), out_Color, visibility);
+   out_Color = vec4(totalDiffuse, 1.0) * totalColor + vec4(totalSpecular, 1.0);
+   out_Color = mix(vec4(skyColor, 1.0), out_Color, visibility);
+    
+ 	for (int i = 0; i<highlightedCount; i++){
+  		float alpha = getHighlightAlpha(highlightedPositions[i], pass_worldPos);
+   		out_Color = mix(out_Color, vec4(highlightColor, 1.0), alpha);
+    }
+    for (int i = 0; i<selectedCount; i++){
+  		float alpha = getHighlightAlpha(selectedPositions[i], pass_worldPos);
+   		out_Color = mix(out_Color, vec4(selectColor, 1.0), alpha);
+    }
  }

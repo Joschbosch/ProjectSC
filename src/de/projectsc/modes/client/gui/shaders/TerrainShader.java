@@ -68,6 +68,14 @@ public class TerrainShader extends Shader {
 
     private int locationShadowDistance;
 
+    private int locationHighlightedCount;
+
+    private int locationSelectedCount;
+
+    private int[] locationHighlightedPositions;
+
+    private int[] locationSelectedPositions;
+
     public TerrainShader() {
         super(VERTEX_FILE, FRAGMENT_FILE);
         LOGGER.info("Terrain shader loaded.");
@@ -106,7 +114,14 @@ public class TerrainShader extends Shader {
             locationLightColor[i] = getUniformLocation(String.format("lightColor[%s]", i));
             locationAttenuation[i] = getUniformLocation(String.format("attenuation[%s]", i));
         }
-
+        locationHighlightedPositions = new int[256];
+        locationSelectedPositions = new int[256];
+        for (int i = 0; i < 256; i++) {
+            locationHighlightedPositions[i] = getUniformLocation(String.format("highlightedPositions[%s]", i));
+            locationSelectedPositions[i] = getUniformLocation(String.format("selectedPositions[%s]", i));
+        }
+        locationHighlightedCount = super.getUniformLocation("highlightedCount");
+        locationSelectedCount = super.getUniformLocation("selectedCount");
     }
 
     /**
@@ -208,6 +223,25 @@ public class TerrainShader extends Shader {
             }
         }
 
+    }
+
+    public void loadHighlightedAndSeleced(List<Vector3f> highlighted, List<Vector3f> selected) {
+        for (int i = 0; i < 256; i++) {
+            if (i < highlighted.size()) {
+                loadVector(locationHighlightedPositions[i], highlighted.get(i));
+            } else {
+                loadVector(locationHighlightedPositions[i], new Vector3f(0.0f, 0.0f, 1.0f));
+            }
+        }
+        for (int i = 0; i < 256; i++) {
+            if (i < selected.size()) {
+                loadVector(locationSelectedPositions[i], selected.get(i));
+            } else {
+                loadVector(locationSelectedPositions[i], new Vector3f(0.0f, 0.0f, 1.0f));
+            }
+        }
+        loadInt(locationHighlightedCount, highlighted.size());
+        loadInt(locationSelectedCount, selected.size());
     }
 
     /**

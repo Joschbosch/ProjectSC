@@ -125,8 +125,7 @@ public class MasterRenderer {
         }
         entityShader.loadLights(scene.getLights(), scene.getPositions(), camera.getViewMatrix());
         entityShader.loadViewMatrix(camera);
-        entityRenderer.render(scene.getModels(), scene.getPositions(), scene.getRotations(), scene.getScales(),
-            scene.getSelectedEntites(), scene.getHightlightedEntites());
+        entityRenderer.render(scene.getModels(), scene.getPositions(), scene.getRotations(), scene.getScales());
         entityShader.stop();
         Light sun = new Light("", new Vector3f(1000, 1000, 1000), new Vector3f(1, 1, 1), new Vector3f(1, 0, 0), "newSun");
         if (sun != null) {
@@ -145,6 +144,7 @@ public class MasterRenderer {
         } else {
             terrainShader.loadSkyColor(scene.getSkyColor().x, scene.getSkyColor().y, scene.getSkyColor().z);
         }
+        terrainShader.loadHighlightedAndSeleced(scene.getHightlightedEntites(), scene.getSelectedEntites());
         terrainShader.loadLights(scene.getLights(), scene.getPositions());
         terrainShader.loadViewMatrix(camera);
         terrainRenderer.render(scene.getTerrains(), shadowRenderer.getToShadowMapSpaceMatrix(), shadowRenderer.getShadowDistance());
