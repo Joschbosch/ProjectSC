@@ -17,7 +17,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.lwjgl.util.vector.Vector3f;
 
-import de.projectsc.core.component.registry.ComponentListItem;
+import de.projectsc.core.component.registry.ComponentRegistry;
 import de.projectsc.core.data.structure.Snapshot;
 import de.projectsc.core.data.structure.SnapshotDelta;
 import de.projectsc.core.data.utils.Timer;
@@ -227,7 +227,7 @@ public class GameImpl implements Game {
     }
 
     private void loadComponents() {
-        for (ComponentListItem it : ComponentListItem.values()) {
+        for (ComponentRegistry it : ComponentRegistry.values()) {
             componentManager.registerComponent(it.getName(), it.getClazz());
         }
     }

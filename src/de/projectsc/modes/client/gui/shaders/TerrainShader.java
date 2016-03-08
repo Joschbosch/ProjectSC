@@ -224,7 +224,11 @@ public class TerrainShader extends Shader {
         }
 
     }
-
+    /**
+     * Load up all highlited and selected entities. 
+     * @param highlighted to load
+     * @param selected to load
+     */
     public void loadHighlightedAndSeleced(List<Vector3f> highlighted, List<Vector3f> selected) {
         for (int i = 0; i < 256; i++) {
             if (i < highlighted.size()) {

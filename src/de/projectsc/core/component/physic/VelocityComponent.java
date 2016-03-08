@@ -44,23 +44,6 @@ public class VelocityComponent extends DefaultComponent {
 
     }
 
-    //
-    // @Override
-    // public Map<String, Object> serialize(File savingLocation) {
-    // Map<String, Object> serialized = new HashMap<>();
-    // serialized.put("acceleration", acceleration);
-    // serialized.put("maxSpeed", maximumSpeed);
-    // serialized.put("turnSpeed", turnSpeed);
-    // return serialized;
-    // }
-    //
-    // @Override
-    // public void deserialize(Map<String, Object> serialized, String loadingLocation) {
-    // acceleration = (float) (double) serialized.get("acceleration");
-    // maximumSpeed = (float) (double) serialized.get("maxSpeed");
-    // turnSpeed = (float) (double) serialized.get("turnSpeed");
-    // }
-
     @Override
     public String serializeForNetwork() {
         return "" + acceleration + CoreConstants.SERIALIZATION_SEPARATOR + maximumSpeed + CoreConstants.SERIALIZATION_SEPARATOR

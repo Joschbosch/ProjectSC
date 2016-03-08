@@ -10,6 +10,7 @@ in vec3 toCameraVector;
 in float visibility; 
 in vec4 shadowCoords;
 in vec2 pass_worldPos;
+
 out vec4 out_Color;
 
 uniform sampler2D backgroundTexture;
@@ -24,6 +25,7 @@ uniform float shineDamper;
 uniform float reflectivity;
 uniform vec3 skyColor;
 uniform vec3 attenuation[lightSources];
+
 uniform vec3 highlightedPositions[maxSelectedOrHightlighted];
 uniform vec3 selectedPositions[maxSelectedOrHightlighted];
 uniform int highlightedCount;
@@ -42,7 +44,7 @@ float smoothlyStep(float edge0, float edge1, float x){
 
 float getHighlightAlpha(vec3 info, vec2 worldPos){
 	float distance = length(info.xy - worldPos);
-	float inner = 1.0 - smoothlyStep(info.z, 1+0.05, distance);
+	float inner = 1.0 - smoothlyStep(info.z, info.z+0.05, distance);
 	float outer = 1.0 - smoothlyStep(info.z * highlightThickness, info.z * highlightThickness + 0.05, distance);
 	return (outer - inner) * highlightAlpha;
 }
@@ -102,12 +104,12 @@ void main(void){
    out_Color = vec4(totalDiffuse, 1.0) * totalColor + vec4(totalSpecular, 1.0);
    out_Color = mix(vec4(skyColor, 1.0), out_Color, visibility);
     
- 	for (int i = 0; i<highlightedCount; i++){
-  		float alpha = getHighlightAlpha(highlightedPositions[i], pass_worldPos);
-   		out_Color = mix(out_Color, vec4(highlightColor, 1.0), alpha);
-    }
-    for (int i = 0; i<selectedCount; i++){
-  		float alpha = getHighlightAlpha(selectedPositions[i], pass_worldPos);
-   		out_Color = mix(out_Color, vec4(selectColor, 1.0), alpha);
-    }
+   for (int i = 0; i<highlightedCount; i++){
+      float alpha = getHighlightAlpha(highlightedPositions[i], pass_worldPos);
+   	  out_Color = mix(out_Color, vec4(highlightColor, 1.0), alpha);
+   }
+   for (int i = 0; i<selectedCount; i++){
+      float alpha = getHighlightAlpha(selectedPositions[i], pass_worldPos);
+   	  out_Color = mix(out_Color, vec4(selectColor, 1.0), alpha);
+   }
  }

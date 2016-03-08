@@ -90,5 +90,21 @@ public class Snapshot {
     public void setTick(long tick) {
         this.tick = tick;
     }
+    /**
+     * Clone current snapshot. 
+     * @return new cloned snapshot.
+     */
+    public Snapshot cloneSnapshot() {
+        Snapshot newSnapshot = new Snapshot();
+        newSnapshot.setGameTime(gameTime);
+        newSnapshot.setTick(tick);
+        Map<String, Map<String, String>> newComponents = new HashMap<>();
+        newComponents.putAll(componentsSerialized);
+        newSnapshot.setComponentsSerialized(newComponents);
+        Map<String, String> newEntities = new HashMap<>();
+        newEntities.putAll(entitiesSerialized);
+        newSnapshot.setEntitiesSerialized(newEntities);
+        return newSnapshot;
+    }
 
 }

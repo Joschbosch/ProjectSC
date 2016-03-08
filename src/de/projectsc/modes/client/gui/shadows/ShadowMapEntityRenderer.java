@@ -13,7 +13,7 @@ import org.lwjgl.util.vector.Vector3f;
 import de.projectsc.core.utils.Maths;
 import de.projectsc.modes.client.gui.models.RawModel;
 import de.projectsc.modes.client.gui.models.TexturedModel;
-import de.projectsc.modes.client.gui.render.MasterRenderer;
+import de.projectsc.modes.client.gui.settings.GUISettings;
 import de.projectsc.modes.client.gui.textures.ModelTexture;
 
 /**
@@ -53,7 +53,7 @@ public class ShadowMapEntityRenderer {
             GL13.glActiveTexture(GL13.GL_TEXTURE0);
             GL11.glBindTexture(GL11.GL_TEXTURE_2D, model.getTexture().getTextureID());
             if (model.getTexture().isTransparent()) {
-                MasterRenderer.disableCulling();
+                GUISettings.disableCulling();
             }
             List<String> batch = entitiesWithModel.get(model);
             for (String e : batch) {
@@ -63,7 +63,7 @@ public class ShadowMapEntityRenderer {
                 }
             }
             if (model.getTexture().isTransparent()) {
-                MasterRenderer.enableCulling();
+                GUISettings.enableCulling();
             }
         }
         GL20.glDisableVertexAttribArray(0);

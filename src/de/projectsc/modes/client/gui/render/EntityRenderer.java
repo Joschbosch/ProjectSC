@@ -21,6 +21,7 @@ import de.projectsc.core.data.utils.OBJFileLoader;
 import de.projectsc.core.utils.Maths;
 import de.projectsc.modes.client.gui.models.RawModel;
 import de.projectsc.modes.client.gui.models.TexturedModel;
+import de.projectsc.modes.client.gui.settings.GUISettings;
 import de.projectsc.modes.client.gui.shaders.EntityShader;
 import de.projectsc.modes.client.gui.textures.ModelTexture;
 import de.projectsc.modes.client.gui.utils.Loader;
@@ -95,7 +96,7 @@ public class EntityRenderer {
 
         ModelTexture texture = tModel.getTexture();
         if (texture.isTransparent()) {
-            MasterRenderer.disableCulling();
+            GUISettings.disableCulling();
         }
         shader.loadNumberRows(texture.getNumberOfRows());
         shader.loadShineValues(texture.getShineDamper(), texture.getReflectivity());
@@ -115,7 +116,7 @@ public class EntityRenderer {
         GL20.glDisableVertexAttribArray(2);
         GL20.glDisableVertexAttribArray(3);
         GL30.glBindVertexArray(0);
-        MasterRenderer.enableCulling();
+        GUISettings.enableCulling();
     }
 
     private void prepareInstance(ModelTexture modelTexture, Vector3f position, Vector3f rotation, Vector3f scale) {

@@ -159,7 +159,7 @@ public class ParticleRenderer {
     }
 
     /**
-     * Dipose renderer.
+     * Dispose renderer.
      */
     public void dispose() {
         shader.dispose();

@@ -12,7 +12,6 @@ import java.util.Map;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
 
-import com.rits.cloning.Cloner;
 
 import de.projectsc.core.data.structure.Snapshot;
 import de.projectsc.core.data.structure.SnapshotDelta;
@@ -99,7 +98,7 @@ public class ClientSnapshotManger {
      */
     public void applyNewSnapshotDelta(SnapshotDelta snapshot) throws JsonParseException, JsonMappingException, IOException {
         Snapshot old = getCurrentSnapshot();
-        Snapshot newShot = Cloner.standard().deepClone(old);
+        Snapshot newShot = old.cloneSnapshot();
         newShot.setGameTime(snapshot.getGameTime());
         newShot.setTick(snapshot.getTick());
         if (snapshot.getRemoved() != null) {

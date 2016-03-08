@@ -58,7 +58,7 @@ import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import de.projectsc.core.CoreConstants;
-import de.projectsc.core.component.registry.ComponentListItem;
+import de.projectsc.core.component.registry.ComponentRegistry;
 import de.projectsc.core.interfaces.Component;
 import de.projectsc.core.manager.ComponentManager;
 import de.projectsc.core.manager.EntityManager;
@@ -192,7 +192,7 @@ public class EntityEditor extends JFrame {
     }
 
     private void loadComponents() {
-        for (ComponentListItem it : ComponentListItem.values()) {
+        for (ComponentRegistry it : ComponentRegistry.values()) {
             componentManager.registerComponent(it.getName(), it.getClazz());
         }
     }

@@ -11,7 +11,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import de.projectsc.core.component.registry.ComponentListItem;
+import de.projectsc.core.component.registry.ComponentRegistry;
 import de.projectsc.core.data.structure.Snapshot;
 import de.projectsc.core.data.utils.Timer;
 import de.projectsc.core.manager.ComponentManager;
@@ -131,7 +131,7 @@ public abstract class ClientCore implements Runnable {
     }
 
     private void loadComponents() {
-        for (ComponentListItem c : ComponentListItem.values()) {
+        for (ComponentRegistry c : ComponentRegistry.values()) {
             componentManager.registerComponent(c.getName(), c.getClazz());
         }
     }

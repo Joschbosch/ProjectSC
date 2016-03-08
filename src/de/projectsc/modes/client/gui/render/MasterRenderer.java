@@ -18,6 +18,7 @@ import de.projectsc.core.data.objects.Light;
 import de.projectsc.modes.client.gui.data.GUIScene;
 import de.projectsc.modes.client.gui.objects.Camera;
 import de.projectsc.modes.client.gui.objects.particles.ParticleMaster;
+import de.projectsc.modes.client.gui.settings.GUISettings;
 import de.projectsc.modes.client.gui.shaders.EntityShader;
 import de.projectsc.modes.client.gui.shaders.TerrainShader;
 import de.projectsc.modes.client.gui.shaders.WireFrameShader;
@@ -60,7 +61,7 @@ public class MasterRenderer {
     private final ShadowMapMasterRenderer shadowRenderer;
 
     public MasterRenderer() {
-        enableCulling();
+        GUISettings.enableCulling();
         GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
         createProjectionMatrix();
         entityShader = new EntityShader();
@@ -177,20 +178,6 @@ public class MasterRenderer {
         return shadowRenderer.getShadowMap();
     }
 
-    /**
-     * Enable culling for not render too much back faces.
-     */
-    public static void enableCulling() {
-        GL11.glEnable(GL11.GL_CULL_FACE);
-        GL11.glCullFace(GL11.GL_BACK);
-    }
-
-    /**
-     * Disable culling for rendering transparent faces.
-     */
-    public static void disableCulling() {
-        GL11.glDisable(GL11.GL_CULL_FACE);
-    }
 
     private void createProjectionMatrix() {
         projectionMatrix = new Matrix4f();

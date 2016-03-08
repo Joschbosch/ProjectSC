@@ -48,8 +48,8 @@ public class ParticleSystemComponent extends DefaultComponent {
      * Add a new system.
      */
     public void addNewParticleSystem() {
-        ParticleSystem particleSystem = new ParticleSystem(new Vector3f(), 100, 1, -1, 5, 1, true, new ParticleTexture(Loader
-            .loadTexture("particles/smoke.png"), 1));
+        ParticleSystem particleSystem = new ParticleSystem(new Vector3f(0, 10, 0), 100, 0.1f, -1, 5, 1, true, new ParticleTexture(Loader
+            .loadTexture("particles/smoke.png"), 5));
         particleSystems.add(particleSystem);
         offsets.put(particleSystem.getId(), new Vector3f(0, 10, 0));
     }
