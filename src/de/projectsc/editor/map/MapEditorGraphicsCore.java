@@ -340,12 +340,13 @@ public class MapEditorGraphicsCore implements Runnable {
             if (entityManager.hasComponent(e, ColliderComponent.class)) {
                 ColliderComponent collider = (ColliderComponent) entityManager.getComponent(e, ColliderComponent.class);
 
-                if (collider != null && collider.getAABB().intersects(entityManager.getEntity(e).getTransform(), camera.getPosition(),
-                    mousePicker.getCurrentRay()) > 0) {
-                    eventManager.fireEvent(new UpdateEntitySelectionEvent(e, false, true));
-                } else {
-                    eventManager.fireEvent(new UpdateEntitySelectionEvent(e, false, false));
-                }
+                // if (collider != null && collider.getAABB().intersects(entityManager.getEntity(e).getTransform(), camera.getPosition(),
+                // mousePicker.getCurrentRay()) > 0) {
+                // eventManager.fireEvent(new UpdateEntitySelectionEvent(e, false, true));
+                // } else {
+                // eventManager.fireEvent(new UpdateEntitySelectionEvent(e, false, false));
+                // }
+                System.out.println("TODO COLLISION");
             }
         }
         if (Mouse.isButtonDown(0) && mode == 1 && !alreadyClicked) {
@@ -353,10 +354,11 @@ public class MapEditorGraphicsCore implements Runnable {
             for (String e : entityManager.getAllEntites()) {
                 if (entityManager.hasComponent(e, ColliderComponent.class)) {
                     ColliderComponent collider = (ColliderComponent) entityManager.getComponent(e, ColliderComponent.class);
-                    if (collider.getAABB().intersects(entityManager.getEntity(e).getTransform(),
-                        camera.getPosition(), mousePicker.getCurrentRay()) > 0) {
-                        selectedEntity = e;
-                    }
+                    // if (collider.getAABB().intersects(entityManager.getEntity(e).getTransform(),
+                    // camera.getPosition(), mousePicker.getCurrentRay()) > 0) {
+                    // selectedEntity = e;
+                    // }
+                    System.out.println("TODO COLLISION");
                 }
             }
         }

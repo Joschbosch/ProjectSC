@@ -4,17 +4,18 @@
 
 package de.projectsc.core.systems.physics.collision;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.core.component.collision.ColliderComponent;
+import de.projectsc.core.component.physic.TransformComponent;
 import de.projectsc.core.component.state.EntityStateComponent;
 import de.projectsc.core.data.EntityEvent;
 import de.projectsc.core.data.Event;
-import de.projectsc.core.data.physics.AxisAlignedBoundingBox;
+import de.projectsc.core.data.physics.boundings.AxisAlignedBoundingBox;
 import de.projectsc.core.events.entity.component.ComponentAddedEvent;
 import de.projectsc.core.events.entity.component.ComponentRemovedEvent;
 import de.projectsc.core.events.entity.objects.NotifyEntityDeletedEvent;
@@ -37,7 +38,7 @@ public class CollisionSystem extends DefaultSystem {
 
     private static final String NAME = "Collision System";
 
-    private OctTree<Entity> octree;
+    private OctTree<String> octree;
 
     public CollisionSystem(EntityManager entityManager, EventManager eventManager) {
         super(CollisionSystem.NAME, entityManager, eventManager);
@@ -47,19 +48,21 @@ public class CollisionSystem extends DefaultSystem {
         eventManager.registerForEvent(MousePositionChangedAction.class, this);
         eventManager.registerForEvent(MouseButtonClickedAction.class, this);
         octree =
-            new OctTree<Entity>(new AxisAlignedBoundingBox(new Vector3f(-1000, -1000, -1000), new Vector3f(1000, 1000, 1000)));
+            new OctTree<String>(new AxisAlignedBoundingBox(new Vector3f(-1000, -1000, -1000), new Vector3f(1000, 1000, 1000)));
 
     }
 
     @Override
     public void update(long tick) {
-        List<Entity> moved = new LinkedList<>();
+        Map<String, OctTreeEntry<String>> moved = new HashMap<>();
         Set<String> entities = entityManager.getEntitiesWithComponent(ColliderComponent.class);
         for (String e : entities) {
             if (hasComponent(e, EntityStateComponent.class)) {
                 EntityStateComponent state = getComponent(e, EntityStateComponent.class);
+                TransformComponent tc = getComponent(e, TransformComponent.class);
+                ColliderComponent cc = getComponent(e, ColliderComponent.class);
                 if (state.hasMoved()) {
-                    moved.add(entityManager.getEntity(e));
+                    moved.put(e, new OctTreeEntry<String>(e, tc.getTransform(), cc.getSimpleBoundingVolume()));
                 }
             }
         }
@@ -100,7 +103,8 @@ public class CollisionSystem extends DefaultSystem {
         if (e instanceof ComponentAddedEvent) {
             Component c = ((ComponentAddedEvent) e).getComponent();
             if (c instanceof ColliderComponent) {
-                octree.addEntity(entityManager.getEntity(e.getEntityId()));
+                octree.addEntity(e.getEntityId(), getComponent(e.getEntityId(), TransformComponent.class).getTransform(),
+                    ((ColliderComponent) c).getSimpleBoundingVolume());
                 octree.recalculateTree();
             }
         } else if (e instanceof ComponentRemovedEvent) {
@@ -114,7 +118,7 @@ public class CollisionSystem extends DefaultSystem {
         }
     }
 
-    public OctTree<Entity> getOctree() {
+    public OctTree<String> getOctree() {
         return octree;
     }
 }

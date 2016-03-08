@@ -4,11 +4,9 @@
 
 package de.projectsc.core.component.collision;
 
-import org.lwjgl.util.vector.Vector3f;
-
 import de.projectsc.core.component.ComponentType;
 import de.projectsc.core.component.DefaultComponent;
-import de.projectsc.core.data.physics.AxisAlignedBoundingBox;
+import de.projectsc.core.data.physics.BoundingVolume;
 import de.projectsc.core.interfaces.Component;
 
 /**
@@ -25,14 +23,13 @@ public class ColliderComponent extends DefaultComponent {
      */
     public static final String NAME = "Collider Component";
 
-    private AxisAlignedBoundingBox axisAlignedBoundingBox;
+    private BoundingVolume simpleBoundingVolume;
+
+    private BoundingVolume exactBoundingVolume;
 
     public ColliderComponent() {
         setType(ComponentType.PREPHYSICS);
         setComponentName(NAME);
-        if (this.axisAlignedBoundingBox == null) {
-            this.axisAlignedBoundingBox = new AxisAlignedBoundingBox(new Vector3f(0, 0, 0), new Vector3f(1, 1, 1));
-        }
     }
 
     @Override
@@ -42,15 +39,24 @@ public class ColliderComponent extends DefaultComponent {
 
     @Override
     public Component cloneComponent() {
-        System.out.println("TO DO");
-        return new ColliderComponent();
+        ColliderComponent cc = new ColliderComponent();
+        cc.setSimpleBoundingVolume(getSimpleBoundingVolume().cloneVolume());
+        return cc;
     }
 
-    public AxisAlignedBoundingBox getAABB() {
-        return axisAlignedBoundingBox;
+    public BoundingVolume getSimpleBoundingVolume() {
+        return simpleBoundingVolume;
     }
 
-    public AxisAlignedBoundingBox getAxisAlignedBoundingBox() {
-        return axisAlignedBoundingBox;
+    public void setSimpleBoundingVolume(BoundingVolume boundingVolume) {
+        this.simpleBoundingVolume = boundingVolume;
+    }
+
+    public BoundingVolume getExactBoundingVolume() {
+        return exactBoundingVolume;
+    }
+
+    public void setExactBoundingVolume(BoundingVolume exactBoundingVolume) {
+        this.exactBoundingVolume = exactBoundingVolume;
     }
 }

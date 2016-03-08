@@ -9,7 +9,7 @@ package de.projectsc.core.terrain;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
-import de.projectsc.core.data.physics.AxisAlignedBoundingBox;
+import de.projectsc.core.data.physics.boundings.AxisAlignedBoundingBox;
 import de.projectsc.core.utils.Maths;
 
 /**

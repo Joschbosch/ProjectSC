@@ -17,17 +17,17 @@ import de.projectsc.core.component.state.EntityStateComponent;
 import de.projectsc.core.data.EntityEvent;
 import de.projectsc.core.data.Event;
 import de.projectsc.core.data.objects.Light;
-import de.projectsc.core.data.physics.AxisAlignedBoundingBox;
 import de.projectsc.core.data.physics.Transform;
 import de.projectsc.core.data.physics.WireFrame;
+import de.projectsc.core.data.physics.boundings.AxisAlignedBoundingBox;
 import de.projectsc.core.events.entity.movement.NotifyTransformUpdateEvent;
 import de.projectsc.core.events.entity.objects.CreateLightEvent;
 import de.projectsc.core.events.entity.objects.RemoveLightEvent;
-import de.projectsc.core.interfaces.Entity;
 import de.projectsc.core.manager.EntityManager;
 import de.projectsc.core.manager.EventManager;
 import de.projectsc.core.systems.DefaultSystem;
 import de.projectsc.core.systems.physics.collision.OctTree;
+import de.projectsc.core.utils.Maths;
 import de.projectsc.modes.client.gui.components.EmittingLightComponent;
 import de.projectsc.modes.client.gui.components.MeshRendererComponent;
 import de.projectsc.modes.client.gui.components.ParticleSystemComponent;
@@ -142,7 +142,7 @@ public class RenderingSystem extends DefaultSystem {
      * 
      * @return scene to render
      */
-    public GUIScene createScene(OctTree<Entity> octTree) {
+    public GUIScene createScene(OctTree<String> octTree) {
         Set<String> entities = entityManager.getAllEntites();
         GUIScene scene = new GUIScene();
         for (String entity : entities) {
@@ -159,9 +159,10 @@ public class RenderingSystem extends DefaultSystem {
             }
             if (hasComponent(entity, ColliderComponent.class)) {
                 ColliderComponent cc = getComponent(entity, ColliderComponent.class);
+                TransformComponent tc = getComponent(entity, TransformComponent.class);
                 WireFrame wf =
-                    new WireFrame(WireFrame.CUBE, cc.getAABB().getPosition(), new Vector3f(),
-                        cc.getAxisAlignedBoundingBox().getSize());
+                    new WireFrame(WireFrame.CUBE, Vector3f.add(cc.getSimpleBoundingVolume().getPositionOffset(), tc.getPosition(), null),
+                        new Vector3f(), cc.getSimpleBoundingVolume().getScale());
                 wf.setColor(new Vector3f(1.0f, 0, 0));
                 scene.getWireFrames().add(wf);
             }
@@ -173,13 +174,13 @@ public class RenderingSystem extends DefaultSystem {
                 scene.getSelectedEntites().add(new Vector3f(
                     transform.getPosition().x,
                     transform.getPosition().z,
-                    cc.getAABB().getSize().x));
+                    Maths.getSize(cc.getSimpleBoundingVolume()).x));
                 // }
                 if (esc.isHighlightAble() && esc.isHighlighted()) {
                     scene.getHightlightedEntites().add(new Vector3f(
                         transform.getPosition().x,
                         transform.getPosition().z,
-                        cc.getAABB().getSize().x));
+                        Maths.getSize(cc.getSimpleBoundingVolume()).x));
                 }
             }
             if (hasComponent(entity, ParticleSystemComponent.class)) {
@@ -192,11 +193,11 @@ public class RenderingSystem extends DefaultSystem {
         if (octTree != null) {
             List<AxisAlignedBoundingBox> boxes = octTree.getBoxes();
             for (AxisAlignedBoundingBox box : boxes) {
-                Vector3f size = new Vector3f(box.getSize());
+                Vector3f size = new Vector3f(Maths.getSize(box));
                 size.scale(0.5f);
-                Vector3f position = new Vector3f(box.getCenter());
+                Vector3f position = new Vector3f(Maths.getCenter(box));
                 position.y = position.y - size.y;
-                WireFrame wf = new WireFrame(WireFrame.CUBE, position, new Vector3f(), box.getSize());
+                WireFrame wf = new WireFrame(WireFrame.CUBE, position, new Vector3f(), Maths.getSize(box));
                 wf.setColor(new Vector3f(0.0f, 1f, 0));
                 scene.getWireFrames().add(wf);
             }

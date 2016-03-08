@@ -9,6 +9,9 @@ import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
+import de.projectsc.core.data.physics.BoundingVolume;
+import de.projectsc.core.data.physics.boundings.AxisAlignedBoundingBox;
+
 /**
  * Mathematics helper methods.
  * 
@@ -72,6 +75,16 @@ public final class Maths {
         Matrix4f.rotate((float) Math.toRadians(rz), new Vector3f(0, 0, 1), matrix, matrix);
         Matrix4f.scale(new Vector3f(scale.x, scale.y, scale.z), matrix, matrix);
         return matrix;
+    }
+
+    public static Vector3f getCenter(AxisAlignedBoundingBox region) {
+        Vector3f center = Vector3f.add(region.getMinima(), region.getMaxima(), null);
+        center.scale(1.0f / 2.0f);
+        return center;
+    }
+
+    public static Vector3f getSize(BoundingVolume boundingVolume) {
+        return Vector3f.sub(boundingVolume.getMinima(), boundingVolume.getMaxima(), null);
     }
 
 }
