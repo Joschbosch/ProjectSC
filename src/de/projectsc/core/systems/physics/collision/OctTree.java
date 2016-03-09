@@ -85,6 +85,8 @@ public class OctTree<T> {
      * Add new entity to OcTree.
      * 
      * @param e to add
+     * @param t Transform of entity
+     * @param b simple bounding volume of entity
      */
     public void addEntity(T e, Transform t, BoundingVolume b) {
         pendingEntities.put(e, new OctTreeEntry<T>(e, t, b));
@@ -130,8 +132,8 @@ public class OctTree<T> {
                     if (children[i] != null) {
                         children[i].insert(e, octTreeEntry);
                     } else {
-                        List<T> list = new LinkedList<>();
-                        list.add(e);
+                        Map<T, OctTreeEntry<T>> list = new HashMap<>();
+                        list.put(e, octTreeEntry);
                         children[i] = createNewNode(octant[i], list);
                         activeNodes |= (byte) (1 << i);
                     }
@@ -269,14 +271,13 @@ public class OctTree<T> {
         return false;
     }
 
-    private boolean boundingBoxesColliding(T a, T b, AxisAlignedBoundingBox currentAABB, AxisAlignedBoundingBox entityAABB) {
-        Transform aT = a.getTransform();
-        Transform bT = b.getTransform();
+    private boolean boundingBoxesColliding(Transform currentTransform, Transform entityTransform, AxisAlignedBoundingBox currentAABB,
+        AxisAlignedBoundingBox entityAABB) {
 
-        Vector3f aMax = Vector3f.add(aT.getPosition(), currentAABB.getMax(), null);
-        Vector3f aMin = Vector3f.add(aT.getPosition(), currentAABB.getMin(), null);
-        Vector3f bMax = Vector3f.add(bT.getPosition(), entityAABB.getMax(), null);
-        Vector3f bMin = Vector3f.add(bT.getPosition(), entityAABB.getMin(), null);
+        Vector3f aMax = Vector3f.add(currentTransform.getPosition(), currentAABB.getMaxima(), null);
+        Vector3f aMin = Vector3f.add(currentTransform.getPosition(), currentAABB.getMinima(), null);
+        Vector3f bMax = Vector3f.add(entityTransform.getPosition(), entityAABB.getMaxima(), null);
+        Vector3f bMin = Vector3f.add(entityTransform.getPosition(), entityAABB.getMinima(), null);
 
         return (aMax.x > bMin.x
             && aMin.x < bMax.x
@@ -364,19 +365,18 @@ public class OctTree<T> {
 
     private List<T> getAllIntersections(LinkedList<T> parentEntities) {
         List<T> intersectionIDs = new ArrayList<>();
-        List<T> entityCopy = new LinkedList<>();
-        entityCopy.addAll(entities);
+        Map<T, OctTreeEntry<T>> entityCopy = new HashMap<>();
+        entityCopy.putAll(entities);
         for (T parentEntity : parentEntities) {
             entityCopy.remove(parentEntity);
-            for (T entity : entityCopy) {
-                if (parentEntity.getID() != entity.getID()) {
-                    ColliderComponent colliderComponentA = ((ColliderComponent) parentEntity.getComponent(ColliderComponent.class));
-                    ColliderComponent colliderComponentB = ((ColliderComponent) entity.getComponent(ColliderComponent.class));
-                    if (colliderComponentA != null && colliderComponentB != null) {
-                        AxisAlignedBoundingBox parentAABB = colliderComponentA.getAABB();
-                        AxisAlignedBoundingBox entityAABB = colliderComponentB.getAABB();
-                        if (parentAABB != null
-                            && entityAABB != null && boundingBoxesColliding(parentEntity, entity, parentAABB, entityAABB)) {
+            for (T entity : entityCopy.keySet()) {
+                if (!parentEntity.equals(entity)) {
+                    BoundingVolume bvA = entityCopy.get(parentEntities).getBoundingVolume();
+                    BoundingVolume bvB = entityCopy.get(entity).getBoundingVolume();
+                    if (bvA.getType() == BoundingVolumeType.AXIS_ALIGNED_BOUNDING_BOX
+                        && bvB.getType() == BoundingVolumeType.AXIS_ALIGNED_BOUNDING_BOX) {
+                        if (boundingBoxesColliding(entityCopy.get(parentEntity).getTransform(), entityCopy.get(entity).getTransform(),
+                            (AxisAlignedBoundingBox) bvA, (AxisAlignedBoundingBox) bvB)) {
                             intersectionIDs.add(parentEntity);
                             intersectionIDs.add(entity);
                         }
@@ -385,22 +385,20 @@ public class OctTree<T> {
             }
         }
         if (entities.size() > 1) {
-            Queue<T> tmp = new LinkedList<>(entities);
-            entityCopy = new LinkedList<>();
-            entityCopy.addAll(entities);
+            Map<T, OctTreeEntry<T>> tmp = new HashMap<>(entities);
+            entityCopy = new HashMap<>();
+            entityCopy.putAll(entities);
             while (!tmp.isEmpty()) {
-                T current = tmp.remove();
+                T current = tmp.keySet().iterator().next();
                 entityCopy.remove(current);
-                for (T e : entityCopy) {
-                    if (e.getID() != current.getID()) {
-                        checkForIntersect(intersectionIDs, current, e);
+                for (T e : entityCopy.keySet()) {
+                    if (!e.equals(current)) {
+                        checkForIntersect(intersectionIDs, current, e, tmp.get(current), entityCopy.get(e));
                     }
                 }
             }
-            for (T e : entities) {
-                if (e.hasComponent(VelocityComponent.class)) {
-                    parentEntities.add(e);
-                }
+            for (T e : entities.keySet()) {
+                parentEntities.add(e);
             }
             for (int i = 0; i < 8; i++) {
                 if (children[i] != null) {
@@ -411,13 +409,11 @@ public class OctTree<T> {
         return intersectionIDs;
     }
 
-    private void checkForIntersect(List<T> intersectionIDs, T current, T e) {
-        ColliderComponent colliderComponentA = (ColliderComponent) e.getComponent(ColliderComponent.class);
-        ColliderComponent colliderComponentB = (ColliderComponent) current.getComponent(ColliderComponent.class);
-        if (colliderComponentA != null && colliderComponentB != null) {
-            AxisAlignedBoundingBox entityAABB = colliderComponentA.getAABB();
-            AxisAlignedBoundingBox currentAABB = colliderComponentB.getAABB();
-            if (currentAABB != null && entityAABB != null && boundingBoxesColliding(current, e, currentAABB, entityAABB)) {
+    private void checkForIntersect(List<T> intersectionIDs, T current, T e, OctTreeEntry<T> currentEntry, OctTreeEntry<T> eEntry) {
+        if (currentEntry.getBoundingVolume().getType() == BoundingVolumeType.AXIS_ALIGNED_BOUNDING_BOX
+            && eEntry.getBoundingVolume().getType() == BoundingVolumeType.AXIS_ALIGNED_BOUNDING_BOX) {
+            if (boundingBoxesColliding(currentEntry.getTransform(), eEntry.getTransform(),
+                (AxisAlignedBoundingBox) currentEntry.getBoundingVolume(), (AxisAlignedBoundingBox) eEntry.getBoundingVolume())) {
                 intersectionIDs.add(current);
                 intersectionIDs.add(e);
             }
@@ -445,9 +441,9 @@ public class OctTree<T> {
     }
 
     private boolean removeRecursive(String toRemove) {
-        Iterator<T> it = entities.iterator();
+        Iterator<T> it = entities.keySet().iterator();
         while (it.hasNext()) {
-            if (it.next().getID() == toRemove) {
+            if (it.next() == toRemove) {
                 it.remove();
                 return true;
             }
@@ -508,22 +504,24 @@ public class OctTree<T> {
      * @param currentCameraPosition for origin
      * @return entities
      */
-    public List<Entity> intersectsRay(Vector3f currentRay, Vector3f currentCameraPosition) {
-        List<Entity> intersecting = new LinkedList<>();
+    public List<T> intersectsRay(Vector3f currentRay, Vector3f currentCameraPosition) {
+        List<T> intersecting = new LinkedList<>();
         if (entities.size() == 0 && !hasChildren()) {
             return intersecting;
         }
-        for (Entity e : entities) {
-            if (((EntityStateComponent) e.getComponent(EntityStateComponent.class)).isHighlightAble()) {
-                if (((ColliderComponent) e.getComponent(ColliderComponent.class)).getAABB().intersects(e.getTransform(),
-                    currentRay, currentCameraPosition) > 0) {
-                    intersecting.add(e);
-                }
+        for (T e : entities.keySet()) {
+            float intersectValue =
+                Maths.intersects(entities.get(e).getTransform().getPosition(), entities.get(e).getBoundingVolume(), currentRay,
+                    currentCameraPosition);
+            if (intersectValue != Float.NaN && intersectValue > 0) {
+                intersecting.add(e);
             }
         }
         for (int i = 0; i < 8; i++) {
+            float intersectValue = Maths.intersects(children[i].getRegion().getPositionOffset(), children[i].getRegion(), currentRay,
+                currentCameraPosition);
             if (children[i] != null
-                && children[i].getRegion().intersects(currentRay, currentCameraPosition) > 0) {
+                && intersectValue != Float.NaN && intersectValue > 0) {
                 intersecting.addAll(children[i].intersectsRay(currentRay, currentCameraPosition));
             }
         }

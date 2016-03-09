@@ -160,6 +160,7 @@ public class RenderingSystem extends DefaultSystem {
             if (hasComponent(entity, ColliderComponent.class)) {
                 ColliderComponent cc = getComponent(entity, ColliderComponent.class);
                 TransformComponent tc = getComponent(entity, TransformComponent.class);
+                System.out.println(entity);
                 WireFrame wf =
                     new WireFrame(WireFrame.CUBE, Vector3f.add(cc.getSimpleBoundingVolume().getPositionOffset(), tc.getPosition(), null),
                         new Vector3f(), cc.getSimpleBoundingVolume().getScale());

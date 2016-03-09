@@ -76,9 +76,9 @@ public class CollisionSystem extends DefaultSystem {
         }
 
         if (e instanceof MousePositionChangedAction) {
-            for (Entity entity : octree.intersectsRay(((MousePositionChangedAction) e).getCurrentRay(),
+            for (String entity : octree.intersectsRay(((MousePositionChangedAction) e).getCurrentRay(),
                 ((MousePositionChangedAction) e).getCurrentCameraPosition())) {
-                fireEvent(new UpdateEntitySelectionEvent(entity.getID(), false, true));
+                fireEvent(new UpdateEntitySelectionEvent(entity, false, true));
             }
 
         } else if (e instanceof MouseButtonClickedAction) {

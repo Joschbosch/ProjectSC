@@ -127,7 +127,7 @@ public class GUICore implements GUI {
             Display.setDisplayMode(new DisplayMode(WIDTH, HEIGHT));
             Display.setTitle("Project SC");
             Display.setVSyncEnabled(true);
-            Display.create(new PixelFormat().withSamples(ANTI_ALIAILISING_MULTISAMPLE_RATE), attribs);
+            Display.create(new PixelFormat().withSamples(ANTI_ALIAILISING_MULTISAMPLE_RATE).withDepthBits(24), attribs);
             if (ENABLE_MSAA) {
                 GL11.glEnable(GL13.GL_MULTISAMPLE);
             }

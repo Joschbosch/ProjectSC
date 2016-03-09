@@ -41,7 +41,7 @@ public class AxisAlignedBoundingBox implements BoundingVolume {
 
     @Override
     public String toString() {
-        String result = String.format("Bounding box:\n\tMinium (%s)\n\tMaximum", min, max);
+        String result = String.format("Bounding box:\n\tMinium (%s)\n\tMaximum %s\n", min, max);
         return result;
 
     }
