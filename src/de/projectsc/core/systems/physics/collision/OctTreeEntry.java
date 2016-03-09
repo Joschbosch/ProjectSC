@@ -7,6 +7,12 @@ package de.projectsc.core.systems.physics.collision;
 import de.projectsc.core.data.physics.BoundingVolume;
 import de.projectsc.core.data.physics.Transform;
 
+/**
+ * Information of the entries in the octree.
+ * 
+ * @param <T> generic
+ * @author Josch Bosch
+ */
 public class OctTreeEntry<T> {
 
     private T owner;

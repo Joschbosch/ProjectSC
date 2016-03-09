@@ -49,6 +49,7 @@ import de.projectsc.core.manager.EventManager;
 import de.projectsc.core.systems.physics.collision.CollisionSystem;
 import de.projectsc.core.systems.state.EntityStateSystem;
 import de.projectsc.core.terrain.Terrain;
+import de.projectsc.core.utils.Maths;
 import de.projectsc.editor.entity.EntityEditor;
 import de.projectsc.modes.client.gui.InputSystem;
 import de.projectsc.modes.client.gui.RenderingSystem;
@@ -340,20 +341,19 @@ public class MapEditorGraphicsCore implements Runnable {
             if (entityManager.hasComponent(e, ColliderComponent.class)) {
                 ColliderComponent collider = (ColliderComponent) entityManager.getComponent(e, ColliderComponent.class);
 
-                // if (collider != null && collider.getAABB().intersects(entityManager.getEntity(e).getTransform(), camera.getPosition(),
-                // mousePicker.getCurrentRay()) > 0) {
-                // eventManager.fireEvent(new UpdateEntitySelectionEvent(e, false, true));
-                // } else {
-                // eventManager.fireEvent(new UpdateEntitySelectionEvent(e, false, false));
-                // }
-                System.out.println("TODO COLLISION");
+                if (Maths.intersects(entityManager.getEntity(e).getTransform().getPosition(), collider.getSimpleBoundingVolume(),
+                    camera.getPosition(), mousePicker.getCurrentRay()) > 0) {
+                    eventManager.fireEvent(new UpdateEntitySelectionEvent(e, false, true));
+                } else {
+                    eventManager.fireEvent(new UpdateEntitySelectionEvent(e, false, false));
+                }
             }
         }
         if (Mouse.isButtonDown(0) && mode == 1 && !alreadyClicked) {
             alreadyClicked = true;
             for (String e : entityManager.getAllEntites()) {
                 if (entityManager.hasComponent(e, ColliderComponent.class)) {
-                    ColliderComponent collider = (ColliderComponent) entityManager.getComponent(e, ColliderComponent.class);
+                    // ColliderComponent collider = (ColliderComponent) entityManager.getComponent(e, ColliderComponent.class);
                     // if (collider.getAABB().intersects(entityManager.getEntity(e).getTransform(),
                     // camera.getPosition(), mousePicker.getCurrentRay()) > 0) {
                     // selectedEntity = e;

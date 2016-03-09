@@ -17,9 +17,11 @@ import de.projectsc.core.component.state.EntityStateComponent;
 import de.projectsc.core.data.EntityEvent;
 import de.projectsc.core.data.Event;
 import de.projectsc.core.data.objects.Light;
+import de.projectsc.core.data.physics.BoundingVolumeType;
 import de.projectsc.core.data.physics.Transform;
 import de.projectsc.core.data.physics.WireFrame;
 import de.projectsc.core.data.physics.boundings.AxisAlignedBoundingBox;
+import de.projectsc.core.data.physics.boundings.Sphere;
 import de.projectsc.core.events.entity.movement.NotifyTransformUpdateEvent;
 import de.projectsc.core.events.entity.objects.CreateLightEvent;
 import de.projectsc.core.events.entity.objects.RemoveLightEvent;
@@ -160,10 +162,19 @@ public class RenderingSystem extends DefaultSystem {
             if (hasComponent(entity, ColliderComponent.class)) {
                 ColliderComponent cc = getComponent(entity, ColliderComponent.class);
                 TransformComponent tc = getComponent(entity, TransformComponent.class);
-                System.out.println(entity);
-                WireFrame wf =
-                    new WireFrame(WireFrame.CUBE, Vector3f.add(cc.getSimpleBoundingVolume().getPositionOffset(), tc.getPosition(), null),
-                        new Vector3f(), cc.getSimpleBoundingVolume().getScale());
+                WireFrame wf = null;
+                if (cc.getSimpleBoundingVolume().getType() == BoundingVolumeType.AXIS_ALIGNED_BOUNDING_BOX) {
+                    wf = new WireFrame(WireFrame.CUBE,
+                        Vector3f.add(cc.getSimpleBoundingVolume().getPositionOffset(), tc.getPosition(), null),
+                        new Vector3f(), Maths.getSize(cc.getSimpleBoundingVolume()));
+                } else if (cc.getSimpleBoundingVolume().getType() == BoundingVolumeType.SPHERE) {
+                    float radius = ((Sphere) cc.getSimpleBoundingVolume()).getRadius();
+                    wf =
+                        new WireFrame(WireFrame.SPHERE,
+                            Vector3f.add(Vector3f.add(((Sphere) cc.getSimpleBoundingVolume()).getPositionOffset(), tc.getPosition(), null),
+                                tc.getPosition(), null),
+                            new Vector3f(), new Vector3f(radius, radius, radius));
+                }
                 wf.setColor(new Vector3f(1.0f, 0, 0));
                 scene.getWireFrames().add(wf);
             }

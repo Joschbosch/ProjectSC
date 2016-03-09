@@ -11,21 +11,16 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.TreeMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.lwjgl.util.vector.Vector3f;
 
-import de.projectsc.core.component.collision.ColliderComponent;
-import de.projectsc.core.component.physic.VelocityComponent;
-import de.projectsc.core.component.state.EntityStateComponent;
 import de.projectsc.core.data.physics.BoundingVolume;
 import de.projectsc.core.data.physics.BoundingVolumeType;
 import de.projectsc.core.data.physics.Transform;
 import de.projectsc.core.data.physics.boundings.AxisAlignedBoundingBox;
-import de.projectsc.core.interfaces.Entity;
 import de.projectsc.core.utils.Maths;
 
 /**
@@ -125,10 +120,10 @@ public class OctTree<T> {
 
         AxisAlignedBoundingBox[] octant = new AxisAlignedBoundingBox[8];
         createOctantWithChildren(center, octant);
-        if (containsAABB(region, e, octTreeEntry)) {
+        if (containsVolume(region, e, octTreeEntry)) {
             boolean foundChild = false;
             for (int i = 0; i < 8; i++) {
-                if (containsAABB(octant[i], e, octTreeEntry)) {
+                if (containsVolume(octant[i], e, octTreeEntry)) {
                     if (children[i] != null) {
                         children[i].insert(e, octTreeEntry);
                     } else {
@@ -136,6 +131,7 @@ public class OctTree<T> {
                         list.put(e, octTreeEntry);
                         children[i] = createNewNode(octant[i], list);
                         activeNodes |= (byte) (1 << i);
+
                     }
 
                     foundChild = true;
@@ -205,7 +201,7 @@ public class OctTree<T> {
             BoundingVolumeType type = entities.get(e).getBoundingVolume().getType();
             if (type == BoundingVolumeType.AXIS_ALIGNED_BOUNDING_BOX) {
                 for (int i = 0; i < 8; i++) {
-                    if (containsAABB(octant[i], e, entities.get(e))) {
+                    if (containsVolume(octant[i], e, entities.get(e))) {
                         subEntities.get(i).put(e, entities.get(e));
                         remove.add(e);
                         break;
@@ -213,7 +209,13 @@ public class OctTree<T> {
                 }
             }
             if (type == BoundingVolumeType.SPHERE) {
-                System.out.println("TODO");
+                for (int i = 0; i < 8; i++) {
+                    if (containsVolume(octant[i], e, entities.get(e))) {
+                        subEntities.get(i).put(e, entities.get(e));
+                        remove.add(e);
+                        break;
+                    }
+                }
             }
         }
         for (T e : remove) {
@@ -257,9 +259,13 @@ public class OctTree<T> {
                 region.getMaxima().z));
     }
 
-    private boolean containsAABB(AxisAlignedBoundingBox boundingBox, T e, OctTreeEntry<T> ote) {
-        Vector3f minBB = Vector3f.add(ote.getTransform().getPosition(), ote.getBoundingVolume().getMinima(), null);
-        Vector3f maxBB = Vector3f.add(ote.getTransform().getPosition(), ote.getBoundingVolume().getMaxima(), null);
+    private boolean containsVolume(AxisAlignedBoundingBox boundingBox, T e, OctTreeEntry<T> ote) {
+        Vector3f minBB =
+            Vector3f.add(Vector3f.add(ote.getTransform().getPosition(), ote.getBoundingVolume().getMinima(), null), ote.getBoundingVolume()
+                .getPositionOffset(), null);
+        Vector3f maxBB =
+            Vector3f.add(Vector3f.add(ote.getTransform().getPosition(), ote.getBoundingVolume().getMaxima(), null), ote.getBoundingVolume()
+                .getPositionOffset(), null);
         if (minBB.x <= boundingBox.getMaxima().x && minBB.x >= boundingBox.getMinima().x
             && minBB.y <= boundingBox.getMaxima().y && minBB.y >= boundingBox.getMinima().y
             && minBB.z <= boundingBox.getMaxima().z && minBB.z >= boundingBox.getMinima().z
@@ -334,9 +340,10 @@ public class OctTree<T> {
                     children[i].update(moved);
                 }
             }
+
             for (T e : moved.keySet()) {
                 OctTree<T> current = this;
-                while (!containsAABB(current.region, e, moved.get(e))) {
+                while (!containsVolume(current.region, e, moved.get(e))) {
                     if (current.parent != null) {
                         current = current.parent;
                     } else {
@@ -354,7 +361,7 @@ public class OctTree<T> {
                 }
             }
             if (parent == null) {
-                interSectionList = getAllIntersections(new LinkedList<T>());
+                interSectionList = getAllIntersections(new HashMap<T, OctTreeEntry<T>>());
             }
         }
     }
@@ -363,19 +370,18 @@ public class OctTree<T> {
         return interSectionList;
     }
 
-    private List<T> getAllIntersections(LinkedList<T> parentEntities) {
+    private List<T> getAllIntersections(Map<T, OctTreeEntry<T>> parentEntities) {
         List<T> intersectionIDs = new ArrayList<>();
         Map<T, OctTreeEntry<T>> entityCopy = new HashMap<>();
         entityCopy.putAll(entities);
-        for (T parentEntity : parentEntities) {
-            entityCopy.remove(parentEntity);
+        for (T parentEntity : parentEntities.keySet()) {
             for (T entity : entityCopy.keySet()) {
                 if (!parentEntity.equals(entity)) {
-                    BoundingVolume bvA = entityCopy.get(parentEntities).getBoundingVolume();
+                    BoundingVolume bvA = parentEntities.get(parentEntity).getBoundingVolume();
                     BoundingVolume bvB = entityCopy.get(entity).getBoundingVolume();
                     if (bvA.getType() == BoundingVolumeType.AXIS_ALIGNED_BOUNDING_BOX
                         && bvB.getType() == BoundingVolumeType.AXIS_ALIGNED_BOUNDING_BOX) {
-                        if (boundingBoxesColliding(entityCopy.get(parentEntity).getTransform(), entityCopy.get(entity).getTransform(),
+                        if (boundingBoxesColliding(parentEntities.get(parentEntity).getTransform(), entityCopy.get(entity).getTransform(),
                             (AxisAlignedBoundingBox) bvA, (AxisAlignedBoundingBox) bvB)) {
                             intersectionIDs.add(parentEntity);
                             intersectionIDs.add(entity);
@@ -383,22 +389,26 @@ public class OctTree<T> {
                     }
                 }
             }
+            entityCopy.remove(parentEntity);
         }
         if (entities.size() > 1) {
             Map<T, OctTreeEntry<T>> tmp = new HashMap<>(entities);
             entityCopy = new HashMap<>();
             entityCopy.putAll(entities);
-            while (!tmp.isEmpty()) {
-                T current = tmp.keySet().iterator().next();
+            Iterator<T> it = tmp.keySet().iterator();
+            while (it.hasNext()) {
+                T current = it.next();
                 entityCopy.remove(current);
                 for (T e : entityCopy.keySet()) {
                     if (!e.equals(current)) {
                         checkForIntersect(intersectionIDs, current, e, tmp.get(current), entityCopy.get(e));
                     }
                 }
+                it.remove();
+
             }
             for (T e : entities.keySet()) {
-                parentEntities.add(e);
+                parentEntities.put(e, entities.get(e));
             }
             for (int i = 0; i < 8; i++) {
                 if (children[i] != null) {
@@ -465,20 +475,21 @@ public class OctTree<T> {
         int level = 0;
         for (int i = 0; i < 8; i++) {
             if (children[i] != null) {
-                count += Integer.parseInt(children[i].toStringLevel(level));
+                count += children[i].toStringLevel(level);
             }
         }
         return "" + count;
     }
 
-    private String toStringLevel(int level) {
+    private int toStringLevel(int level) {
         level++;
+        int countChildren = 0;
         for (int i = 0; i < 8; i++) {
             if (children[i] != null) {
-                children[i].toStringLevel(level);
+                countChildren += children[i].toStringLevel(level);
             }
         }
-        return "" + entities.size();
+        return entities.size() + countChildren;
     }
 
     /**
@@ -518,11 +529,12 @@ public class OctTree<T> {
             }
         }
         for (int i = 0; i < 8; i++) {
-            float intersectValue = Maths.intersects(children[i].getRegion().getPositionOffset(), children[i].getRegion(), currentRay,
-                currentCameraPosition);
-            if (children[i] != null
-                && intersectValue != Float.NaN && intersectValue > 0) {
-                intersecting.addAll(children[i].intersectsRay(currentRay, currentCameraPosition));
+            if (children[i] != null) {
+                float intersectValue = Maths.intersects(children[i].getRegion().getPositionOffset(), children[i].getRegion(), currentRay,
+                    currentCameraPosition);
+                if (intersectValue != Float.NaN && intersectValue > 0) {
+                    intersecting.addAll(children[i].intersectsRay(currentRay, currentCameraPosition));
+                }
             }
         }
         return intersecting;

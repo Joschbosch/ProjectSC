@@ -24,7 +24,6 @@ import de.projectsc.core.events.input.MouseButtonClickedAction;
 import de.projectsc.core.events.input.MousePositionChangedAction;
 import de.projectsc.core.events.input.MoveToPositionAction;
 import de.projectsc.core.interfaces.Component;
-import de.projectsc.core.interfaces.Entity;
 import de.projectsc.core.manager.EntityManager;
 import de.projectsc.core.manager.EventManager;
 import de.projectsc.core.systems.DefaultSystem;

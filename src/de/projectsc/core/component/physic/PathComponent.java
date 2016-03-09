@@ -4,10 +4,6 @@
 
 package de.projectsc.core.component.physic;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.core.CoreConstants;
@@ -32,16 +28,6 @@ public class PathComponent extends DefaultComponent {
     public PathComponent() {
         setComponentName(NAME);
         setType(ComponentType.PHYSICS);
-    }
-
-    @Override
-    public boolean isValidForEntitySaving() {
-        return true;
-    }
-
-    @Override
-    public Map<String, Object> serialize(File savingLocation) {
-        return new HashMap<String, Object>();
     }
 
     @Override

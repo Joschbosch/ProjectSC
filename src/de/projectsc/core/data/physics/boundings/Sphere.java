@@ -8,8 +8,10 @@ import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.core.data.physics.BoundingVolume;
 import de.projectsc.core.data.physics.BoundingVolumeType;
+
 /**
  * A sphere as bounding volume.
+ * 
  * @author Josch Bosch
  */
 public class Sphere implements BoundingVolume {
@@ -20,7 +22,7 @@ public class Sphere implements BoundingVolume {
 
     @Override
     public Vector3f getPositionOffset() {
-        return position;
+        return Vector3f.add(position, new Vector3f(0, radius, 0), null);
     }
 
     @Override
@@ -46,7 +48,7 @@ public class Sphere implements BoundingVolume {
     @Override
     public BoundingVolume cloneVolume() {
         Sphere sphere = new Sphere();
-        sphere.setPosition(position);
+        sphere.setPositionOffset(position);
         sphere.setRadius(radius);
         return sphere;
     }
@@ -59,8 +61,14 @@ public class Sphere implements BoundingVolume {
         this.radius = radius;
     }
 
-    public void setPosition(Vector3f position) {
-        this.position = position;
+    @Override
+    public void setPositionOffset(Vector3f newPosition) {
+        this.position = newPosition;
+    }
+
+    @Override
+    public void setScale(Vector3f scale) {
+
     }
 
 }

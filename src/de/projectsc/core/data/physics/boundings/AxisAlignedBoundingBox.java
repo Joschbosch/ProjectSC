@@ -46,15 +46,12 @@ public class AxisAlignedBoundingBox implements BoundingVolume {
 
     }
 
-    public Vector3f getPosition() {
-        return position;
-    }
-
     /**
-     * @param position to set
+     * @param newPosition to set
      */
-    public void setPosition(Vector3f position) {
-        this.position = position;
+    @Override
+    public void setPositionOffset(Vector3f newPosition) {
+        this.position = newPosition;
     }
 
     /**
@@ -62,6 +59,7 @@ public class AxisAlignedBoundingBox implements BoundingVolume {
      * 
      * @param scale to set
      */
+    @Override
     public void setScale(Vector3f scale) {
         this.scale = scale;
     }
@@ -95,7 +93,7 @@ public class AxisAlignedBoundingBox implements BoundingVolume {
     public BoundingVolume cloneVolume() {
         AxisAlignedBoundingBox aabb = new AxisAlignedBoundingBox(new Vector3f(min), new Vector3f(max));
         aabb.setScale(new Vector3f(scale));
-        aabb.setPosition(new Vector3f(position));
-        return null;
+        aabb.setPositionOffset(new Vector3f(position));
+        return aabb;
     }
 }

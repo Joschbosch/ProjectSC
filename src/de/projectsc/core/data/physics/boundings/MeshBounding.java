@@ -9,6 +9,11 @@ import org.lwjgl.util.vector.Vector3f;
 import de.projectsc.core.data.physics.BoundingVolume;
 import de.projectsc.core.data.physics.BoundingVolumeType;
 
+/**
+ * Bounding volume that is a mesh.
+ * 
+ * @author Josch Bosch
+ */
 public class MeshBounding implements BoundingVolume {
 
     private Vector3f position;
@@ -25,6 +30,11 @@ public class MeshBounding implements BoundingVolume {
     @Override
     public Vector3f getPositionOffset() {
         return position;
+    }
+
+    @Override
+    public void setPositionOffset(Vector3f vector3f) {
+        position = vector3f;
     }
 
     @Override
@@ -60,5 +70,10 @@ public class MeshBounding implements BoundingVolume {
 
     public int getMeshId() {
         return meshId;
+    }
+
+    @Override
+    public void setScale(Vector3f scale) {
+        this.scale = scale;
     }
 }

@@ -4,7 +4,14 @@
 
 package de.projectsc.core.data.physics;
 
+/**
+ * All types of bounding volumes.
+ * 
+ * @author Josch Bosch
+ */
 public enum BoundingVolumeType {
-    AXIS_ALIGNED_BOUNDING_BOX,
-    SPHERE, MESH
+    /**
+     * Types.
+     */
+    AXIS_ALIGNED_BOUNDING_BOX, SPHERE, MESH
 }

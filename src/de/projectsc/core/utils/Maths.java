@@ -5,21 +5,13 @@
  */
 package de.projectsc.core.utils;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
-import de.projectsc.core.component.collision.ColliderComponent;
-import de.projectsc.core.component.state.EntityStateComponent;
 import de.projectsc.core.data.physics.BoundingVolume;
 import de.projectsc.core.data.physics.BoundingVolumeType;
-import de.projectsc.core.data.physics.Transform;
-import de.projectsc.core.data.physics.boundings.AxisAlignedBoundingBox;
 import de.projectsc.core.data.physics.boundings.Sphere;
-import de.projectsc.core.interfaces.Entity;
 
 /**
  * Mathematics helper methods.
@@ -86,16 +78,37 @@ public final class Maths {
         return matrix;
     }
 
-    public static Vector3f getCenter(AxisAlignedBoundingBox region) {
+    /**
+     * Get center of bounding volume.
+     * 
+     * @param region to get center from
+     * @return center vector
+     */
+    public static Vector3f getCenter(BoundingVolume region) {
         Vector3f center = Vector3f.add(region.getMinima(), region.getMaxima(), null);
         center.scale(1.0f / 2.0f);
         return center;
     }
 
+    /**
+     * Get size of volume.
+     * 
+     * @param boundingVolume to get size from
+     * @return size
+     */
     public static Vector3f getSize(BoundingVolume boundingVolume) {
-        return Vector3f.sub(boundingVolume.getMinima(), boundingVolume.getMaxima(), null);
+        return Vector3f.sub(boundingVolume.getMaxima(), boundingVolume.getMinima(), null);
     }
 
+    /**
+     * Check if the given bounding volume intersects with the given ray.
+     * 
+     * @param position of bounding volume to check
+     * @param boundingVolume to check
+     * @param currentRay to check
+     * @param currentPointOfOrigin to check
+     * @return value of intersection.
+     */
     public static float intersects(Vector3f position, BoundingVolume boundingVolume, Vector3f currentRay, Vector3f currentPointOfOrigin) {
         if (boundingVolume.getType() == BoundingVolumeType.AXIS_ALIGNED_BOUNDING_BOX) {
             Vector3f lb = Vector3f.add(position, boundingVolume.getMinima(), null);
