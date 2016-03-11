@@ -4,15 +4,12 @@
 
 package de.projectsc.core.interfaces;
 
-import de.projectsc.core.data.physics.Transform;
-
 /**
  * Interface for the entity container.
  * 
  * @author Josch Bosch
  */
 public interface Entity {
-
 
     /**
      * Check if entity has the specified component.

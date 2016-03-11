@@ -7,9 +7,6 @@ package de.projectsc.core.entities;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.lwjgl.util.vector.Vector3f;
-
-import de.projectsc.core.component.physic.TransformComponent;
 import de.projectsc.core.data.physics.Transform;
 import de.projectsc.core.interfaces.Component;
 import de.projectsc.core.manager.EntityManager;

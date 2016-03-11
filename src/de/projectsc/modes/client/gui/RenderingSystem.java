@@ -20,7 +20,6 @@ import de.projectsc.core.data.objects.Light;
 import de.projectsc.core.data.physics.BoundingVolumeType;
 import de.projectsc.core.data.physics.Transform;
 import de.projectsc.core.data.physics.WireFrame;
-import de.projectsc.core.data.physics.boundings.AxisAlignedBoundingBox;
 import de.projectsc.core.data.physics.boundings.Sphere;
 import de.projectsc.core.events.entity.movement.NotifyTransformUpdateEvent;
 import de.projectsc.core.events.entity.objects.CreateLightEvent;
@@ -28,7 +27,7 @@ import de.projectsc.core.events.entity.objects.RemoveLightEvent;
 import de.projectsc.core.manager.EntityManager;
 import de.projectsc.core.manager.EventManager;
 import de.projectsc.core.systems.DefaultSystem;
-import de.projectsc.core.systems.physics.collision.OctTree2;
+import de.projectsc.core.systems.physics.collision.OctreeNode;
 import de.projectsc.core.utils.Maths;
 import de.projectsc.modes.client.gui.components.EmittingLightComponent;
 import de.projectsc.modes.client.gui.components.MeshRendererComponent;
@@ -144,7 +143,7 @@ public class RenderingSystem extends DefaultSystem {
      * 
      * @return scene to render
      */
-    public GUIScene createScene(OctTree2<String> octTree) {
+    public GUIScene createScene(OctreeNode octTree) {
         Set<String> entities = entityManager.getAllEntites();
         GUIScene scene = new GUIScene();
         for (String entity : entities) {
@@ -202,20 +201,12 @@ public class RenderingSystem extends DefaultSystem {
                 }
             }
         }
-        if (octTree != null) {
-            List<AxisAlignedBoundingBox> boxes = octTree.getBoxes();
-            System.out.println(boxes);
-            for (AxisAlignedBoundingBox box : boxes) {
-                Vector3f size = new Vector3f(Maths.getSize(box));
-                size.scale(0.5f);
-                Vector3f position = new Vector3f(Maths.getCenter(box));
-                position.y = position.y - size.y;
-                System.out.println(position);
-                WireFrame wf = new WireFrame(WireFrame.CUBE, position, new Vector3f(), Maths.getSize(box));
-                wf.setColor(new Vector3f(0.0f, 1f, 0));
-                scene.getWireFrames().add(wf);
-            }
-        }
+
+        WireFrame w =
+            new WireFrame(WireFrame.CUBE, octTree.getNodeWorldRenderingPosition(), new Vector3f(),
+                octTree.getNodeWorldScale());
+        w.setColor(new Vector3f(0, 1, 0));
+        scene.getWireFrames().add(w);
         return scene;
     }
 

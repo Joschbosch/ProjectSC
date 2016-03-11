@@ -4,10 +4,14 @@
 
 package de.projectsc.core.systems.physics.collision;
 
-import javax.print.attribute.HashPrintJobAttributeSet;
-
 import org.lwjgl.util.vector.Vector3f;
 
+/**
+ * Records an intersection in the collision system.
+ * 
+ * @param <T> generic
+ * @author Josch Bosch
+ */
 public class IntersectionRecord<T> {
 
     private Vector3f position;
@@ -33,7 +37,7 @@ public class IntersectionRecord<T> {
         distance = Double.MAX_VALUE;
         object1 = null;
     }
-    
+
     public IntersectionRecord(Vector3f hitPos, Vector3f hitNormal, Vector3f ray, double distance) {
         position = hitPos;
         normal = hitNormal;
@@ -41,7 +45,7 @@ public class IntersectionRecord<T> {
         this.distance = distance;
         hasHit = true;
     }
-    
+
     @Override
     public boolean equals(Object obj) {
         @SuppressWarnings("unchecked") IntersectionRecord<T> other = (IntersectionRecord<T>) obj;
@@ -108,22 +112,18 @@ public class IntersectionRecord<T> {
         this.node = node;
     }
 
-    
     public boolean isHasHit() {
         return hasHit;
     }
 
-    
     public void setHasHit(boolean hasHit) {
         this.hasHit = hasHit;
     }
 
-    
     public double getDistance() {
         return distance;
     }
 
-    
     public void setDistance(double distance) {
         this.distance = distance;
     }
