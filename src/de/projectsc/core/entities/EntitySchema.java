@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.lwjgl.util.vector.Vector3f;
 
+import de.projectsc.core.component.physic.TransformComponent;
 import de.projectsc.core.data.physics.Transform;
 import de.projectsc.core.interfaces.Component;
 import de.projectsc.core.manager.EntityManager;
@@ -40,13 +41,9 @@ public class EntitySchema {
      * @param entityManager manager.
      */
     public void createNewEntity(Transform oldTransform, String e, EntityManager entityManager) {
-        Transform t = entityManager.getEntity(e).getTransform();
-        t.setPosition(new Vector3f(oldTransform.getPosition()));
-        t.setRotation(new Vector3f(oldTransform.getRotation()));
-        t.setScale(new Vector3f(oldTransform.getScale()));
         for (Component c : components) {
             Component clone = c.cloneComponent();
-            entityManager.addComponentToEntity(e, clone);
+            entityManager.addComponentToEntity(e, clone, false);
             clone.setOwner(entityManager.getEntity(e));
         }
         entityManager.getEntity(e).setEntityTypeId(id);

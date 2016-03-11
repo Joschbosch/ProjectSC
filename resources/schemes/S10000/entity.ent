@@ -1,33 +1,67 @@
 {
   "components" : {
-    "Collider Component" : { },
     "Emitting light component" : { },
+    "Collider Component" : {
+      "exact" : {
+        "radius" : 1.0,
+        "type" : "SPHERE",
+        "scale" : {
+          "x" : 1.0,
+          "y" : 1.0,
+          "z" : 1.0
+        },
+        "positionOffset" : {
+          "x" : 0.0,
+          "y" : 1.0,
+          "z" : 0.0
+        },
+        "maxima" : {
+          "x" : 1.0,
+          "y" : 1.0,
+          "z" : 1.0
+        },
+        "minima" : {
+          "x" : -1.0,
+          "y" : -1.0,
+          "z" : -1.0
+        }
+      },
+      "simple" : {
+        "scale" : {
+          "x" : 1.0,
+          "y" : 1.0,
+          "z" : 1.0
+        },
+        "type" : "AXIS_ALIGNED_BOUNDING_BOX",
+        "positionOffset" : {
+          "x" : 0.0,
+          "y" : 0.0,
+          "z" : 0.0
+        },
+        "maxima" : {
+          "x" : 1.0,
+          "y" : 1.0,
+          "z" : 1.0
+        },
+        "minima" : {
+          "x" : 0.0,
+          "y" : 0.0,
+          "z" : 0.0
+        }
+      }
+    },
+    "Controlable Component" : { },
     "Mesh Renderer Component" : {
       "shineDamper" : 1.0,
       "reflectivity" : 0.0,
       "numColumns" : 1
     },
     "Mesh Component" : { },
-    "Controlable Component" : {},
-    "Velocity Component" : {
-      "acceleration" : 10000.0,
-      "turnSpeed" : 1200.0,
-      "maxSpeed" : 16.0
-    },
+    "Velocity Component" : { },
+    "Health Component" : { },
     "Path Component" : { },
-    "Transform Component" : {
-      "positionY" : 0.0,
-      "scaleX" : 1.0,
-      "positionZ" : 0.0,
-      "scaleY" : 1.0,
-      "rotationX" : 0.0,
-      "rotationY" : 0.0,
-      "rotationZ" : 0.0,
-      "scaleZ" : 1.0,
-      "positionX" : 0.0
-    },
-    "Entity State Component" : { },
-    "Health Component" : {}
+    "Transform Component" : { },
+    "Entity State Component" : { }
   },
   "schemaId" : 10000,
   "schemaName" : "EntitySchema0"

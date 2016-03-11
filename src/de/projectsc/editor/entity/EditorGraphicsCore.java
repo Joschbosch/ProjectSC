@@ -208,7 +208,7 @@ public class EditorGraphicsCore implements Runnable {
         EmittingLightComponent lightComponent =
             (EmittingLightComponent) entityManager.addComponentToEntity(sun,
                 GraphicalComponentImplementation.EMMITING_LIGHT_COMPONENT.getName());
-        Transform position = entityManager.getEntity(sun).getTransform();
+        Transform position = ((TransformComponent) entityManager.getComponent(sun, TransformComponent.class)).getTransform();
         Light light = new Light(sun, new Vector3f(position.getPosition()), new Vector3f(1.0f, 1.0f, 1.0f), "sun");
         light.setAttenuation(new Vector3f(1, 0, 0));
         lightComponent.addLight(sun, new Vector3f(position.getPosition()), light);
@@ -334,29 +334,11 @@ public class EditorGraphicsCore implements Runnable {
                 String name = componentNamesIterator.next();
                 Map<String, Object> serialized =
                     mapper.readValue(tree.get("components").get(name), new HashMap<String, Object>().getClass());
-                if (name.equals(TransformComponent.class)) {
-                    Transform t = entityManager.getEntity(getCurrentEntity()).getTransform();
-                    Vector3f position = new Vector3f();
-                    Vector3f rotation = new Vector3f();
-                    Vector3f scale = new Vector3f();
-                    position.x = (float) (double) serialized.get("positionX");
-                    position.y = (float) (double) serialized.get("positionY");
-                    position.z = (float) (double) serialized.get("positionZ");
-                    position.x = (float) (double) serialized.get("rotationX");
-                    rotation.y = (float) (double) serialized.get("rotationY");
-                    rotation.z = (float) (double) serialized.get("rotationZ");
-                    scale.x = (float) (double) serialized.get("scaleX");
-                    scale.y = (float) (double) serialized.get("scaleY");
-                    scale.z = (float) (double) serialized.get("scaleZ");
-                    t.setPosition(position);
-                    t.setRotation(rotation);
-                    t.setScale(scale);
-                } else {
-                    addComponent(name);
-                    Component c = entityManager.getComponent(getCurrentEntity(), name);
-                    if (c != null) {
-                        c.deserialize(serialized, schemaFile.getAbsolutePath());
-                    }
+
+                addComponent(name);
+                Component c = entityManager.getComponent(getCurrentEntity(), name);
+                if (c != null) {
+                    c.deserialize(serialized, schemaFile.getAbsolutePath());
                 }
             }
         } catch (IOException e1) {

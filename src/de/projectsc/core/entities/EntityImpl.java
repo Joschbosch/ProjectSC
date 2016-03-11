@@ -5,7 +5,6 @@
  */
 package de.projectsc.core.entities;
 
-import de.projectsc.core.data.physics.Transform;
 import de.projectsc.core.interfaces.Component;
 import de.projectsc.core.interfaces.Entity;
 import de.projectsc.core.manager.EntityManager;
@@ -23,15 +22,12 @@ public class EntityImpl implements Entity {
 
     private String tag;
 
-    private final Transform transform;
-
     private transient EntityManager entityManager;
 
     private int layer;
 
     public EntityImpl(EntityManager entityManager, String uid) {
         entityUID = uid;
-        transform = new Transform();
         this.tag = "";
         this.layer = 0;
         this.entityManager = entityManager;
@@ -45,11 +41,6 @@ public class EntityImpl implements Entity {
     @Override
     public Component getComponent(Class<? extends Component> clazz) {
         return entityManager.getComponent(entityUID, clazz);
-    }
-
-    @Override
-    public Transform getTransform() {
-        return transform;
     }
 
     @Override

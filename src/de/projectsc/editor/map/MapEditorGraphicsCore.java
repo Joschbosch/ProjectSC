@@ -34,6 +34,7 @@ import org.lwjgl.util.vector.Vector4f;
 
 import de.projectsc.core.CoreConstants;
 import de.projectsc.core.component.collision.ColliderComponent;
+import de.projectsc.core.component.physic.TransformComponent;
 import de.projectsc.core.data.objects.Light;
 import de.projectsc.core.data.physics.Transform;
 import de.projectsc.core.data.physics.WireFrame;
@@ -232,8 +233,9 @@ public class MapEditorGraphicsCore implements Runnable {
             inputConsumeManager.processInput(inputSystem.updateInputs());
             camera.move(timer.getDelta());
             ParticleMaster.update(timer.getDelta(), camera.getPosition());
-            if (entityManager.getEntity(sun) != null && !entityManager.getEntity(sun).getTransform().getPosition().equals(
-                camera.getPosition())) {
+            if (entityManager.getEntity(sun) != null
+                && !((TransformComponent) entityManager.getComponent(sun, TransformComponent.class)).getTransform().getPosition().equals(
+                    camera.getPosition())) {
                 eventManager.fireEvent(new UpdatePositionEvent(camera.getPosition(), sun));
             }
 
@@ -250,7 +252,8 @@ public class MapEditorGraphicsCore implements Runnable {
 
                 if (!entityAtCursor.isEmpty() && mousePicker.getCurrentTerrainPoint() != null
                     && entityManager.getEntity(entityAtCursor) != null) {
-                    entityManager.getEntity(entityAtCursor).getTransform().setPosition(mousePicker.getCurrentTerrainPoint());
+                    ((TransformComponent) entityManager.getComponent(entityAtCursor, TransformComponent.class)).getTransform()
+                        .setPosition(mousePicker.getCurrentTerrainPoint());
                 }
 
                 if (doRender.get()) {
@@ -259,7 +262,9 @@ public class MapEditorGraphicsCore implements Runnable {
                     s.setRenderSkybox(true);
                     if (!entityAtCursor.isEmpty() && entityManager.getEntity(entityAtCursor) != null) {
                         s.getWireFrames().add(
-                            new WireFrame(WireFrame.SPHERE, entityManager.getEntity(entityAtCursor).getTransform().getPosition(),
+                            new WireFrame(WireFrame.SPHERE,
+                                ((TransformComponent) entityManager.getComponent(entityAtCursor, TransformComponent.class)).getTransform()
+                                    .getPosition(),
                                 new Vector3f(), new Vector3f(0.5f, 0.5f,
                                     0.5f)));
                     }
@@ -284,25 +289,34 @@ public class MapEditorGraphicsCore implements Runnable {
 
     private void readInput() {
         if (Keyboard.isKeyDown(Keyboard.KEY_R)) {
-            entityManager.getEntity(entityAtCursor).getTransform().setScale(
-                Vector3f.add(entityManager.getEntity(entityAtCursor).getTransform().getScale(), new Vector3f(0.5f, 0.5f, 0.5f), null));
+            ((TransformComponent) entityManager.getComponent(entityAtCursor, TransformComponent.class)).getTransform().setScale(
+                Vector3f.add(
+                    ((TransformComponent) entityManager.getComponent(entityAtCursor, TransformComponent.class)).getTransform().getScale(),
+                    new Vector3f(0.5f, 0.5f, 0.5f), null));
         }
         if (Keyboard.isKeyDown(Keyboard.KEY_F)) {
-            if (entityManager.getEntity(entityAtCursor).getTransform().getScale().x > 0.5
-                && entityManager.getEntity(entityAtCursor).getTransform().getScale().y > 0.5
-                && entityManager.getEntity(entityAtCursor).getTransform().getScale().z > 0.5) {
-                entityManager.getEntity(entityAtCursor).getTransform()
-                    .setScale(Vector3f.sub(entityManager.getEntity(entityAtCursor).getTransform().getScale(), new Vector3f(0.5f,
-                        0.5f, 0.5f), null));
+            if (((TransformComponent) entityManager.getComponent(entityAtCursor, TransformComponent.class)).getTransform()
+                .getScale().x > 0.5
+                && ((TransformComponent) entityManager.getComponent(entityAtCursor, TransformComponent.class)).getTransform()
+                    .getScale().y > 0.5
+                && ((TransformComponent) entityManager.getComponent(entityAtCursor, TransformComponent.class)).getTransform()
+                    .getScale().z > 0.5) {
+                ((TransformComponent) entityManager.getComponent(entityAtCursor, TransformComponent.class)).getTransform()
+                    .setScale(Vector3f.sub(((TransformComponent) entityManager.getComponent(entityAtCursor, TransformComponent.class))
+                        .getTransform().getScale(), new Vector3f(0.5f,
+                            0.5f, 0.5f),
+                        null));
             }
         }
         if (Keyboard.isKeyDown(Keyboard.KEY_Q)) {
-            entityManager.getEntity(entityAtCursor).getTransform().setRotation(
-                Vector3f.sub(entityManager.getEntity(entityAtCursor).getTransform().getRotation(), new Vector3f(0, 0.5f, 0), null));
+            ((TransformComponent) entityManager.getComponent(entityAtCursor, TransformComponent.class)).getTransform().setRotation(
+                Vector3f.sub(((TransformComponent) entityManager.getComponent(entityAtCursor, TransformComponent.class)).getTransform()
+                    .getRotation(), new Vector3f(0, 0.5f, 0), null));
         }
         if (Keyboard.isKeyDown(Keyboard.KEY_E)) {
-            entityManager.getEntity(entityAtCursor).getTransform().setRotation(
-                Vector3f.add(entityManager.getEntity(entityAtCursor).getTransform().getRotation(), new Vector3f(0, 0.5f, 0), null));
+            ((TransformComponent) entityManager.getComponent(entityAtCursor, TransformComponent.class)).getTransform().setRotation(
+                Vector3f.add(((TransformComponent) entityManager.getComponent(entityAtCursor, TransformComponent.class)).getTransform()
+                    .getRotation(), new Vector3f(0, 0.5f, 0), null));
         }
         if (Mouse.isButtonDown(0) && mode == 0 && !alreadyClicked) {
             alreadyClicked = true;
@@ -341,7 +355,9 @@ public class MapEditorGraphicsCore implements Runnable {
             if (entityManager.hasComponent(e, ColliderComponent.class)) {
                 ColliderComponent collider = (ColliderComponent) entityManager.getComponent(e, ColliderComponent.class);
 
-                if (Maths.intersects(entityManager.getEntity(e).getTransform().getPosition(), collider.getSimpleBoundingVolume(),
+                if (Maths.intersects(
+                    ((TransformComponent) entityManager.getComponent(e, TransformComponent.class)).getTransform().getPosition(),
+                    collider.getSimpleBoundingVolume(),
                     camera.getPosition(), mousePicker.getCurrentRay()) > 0) {
                     eventManager.fireEvent(new UpdateEntitySelectionEvent(e, false, true));
                 } else {
@@ -351,16 +367,17 @@ public class MapEditorGraphicsCore implements Runnable {
         }
         if (Mouse.isButtonDown(0) && mode == 1 && !alreadyClicked) {
             alreadyClicked = true;
-            for (String e : entityManager.getAllEntites()) {
-                if (entityManager.hasComponent(e, ColliderComponent.class)) {
-                    // ColliderComponent collider = (ColliderComponent) entityManager.getComponent(e, ColliderComponent.class);
-                    // if (collider.getAABB().intersects(entityManager.getEntity(e).getTransform(),
-                    // camera.getPosition(), mousePicker.getCurrentRay()) > 0) {
-                    // selectedEntity = e;
-                    // }
-                    System.out.println("TODO COLLISION");
-                }
-            }
+            // for (String e : entityManager.getAllEntites()) {
+            // if (entityManager.hasComponent(e, ColliderComponent.class)) {
+            // ColliderComponent collider = (ColliderComponent) entityManager.getComponent(e, ColliderComponent.class);
+            // if (collider.getAABB().intersects( ((TransformComponent) entityManager.getComponent(e,
+            // TransformComponent.class)).getTransform(),
+            // camera.getPosition(), mousePicker.getCurrentRay()) > 0) {
+            // selectedEntity = e;
+            // }
+            // System.out.println("TODO COLLISION");
+            // }
+            // }
         }
         if (!selectedEntity.isEmpty()) {
             eventManager.fireEvent(new UpdateEntitySelectionEvent(selectedEntity, true, false));
@@ -370,11 +387,13 @@ public class MapEditorGraphicsCore implements Runnable {
     private void newMouseEntity(long type) {
         String e = entityManager.createNewEntity();
         if (entityAtCursor.isEmpty()) {
-            entitySchemas.get(type).createNewEntity(entityManager.getEntity(e).getTransform(), e, entityManager);
+            entitySchemas.get(type).createNewEntity(
+                ((TransformComponent) entityManager.getComponent(e, TransformComponent.class)).getTransform(), e, entityManager);
         } else {
-            entitySchemas.get(type).createNewEntity(entityManager.getEntity(entityAtCursor).getTransform(), e, entityManager);
+            entitySchemas.get(type).createNewEntity(
+                ((TransformComponent) entityManager.getComponent(entityAtCursor, TransformComponent.class)).getTransform(), e,
+                entityManager);
         }
-
         entityAtCursor = e;
         selectionChanged(e);
     }
@@ -390,10 +409,9 @@ public class MapEditorGraphicsCore implements Runnable {
         EmittingLightComponent lightComponent =
             (EmittingLightComponent) entityManager.addComponentToEntity(sun,
                 GraphicalComponentImplementation.EMMITING_LIGHT_COMPONENT.getName());
-        Transform position = entityManager.getEntity(sun).getTransform();
+        Transform position = ((TransformComponent) entityManager.getComponent(sun, TransformComponent.class)).getTransform();
         Light light = new Light(sun, new Vector3f(position.getPosition()), new Vector3f(1.0f, 1.0f, 1.0f), "sun");
         lightComponent.addLight(sun, new Vector3f(position.getPosition()), light);
-        entityManager.addComponentToEntity(sun, ColliderComponent.NAME);
     }
 
     private void createTerrain(int k, int l, String parsed) {

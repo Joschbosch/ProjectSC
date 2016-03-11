@@ -22,6 +22,7 @@ import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
 import de.projectsc.core.component.collision.ColliderComponent;
+import de.projectsc.core.component.physic.TransformComponent;
 import de.projectsc.core.data.objects.Light;
 import de.projectsc.core.data.physics.Transform;
 import de.projectsc.core.data.structure.Snapshot;
@@ -173,7 +174,7 @@ public class GUICore implements GUI {
         EmittingLightComponent lightComponent =
             (EmittingLightComponent) entityManager.addComponentToEntity(sun,
                 GraphicalComponentImplementation.EMMITING_LIGHT_COMPONENT.getName());
-        Transform position = entityManager.getEntity(sun).getTransform();
+        Transform position = ((TransformComponent) entityManager.getComponent(sun, TransformComponent.class)).getTransform();
         position.setPosition(new Vector3f(10000, 10000, 10000));
         Light light = new Light(sun, new Vector3f(position.getPosition()), new Vector3f(1.0f, 1.0f, 1.0f), "sun");
         light.setAttenuation(new Vector3f(1, 0, 0));

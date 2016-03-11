@@ -28,7 +28,7 @@ import de.projectsc.core.events.entity.objects.RemoveLightEvent;
 import de.projectsc.core.manager.EntityManager;
 import de.projectsc.core.manager.EventManager;
 import de.projectsc.core.systems.DefaultSystem;
-import de.projectsc.core.systems.physics.collision.OctTree;
+import de.projectsc.core.systems.physics.collision.OctTree2;
 import de.projectsc.core.utils.Maths;
 import de.projectsc.modes.client.gui.components.EmittingLightComponent;
 import de.projectsc.modes.client.gui.components.MeshRendererComponent;
@@ -99,7 +99,7 @@ public class RenderingSystem extends DefaultSystem {
                 createNewLightEvent.getLight().setEntity(e.getEntityId());
             } else {
 
-                Transform pos = entityManager.getEntity(e.getEntityId()).getTransform();
+                Transform pos = getComponent(e.getEntityId(), TransformComponent.class).getTransform();
                 getComponent(e.getEntityId(), EmittingLightComponent.class).addLight(createNewLightEvent.getEntityId(),
                     pos.getPosition(), createNewLightEvent.getLight());
             }
@@ -144,7 +144,7 @@ public class RenderingSystem extends DefaultSystem {
      * 
      * @return scene to render
      */
-    public GUIScene createScene(OctTree<String> octTree) {
+    public GUIScene createScene(OctTree2<String> octTree) {
         Set<String> entities = entityManager.getAllEntites();
         GUIScene scene = new GUIScene();
         for (String entity : entities) {
@@ -204,11 +204,13 @@ public class RenderingSystem extends DefaultSystem {
         }
         if (octTree != null) {
             List<AxisAlignedBoundingBox> boxes = octTree.getBoxes();
+            System.out.println(boxes);
             for (AxisAlignedBoundingBox box : boxes) {
                 Vector3f size = new Vector3f(Maths.getSize(box));
                 size.scale(0.5f);
                 Vector3f position = new Vector3f(Maths.getCenter(box));
                 position.y = position.y - size.y;
+                System.out.println(position);
                 WireFrame wf = new WireFrame(WireFrame.CUBE, position, new Vector3f(), Maths.getSize(box));
                 wf.setColor(new Vector3f(0.0f, 1f, 0));
                 scene.getWireFrames().add(wf);

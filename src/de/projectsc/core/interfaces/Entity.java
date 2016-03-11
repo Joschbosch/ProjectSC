@@ -13,12 +13,6 @@ import de.projectsc.core.data.physics.Transform;
  */
 public interface Entity {
 
-    /**
-     * Every entity has a tronsform and knows about it.
-     * 
-     * @return transform of the entity.
-     */
-    Transform getTransform();
 
     /**
      * Check if entity has the specified component.

@@ -137,7 +137,6 @@ public class EntityManager {
         addComponentToEntity(id, c);
         return c;
     }
-
     /**
      * Adds the specified component to the given entity.
      * 
@@ -146,6 +145,17 @@ public class EntityManager {
      * @return the component
      */
     public Component addComponentToEntity(String id, Component c) {
+        return addComponentToEntity(id, c, true);
+    }
+    /**
+     * Adds the specified component to the given entity.
+     * 
+     * @param id of entity
+     * @param c component
+     * @param addToCollision 
+     * @return the component
+     */
+    public Component addComponentToEntity(String id, Component c, boolean addToCollision) {
         if (c != null) {
             Map<String, Component> components = entityComponents.get(id);
             if (components == null) {

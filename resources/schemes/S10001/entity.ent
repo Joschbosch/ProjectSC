@@ -1,6 +1,5 @@
 {
   "components" : {
-    "Collider Component" : { },
     "Emitting light component" : { },
     "Mesh Renderer Component" : {
       "shineDamper" : 1.0,

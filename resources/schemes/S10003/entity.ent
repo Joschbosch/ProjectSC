@@ -1,6 +1,5 @@
 {
   "components" : {
-    "Collider Component" : { },
     "AI Controlled Component" : { },
     "Mesh Renderer Component" : {
       "shineDamper" : 1.0,

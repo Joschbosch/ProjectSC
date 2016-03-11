@@ -9,6 +9,7 @@ import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.core.data.physics.BoundingVolume;
 import de.projectsc.core.data.physics.BoundingVolumeType;
+import de.projectsc.core.utils.Maths;
 
 /**
  * An axis aligned bounding box for each entitiy.
@@ -35,13 +36,15 @@ public class AxisAlignedBoundingBox implements BoundingVolume {
         super();
         this.min = min;
         this.max = max;
-        this.position = new Vector3f();
+        Vector3f center = Maths.getCenter(this);
+        Vector3f size = Maths.getSize(this);
+        this.position = new Vector3f(center.x, center.y - size.y/2, center.z);
         this.scale = new Vector3f(1, 1, 1);
     }
 
     @Override
     public String toString() {
-        String result = String.format("Bounding box:\n\tMinium (%s)\n\tMaximum %s\n", min, max);
+        String result = String.format("\nBounding box:\n\tMinium (%s)\n\tMaximum %s\n\tPosition %s\n", min, max, position);
         return result;
 
     }
@@ -95,5 +98,12 @@ public class AxisAlignedBoundingBox implements BoundingVolume {
         aabb.setScale(new Vector3f(scale));
         aabb.setPositionOffset(new Vector3f(position));
         return aabb;
+    }
+
+    public void setMaxima(Vector3f newMax) {
+        this.max = newMax;
+    }
+    public void setMinima(Vector3f newMin) {
+        this.min = newMin;
     }
 }

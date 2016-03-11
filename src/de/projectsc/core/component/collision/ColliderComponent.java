@@ -55,6 +55,7 @@ public class ColliderComponent extends DefaultComponent {
     @SuppressWarnings("unchecked")
     @Override
     public void deserialize(Map<String, Object> serialized, String loadingLocation) {
+        System.out.println(serialized);
         simpleBoundingVolume = deserialize((Map<String, Object>) serialized.get("simple"));
         exactBoundingVolume = deserialize((Map<String, Object>) serialized.get("exact"));
 

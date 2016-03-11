@@ -13,6 +13,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.map.ObjectMapper;
 
+import de.projectsc.core.component.physic.TransformComponent;
 import de.projectsc.core.interfaces.Component;
 import de.projectsc.core.manager.EntityManager;
 
@@ -62,7 +63,8 @@ public final class MapLoader {
                     }
                 }
                 LOGGER.info(String.format("Added entity %s of type %s with transform %s", newEntity, entityManager.getEntity(newEntity)
-                    .getEntityTypeId(), entityManager.getEntity(newEntity).getTransform()));
+                    .getEntityTypeId(),
+                    ((TransformComponent) entityManager.getComponent(newEntity, TransformComponent.class)).getTransform()));
             } else {
                 LOGGER.error("Failed to load entity " + entityValues);
             }

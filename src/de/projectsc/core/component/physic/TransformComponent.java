@@ -26,6 +26,8 @@ public class TransformComponent extends DefaultComponent {
      */
     public static final String NAME = "Transform Component";
 
+    private Transform transform = new Transform();
+    
     public TransformComponent() {
         setComponentName(NAME);
         setType(ComponentType.PHYSICS);
@@ -39,48 +41,48 @@ public class TransformComponent extends DefaultComponent {
      * @param angle of the entity
      */
     public void updatePosition(String entity, Vector3f velocity, float angle) {
-        Vector3f.add(owner.getTransform().getPosition(), velocity, owner.getTransform().getPosition());
-        owner.getTransform().getRotation().y = angle;
+        Vector3f.add(transform.getPosition(), velocity, transform.getPosition());
+        transform.getRotation().y = angle;
     }
 
     @Override
     public Map<String, Object> getConfiguration() {
         Map<String, Object> serialized = new HashMap<>();
-        serialized.put("positionX", owner.getTransform().getPosition().x);
-        serialized.put("positionY", owner.getTransform().getPosition().y);
-        serialized.put("positionZ", owner.getTransform().getPosition().z);
-        serialized.put("rotationX", owner.getTransform().getRotation().x);
-        serialized.put("rotationY", owner.getTransform().getRotation().y);
-        serialized.put("rotationZ", owner.getTransform().getRotation().z);
-        serialized.put("scaleX", owner.getTransform().getScale().x);
-        serialized.put("scaleY", owner.getTransform().getScale().y);
-        serialized.put("scaleZ", owner.getTransform().getScale().z);
+        serialized.put("positionX", transform.getPosition().x);
+        serialized.put("positionY", transform.getPosition().y);
+        serialized.put("positionZ", transform.getPosition().z);
+        serialized.put("rotationX", transform.getRotation().x);
+        serialized.put("rotationY", transform.getRotation().y);
+        serialized.put("rotationZ", transform.getRotation().z);
+        serialized.put("scaleX", transform.getScale().x);
+        serialized.put("scaleY", transform.getScale().y);
+        serialized.put("scaleZ", transform.getScale().z);
         return serialized;
     }
 
     @Override
     public void loadConfiguration(Map<String, Object> serialized) {
-        owner.getTransform().setPosition(
+        transform.setPosition(
             new Vector3f((float) (double) serialized.get("positionX"), (float) (double) serialized.get("positionY"),
                 (float) (double) serialized.get("positionZ")));
-        owner.getTransform().setRotation(
+        transform.setRotation(
             new Vector3f((float) (double) serialized.get("rotationX"), (float) (double) serialized.get("rotationY"),
                 (float) (double) serialized.get("rotationZ")));
-        owner.getTransform().setScale(new Vector3f((float) (double) serialized.get("scaleX"), (float) (double) serialized.get("scaleY"),
+        transform.setScale(new Vector3f((float) (double) serialized.get("scaleX"), (float) (double) serialized.get("scaleY"),
             (float) (double) serialized.get("scaleZ")));
     }
 
     @Override
     public String serializeForNetwork() {
-        return "" + owner.getTransform().toString();
+        return "" + transform.toString();
     }
 
     @Override
     public void deserializeFromNetwork(String serialized) {
         String[] split = serialized.split(";");
-        owner.getTransform().setPosition(new Vector3f(Float.valueOf(split[0]), Float.valueOf(split[1]), Float.valueOf(split[2])));
-        owner.getTransform().setRotation(new Vector3f(Float.valueOf(split[3]), Float.valueOf(split[4]), Float.valueOf(split[5])));
-        owner.getTransform().setScale(new Vector3f(Float.valueOf(split[6]), Float.valueOf(split[7]), Float.valueOf(split[8])));
+        transform.setPosition(new Vector3f(Float.valueOf(split[0]), Float.valueOf(split[1]), Float.valueOf(split[2])));
+        transform.setRotation(new Vector3f(Float.valueOf(split[3]), Float.valueOf(split[4]), Float.valueOf(split[5])));
+        transform.setScale(new Vector3f(Float.valueOf(split[6]), Float.valueOf(split[7]), Float.valueOf(split[8])));
     }
 
     @Override
@@ -98,7 +100,7 @@ public class TransformComponent extends DefaultComponent {
     }
 
     public Vector3f getPosition() {
-        return owner.getTransform().getPosition();
+        return transform.getPosition();
     }
 
     /**
@@ -106,12 +108,12 @@ public class TransformComponent extends DefaultComponent {
      */
     public void setPosition(Vector3f position) {
         if (owner != null) {
-            owner.getTransform().getPosition().set(position);
+            transform.getPosition().set(position);
         }
     }
 
     public Vector3f getRotation() {
-        return owner.getTransform().getRotation();
+        return transform.getRotation();
     }
 
     /**
@@ -119,12 +121,12 @@ public class TransformComponent extends DefaultComponent {
      */
     public void setRotation(Vector3f rotation) {
         if (owner != null) {
-            owner.getTransform().getRotation().set(rotation);
+            transform.getRotation().set(rotation);
         }
     }
 
     public Vector3f getScale() {
-        return owner.getTransform().getScale();
+        return transform.getScale();
     }
 
     /**
@@ -132,12 +134,12 @@ public class TransformComponent extends DefaultComponent {
      */
     public void setScale(Vector3f scale) {
         if (owner != null) {
-            owner.getTransform().getScale().set(scale);
+            transform.getScale().set(scale);
         }
     }
 
     public Transform getTransform() {
-        return owner.getTransform();
+        return transform;
     }
 
 }
