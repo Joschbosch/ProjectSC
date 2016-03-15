@@ -37,12 +37,12 @@ import de.projectsc.core.component.collision.ColliderComponent;
 import de.projectsc.core.component.physic.TransformComponent;
 import de.projectsc.core.data.objects.Light;
 import de.projectsc.core.data.physics.Transform;
-import de.projectsc.core.data.physics.WireFrame;
 import de.projectsc.core.data.utils.Timer;
 import de.projectsc.core.entities.EntitySchema;
 import de.projectsc.core.events.entity.movement.UpdatePositionEvent;
 import de.projectsc.core.events.entity.movement.UpdateRotationEvent;
 import de.projectsc.core.events.entity.state.UpdateEntitySelectionEvent;
+import de.projectsc.core.events.input.MousePositionChangedAction;
 import de.projectsc.core.interfaces.Component;
 import de.projectsc.core.manager.ComponentManager;
 import de.projectsc.core.manager.EntityManager;
@@ -53,7 +53,6 @@ import de.projectsc.core.terrain.Terrain;
 import de.projectsc.core.utils.Maths;
 import de.projectsc.editor.entity.EntityEditor;
 import de.projectsc.modes.client.gui.InputSystem;
-import de.projectsc.modes.client.gui.RenderingSystem;
 import de.projectsc.modes.client.gui.components.EmittingLightComponent;
 import de.projectsc.modes.client.gui.components.GraphicalComponentImplementation;
 import de.projectsc.modes.client.gui.data.GUIScene;
@@ -104,7 +103,7 @@ public class MapEditorGraphicsCore implements Runnable {
 
     private final Map<Long, EntitySchema> entitySchemas = new TreeMap<>();
 
-    private String entityAtCursor = "";
+    private EditorMouseEntity mouseEntity;
 
     private boolean alreadyClicked;
 
@@ -114,7 +113,7 @@ public class MapEditorGraphicsCore implements Runnable {
 
     private List<TerrainModel> terrainModels;
 
-    private RenderingSystem renderSystem;
+    private MapEditorRenderingSystem renderSystem;
 
     private ComponentManager componentManager;
 
@@ -134,8 +133,6 @@ public class MapEditorGraphicsCore implements Runnable {
 
     private boolean rightDown = false;
 
-    private MapEditor parentEditor;
-
     private EntityStateSystem entityStateSystem;
 
     public MapEditorGraphicsCore(MapEditor mapEditor, Canvas displayParent, int width, int height, BlockingQueue<String> messageQueue,
@@ -149,7 +146,6 @@ public class MapEditorGraphicsCore implements Runnable {
         this.eventManager = eventManager;
         this.inputConsumeManager = new InputConsumeManager();
         this.timer = new Timer();
-        this.parentEditor = mapEditor;
     }
 
     @Override
@@ -165,9 +161,10 @@ public class MapEditorGraphicsCore implements Runnable {
         } catch (LWJGLException e) {
         }
         loadGUIComponents();
+        mouseEntity = new EditorMouseEntity();
         entityStateSystem = new EntityStateSystem(entityManager, eventManager);
         collisionSystem = new CollisionSystem(entityManager, eventManager);
-        renderSystem = new RenderingSystem(entityManager, eventManager);
+        renderSystem = new MapEditorRenderingSystem(entityManager, eventManager);
         inputSystem = new InputSystem();
 
         TextMaster.init();
@@ -179,7 +176,6 @@ public class MapEditorGraphicsCore implements Runnable {
         createSun();
         createTerrain(10, 10, "");
         loadEntitySchemas();
-        newMouseEntity(10000L);
         gameLoop();
     }
 
@@ -249,25 +245,14 @@ public class MapEditorGraphicsCore implements Runnable {
             if (terrainModels != null) {
                 mousePicker.update(getTerrains(), camera.getPosition(), camera.getViewMatrix());
                 readInput();
-
-                if (!entityAtCursor.isEmpty() && mousePicker.getCurrentTerrainPoint() != null
-                    && entityManager.getEntity(entityAtCursor) != null) {
-                    ((TransformComponent) entityManager.getComponent(entityAtCursor, TransformComponent.class)).getTransform()
-                        .setPosition(mousePicker.getCurrentTerrainPoint());
+                if (mouseEntity != null) {
+                    mouseEntity.getT().setPosition(mousePicker.getCurrentTerrainPoint());
                 }
-
                 if (doRender.get()) {
-                    GUIScene s = renderSystem.createScene(collisionSystem.getOctree());
+                    GUIScene s = renderSystem.createScene(collisionSystem.getOctree(), mouseEntity,
+                        entitySchemas.get(mouseEntity.getType()).getComponents());
                     s.setTerrains(terrainModels);
                     s.setRenderSkybox(true);
-                    if (!entityAtCursor.isEmpty() && entityManager.getEntity(entityAtCursor) != null) {
-                        s.getWireFrames().add(
-                            new WireFrame(WireFrame.SPHERE,
-                                ((TransformComponent) entityManager.getComponent(entityAtCursor, TransformComponent.class)).getTransform()
-                                    .getPosition(),
-                                new Vector3f(), new Vector3f(0.5f, 0.5f,
-                                    0.5f)));
-                    }
                     masterRenderer.renderScene(s, camera, timer.getDelta(), new Vector4f(0, 100000000, 0, 100000000));
                     fontRenderer.render(TextMaster.render(), 0);
                 }
@@ -289,40 +274,37 @@ public class MapEditorGraphicsCore implements Runnable {
 
     private void readInput() {
         if (Keyboard.isKeyDown(Keyboard.KEY_R)) {
-            ((TransformComponent) entityManager.getComponent(entityAtCursor, TransformComponent.class)).getTransform().setScale(
-                Vector3f.add(
-                    ((TransformComponent) entityManager.getComponent(entityAtCursor, TransformComponent.class)).getTransform().getScale(),
-                    new Vector3f(0.5f, 0.5f, 0.5f), null));
+            mouseEntity.getT().getScale().x += 0.1f;
+            mouseEntity.getT().getScale().y += 0.1f;
+            mouseEntity.getT().getScale().z += 0.1f;
         }
         if (Keyboard.isKeyDown(Keyboard.KEY_F)) {
-            if (((TransformComponent) entityManager.getComponent(entityAtCursor, TransformComponent.class)).getTransform()
-                .getScale().x > 0.5
-                && ((TransformComponent) entityManager.getComponent(entityAtCursor, TransformComponent.class)).getTransform()
-                    .getScale().y > 0.5
-                && ((TransformComponent) entityManager.getComponent(entityAtCursor, TransformComponent.class)).getTransform()
-                    .getScale().z > 0.5) {
-                ((TransformComponent) entityManager.getComponent(entityAtCursor, TransformComponent.class)).getTransform()
-                    .setScale(Vector3f.sub(((TransformComponent) entityManager.getComponent(entityAtCursor, TransformComponent.class))
-                        .getTransform().getScale(), new Vector3f(0.5f,
-                            0.5f, 0.5f),
-                        null));
-            }
+            mouseEntity.getT().getScale().x -= 0.1f;
+            mouseEntity.getT().getScale().y -= 0.1f;
+            mouseEntity.getT().getScale().z -= 0.1f;
+
         }
         if (Keyboard.isKeyDown(Keyboard.KEY_Q)) {
-            ((TransformComponent) entityManager.getComponent(entityAtCursor, TransformComponent.class)).getTransform().setRotation(
-                Vector3f.sub(((TransformComponent) entityManager.getComponent(entityAtCursor, TransformComponent.class)).getTransform()
-                    .getRotation(), new Vector3f(0, 0.5f, 0), null));
+            mouseEntity.getT().getRotation().y -= 1.1f;
+
         }
         if (Keyboard.isKeyDown(Keyboard.KEY_E)) {
-            ((TransformComponent) entityManager.getComponent(entityAtCursor, TransformComponent.class)).getTransform().setRotation(
-                Vector3f.add(((TransformComponent) entityManager.getComponent(entityAtCursor, TransformComponent.class)).getTransform()
-                    .getRotation(), new Vector3f(0, 0.5f, 0), null));
+            mouseEntity.getT().getRotation().y += 1.1f;
+
         }
         if (Mouse.isButtonDown(0) && mode == 0 && !alreadyClicked) {
             alreadyClicked = true;
-            newMouseEntity(entityManager.getEntity(entityAtCursor).getEntityTypeId());
-        }
-
+            newMouseEntity(mouseEntity.getType());
+        } 
+        if (Mouse.isButtonDown(1) && mode == 0) {
+            for (String entity : entityManager.getAllEntites()){
+                if (entityManager.hasComponent(entity, ColliderComponent.class)){
+                    entityManager.removeComponentFromEntity(entity, ColliderComponent.NAME);
+                }
+            }
+            
+        } 
+        eventManager.fireEvent(new MousePositionChangedAction(mousePicker.getCurrentRay(), mousePicker.getCurrentCameraPosition()));
         calculateSelectionAndHighlighting();
         if (!Mouse.isButtonDown(0)) {
             alreadyClicked = false;
@@ -331,14 +313,12 @@ public class MapEditorGraphicsCore implements Runnable {
             if (Keyboard.getEventKeyState()) {
                 if (!rightDown) {
                     rightDown = true;
-                    long id = entityManager.getEntity(entityAtCursor).getEntityTypeId();
+                    long id = mouseEntity.getType();
                     id = (id + 1) % 1000000;
                     while (entitySchemas.get(id) == null) {
                         id = (id + 1) % 1000000;
                     }
-                    String oldEntity = entityAtCursor;
-                    newMouseEntity(id);
-                    entityManager.deleteEntity(oldEntity);
+                    mouseEntity.setType(id);
                 }
             }
         } else {
@@ -367,17 +347,6 @@ public class MapEditorGraphicsCore implements Runnable {
         }
         if (Mouse.isButtonDown(0) && mode == 1 && !alreadyClicked) {
             alreadyClicked = true;
-            // for (String e : entityManager.getAllEntites()) {
-            // if (entityManager.hasComponent(e, ColliderComponent.class)) {
-            // ColliderComponent collider = (ColliderComponent) entityManager.getComponent(e, ColliderComponent.class);
-            // if (collider.getAABB().intersects( ((TransformComponent) entityManager.getComponent(e,
-            // TransformComponent.class)).getTransform(),
-            // camera.getPosition(), mousePicker.getCurrentRay()) > 0) {
-            // selectedEntity = e;
-            // }
-            // System.out.println("TODO COLLISION");
-            // }
-            // }
         }
         if (!selectedEntity.isEmpty()) {
             eventManager.fireEvent(new UpdateEntitySelectionEvent(selectedEntity, true, false));
@@ -385,21 +354,16 @@ public class MapEditorGraphicsCore implements Runnable {
     }
 
     private void newMouseEntity(long type) {
-        String e = entityManager.createNewEntity();
-        if (entityAtCursor.isEmpty()) {
-            entitySchemas.get(type).createNewEntity(
-                ((TransformComponent) entityManager.getComponent(e, TransformComponent.class)).getTransform(), e, entityManager);
-        } else {
-            entitySchemas.get(type).createNewEntity(
-                ((TransformComponent) entityManager.getComponent(entityAtCursor, TransformComponent.class)).getTransform(), e,
-                entityManager);
+        Vector3f position = mousePicker.getCurrentTerrainPoint();
+        if (position != null) {
+            Transform t = new Transform();
+            String e = entityManager.createNewEntity();
+            entitySchemas.get(type).createNewEntity(t, e, entityManager);
+            TransformComponent tc = (TransformComponent) entityManager.getComponent(e, TransformComponent.class);
+            tc.setPosition(position);
+            tc.setScale(mouseEntity.getT().getScale());
+            tc.setRotation(mouseEntity.getT().getRotation());
         }
-        entityAtCursor = e;
-        selectionChanged(e);
-    }
-
-    private void selectionChanged(String e) {
-        parentEditor.selectionChanged(e);
     }
 
     private void createSun() {
@@ -475,9 +439,6 @@ public class MapEditorGraphicsCore implements Runnable {
         } else {
             if (this.mode != 1) {
                 this.mode = 1;
-                selectedEntity = "";
-                entityManager.deleteEntity(entityAtCursor);
-                entityAtCursor = "";
             }
 
         }
@@ -488,9 +449,6 @@ public class MapEditorGraphicsCore implements Runnable {
      */
     public void performSave() {
         File levelRootDirectory = null;
-        long idAtCursor = entityManager.getEntity(entityAtCursor).getEntityTypeId();
-        entityManager.deleteEntity(entityAtCursor);
-        entityAtCursor = "";
 
         try {
 
@@ -521,6 +479,5 @@ public class MapEditorGraphicsCore implements Runnable {
         } catch (URISyntaxException | IOException e) {
             LOGGER.error(e);
         }
-        newMouseEntity(idAtCursor);
     }
 }

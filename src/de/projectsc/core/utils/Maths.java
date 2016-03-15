@@ -123,6 +123,20 @@ public final class Maths {
         }
     }
 
+    /**
+     * 
+     * @param position of box
+     * @param halfSize of box
+     * @param currentRay to check
+     * @param currentPointOfOrigin to check
+     * @return intersection position
+     */
+    public static float intersects(Vector3f position, float halfSize, Vector3f currentRay, Vector3f currentPointOfOrigin) {
+        Vector3f min = Vector3f.sub(position, new Vector3f(halfSize, halfSize, halfSize), null);
+        Vector3f max = Vector3f.add(position, new Vector3f(halfSize, halfSize, halfSize), null);
+        return calculateBoxIntersection(currentRay, currentPointOfOrigin, min, max);
+    }
+
     private static float calculateSphereIntersection(Vector3f rayDirection, Vector3f rayOrigin, Vector3f centerPosition,
         float radius) {
         Vector3f length = Vector3f.sub(rayOrigin, centerPosition, null);

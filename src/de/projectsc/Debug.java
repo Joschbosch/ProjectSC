@@ -4,6 +4,8 @@
 
 package de.projectsc;
 
+import org.apache.commons.logging.Log;
+
 /**
  * Class for specifing the global and area wide debug level.
  * 
@@ -75,6 +77,19 @@ public final class Debug {
 
     public static void setNetworkDebugLevel(int networkDebugLevel) {
         Debug.networkDebugLevel = networkDebugLevel;
+    }
+
+    /**
+     * Print content if the given debug level is ok, using the standard debug for compare.
+     * 
+     * @param logger to debug to
+     * @param incDebugLevel to check
+     * @param content to print
+     */
+    public static void printDebug(Log logger, int incDebugLevel, String content) {
+        if (incDebugLevel < getDebugLevel()) {
+            logger.debug(content);
+        }
     }
 
 }

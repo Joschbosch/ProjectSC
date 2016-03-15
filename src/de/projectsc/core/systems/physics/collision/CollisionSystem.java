@@ -15,8 +15,10 @@ import de.projectsc.core.data.Event;
 import de.projectsc.core.events.entity.component.ComponentAddedEvent;
 import de.projectsc.core.events.entity.component.ComponentRemovedEvent;
 import de.projectsc.core.events.entity.objects.NotifyEntityDeletedEvent;
+import de.projectsc.core.events.entity.state.UpdateEntitySelectionEvent;
 import de.projectsc.core.events.input.MouseButtonClickedAction;
 import de.projectsc.core.events.input.MousePositionChangedAction;
+import de.projectsc.core.events.input.MoveToPositionAction;
 import de.projectsc.core.interfaces.Component;
 import de.projectsc.core.manager.EntityManager;
 import de.projectsc.core.manager.EventManager;
@@ -45,6 +47,7 @@ public class CollisionSystem extends DefaultSystem {
 
     @Override
     public void update(long tick) {
+        octree = octree.recalculateTree();
         List<String> moved = new LinkedList<>();
         Set<String> entities = entityManager.getEntitiesWithComponent(ColliderComponent.class);
         for (String e : entities) {
@@ -53,6 +56,15 @@ public class CollisionSystem extends DefaultSystem {
                 if (state.hasMoved()) {
                     moved.add(e);
                 }
+                // testCode
+                // else {
+                // float dist = 0.5f;
+                // if (Math.random()<0.5){
+                // dist *= -1;
+                // }
+                // getComponent(e, TransformComponent.class).getTransform().getPosition().x += dist;
+                // moved.add(e);
+                // }
             }
         }
         octree.update(moved);
@@ -65,22 +77,21 @@ public class CollisionSystem extends DefaultSystem {
         }
 
         if (e instanceof MousePositionChangedAction) {
-            // for (String entity : octree.intersectsRay(((MousePositionChangedAction) e).getCurrentRay(),
-            // ((MousePositionChangedAction) e).getCurrentCameraPosition())) {
-            // fireEvent(new UpdateEntitySelectionEvent(entity, false, true));
-            // }
-            System.out.println("TODO");
+            for (String entity : octree.intersectsRay(((MousePositionChangedAction) e).getCurrentRay(),
+                ((MousePositionChangedAction) e).getCurrentCameraPosition())) {
+                fireEvent(new UpdateEntitySelectionEvent(entity, false, true));
+            }
 
         } else if (e instanceof MouseButtonClickedAction) {
-            // if (octree.intersectsRay(((MouseButtonClickedAction) e).getCurrentRay(),
-            // ((MouseButtonClickedAction) e).getCurrentCameraPosition()).isEmpty()) {
-            // if (((MouseButtonClickedAction) e).getButton() == 1) {
-            // fireEvent(new MoveToPositionAction(((MouseButtonClickedAction) e).getTerrainPoint()));
-            // } else if (((MouseButtonClickedAction) e).getButton() == 0) {
-            // ((MouseButtonClickedAction) e).getButton();
-            // fireEvent(new BasicAttackPoint(((MouseButtonClickedAction) e).getTerrainPoint()));
-            // }
-            // }
+            if (octree.intersectsRay(((MouseButtonClickedAction) e).getCurrentRay(),
+                ((MouseButtonClickedAction) e).getCurrentCameraPosition()).isEmpty()) {
+                if (((MouseButtonClickedAction) e).getButton() == 1) {
+                    fireEvent(new MoveToPositionAction(((MouseButtonClickedAction) e).getTerrainPoint()));
+                } else if (((MouseButtonClickedAction) e).getButton() == 0) {
+                    ((MouseButtonClickedAction) e).getButton();
+                    // fireEvent(new BasicAttackPoint(((MouseButtonClickedAction) e).getTerrainPoint()));
+                }
+            }
         }
     }
 

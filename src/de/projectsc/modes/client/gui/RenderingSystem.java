@@ -6,7 +6,9 @@ package de.projectsc.modes.client.gui;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.lwjgl.util.vector.Vector3f;
@@ -165,7 +167,7 @@ public class RenderingSystem extends DefaultSystem {
                 if (cc.getSimpleBoundingVolume().getType() == BoundingVolumeType.AXIS_ALIGNED_BOUNDING_BOX) {
                     wf = new WireFrame(WireFrame.CUBE,
                         Vector3f.add(cc.getSimpleBoundingVolume().getPositionOffset(), tc.getPosition(), null),
-                        new Vector3f(), Maths.getSize(cc.getSimpleBoundingVolume()));
+                        new Vector3f(), ((Vector3f) Maths.getSize(cc.getSimpleBoundingVolume()).scale(tc.getScale().x)));
                 } else if (cc.getSimpleBoundingVolume().getType() == BoundingVolumeType.SPHERE) {
                     float radius = ((Sphere) cc.getSimpleBoundingVolume()).getRadius();
                     wf =
@@ -202,11 +204,17 @@ public class RenderingSystem extends DefaultSystem {
             }
         }
 
-        WireFrame w =
-            new WireFrame(WireFrame.CUBE, octTree.getNodeWorldRenderingPosition(), new Vector3f(),
-                octTree.getNodeWorldScale());
-        w.setColor(new Vector3f(0, 1, 0));
-        scene.getWireFrames().add(w);
+        if (octTree != null) {
+            Map<Vector3f, Vector3f> boxes = new HashMap<>();
+            octTree.traverseTree(boxes, 0, false);
+            for (Vector3f box : boxes.keySet()) {
+                WireFrame w =
+                    new WireFrame(WireFrame.CUBE, box, new Vector3f(), boxes.get(box));
+                w.setColor(new Vector3f(0, 1, 0));
+                scene.getWireFrames().add(w);
+            }
+        }
+
         return scene;
     }
 

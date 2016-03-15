@@ -9,10 +9,9 @@ import org.lwjgl.util.vector.Vector3f;
 /**
  * Records an intersection in the collision system.
  * 
- * @param <T> generic
  * @author Josch Bosch
  */
-public class IntersectionRecord<T> {
+public class IntersectionRecord {
 
     private Vector3f position;
 
@@ -20,11 +19,11 @@ public class IntersectionRecord<T> {
 
     private Vector3f ray;
 
-    private T object1;
+    private String object1;
 
-    private T object2;
+    private String object2;
 
-    private OctTree2<T> node;
+    private OctreeNode node;
 
     private boolean hasHit = false;
 
@@ -48,7 +47,7 @@ public class IntersectionRecord<T> {
 
     @Override
     public boolean equals(Object obj) {
-        @SuppressWarnings("unchecked") IntersectionRecord<T> other = (IntersectionRecord<T>) obj;
+        IntersectionRecord other = (IntersectionRecord) obj;
         if (obj == null) {
             return false;
         } else if (other.getObject1().equals(object1) && other.getObject2().equals(object2)) {
@@ -88,27 +87,27 @@ public class IntersectionRecord<T> {
         this.ray = ray;
     }
 
-    public T getObject1() {
+    public String getObject1() {
         return object1;
     }
 
-    public void setObject1(T object1) {
+    public void setObject1(String object1) {
         this.object1 = object1;
     }
 
-    public T getObject2() {
+    public String getObject2() {
         return object2;
     }
 
-    public void setObject2(T object2) {
+    public void setObject2(String object2) {
         this.object2 = object2;
     }
 
-    public OctTree2<T> getNode() {
+    public OctreeNode getNode() {
         return node;
     }
 
-    public void setNode(OctTree2<T> node) {
+    public void setNode(OctreeNode node) {
         this.node = node;
     }
 
