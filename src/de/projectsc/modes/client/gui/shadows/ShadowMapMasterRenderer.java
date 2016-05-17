@@ -82,7 +82,7 @@ public class ShadowMapMasterRenderer {
     /**
      * Clean up the shader and FBO on closing.
      */
-    public void cleanUp() {
+    public void dispose() {
         shader.dispose();
         shadowFbo.cleanUp();
     }

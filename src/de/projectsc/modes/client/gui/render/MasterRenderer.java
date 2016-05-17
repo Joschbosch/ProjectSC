@@ -18,6 +18,8 @@ import de.projectsc.core.data.objects.Light;
 import de.projectsc.modes.client.gui.data.GUIScene;
 import de.projectsc.modes.client.gui.objects.Camera;
 import de.projectsc.modes.client.gui.objects.particles.ParticleMaster;
+import de.projectsc.modes.client.gui.postProcessing.FrameBufferObject;
+import de.projectsc.modes.client.gui.postProcessing.PostProcessing;
 import de.projectsc.modes.client.gui.settings.GUISettings;
 import de.projectsc.modes.client.gui.shaders.EntityShader;
 import de.projectsc.modes.client.gui.shaders.TerrainShader;
@@ -60,6 +62,8 @@ public class MasterRenderer {
 
     private final ShadowMapMasterRenderer shadowRenderer;
 
+    private FrameBufferObject postProcessingFBO;
+
     public MasterRenderer() {
         GUISettings.enableCulling();
         GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
@@ -74,6 +78,8 @@ public class MasterRenderer {
         skyboxRenderer = new SkyboxRenderer(projectionMatrix);
         particleRenderer = new ParticleRenderer(projectionMatrix);
         shadowRenderer = new ShadowMapMasterRenderer();
+        postProcessingFBO = new FrameBufferObject(Display.getWidth(), Display.getHeight(), FrameBufferObject.DEPTH_RENDER_BUFFER);
+        PostProcessing.init();
     }
 
     /**
@@ -91,6 +97,7 @@ public class MasterRenderer {
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
         GL13.glActiveTexture(GL13.GL_TEXTURE5);
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, getShadowMapTexture());
+
     }
 
     /**
@@ -103,18 +110,21 @@ public class MasterRenderer {
      */
     public void renderScene(GUIScene scene, Camera camera, long elapsedTime, Vector4f clipPlane) {
         billboardRenderer.setCamera(camera);
+        renderShadowMap(scene, camera);
+        postProcessingFBO.bindFrameBuffer();
         render(scene, camera, elapsedTime, clipPlane);
+        postProcessingFBO.unbindFrameBuffer();
+        PostProcessing.doPostProcessing(postProcessingFBO.getColourTexture());
     }
 
-    /**
-     * General render method .
-     * 
-     * @param scene to render
-     * @param camera to use
-     * @param elapsedTime since last frame
-     * @param clipPlane to clip the world
-     */
-    public void render(GUIScene scene, Camera camera, long elapsedTime,
+    private void renderShadowMap(GUIScene scene, Camera camera) {
+        Light sun = new Light("", new Vector3f(1000, 1000, 1000), new Vector3f(1, 1, 1), new Vector3f(1, 0, 0), "newSun");
+        if (sun != null) {
+            shadowRenderer.render(scene, sun, camera);
+        }
+    }
+
+    private void render(GUIScene scene, Camera camera, long elapsedTime,
         Vector4f clipPlane) {
         prepare(scene);
         entityShader.start();
@@ -128,10 +138,6 @@ public class MasterRenderer {
         entityShader.loadViewMatrix(camera);
         entityRenderer.render(scene.getModels(), scene.getPositions(), scene.getRotations(), scene.getScales());
         entityShader.stop();
-        Light sun = new Light("", new Vector3f(1000, 1000, 1000), new Vector3f(1, 1, 1), new Vector3f(1, 0, 0), "newSun");
-        if (sun != null) {
-            shadowRenderer.render(scene, sun, camera);
-        }
         if (scene.isDebugMode()) {
             wireframeShader.start();
             wireframeShader.loadViewMatrix(camera);
@@ -170,14 +176,15 @@ public class MasterRenderer {
         entityShader.dispose();
         terrainShader.dispose();
         wireframeShader.dispose();
-        shadowRenderer.cleanUp();
+        shadowRenderer.dispose();
+        postProcessingFBO.dispose();
+        PostProcessing.dispose();
     }
 
     // Testing
     public int getShadowMapTexture() {
         return shadowRenderer.getShadowMap();
     }
-
 
     private void createProjectionMatrix() {
         projectionMatrix = new Matrix4f();

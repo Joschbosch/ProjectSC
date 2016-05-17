@@ -85,7 +85,6 @@ public class ShadowFrameBuffer {
      * @param height - the height of the frame buffer.
      */
     private static void bindFrameBuffer(int frameBuffer, int width, int height) {
-        GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
         GL30.glBindFramebuffer(GL30.GL_DRAW_FRAMEBUFFER, frameBuffer);
         GL11.glViewport(0, 0, width, height);
     }
