@@ -64,6 +64,10 @@ public class MasterRenderer {
 
     private FrameBufferObject postProcessingFBO;
 
+    private FrameBufferObject resolvingFBO;
+
+    private boolean doPostProcessing = true;
+
     public MasterRenderer() {
         GUISettings.enableCulling();
         GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
@@ -78,7 +82,8 @@ public class MasterRenderer {
         skyboxRenderer = new SkyboxRenderer(projectionMatrix);
         particleRenderer = new ParticleRenderer(projectionMatrix);
         shadowRenderer = new ShadowMapMasterRenderer();
-        postProcessingFBO = new FrameBufferObject(Display.getWidth(), Display.getHeight(), FrameBufferObject.DEPTH_RENDER_BUFFER);
+        postProcessingFBO = new FrameBufferObject(Display.getWidth(), Display.getHeight());
+        resolvingFBO = new FrameBufferObject(Display.getWidth(), Display.getHeight(), FrameBufferObject.DEPTH_TEXTURE);
         PostProcessing.init();
     }
 
@@ -114,7 +119,12 @@ public class MasterRenderer {
         postProcessingFBO.bindFrameBuffer();
         render(scene, camera, elapsedTime, clipPlane);
         postProcessingFBO.unbindFrameBuffer();
-        PostProcessing.doPostProcessing(postProcessingFBO.getColourTexture());
+        if (doPostProcessing) {
+            postProcessingFBO.resolveToFBO(resolvingFBO);
+            PostProcessing.doPostProcessing(resolvingFBO.getColourTexture());
+        } else {
+            postProcessingFBO.resolveToScreen();
+        }
     }
 
     private void renderShadowMap(GUIScene scene, Camera camera) {
@@ -178,6 +188,7 @@ public class MasterRenderer {
         wireframeShader.dispose();
         shadowRenderer.dispose();
         postProcessingFBO.dispose();
+        resolvingFBO.dispose();
         PostProcessing.dispose();
     }
 

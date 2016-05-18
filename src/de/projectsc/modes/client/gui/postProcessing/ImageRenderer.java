@@ -2,6 +2,11 @@ package de.projectsc.modes.client.gui.postProcessing;
 
 import org.lwjgl.opengl.GL11;
 
+/**
+ * Renders the given fbo onto a quad.
+ * 
+ * @author Josch Boschj
+ */
 public class ImageRenderer {
 
     private FrameBufferObject fbo;
@@ -12,6 +17,9 @@ public class ImageRenderer {
 
     public ImageRenderer() {}
 
+    /**
+     * Render the buffer.
+     */
     public void renderQuad() {
         if (fbo != null) {
             fbo.bindFrameBuffer();
@@ -27,6 +35,9 @@ public class ImageRenderer {
         return fbo.getColourTexture();
     }
 
+    /**
+     * Dispose everything.
+     */
     public void dispose() {
         if (fbo != null) {
             fbo.dispose();

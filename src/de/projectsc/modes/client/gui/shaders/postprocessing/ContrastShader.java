@@ -2,6 +2,11 @@ package de.projectsc.modes.client.gui.shaders.postprocessing;
 
 import de.projectsc.modes.client.gui.shaders.Shader;
 
+/**
+ * Shader for postprocessing effect.
+ * 
+ * @author Josch Bosch
+ */
 public class ContrastShader extends Shader {
 
     private static final String VERTEX_FILE = "/postprocessing/ppContrast.vert";

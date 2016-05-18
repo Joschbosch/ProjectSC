@@ -64,8 +64,6 @@ public class GUICore implements GUI {
 
     private static final boolean ENABLE_MSAA = true;
 
-    private static final int ANTI_ALIAILISING_MULTISAMPLE_RATE = 4;
-
     private static final int MAX_FRAME_RATE = 60;
 
     private static final int HEIGHT = 1024;
@@ -128,7 +126,7 @@ public class GUICore implements GUI {
             Display.setDisplayMode(new DisplayMode(WIDTH, HEIGHT));
             Display.setTitle("Project SC");
             Display.setVSyncEnabled(true);
-            Display.create(new PixelFormat().withSamples(ANTI_ALIAILISING_MULTISAMPLE_RATE).withDepthBits(24), attribs);
+            Display.create(new PixelFormat(), attribs);
             if (ENABLE_MSAA) {
                 GL11.glEnable(GL13.GL_MULTISAMPLE);
             }

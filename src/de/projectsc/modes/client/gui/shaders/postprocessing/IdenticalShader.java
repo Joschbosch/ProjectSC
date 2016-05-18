@@ -6,6 +6,11 @@ package de.projectsc.modes.client.gui.shaders.postprocessing;
 
 import de.projectsc.modes.client.gui.shaders.Shader;
 
+/**
+ * Shader for identical effect.
+ * 
+ * @author Josch Bosch
+ */
 public class IdenticalShader extends Shader {
 
     private static final String VERTEX_FILE = "postprocessing/ident.vert";

@@ -1,40 +1,26 @@
 package de.projectsc.modes.client.gui.postProcessing.gaussianBlur;
 
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL13;
-
-import de.projectsc.modes.client.gui.postProcessing.ImageRenderer;
+import de.projectsc.modes.client.gui.postProcessing.PostProcessingEffect;
 import de.projectsc.modes.client.gui.shaders.postprocessing.HorizontalBlurShader;
 
-public class HorizontalBlur {
-
-    private ImageRenderer renderer;
-
-    private HorizontalBlurShader shader;
+/**
+ * Postprocessing effect for gaussian blur.
+ * 
+ * @author Josch Bosch
+ */
+public class HorizontalBlur extends PostProcessingEffect {
 
     public HorizontalBlur(int targetFboWidth, int targetFboHeight) {
-        shader = new HorizontalBlurShader();
-        shader.start();
-        shader.loadTargetWidth(targetFboWidth);
-        shader.stop();
-        renderer = new ImageRenderer(targetFboWidth, targetFboHeight);
+        super(targetFboWidth, targetFboHeight);
     }
 
-    public void render(int texture) {
-        shader.start();
-        GL13.glActiveTexture(GL13.GL_TEXTURE0);
-        GL11.glBindTexture(GL11.GL_TEXTURE_2D, texture);
-        renderer.renderQuad();
-        shader.stop();
-    }
-
-    public int getOutputTexture() {
-        return renderer.getOutputTexture();
-    }
-
-    public void dispose() {
-        renderer.dispose();
-        shader.dispose();
+    @Override
+    protected void addShader(int targetFboWidth, int targetFboHeight) {
+        HorizontalBlurShader myShader = new HorizontalBlurShader();
+        myShader.start();
+        myShader.loadTargetWidth(targetFboWidth);
+        myShader.stop();
+        shader = myShader;
     }
 
 }

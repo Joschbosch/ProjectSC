@@ -7,26 +7,28 @@ package de.projectsc.modes.client.gui.postProcessing;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 
-import de.projectsc.modes.client.gui.shaders.postprocessing.IdenticalShader;
+import de.projectsc.modes.client.gui.shaders.Shader;
 
 /**
- * REsolves the post processing chain to the screen.
+ * Base class for all post processing effects.
  * 
  * @author Josch Bosch
  */
-public class Identical {
+public abstract class PostProcessingEffect {
+
+    protected Shader shader;
 
     private ImageRenderer renderer;
 
-    private IdenticalShader shader;
-
-    public Identical() {
-        shader = new IdenticalShader();
-        renderer = new ImageRenderer();
+    public PostProcessingEffect(int targetFboWidth, int targetFboHeight) {
+        renderer = new ImageRenderer(targetFboWidth, targetFboHeight);
+        addShader(targetFboWidth, targetFboHeight);
     }
 
+    protected abstract void addShader(int targetFboWidth, int targetFboHeight);
+
     /**
-     * Render given texture onto the screen.
+     * Render the given texture.
      * 
      * @param texture to render.
      */
@@ -43,7 +45,7 @@ public class Identical {
     }
 
     /**
-     * Dispose everything.
+     * Clean up the mess.
      */
     public void dispose() {
         renderer.dispose();

@@ -1,5 +1,8 @@
 package de.projectsc.modes.client.gui.postProcessing;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
@@ -10,46 +13,63 @@ import de.projectsc.modes.client.gui.postProcessing.gaussianBlur.HorizontalBlur;
 import de.projectsc.modes.client.gui.postProcessing.gaussianBlur.VerticalBlur;
 import de.projectsc.modes.client.gui.utils.Loader;
 
-public class PostProcessing {
+/**
+ * Main class for the post processing pipeline.
+ * 
+ * @author Josch Bosch
+ */
+public final class PostProcessing {
 
     private static final float[] POSITIONS = { -1, 1, -1, -1, 1, 1, 1, -1 };
 
     private static RawModel quad;
 
-    private static ConstrastChanger constrastChanger;
-
-    private static HorizontalBlur hBlur;
-
-    private static VerticalBlur vBlur;
+    private static List<PostProcessingEffect> effects;
 
     private static Identical identical;
 
-    public static void init() {
-        quad = Loader.loadToVAO(POSITIONS, 2);
-        identical = new Identical();
-        constrastChanger = new ConstrastChanger();
-        hBlur = new HorizontalBlur(Display.getWidth(), Display.getHeight());
-        vBlur = new VerticalBlur(Display.getWidth(), Display.getHeight());
+    private PostProcessing() {
 
     }
 
+    /**
+     * Initialize post processing.
+     */
+    public static void init() {
+        quad = Loader.loadToVAO(POSITIONS, 2);
+
+        identical = new Identical();
+
+        effects = new ArrayList<PostProcessingEffect>(5);
+        effects.add(new ConstrastChanger(Display.getWidth(), Display.getHeight()));
+        effects.add(new VerticalBlur(Display.getWidth(), Display.getHeight()));
+        effects.add(new HorizontalBlur(Display.getWidth(), Display.getHeight()));
+
+    }
+
+    /**
+     * Start post processing pipeline with registered effects.
+     * 
+     * @param colorTexture to render to.
+     */
     public static void doPostProcessing(int colorTexture) {
         start();
         int currentTexture = colorTexture;
-        hBlur.render(currentTexture);
-        currentTexture = hBlur.getOutputTexture();
-        vBlur.render(currentTexture);
-        currentTexture = vBlur.getOutputTexture();
-        constrastChanger.render(currentTexture);
-
+        for (int i = effects.size() - 1; i >= 0; i--) {
+            effects.get(i).render(currentTexture);
+            currentTexture = effects.get(i).getOutputTexture();
+        }
         identical.render(currentTexture);
         end();
     }
 
+    /**
+     * Delete everything.
+     */
     public static void dispose() {
-        constrastChanger.dispose();
-        hBlur.dispose();
-        vBlur.dispose();
+        for (int i = effects.size() - 1; i >= 0; i--) {
+            effects.get(i).dispose();
+        }
         identical.dispose();
     }
 
