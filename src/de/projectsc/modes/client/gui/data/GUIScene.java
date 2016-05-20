@@ -13,6 +13,7 @@ import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.core.data.objects.Light;
 import de.projectsc.core.data.physics.WireFrame;
+import de.projectsc.modes.client.gui.models.AnimatedModel;
 import de.projectsc.modes.client.gui.models.TexturedModel;
 import de.projectsc.modes.client.gui.objects.billboards.Billboard;
 import de.projectsc.modes.client.gui.objects.terrain.TerrainModel;
@@ -47,13 +48,15 @@ public class GUIScene {
 
     private boolean wireframeEnabled = true;
 
-    private boolean isDebugMode = true;
+    private boolean isDebugMode = false;
 
     private List<WireFrame> wireFrames = new LinkedList<>();
 
     private List<Vector3f> selectedEntites = new LinkedList<>();
 
     private List<Vector3f> highlightedEntities = new LinkedList<>();
+
+    private Map<AnimatedModel, List<String>> animatedModels;
 
     public GUIScene() {
         super();
@@ -64,6 +67,7 @@ public class GUIScene {
         scales = new HashMap<>();
         rotations = new HashMap<>();
         positions = new HashMap<>();
+        animatedModels = new HashMap<>();
 
     }
 
@@ -73,6 +77,10 @@ public class GUIScene {
 
     public Map<TexturedModel, List<String>> getModels() {
         return models;
+    }
+
+    public Map<AnimatedModel, List<String>> getAnimatedModels() {
+        return animatedModels;
     }
 
     public List<Light> getLights() {

@@ -3,14 +3,11 @@ package de.projectsc.modes.client.gui.postProcessing;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 
 import de.projectsc.modes.client.gui.models.RawModel;
-import de.projectsc.modes.client.gui.postProcessing.gaussianBlur.HorizontalBlur;
-import de.projectsc.modes.client.gui.postProcessing.gaussianBlur.VerticalBlur;
 import de.projectsc.modes.client.gui.utils.Loader;
 
 /**
@@ -41,9 +38,9 @@ public final class PostProcessing {
         identical = new Identical();
 
         effects = new ArrayList<PostProcessingEffect>(5);
-        effects.add(new ConstrastChanger(Display.getWidth(), Display.getHeight()));
-        effects.add(new VerticalBlur(Display.getWidth(), Display.getHeight()));
-        effects.add(new HorizontalBlur(Display.getWidth(), Display.getHeight()));
+        // effects.add(new ConstrastChanger(Display.getWidth(), Display.getHeight()));
+        // effects.add(new VerticalBlur(Display.getWidth(), Display.getHeight()));
+        // effects.add(new HorizontalBlur(Display.getWidth(), Display.getHeight()));
 
     }
 

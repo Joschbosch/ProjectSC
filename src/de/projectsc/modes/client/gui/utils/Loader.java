@@ -109,6 +109,29 @@ public final class Loader {
      * @param positions to load
      * @param textureCoordinates to apply to the model
      * @param normals of each face
+     * @param indices for vao
+     * 
+     * @return the model with the vao
+     */
+    public static RawModel loadToVAO(float[] positions, float[] textureCoordinates, float[] normals, int[] indices, int[] jointIndicesArr,
+        float[] weightsArr) {
+        int vaoID = createVAO();
+        bindIndicesBuffer(indices);
+        storeDataInAttributeList(0, 3, positions);
+        storeDataInAttributeList(1, 2, textureCoordinates);
+        storeDataInAttributeList(2, 3, normals);
+        storeDataInAttributeList(3, 4, weightsArr);
+        storeDataInAttributeList(4, 4, jointIndicesArr);
+        unbind();
+        return new RawModel(vaoID, indices.length);
+    }
+
+    /**
+     * Loading given data positions into a VAO.
+     * 
+     * @param positions to load
+     * @param textureCoordinates to apply to the model
+     * @param normals of each face
      * @param tangents of the faces
      * @param indices for vao
      * 
@@ -306,6 +329,16 @@ public final class Loader {
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
     }
 
+    private static void storeDataInAttributeList(int attrNumber, int dataSize, int[] data) {
+        int vboID = GL15.glGenBuffers();
+        VBOS.add(vboID);
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vboID);
+        IntBuffer buffer = storeDataInIntBuffer(data);
+        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, buffer, GL15.GL_STATIC_DRAW);
+        GL20.glVertexAttribPointer(attrNumber, dataSize, GL11.GL_FLOAT, false, 0, 0);
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+    }
+
     /**
      * create Buffer.
      * 
@@ -325,6 +358,7 @@ public final class Loader {
         GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, vboId);
         IntBuffer buffer = storeDataInIntBuffer(indices);
         GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, buffer, GL15.GL_STATIC_DRAW);
+
     }
 
     /**
