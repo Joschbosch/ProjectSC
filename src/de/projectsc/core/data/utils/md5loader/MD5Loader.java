@@ -7,10 +7,8 @@ package de.projectsc.core.data.utils.md5loader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -32,10 +30,6 @@ public class MD5Loader {
 
     private static final Log LOGGER = LogFactory.getLog(MD5Loader.class);
 
-    private static Map<String, MD5Model> modelCache = new HashMap<>();
-
-    private static Map<String, MD5AnimModel> animCache = new HashMap<>();
-
     public static void main(String[] args) {
         // loadMD5MeshFile("bob1.md5mesh");
         loadMD5AnimFile("bob1.md5anim");
@@ -43,9 +37,6 @@ public class MD5Loader {
 
     public static MD5AnimModel loadMD5AnimFile(String filename) {
         String fullPath = "/models/animated/" + filename;
-        if (animCache.get(fullPath) != null) {
-            return animCache.get(fullPath);
-        }
         MD5AnimModel model = loadAnimFile(fullPath);
         return model;
     }
@@ -160,9 +151,6 @@ public class MD5Loader {
                     newModel.setBaseFrame(baseframe);
                     newModel.setBoundInfo(bounds);
                     newModel.setHierarchy(hierarchy);
-
-                    // System.out.println(newModel.toString());
-                    animCache.put(fullPath, newModel);
                     return newModel;
                 } else {
                     throw new IOException("Empty file");
@@ -178,9 +166,6 @@ public class MD5Loader {
 
     public static MD5Model loadMD5MeshFile(String filename) {
         String fullPath = "/models/animated/" + filename;
-        if (modelCache.get(fullPath) != null) {
-            return modelCache.get(fullPath);
-        }
         MD5Model model = loadMeshFile(fullPath);
         return model;
     }
@@ -251,8 +236,6 @@ public class MD5Loader {
                     newModel.setHeader(header);
                     newModel.setMeshes(meshes);
                     newModel.setJoints(joints);
-                    // System.out.println(newModel.toString());
-                    modelCache.put(fullPath, newModel);
                     return newModel;
                 } else {
                     throw new IOException("Empty file");

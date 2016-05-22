@@ -15,6 +15,7 @@ import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -120,8 +121,11 @@ public final class Loader {
         storeDataInAttributeList(0, 3, positions);
         storeDataInAttributeList(1, 2, textureCoordinates);
         storeDataInAttributeList(2, 3, normals);
-        storeDataInAttributeList(3, 4, weightsArr);
-        storeDataInAttributeList(4, 4, jointIndicesArr);
+        float[] tangents = new float[positions.length];
+        Arrays.fill(tangents, 0);
+        storeDataInAttributeList(3, 3, tangents);
+        storeDataInAttributeList(4, 4, weightsArr);
+        storeDataInAttributeList(5, 4, jointIndicesArr);
         unbind();
         return new RawModel(vaoID, indices.length);
     }

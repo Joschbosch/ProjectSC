@@ -4,13 +4,25 @@
 
 package de.projectsc.core.data.utils.md5loader;
 
+import static org.lwjgl.opengl.GL11.GL_FLOAT;
+import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
+import static org.lwjgl.opengl.GL15.GL_ELEMENT_ARRAY_BUFFER;
+import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
+import static org.lwjgl.opengl.GL15.glBindBuffer;
+import static org.lwjgl.opengl.GL15.glBufferData;
+import static org.lwjgl.opengl.GL15.glGenBuffers;
+import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
+import static org.lwjgl.opengl.GL30.glBindVertexArray;
+import static org.lwjgl.opengl.GL30.glGenVertexArrays;
+
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
+import org.lwjgl.BufferUtils;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Quaternion;
 import org.lwjgl.util.vector.Vector3f;
@@ -24,53 +36,49 @@ import de.projectsc.core.data.utils.md5loader.mesh.MD5Joints;
 import de.projectsc.core.data.utils.md5loader.mesh.MD5Mesh;
 import de.projectsc.modes.client.gui.models.AnimatedModel;
 import de.projectsc.modes.client.gui.models.RawModel;
+import de.projectsc.modes.client.gui.models.TexturedModel;
 import de.projectsc.modes.client.gui.textures.ModelTexture;
-import de.projectsc.modes.client.gui.utils.GUIConstants;
 import de.projectsc.modes.client.gui.utils.Loader;
 
 public class MD5Processor {
 
-    private static Map<MD5Mesh, RawModel> meshCache = new HashMap<>();
-
-    private static ModelTexture white;
-
-    public static void process(MD5Model md5Model, MD5AnimModel animModel, Vector3f defaultColour,
-        Map<AnimatedModel, List<String>> entitiesWithModel) {
+    public static List<TexturedModel> process(MD5Model md5Model, MD5AnimModel animModel) {
+        List<TexturedModel> newModels = new LinkedList<>();
 
         List<Matrix4f> invJointMatrices = calcInJointMatrices(md5Model);
         List<AnimatedFrame> animatedFrames = processAnimationFrames(md5Model, animModel, invJointMatrices);
-        if (white == null) {
-            white = new ModelTexture(Loader.loadTexture(
-                MD5Loader.class.getResourceAsStream(GUIConstants.TEXTURE_ROOT + GUIConstants.BASIC_TEXTURE_WHITE),
-                "png"));
 
-        }
         for (MD5Mesh md5Mesh : md5Model.getMeshes()) {
             RawModel mesh = null;
-            if (meshCache.get(md5Mesh) != null) {
-                mesh = meshCache.get(md5Mesh);
+            mesh = generateMesh(md5Model, md5Mesh);
+            ModelTexture texture =
+                new ModelTexture(Loader.loadTexture(MD5Loader.class.getResourceAsStream(md5Mesh.getTexture()), "png"));
+
+            TexturedModel model = null;
+            if (animModel != null) {
+                model = new AnimatedModel(mesh, invJointMatrices, animatedFrames, texture);
             } else {
-                mesh = generateMesh(md5Model, md5Mesh);
-                meshCache.put(md5Mesh, mesh);
+                texture.setTransparent(true);
+                model = new TexturedModel(mesh, texture);
             }
-            AnimatedModel m = new AnimatedModel(mesh, invJointMatrices, animatedFrames, white);
-            List<String> list = new LinkedList<>();
-            list.add("md5");
-            entitiesWithModel.put(m, list);
+            newModels.add(model);
         }
+        return newModels;
     }
 
     private static List<AnimatedFrame> processAnimationFrames(MD5Model md5Model, MD5AnimModel animModel, List<Matrix4f> invJointMatrices) {
         List<AnimatedFrame> animatedFrames = new ArrayList<>();
-        List<MD5Frame> frames = animModel.getFrames();
-        for (MD5Frame frame : frames) {
-            AnimatedFrame data = processAnimationFrame(md5Model, animModel, frame, invJointMatrices);
-            animatedFrames.add(data);
+        if (animModel != null) {
+            List<MD5Frame> frames = animModel.getFrames();
+            for (MD5Frame frame : frames) {
+                AnimatedFrame data = processAnimationFrame(md5Model, animModel, frame, invJointMatrices);
+                animatedFrames.add(data);
+            }
         }
         return animatedFrames;
     }
 
-    private static AnimatedFrame processAnimationFrame(MD5Model md5Model, MD5AnimModel animModel, MD5Frame frame,
+    public static AnimatedFrame processAnimationFrame(MD5Model md5Model, MD5AnimModel animModel, MD5Frame frame,
         List<Matrix4f> invJointMatrices) {
         AnimatedFrame result = new AnimatedFrame();
 
@@ -196,9 +204,7 @@ public class MD5Processor {
             v1.normal = (Vector3f) Vector3f.add(v1.normal, normal, null).normalise();
             v2.normal = (Vector3f) Vector3f.add(v2.normal, normal, null).normalise();
         }
-
-        RawModel mesh = createMesh(vertices, indices);
-        return mesh;
+        return createMesh(vertices, indices);
     }
 
     private static RawModel createMesh(List<AnimVertex> vertices, List<Integer> indices) {
@@ -240,6 +246,66 @@ public class MD5Processor {
         float[] weightsArr = listToArray(weights);
 
         return Loader.loadToVAO(positionsArr, textCoordsArr, normalsArr, indicesArr, jointIndicesArr, weightsArr);
+    }
+
+    public static RawModel loadUp(float[] positions, float[] textCoords, float[] normals, int[] indices, int[] jointIndices, float[] weights) {
+        int vertexCount = indices.length;
+
+        int vaoId = glGenVertexArrays();
+        glBindVertexArray(vaoId);
+
+        // Position VBO
+        int vboId = glGenBuffers();
+        FloatBuffer posBuffer = BufferUtils.createFloatBuffer(positions.length);
+        posBuffer.put(positions).flip();
+        glBindBuffer(GL_ARRAY_BUFFER, vboId);
+        glBufferData(GL_ARRAY_BUFFER, posBuffer, GL_STATIC_DRAW);
+        glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
+
+        // Texture coordinates VBO
+        vboId = glGenBuffers();
+        FloatBuffer textCoordsBuffer = BufferUtils.createFloatBuffer(textCoords.length);
+        textCoordsBuffer.put(textCoords).flip();
+        glBindBuffer(GL_ARRAY_BUFFER, vboId);
+        glBufferData(GL_ARRAY_BUFFER, textCoordsBuffer, GL_STATIC_DRAW);
+        glVertexAttribPointer(1, 2, GL_FLOAT, false, 0, 0);
+
+        // Vertex normals VBO
+        vboId = glGenBuffers();
+        FloatBuffer vecNormalsBuffer = BufferUtils.createFloatBuffer(normals.length);
+        vecNormalsBuffer.put(normals).flip();
+        glBindBuffer(GL_ARRAY_BUFFER, vboId);
+        glBufferData(GL_ARRAY_BUFFER, vecNormalsBuffer, GL_STATIC_DRAW);
+        glVertexAttribPointer(2, 3, GL_FLOAT, false, 0, 0);
+
+        // Weights
+        vboId = glGenBuffers();
+        FloatBuffer weightsBuffer = BufferUtils.createFloatBuffer(weights.length);
+        weightsBuffer.put(weights).flip();
+        glBindBuffer(GL_ARRAY_BUFFER, vboId);
+        glBufferData(GL_ARRAY_BUFFER, weightsBuffer, GL_STATIC_DRAW);
+        glVertexAttribPointer(4, 4, GL_FLOAT, false, 0, 0);
+
+        // Joint indices
+        vboId = glGenBuffers();
+        IntBuffer jointIndicesBuffer = BufferUtils.createIntBuffer(jointIndices.length);
+        jointIndicesBuffer.put(jointIndices).flip();
+        glBindBuffer(GL_ARRAY_BUFFER, vboId);
+        glBufferData(GL_ARRAY_BUFFER, jointIndicesBuffer, GL_STATIC_DRAW);
+        glVertexAttribPointer(5, 4, GL_FLOAT, false, 0, 0);
+
+        // Index VBO
+        vboId = glGenBuffers();
+        IntBuffer indicesBuffer = BufferUtils.createIntBuffer(indices.length);
+        indicesBuffer.put(indices).flip();
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboId);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicesBuffer, GL_STATIC_DRAW);
+
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindVertexArray(0);
+
+        RawModel model = new RawModel(vaoId, vertexCount);
+        return model;
     }
 
     public static int[] listIntToArray(List<Integer> list) {

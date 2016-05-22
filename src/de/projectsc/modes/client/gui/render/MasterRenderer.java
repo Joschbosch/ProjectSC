@@ -21,7 +21,6 @@ import de.projectsc.modes.client.gui.objects.particles.ParticleMaster;
 import de.projectsc.modes.client.gui.postProcessing.FrameBufferObject;
 import de.projectsc.modes.client.gui.postProcessing.PostProcessing;
 import de.projectsc.modes.client.gui.settings.GUISettings;
-import de.projectsc.modes.client.gui.shaders.AnimatedEntityShader;
 import de.projectsc.modes.client.gui.shaders.EntityShader;
 import de.projectsc.modes.client.gui.shaders.TerrainShader;
 import de.projectsc.modes.client.gui.shaders.WireFrameShader;
@@ -45,11 +44,7 @@ public class MasterRenderer {
 
     private final EntityShader entityShader;
 
-    private final AnimatedEntityShader animatedEntityShader;
-
     private final EntityRenderer entityRenderer;
-
-    private AnimatedEntityRenderer animatedEntityRenderer;
 
     private final TerrainShader terrainShader;
 
@@ -78,10 +73,7 @@ public class MasterRenderer {
         GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
         createProjectionMatrix();
         entityShader = new EntityShader();
-        animatedEntityShader = new AnimatedEntityShader();
         entityRenderer = new EntityRenderer(entityShader, projectionMatrix);
-        animatedEntityRenderer = new AnimatedEntityRenderer(animatedEntityShader, projectionMatrix);
-
         wireframeShader = new WireFrameShader();
         collisionBoxRenderer = new WireFrameRenderer(wireframeShader, projectionMatrix);
         terrainShader = new TerrainShader();
@@ -156,18 +148,6 @@ public class MasterRenderer {
         entityShader.loadViewMatrix(camera);
         entityRenderer.render(scene.getModels(), scene.getPositions(), scene.getRotations(), scene.getScales());
         entityShader.stop();
-
-        animatedEntityShader.start();
-        animatedEntityShader.loadClipPlane(clipPlane);
-        if (scene.getSkyColor() == null) {
-            animatedEntityShader.loadSkyColor(SKY_R, SKY_G, SKY_B);
-        } else {
-            animatedEntityShader.loadSkyColor(scene.getSkyColor().x, scene.getSkyColor().y, scene.getSkyColor().z);
-        }
-        animatedEntityShader.loadLights(scene.getLights(), scene.getPositions(), camera.getViewMatrix());
-        animatedEntityShader.loadViewMatrix(camera);
-        animatedEntityRenderer.render(scene.getAnimatedModels(), scene.getPositions(), scene.getRotations(), scene.getScales());
-        animatedEntityShader.stop();
 
         if (scene.isDebugMode()) {
             wireframeShader.start();

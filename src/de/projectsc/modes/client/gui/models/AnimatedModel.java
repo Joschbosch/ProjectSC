@@ -17,32 +17,18 @@ import de.projectsc.modes.client.gui.textures.ModelTexture;
  * 
  * @author Josch Bosch
  */
-public class AnimatedModel {
+public class AnimatedModel extends TexturedModel {
 
-    public static final int MAX_WEIGHTS = 5;
-
-    private final RawModel rawModel;
-
-    private final ModelTexture texture;
+    public static final int MAX_WEIGHTS = 4;
 
     private List<Matrix4f> invJointMatrices;
 
     private List<AnimatedFrame> animatedFrames;
 
     public AnimatedModel(RawModel rawModel, List<Matrix4f> invJointMatrices, List<AnimatedFrame> animatedFrames, ModelTexture texture) {
-        super();
-        this.rawModel = rawModel;
-        this.texture = texture;
+        super(rawModel, texture);
         this.setInvJointMatrices(invJointMatrices);
         this.setAnimatedFrames(animatedFrames);
-    }
-
-    public RawModel getRawModel() {
-        return rawModel;
-    }
-
-    public ModelTexture getTexture() {
-        return texture;
     }
 
     public List<Matrix4f> getInvJointMatrices() {

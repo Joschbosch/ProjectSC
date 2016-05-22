@@ -33,6 +33,8 @@ public class EntityShader extends Shader {
 
     private static final String FRAGMENT_FILE = "entityShader.frag";
 
+    private static final int MAX_JOINTS = 150;
+
     private int locationTransformationMatrix;
 
     private int locationProjectionMatrix;
@@ -65,6 +67,10 @@ public class EntityShader extends Shader {
 
     private int locationHasNormalMap;
 
+    private int[] locationJointsMatrix;
+
+    private int locationAnimated;
+
     public EntityShader() {
         super(VERTEX_FILE, FRAGMENT_FILE);
         LOGGER.info("Static shader loaded.");
@@ -76,6 +82,8 @@ public class EntityShader extends Shader {
         super.bindAttribute(1, "textureCoords");
         super.bindAttribute(2, "normal");
         super.bindAttribute(3, "tangents");
+        super.bindAttribute(4, "jointWeights");
+        super.bindAttribute(5, "jointIndices");
     }
 
     @Override
@@ -101,6 +109,18 @@ public class EntityShader extends Shader {
             locationLightPositionEyeSpace[i] = getUniformLocation(String.format("lightPositionEyeSpace[%s]", i));
             locationLightColor[i] = getUniformLocation(String.format("lightColor[%s]", i));
             locationAttenuation[i] = getUniformLocation(String.format("attenuation[%s]", i));
+        }
+        locationJointsMatrix = new int[MAX_JOINTS];
+        for (int i = 0; i < MAX_JOINTS; i++) {
+            locationJointsMatrix[i] = super.getUniformLocation(String.format("jointsMatrix[%s]", i));
+
+        }
+        locationAnimated = super.getUniformLocation("isAnimated");
+    }
+
+    public void loadJointsMatrix(Matrix4f[] matrix4fs) {
+        for (int i = 0; i < matrix4fs.length; i++) {
+            super.loadMatrix(locationJointsMatrix[i], matrix4fs[i]);
         }
     }
 
@@ -236,6 +256,11 @@ public class EntityShader extends Shader {
     public void loadShineValues(float damper, float reflectivity) {
         super.loadFloat(locationShineDamper, damper);
         super.loadFloat(locationReflectivity, reflectivity);
+    }
+
+    public void loadAnimated(boolean value) {
+        super.loadBoolean(locationAnimated, value);
+
     }
 
 }

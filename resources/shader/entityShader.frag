@@ -5,6 +5,8 @@ in vec3 toLightVector[lightSources];
 in vec3 toCameraVector;
 in float visibility; 
 in vec3 surfaceNormal;
+in vec4 debugColor;
+
 out vec4 out_Color;
 
 uniform sampler2D textureSampler;
@@ -52,4 +54,5 @@ void main(void){
 	}
    out_Color = vec4(totalDiffuse, 1.0) * textureColor + vec4(totalSpecular, 1.0);
    out_Color = mix(vec4(skyColor, 1.0), out_Color, visibility);
+   //out_Color = debugColor;
  }
