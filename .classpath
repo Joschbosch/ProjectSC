@@ -33,5 +33,6 @@
 	<classpathentry kind="lib" path="lib/kryonet-2.21/asm-all-5.0.4.jar"/>
 	<classpathentry kind="lib" path="lib/commons-configuration-1.10.jar"/>
 	<classpathentry kind="lib" path="lib/slick-util/lib/slick-util.jar"/>
+	<classpathentry kind="lib" path="lib/xom-1.2.10.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

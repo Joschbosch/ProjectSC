@@ -78,15 +78,17 @@ public class EntityRenderer {
         position.put("md5", new Vector3f(0, 0, 0));
         rotations.put("md5", new Vector3f(-90, 0, -90));
         scales.put("md5", new Vector3f(0.5f, 0.5f, 0.5f));
+        float fps = 24;
         time += 15;
-        if (time > 1000 / 10) {
+        if (time > 1000 / fps) {
             currentFrame++;
             if (currentFrame >= 120) {
                 currentFrame = 0;
             }
-            time = 0;
+            time = (int) (time % (1000/fps)) ;
         }
 
+        float delta = time / (1000.0f /fps);
         for (TexturedModel model : entitiesWithModel.keySet()) {
             prepareTexturedModel(model);
             if (model instanceof AnimatedModel) {
@@ -99,7 +101,7 @@ public class EntityRenderer {
                     if (model instanceof AnimatedModel) {
                         AnimatedFrame frame1 = ((AnimatedModel) model).getAnimatedFrames().get(currentFrame);
                         AnimatedFrame frame2 = ((AnimatedModel) model).getAnimatedFrames().get((currentFrame + 1) % 120);
-                        frame = calculateInterpolatedFrame(frame1, frame2);
+                        frame = calculateInterpolatedFrame(frame1, frame2, delta);
                     }
                     prepareInstance(model.getTexture(), position.get(e), rotations.get(e), scales.get(e), frame);
                     GL11.glDrawElements(GL11.GL_TRIANGLES, model.getRawModel().getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
@@ -109,45 +111,31 @@ public class EntityRenderer {
         }
     }
 
-    private Matrix4f[] calculateInterpolatedFrame(AnimatedFrame frame1, AnimatedFrame frame2) {
+    private Matrix4f[] calculateInterpolatedFrame(AnimatedFrame frame1, AnimatedFrame frame2, float delta) {
         Matrix4f[] result = new Matrix4f[frame1.getJointMatrices().length];
         for (int i = 0; i < frame1.getJointMatrices().length; i++) {
-            Matrix4f m1 = frame1.getJointMatrices()[i];
-            Matrix4f m2 = frame2.getJointMatrices()[i];
-            Quaternion q1 = new Quaternion();
+            Matrix4f m1 = new Matrix4f(frame1.getJointMatrices()[i]);
+            Matrix4f m2 = new Matrix4f(frame2.getJointMatrices()[i]);
+            Vector3f position1 = new Vector3f(m1.m30, m1.m31, m1.m32);
+            Vector3f position2 = new Vector3f(m2.m30, m2.m31, m2.m32);
+            Quaternion q1 = new Quaternion(); 
             Quaternion.setFromMatrix(m1, q1);
-            Quaternion q2 = new Quaternion();
-            Quaternion.setFromMatrix(m1, q2);
-
-            result[i] = m1;
+            Quaternion q2 = new Quaternion(); 
+            Quaternion.setFromMatrix(m2, q2);
+            Quaternion interpolatedRotation = Maths.slerp(q1, q2,delta);
+            
+            Vector3f interpolatedPostion = Maths.lerp(position1, position2, delta);
+            
+            result[i] = new Matrix4f();
+            Maths.applyQuaternionToMatrix(interpolatedRotation, result[i]);
+            result[i].m30 = interpolatedPostion.x;
+            result[i].m31 = interpolatedPostion.y;
+            result[i].m32 = interpolatedPostion.z;
         }
         return result;
     }
 
-    private Quaternion slerp(Quaternion q0, Quaternion q1, float alpha) {
-        q0 = new Quaternion(q0);
-        q1 = new Quaternion(q1);
 
-        float dot = Quaternion.dot(q0, q1);
-
-        float DOT_THRESHOLD = 0.9995f;
-        if (dot > DOT_THRESHOLD)
-            return lerp(q0, q1, alpha);
-
-        dot = Math.max(Math.min(dot, -1), 1);
-        float theta = (float) Math.acos(dot) * alpha;
-
-        Quaternion q2 = Quaternion.sub(q1, (Quaternion) q0.scale(dot)).normalize();
-
-        return q0.mult((float) Math.cos(theta)).add(q2.mult((float) Math.sin(theta)));
-    }
-
-    private Quaternion lerp(Quaternion q0, Quaternion q1, float alpha) {
-        return (Quaternion) new Quaternion(q0.x + (q1.x - q0.x) * alpha,
-            q0.y + (q1.y - q0.y) * alpha,
-            q0.z + (q1.z - q0.z) * alpha,
-            q0.w + (q1.w - q0.w) * alpha).normalise();
-    }
 
     private void prepareTexturedModel(TexturedModel tModel) {
         RawModel model = tModel.getRawModel();

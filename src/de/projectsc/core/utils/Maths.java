@@ -6,6 +6,7 @@
 package de.projectsc.core.utils;
 
 import org.lwjgl.util.vector.Matrix4f;
+import org.lwjgl.util.vector.Quaternion;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
@@ -222,4 +223,62 @@ public final class Maths {
         return t;
     }
 
+    public static Quaternion slerp(Quaternion from, Quaternion to, float t) {
+        Quaternion result = new Quaternion();
+        double scale0 = 0;
+        double scale1 = 0;
+        double cosOmega = from.x * to.x + from.y * to.y + from.z * to.z + from.w * to.w;
+        double absCosOmega = Math.abs(cosOmega);
+        if ((1.0f - absCosOmega) > 1e-6f) {
+            double sinSqr = 1.0f - absCosOmega * absCosOmega;
+            double sinom = (1.0 / Math.sqrt(sinSqr));
+            double omega = Math.atan2(sinSqr * sinom, absCosOmega);
+            scale0 = Math.sin((1.0f - t) * omega) * sinom;
+            scale1 = Math.sin(t * omega) * sinom;
+        } else {
+            scale0 = 1.0f - t;
+            scale1 = t;
+        }
+        scale1 = (cosOmega >= 0.0f) ? scale1 : -scale1;
+        result.x = (float) (scale0 * from.x + scale1 * to.x);
+        result.y = (float) (scale0 * from.y + scale1 * to.y);
+        result.z = (float) (scale0 * from.z + scale1 * to.z);
+        result.w = (float) (scale0 * from.w + scale1 * to.w);
+
+        return result;
+    }
+
+    public static Vector3f lerp(Vector3f from, Vector3f to, float t) {
+        Vector3f result = new Vector3f();
+        result.x = from.x + (to.x - from.x) * t;
+        result.y = from.y + (to.y - from.y) * t;
+        result.z = from.z + (to.z - from.z) * t;
+        return result;
+    }
+
+    public static void applyQuaternionToMatrix(Quaternion q, Matrix4f m) {
+        double sqw = q.w * q.w;
+        double sqx = q.x * q.x;
+        double sqy = q.y * q.y;
+        double sqz = q.z * q.z;
+
+        double invs = 1 / (sqx + sqy + sqz + sqw);
+        m.m00 = (float) ((sqx - sqy - sqz + sqw) * invs);
+        m.m11 = (float) ((-sqx + sqy - sqz + sqw) * invs);
+        m.m22 = (float) ((-sqx - sqy + sqz + sqw) * invs);
+
+        double tmp1 = q.x * q.y;
+        double tmp2 = q.z * q.w;
+        m.m10 = (float) (2.0 * (tmp1 + tmp2) * invs);
+        m.m01 = (float) (2.0 * (tmp1 - tmp2) * invs);
+
+        tmp1 = q.x * q.z;
+        tmp2 = q.y * q.w;
+        m.m20 = (float) (2.0 * (tmp1 - tmp2) * invs);
+        m.m02 = (float) (2.0 * (tmp1 + tmp2) * invs);
+        tmp1 = q.y * q.z;
+        tmp2 = q.x * q.w;
+        m.m21 = (float) (2.0 * (tmp1 + tmp2) * invs);
+        m.m12 = (float) (2.0 * (tmp1 - tmp2) * invs);
+    }
 }
