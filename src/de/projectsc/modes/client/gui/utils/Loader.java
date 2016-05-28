@@ -129,7 +129,21 @@ public final class Loader {
         unbind();
         return new RawModel(vaoID, indices.length);
     }
-
+    public static RawModel loadToVAO(FloatBuffer positions,FloatBuffer textureCoordinates, FloatBuffer normals, int[] indices, int[] jointIndicesArr,
+        FloatBuffer weightsArr) {
+        int vaoID = createVAO();
+        bindIndicesBuffer(indices);
+        storeDataInAttributeList(0, 3, positions);
+        storeDataInAttributeList(1, 2, textureCoordinates);
+        storeDataInAttributeList(2, 3, normals);
+        float[] tangents = new float[positions.capacity()];
+        Arrays.fill(tangents, 0);
+        storeDataInAttributeList(3, 3, tangents);
+        storeDataInAttributeList(4, 4, weightsArr);
+        storeDataInAttributeList(5, 4, jointIndicesArr);
+        unbind();
+        return new RawModel(vaoID, indices.length);
+    }
     /**
      * Loading given data positions into a VAO.
      * 
@@ -152,6 +166,27 @@ public final class Loader {
         return new RawModel(vaoID, indices.length);
     }
 
+    /**
+     * Loading given data positions into a VAO.
+     * 
+     * @param positions to load
+     * @param textureCoordinates to apply to the model
+     * @param normals of each face
+     * @param tangents of the faces
+     * @param indices for vao
+     * 
+     * @return the model with the vao
+     */
+    public static RawModel loadToVAO(FloatBuffer positions, FloatBuffer textureCoordinates, FloatBuffer normals, FloatBuffer tangents, int[] indices) {
+        int vaoID = createVAO();
+        bindIndicesBuffer(indices);
+        storeDataInAttributeList(0, 3, positions);
+        storeDataInAttributeList(1, 2, textureCoordinates);
+        storeDataInAttributeList(2, 3, normals);
+        storeDataInAttributeList(3, 3, tangents);
+        unbind();
+        return new RawModel(vaoID, indices.length);
+    }
     /**
      * Loading given data positions into a VAO.
      * 
@@ -332,7 +367,14 @@ public final class Loader {
         GL20.glVertexAttribPointer(attrNumber, dataSize, GL11.GL_FLOAT, false, 0, 0);
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
     }
-
+    private static void storeDataInAttributeList(int attrNumber, int dataSize, FloatBuffer data) {
+        int vboID = GL15.glGenBuffers();
+        VBOS.add(vboID);
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vboID);
+        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, data, GL15.GL_STATIC_DRAW);
+        GL20.glVertexAttribPointer(attrNumber, dataSize, GL11.GL_FLOAT, false, 0, 0);
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+    }
     private static void storeDataInAttributeList(int attrNumber, int dataSize, int[] data) {
         int vboID = GL15.glGenBuffers();
         VBOS.add(vboID);
@@ -364,7 +406,13 @@ public final class Loader {
         GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, buffer, GL15.GL_STATIC_DRAW);
 
     }
+    private static void bindIndicesBuffer(IntBuffer indices) {
+        int vboId = GL15.glGenBuffers();
+        VBOS.add(vboId);
+        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, vboId);
+        GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, indices, GL15.GL_STATIC_DRAW);
 
+    }
     /**
      * create Buffer.
      * 

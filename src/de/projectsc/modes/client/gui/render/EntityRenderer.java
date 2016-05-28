@@ -19,6 +19,7 @@ import org.lwjgl.util.vector.Quaternion;
 import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.core.data.AnimatedFrame;
+import de.projectsc.core.data.utils.gltf.GLTFLoader;
 import de.projectsc.core.data.utils.md5loader.MD5Loader;
 import de.projectsc.core.data.utils.md5loader.MD5Processor;
 import de.projectsc.core.utils.Maths;
@@ -52,7 +53,13 @@ public class EntityRenderer {
         shader.stop();
 
         myModels = new HashMap<>();
-
+        List<TexturedModel> gltfmodels = GLTFLoader.loadGLTF("dragon.gltf");
+        for (TexturedModel m : gltfmodels) {
+            List<String> newList = new LinkedList<>();
+            newList.add("gltf");
+            myModels.put(m, newList);
+        }
+        
         List<TexturedModel> newModels =
             MD5Processor.process(MD5Loader.loadMD5MeshFile("monster.md5mesh"), MD5Loader.loadMD5AnimFile("monster.md5anim"));
         for (TexturedModel m : newModels) {
@@ -75,9 +82,9 @@ public class EntityRenderer {
         Map<String, Vector3f> position, Map<String, Vector3f> rotations, Map<String, Vector3f> scales) {
 
         entitiesWithModel.putAll(myModels);
-        position.put("md5", new Vector3f(0, 0, 0));
-        rotations.put("md5", new Vector3f(-90, 0, -90));
-        scales.put("md5", new Vector3f(0.5f, 0.5f, 0.5f));
+        position.put("gltf", new Vector3f(0, 0, 0));
+        rotations.put("gltf", new Vector3f(-90, 0, 0));
+        scales.put("gltf", new Vector3f(1f, 1f, 1f));
         float fps = 24;
         time += 15;
         if (time > 1000 / fps) {

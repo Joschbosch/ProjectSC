@@ -248,7 +248,19 @@ public class MD5Processor {
         return Loader.loadToVAO(positionsArr, textCoordsArr, normalsArr, indicesArr, jointIndicesArr, weightsArr);
     }
 
-    public static RawModel loadUp(float[] positions, float[] textCoords, float[] normals, int[] indices, int[] jointIndices, float[] weights) {
+    /**
+     * Loads the given model into the graphics card.
+     * 
+     * @param positions to load.
+     * @param textCoords to load.
+     * @param normals to load.
+     * @param indices to load.
+     * @param jointIndices to load.
+     * @param weights to load.
+     * @return {@link RawModel} with neccessary information.
+     */
+    public static RawModel loadUp(float[] positions, float[] textCoords, float[] normals, int[] indices, int[] jointIndices,
+        float[] weights) {
         int vertexCount = indices.length;
 
         int vaoId = glGenVertexArrays();
