@@ -18,6 +18,7 @@ import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Quaternion;
 import org.lwjgl.util.vector.Vector3f;
 
+import de.javagl.jgltf.impl.GlTF;
 import de.projectsc.core.data.AnimatedFrame;
 import de.projectsc.core.data.utils.gltf.GLTFLoader;
 import de.projectsc.core.data.utils.md5loader.MD5Loader;
@@ -59,7 +60,7 @@ public class EntityRenderer {
             newList.add("gltf");
             myModels.put(m, newList);
         }
-        
+
         List<TexturedModel> newModels =
             MD5Processor.process(MD5Loader.loadMD5MeshFile("monster.md5mesh"), MD5Loader.loadMD5AnimFile("monster.md5anim"));
         for (TexturedModel m : newModels) {
@@ -92,10 +93,10 @@ public class EntityRenderer {
             if (currentFrame >= 120) {
                 currentFrame = 0;
             }
-            time = (int) (time % (1000/fps)) ;
+            time = (int) (time % (1000 / fps));
         }
 
-        float delta = time / (1000.0f /fps);
+        float delta = time / (1000.0f / fps);
         for (TexturedModel model : entitiesWithModel.keySet()) {
             prepareTexturedModel(model);
             if (model instanceof AnimatedModel) {
@@ -105,12 +106,16 @@ public class EntityRenderer {
             for (String e : batch) {
                 if (position.get(e) != null && rotations.get(e) != null && scales.get(e) != null) {
                     Matrix4f[] frame = null;
-                    if (model instanceof AnimatedModel) {
+                    if (model instanceof AnimatedModel && ((AnimatedModel) model).getAnimatedFrames() != null) {
                         AnimatedFrame frame1 = ((AnimatedModel) model).getAnimatedFrames().get(currentFrame);
                         AnimatedFrame frame2 = ((AnimatedModel) model).getAnimatedFrames().get((currentFrame + 1) % 120);
                         frame = calculateInterpolatedFrame(frame1, frame2, delta);
+                        prepareInstance(model.getTexture(), position.get(e), rotations.get(e), scales.get(e), frame);
+                    } else if (model instanceof AnimatedModel && ((AnimatedModel) model).getGltf() != null) {
+                        GlTF gltf = ((AnimatedModel) model).getGltf();
+                    } else {
+                        prepareInstance(model.getTexture(), position.get(e), rotations.get(e), scales.get(e), null);
                     }
-                    prepareInstance(model.getTexture(), position.get(e), rotations.get(e), scales.get(e), frame);
                     GL11.glDrawElements(GL11.GL_TRIANGLES, model.getRawModel().getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
                 }
             }
@@ -125,14 +130,14 @@ public class EntityRenderer {
             Matrix4f m2 = new Matrix4f(frame2.getJointMatrices()[i]);
             Vector3f position1 = new Vector3f(m1.m30, m1.m31, m1.m32);
             Vector3f position2 = new Vector3f(m2.m30, m2.m31, m2.m32);
-            Quaternion q1 = new Quaternion(); 
+            Quaternion q1 = new Quaternion();
             Quaternion.setFromMatrix(m1, q1);
-            Quaternion q2 = new Quaternion(); 
+            Quaternion q2 = new Quaternion();
             Quaternion.setFromMatrix(m2, q2);
-            Quaternion interpolatedRotation = Maths.slerp(q1, q2,delta);
-            
+            Quaternion interpolatedRotation = Maths.slerp(q1, q2, delta);
+
             Vector3f interpolatedPostion = Maths.lerp(position1, position2, delta);
-            
+
             result[i] = new Matrix4f();
             Maths.applyQuaternionToMatrix(interpolatedRotation, result[i]);
             result[i].m30 = interpolatedPostion.x;
@@ -141,8 +146,6 @@ public class EntityRenderer {
         }
         return result;
     }
-
-
 
     private void prepareTexturedModel(TexturedModel tModel) {
         RawModel model = tModel.getRawModel();

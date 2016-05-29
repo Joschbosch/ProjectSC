@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.lwjgl.util.vector.Matrix4f;
 
+import de.javagl.jgltf.impl.GlTF;
 import de.projectsc.core.data.AnimatedFrame;
 import de.projectsc.modes.client.gui.textures.ModelTexture;
 
@@ -24,6 +25,8 @@ public class AnimatedModel extends TexturedModel {
     private List<Matrix4f> invJointMatrices;
 
     private List<AnimatedFrame> animatedFrames;
+
+    private GlTF gltf;
 
     public AnimatedModel(RawModel rawModel, List<Matrix4f> invJointMatrices, List<AnimatedFrame> animatedFrames, ModelTexture texture) {
         super(rawModel, texture);
@@ -45,6 +48,14 @@ public class AnimatedModel extends TexturedModel {
 
     public void setAnimatedFrames(List<AnimatedFrame> animatedFrames) {
         this.animatedFrames = animatedFrames;
+    }
+
+    public GlTF getGltf() {
+        return gltf;
+    }
+
+    public void setGltf(GlTF gltf) {
+        this.gltf = gltf;
     }
 
 }
