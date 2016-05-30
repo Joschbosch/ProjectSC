@@ -54,7 +54,7 @@ public class EntityRenderer {
         shader.stop();
 
         myModels = new HashMap<>();
-        List<TexturedModel> gltfmodels = GLTFLoader.loadGLTF("dragon.gltf");
+        List<TexturedModel> gltfmodels = GLTFLoader.loadGLTF("monster_complete.gltf");
         for (TexturedModel m : gltfmodels) {
             List<String> newList = new LinkedList<>();
             newList.add("gltf");
