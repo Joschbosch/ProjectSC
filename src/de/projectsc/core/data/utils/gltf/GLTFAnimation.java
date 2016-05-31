@@ -4,23 +4,48 @@
 
 package de.projectsc.core.data.utils.gltf;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class GLTFAnimation {
 
-    private List<GLTFTrack> tracks;
+    private Map<String, GLTFTrack> tracks;
+
     private float duration;
 
+    private int frameCount;
+
     public GLTFAnimation() {
-        tracks = new ArrayList<>();
+        tracks = new HashMap<>();
         duration = -1f;
     }
 
     public void addTrack(GLTFTrack track) {
-        tracks.add(track);        
-        if (duration == -1f){
-            track.getKeyframes().get(track.getKeyframes().size()-1).getTime();
-        }
+        tracks.put(track.getJointName(), track);
+    }
+
+    public Map<String, GLTFTrack> getTracks() {
+        return tracks;
+    }
+
+    public float getDuration() {
+        return duration;
+    }
+
+    public void setDuration(float time) {
+        duration = time;
+    }
+
+    public int getFrameCount() {
+        return frameCount;
+    }
+
+    public void setFrameCount(int frameCount) {
+        this.frameCount = frameCount;
+    }
+
+    public GLTFTrack getTrackFromJoint(Joint joint) {
+        return tracks.get(joint.getJointName());
     }
 }

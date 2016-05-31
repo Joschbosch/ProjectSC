@@ -165,7 +165,7 @@ public class MasterRenderer {
         terrainShader.loadHighlightedAndSeleced(scene.getHightlightedEntites(), scene.getSelectedEntites());
         terrainShader.loadLights(scene.getLights(), scene.getPositions());
         terrainShader.loadViewMatrix(camera);
-        terrainRenderer.render(scene.getTerrains(), shadowRenderer.getToShadowMapSpaceMatrix(), shadowRenderer.getShadowDistance());
+//        terrainRenderer.render(scene.getTerrains(), shadowRenderer.getToShadowMapSpaceMatrix(), shadowRenderer.getShadowDistance());
         terrainShader.stop();
         if (scene.renderSkyBox()) {
             if (scene.getFogColor() == null) {

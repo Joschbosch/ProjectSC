@@ -36,4 +36,9 @@ public class AnimatedFrame {
         mat = Matrix4f.mul(mat, invJointMatrix, null);
         jointMatrices[pos] = mat;
     }
+    
+    @Override
+    public String toString() {
+        return Arrays.toString(localJointMatrices) + "\nJOINTMATRICES: \n" + Arrays.toString(jointMatrices);
+    }
 }

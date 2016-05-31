@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.function.Consumer;
 
 import org.lwjgl.util.vector.Matrix4f;
@@ -26,9 +27,12 @@ import de.javagl.jgltf.impl.GlTF;
 import de.javagl.jgltf.impl.Mesh;
 import de.javagl.jgltf.impl.MeshPrimitive;
 import de.javagl.jgltf.impl.Node;
+import de.javagl.jgltf.impl.Scene;
 import de.javagl.jgltf.impl.Skin;
 import de.javagl.jgltf.model.GltfData;
 import de.javagl.jgltf.model.GltfDataLoader;
+import de.projectsc.core.data.AnimatedFrame;
+import de.projectsc.core.utils.Maths;
 import de.projectsc.modes.client.gui.models.AnimatedModel;
 import de.projectsc.modes.client.gui.models.RawModel;
 import de.projectsc.modes.client.gui.models.TexturedModel;
@@ -42,39 +46,143 @@ public class GLTFLoader {
 
     private static Map<String, GLTFNode> nodes;
 
-    private static Map<String, GLTFJoint> joints;
+    private static Map<String, Joint> joints;
+
+    private static Map<String, Joint> rootJoints = new HashMap<>();
+
+    private static Map<String, GLTFSkeleton> skeletons = new HashMap<>();
+
+    private static Matrix4f[] invBindPoseMatrices = new Matrix4f[200];
+
+    private static GLTFAnimation animation;
+
+    public static void main(String[] args) {
+        loadGLTF("dragon.gltf");
+    }
 
     public static synchronized List<TexturedModel> loadGLTF(String filename) {
         Consumer consumer = null;
         nodes = new HashMap<>();
+        joints = new HashMap<>();
+        animation = null;
         List<TexturedModel> list = new LinkedList<>();
-
-        ModelTexture white =
-            new ModelTexture(Loader.loadTexture(
-                GLTFLoader.class.getResourceAsStream(GUIConstants.TEXTURE_ROOT + "dragon/dragon_scale.png"), "PNG"));
-        white.setNormalMap(Loader.loadTexture(
-            GLTFLoader.class.getResourceAsStream(GUIConstants.TEXTURE_ROOT + "dragon/dragon_scale_n.png"), "PNG"));
 
         try {
             data = GltfDataLoader.load(GLTFLoader.class.getResource("/models/animated/" + filename).toURI(), consumer);
             GlTF gltf = data.getGltf();
             RawModel model = loadModel(data, gltf);
             createNodes();
-            createJoints();
             createSkins();
-            GLTFAnimation animation = loadAnimations();
-            if (!gltf.getSkins().isEmpty()) {
-                for (Skin s : gltf.getSkins().values()) {
-                    AnimatedModel animated = new AnimatedModel(model, readJointMatrices(s, data), null, white);
-                    animated.setGltf(gltf);
-                    list.add(animated);
+            loadAnimations();
+            createScene();
+            List<AnimatedFrame> frames = new LinkedList<>();
+            for (int i = 0; i < animation.getFrameCount(); i++) {
+                frames.add(processAnimationFrame(i));
+            }
+            List<Matrix4f> inverse = new ArrayList<>();
+            for (int i = 0; i < invBindPoseMatrices.length; i++) {
+                if (invBindPoseMatrices[i] != null) {
+                    inverse.add(invBindPoseMatrices[i]);
                 }
             }
+            ModelTexture white =
+                new ModelTexture(Loader.loadTexture(
+                    GLTFLoader.class.getResourceAsStream(GUIConstants.TEXTURE_ROOT + "dragon/dragon_scale.png"), "PNG"));
+            white.setNormalMap(Loader.loadTexture(
+                GLTFLoader.class.getResourceAsStream(GUIConstants.TEXTURE_ROOT + "dragon/dragon_scale_n.png"), "PNG"));
+            AnimatedModel animated = new AnimatedModel(model, inverse, frames, white);
+            // TexturedModel animated = new TexturedModel(model, white);
+
+            list.add(animated);
+
         } catch (IOException | URISyntaxException e) {
             e.printStackTrace();
         }
+
         return list;
 
+    }
+
+    private static void createScene() {
+        Scene scene = data.getGltf().getScenes().get(data.getGltf().getScene());
+        List<Node> localNodes = new LinkedList<>();
+        for (String nodeName : scene.getNodes()){
+            if (nodes.get(nodeName)!= null){
+                if (!(nodes.get(nodeName) instanceof Joint)){
+                    localNodes.add(nodes.get(nodeName));
+                }
+                
+            }
+        }
+    }
+
+    private static AnimatedFrame processAnimationFrame(int i) {
+        AnimatedFrame result = new AnimatedFrame();
+        for (Joint joint : rootJoints.values()) {
+            Matrix4f parentMatrix = getParentMatrix(joint.getParent());
+            processJoint(i, joint, result, parentMatrix);
+        }
+        return result;
+    }
+
+    private static Matrix4f getParentMatrix(GLTFNode node) {
+        System.out.println("GETTING PARENT: " + node.getName());
+        Matrix4f parent = null;
+        if (node.getParent() != null) {
+            parent = getParentMatrix(node.getParent());
+        }
+
+        Matrix4f own = new Matrix4f();
+        if (node.getMatrix() != null) {
+            own = loadMatrixFromArray(node.getMatrix());
+        } else if (node.getTranslation() != null) {
+            Vector3f translation = new Vector3f(node.getTranslation()[0], node.getTranslation()[1], node.getTranslation()[2]);
+            Quaternion rotation =
+                new Quaternion(node.getRotation()[0], node.getRotation()[1], node.getRotation()[2], node.getRotation()[3]);
+            Vector3f scale = new Vector3f(node.getScale()[0], node.getScale()[1], node.getScale()[2]);
+            own = Maths.createTransformationMatrix(rotation, translation, scale);
+        }
+        if (parent != null) {
+            return Matrix4f.mul(parent, own, null);
+        } else {
+            return own;
+        }
+    }
+
+    private static void processJoint(int i, Joint joint, AnimatedFrame result, Matrix4f pathToRoot) {
+        GLTFTrack track = animation.getTrackFromJoint(joint);
+        GLTFKeyFrame frame = track.getKeyframes().get(i);
+
+        Matrix4f localJointMatrix =
+            Maths.createTransformationMatrix(joint.getRotationQuaternion(), joint.getPositionVector(), joint.getScaleVector());
+
+        Matrix4f animationMatrix = Maths.createTransformationMatrix(frame.getOrientation(), frame.getTranslation(), frame.getScaling());
+        Matrix4f invlocalJointMatrix = Matrix4f.invert(localJointMatrix, null);
+        Matrix4f bindShapeMatrix = skeletons.values().iterator().next().getBindShapeMatrix();
+        Matrix4f invBindShapeMatrix = Matrix4f.invert(bindShapeMatrix, null);
+        // v += {[(v * BSM) * IBMi * JMi] * JW}
+
+        // n: The number of joints that influence vertex v
+        // BSM: Bind-shape matrix
+        // IBMi: Inverse bind-pose matrix of joint i
+        // JMi: Transformation matrix of joint i
+        // JW: Weight of the influence of joint i on vertex v
+        // Matrix4f.mul(localJointMatrix, animationMatrix, localJointMatrix);
+
+        // Matrix4f.mul(localJointMatrix, animationMatrix, );
+
+        Matrix4f jointsMatrix = new Matrix4f();
+        Matrix4f.mul(pathToRoot, localJointMatrix, jointsMatrix);
+        Matrix4f.mul(bindShapeMatrix, jointsMatrix, jointsMatrix);
+        Matrix4f.mul(animationMatrix, jointsMatrix, jointsMatrix);
+        result.setMatrix(joint.getId(), jointsMatrix, invBindPoseMatrices[joint.getId()]);
+
+        if (!joint.getChildren().isEmpty()) {
+            for (String child : joint.getChildren()) {
+                Joint childJoint = joints.get(child);
+                processJoint(i, childJoint, result, localJointMatrix);
+            }
+        }
     }
 
     private static void createNodes() {
@@ -102,7 +210,23 @@ public class GLTFLoader {
     }
 
     private static GLTFNode createNode(String key, Node node, Map<String, Node> origNodes) {
-        GLTFNode glNode = new GLTFNode();
+        GLTFNode glNode = null;
+        if (node.getJointName() != null) {
+            glNode = new Joint();
+            glNode.setName(node.getJointName());
+            joints.put(node.getJointName(), (Joint) glNode);
+        } else if (node.getCamera() != null) {
+            return null;
+        } else if (node.getMeshes() != null && !node.getMeshes().isEmpty()) {
+            // ADD ALL MESHES
+            glNode = new GLTFNode();
+        } else if (node.getSkin() != null) {
+            // get skins
+            glNode = new GLTFNode();
+        } else {
+            glNode = new GLTFNode();
+        }
+
         glNode.setCamera(node.getCamera());
         glNode.setChildren(node.getChildren());
         glNode.setExtensions(node.getExtensions());
@@ -116,39 +240,97 @@ public class GLTFLoader {
         glNode.setSkeletons(node.getSkeletons());
         glNode.setSkin(node.getSkin());
         glNode.setTranslation(node.getTranslation());
+
+        if (glNode.getMatrix() != null) {
+            glNode.applyMatrix(loadMatrixFromArray(glNode.getMatrix()));
+        } else if (glNode.getTranslation() != null) {
+            glNode.setPosition(new Vector3f(node.getTranslation()[0], node.getTranslation()[1], node.getTranslation()[2]));
+            glNode.setScale(new Vector3f(node.getScale()[0], node.getScale()[1], node.getScale()[2]));
+            glNode.setRotation(new Quaternion(node.getRotation()[0], node.getRotation()[1], node.getRotation()[2], node.getRotation()[3]));
+            glNode.applyMatrix(
+                Maths.createTransformationMatrix(glNode.getRotationQuaternion(), glNode.getPositionVector(), glNode.getScaleVector()));
+        }
         nodes.put(key, glNode);
         for (String child : node.getChildren()) {
+            GLTFNode childNode = null;
             if (nodes.containsKey(child)) {
-                GLTFNode childNode = nodes.get(child);
+                childNode = nodes.get(child);
                 childNode.setParent(glNode);
                 glNode.addChild(childNode);
             } else {
-                GLTFNode childNode = createNode(child, origNodes.get(child), origNodes);
+                childNode = createNode(child, origNodes.get(child), origNodes);
                 glNode.addChild(childNode);
                 childNode.setParent(glNode);
+            }
+            if (childNode instanceof Joint && !(glNode instanceof Joint)) {
+                rootJoints.put(child, (Joint) childNode);
             }
         }
         return glNode;
     }
 
     private static void createSkins() {
-
+        for (Entry<String, Skin> skin : data.getGltf().getSkins().entrySet()) {
+            GLTFSkeleton skeleton = new GLTFSkeleton();
+            skeleton.setName(skin.getKey());
+            List<String> jointNames = skin.getValue().getJointNames();
+            for (int i = 0; i < jointNames.size(); i++) {
+                Joint joint = joints.get(jointNames.get(i));
+                joint.setId(i);
+                skeleton.addJoint(joint);
+            }
+            FloatBuffer fb = data.getExtractedAccessorByteBuffer(skin.getValue().getInverseBindMatrices()).asFloatBuffer();
+            for (Joint joint : skeleton.getJoints()) {
+                joint.setInverseBindMatrix(loadMatrixFromBuffer(joint.getId(), fb));
+                invBindPoseMatrices[joint.getId()] = joint.getInverseBindMatrix();
+            }
+            Matrix4f bindShape = loadMatrixFromArray(skin.getValue().getBindShapeMatrix());
+            skeleton.setBindShapeMatrix(bindShape);
+            skeletons.put(skin.getKey(), skeleton);
+        }
     }
 
-    private static Map<String, GLTFJoint> createJoints() {
-        Map<String, Node> nodes = data.getGltf().getNodes();
-        Map<String, GLTFJoint> result = new HashMap<>();
-        for (Node n : nodes.values()) {
-            if (n.getJointName() != null) {
-                GLTFJoint joint = new GLTFJoint();
-                joint.setName(n.getJointName());
-                joint.setPosition(new Vector3f(n.getTranslation()[0], n.getTranslation()[1], n.getTranslation()[2]));
-                joint.setScale(new Vector3f(n.getScale()[0], n.getScale()[1], n.getScale()[2]));
-                joint.setRotation(new Quaternion(n.getRotation()[0], n.getRotation()[1], n.getRotation()[2], n.getRotation()[3]));
-                result.put(n.getJointName(), joint);
-            }
-        }
+    private static Matrix4f loadMatrixFromArray(float[] sourceMatrix) {
+        Matrix4f matrix = new Matrix4f();
+        matrix.m00 = sourceMatrix[0];
+        matrix.m01 = sourceMatrix[1];
+        matrix.m02 = sourceMatrix[2];
+        matrix.m33 = sourceMatrix[3];
+        matrix.m10 = sourceMatrix[4];
+        matrix.m11 = sourceMatrix[5];
+        matrix.m12 = sourceMatrix[6];
+        matrix.m13 = sourceMatrix[7];
+        matrix.m20 = sourceMatrix[8];
+        matrix.m21 = sourceMatrix[9];
+        matrix.m22 = sourceMatrix[10];
+        matrix.m23 = sourceMatrix[11];
+        matrix.m30 = sourceMatrix[12];
+        matrix.m31 = sourceMatrix[13];
+        matrix.m32 = sourceMatrix[14];
+        matrix.m33 = sourceMatrix[15];
+        return matrix;
+    }
+
+    private static Matrix4f loadMatrixFromBuffer(int position, FloatBuffer buffer) {
+        Matrix4f result = new Matrix4f();
+        result.m00 = buffer.get(position + 0);
+        result.m01 = buffer.get(position + 1);
+        result.m02 = buffer.get(position + 2);
+        result.m03 = buffer.get(position + 3);
+        result.m10 = buffer.get(position + 4);
+        result.m11 = buffer.get(position + 5);
+        result.m12 = buffer.get(position + 6);
+        result.m13 = buffer.get(position + 7);
+        result.m20 = buffer.get(position + 8);
+        result.m21 = buffer.get(position + 9);
+        result.m22 = buffer.get(position + 10);
+        result.m23 = buffer.get(position + 11);
+        result.m30 = buffer.get(position + 12);
+        result.m31 = buffer.get(position + 13);
+        result.m32 = buffer.get(position + 14);
+        result.m33 = buffer.get(position + 15);
         return result;
+
     }
 
     private static RawModel loadModel(GltfData result, GlTF gltf) {
@@ -161,23 +343,30 @@ public class GLTFLoader {
                 String texCoordAccessor = p.getAttributes().get("TEXCOORD_0");
                 String jointsAccessor = p.getAttributes().get("JOINT");
                 String weigthsAccessor = p.getAttributes().get("WEIGHT");
-                if (indicesAccessor != null && positionsAccessor != null && normalsAccessor != null && texCoordAccessor != null) {
-                    model = Loader.loadToVAO(getFloatBuffer(positionsAccessor, result), getFloatBuffer(texCoordAccessor, result),
+                FloatBuffer texCoords = ByteBuffer.allocateDirect(4 * 4).asFloatBuffer();
+                texCoords.put(new float[] { 0, 0, 1, 1 });
+                texCoords.flip();
+                if (texCoordAccessor != null) {
+                    getFloatBuffer(texCoordAccessor, result);
+                }
+
+                if (indicesAccessor != null && positionsAccessor != null && normalsAccessor != null && weigthsAccessor == null) {
+                    model = Loader.loadToVAO(getFloatBuffer(positionsAccessor, result), texCoords,
                         getFloatBuffer(normalsAccessor, result), getFloatBuffer(positionsAccessor, result),
                         getIntBuffer(indicesAccessor, result));
 
-                } else if (indicesAccessor != null && positionsAccessor != null && normalsAccessor != null && texCoordAccessor != null
+                } else if (indicesAccessor != null && positionsAccessor != null && normalsAccessor != null
                     && weigthsAccessor != null && jointsAccessor != null) {
-                    model = Loader.loadToVAO(getFloatBuffer(positionsAccessor, result), getFloatBuffer(texCoordAccessor, result),
+                    model = Loader.loadToVAO(getFloatBuffer(positionsAccessor, result), texCoords,
                         getFloatBuffer(normalsAccessor, result), getIntBuffer(indicesAccessor, result),
-                        getIntBuffer(jointsAccessor, result), getFloatBuffer(weigthsAccessor, result));
+                        getIntJointBuffer(jointsAccessor, result), getFloatBuffer(weigthsAccessor, result));
                 }
             }
         }
         return model;
     }
 
-    private static GLTFAnimation loadAnimations() {
+    private static void loadAnimations() {
         GLTFAnimation result = null;
         GlTF gltf = data.getGltf();
         if (gltf.getAnimations() != null && !gltf.getAnimations().isEmpty()) {
@@ -213,45 +402,34 @@ public class GLTFLoader {
                 result.addTrack(track);
             }
         }
-        return result;
+
+        animation = result;
+        if (!animation.getTracks().isEmpty()) {
+            GLTFTrack track = animation.getTracks().values().iterator().next();
+            animation.setDuration(track.getKeyframes().get(track.getKeyframes().size() - 1).getTime());
+            animation.setFrameCount(track.getKeyframes().size());
+        }
     }
 
-    private static List<Matrix4f> readJointMatrices(Skin s, GltfData data) {
-        List<Matrix4f> result = new LinkedList<>();
-        FloatBuffer buffer = getFloatBuffer(s.getInverseBindMatrices(), data);
-        while (buffer.hasRemaining()) {
-            Matrix4f m = new Matrix4f();
-            m.m00 = buffer.get();
-            m.m01 = buffer.get();
-            m.m02 = buffer.get();
-            m.m03 = buffer.get();
-            m.m10 = buffer.get();
-            m.m11 = buffer.get();
-            m.m12 = buffer.get();
-            m.m13 = buffer.get();
-            m.m20 = buffer.get();
-            m.m21 = buffer.get();
-            m.m22 = buffer.get();
-            m.m23 = buffer.get();
-            m.m30 = buffer.get();
-            m.m31 = buffer.get();
-            m.m32 = buffer.get();
-            m.m33 = buffer.get();
-            result.add(m);
+    private static FloatBuffer getFloatBuffer(String accessor, GltfData rawData) {
+        ByteBuffer tmpdata = rawData.getExtractedAccessorByteBuffer(accessor);
+        return tmpdata.asFloatBuffer();
+    }
+
+    private static int[] getIntJointBuffer(String accessor, GltfData rawData) {
+        FloatBuffer tmpdata = rawData.getExtractedAccessorByteBuffer(accessor).asFloatBuffer();
+        int[] result = new int[tmpdata.capacity()];
+        for (int i = 0; i < tmpdata.capacity(); i++) {
+            result[i] = (int) tmpdata.get(i);
         }
         return result;
     }
 
-    private static FloatBuffer getFloatBuffer(String accessor, GltfData rawData) {
-        ByteBuffer data = rawData.getExtractedAccessorByteBuffer(accessor);
-        return data.asFloatBuffer();
-    }
-
     private static int[] getIntBuffer(String accessor, GltfData rawData) {
-        ByteBuffer data = rawData.getExtractedAccessorByteBuffer(accessor);
+        ByteBuffer tmpdata = rawData.getExtractedAccessorByteBuffer(accessor);
         List<Integer> temp = new ArrayList<>();
-        while (data.hasRemaining()) {
-            temp.add(Short.toUnsignedInt(data.getShort()));
+        while (tmpdata.hasRemaining()) {
+            temp.add(Short.toUnsignedInt(tmpdata.getShort()));
         }
         int[] result = new int[temp.size()];
         for (int i = 0; i < temp.size(); i++) {

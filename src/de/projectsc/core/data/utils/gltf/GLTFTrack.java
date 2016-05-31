@@ -9,16 +9,16 @@ import java.util.List;
 
 public class GLTFTrack {
 
-    private String jointId;
+    private int jointId;
 
     private String jointName;
 
-    private GLTFJoint gltfJoint;
+    private Joint gltfJoint;
 
     private List<GLTFKeyFrame> keyframes;
 
     public GLTFTrack() {
-        jointId = null;
+        jointId = -1;
         jointName = null;
         gltfJoint = null;
         keyframes = new ArrayList<>();
@@ -32,19 +32,19 @@ public class GLTFTrack {
         this.jointName = jointName;
     }
 
-    public String getJointId() {
+    public int getJointId() {
         return jointId;
     }
 
-    public void setJointId(String jointId) {
-        this.jointId = jointId;
+    public void setJointId(int i) {
+        this.jointId = i;
     }
 
     public String getJointName() {
         return jointName;
     }
 
-    public void setJoint(GLTFJoint gltfJoint) {
+    public void setJoint(Joint gltfJoint) {
         this.gltfJoint = gltfJoint;
     }
     public List<GLTFKeyFrame> getKeyframes(){

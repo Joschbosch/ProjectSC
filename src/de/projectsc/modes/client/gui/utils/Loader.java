@@ -142,6 +142,7 @@ public final class Loader {
         storeDataInAttributeList(4, 4, weightsArr);
         storeDataInAttributeList(5, 4, jointIndicesArr);
         unbind();
+        System.out.println("JointIndArray : " + Arrays.toString(jointIndicesArr));
         return new RawModel(vaoID, indices.length);
     }
     /**

@@ -281,4 +281,14 @@ public final class Maths {
         m.m21 = (float) (2.0 * (tmp1 + tmp2) * invs);
         m.m12 = (float) (2.0 * (tmp1 - tmp2) * invs);
     }
+    
+    public static Matrix4f createTransformationMatrix(Quaternion interpolatedRotation, Vector3f interpolatedPostion, Vector3f scale) {
+        Matrix4f result = new Matrix4f();
+        Maths.applyQuaternionToMatrix(interpolatedRotation, result);
+        Matrix4f.scale(scale, result, result);
+        result.m30 = interpolatedPostion.x;
+        result.m31 = interpolatedPostion.y;
+        result.m32 = interpolatedPostion.z;
+        return result;
+    }
 }

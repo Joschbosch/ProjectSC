@@ -5,6 +5,7 @@
  */
 package de.projectsc.modes.client.gui.render;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -54,7 +55,7 @@ public class EntityRenderer {
         shader.stop();
 
         myModels = new HashMap<>();
-        List<TexturedModel> gltfmodels = GLTFLoader.loadGLTF("monster_complete.gltf");
+        List<TexturedModel> gltfmodels = GLTFLoader.loadGLTF("simple.gltf");
         for (TexturedModel m : gltfmodels) {
             List<String> newList = new LinkedList<>();
             newList.add("gltf");
@@ -86,16 +87,16 @@ public class EntityRenderer {
         position.put("gltf", new Vector3f(0, 0, 0));
         rotations.put("gltf", new Vector3f(-90, 0, 0));
         scales.put("gltf", new Vector3f(1f, 1f, 1f));
-        float fps = 24;
+        float fps = 1;
+        int maxFrames = 3;
         time += 15;
         if (time > 1000 / fps) {
             currentFrame++;
-            if (currentFrame >= 120) {
+            if (currentFrame >= maxFrames) {
                 currentFrame = 0;
             }
             time = (int) (time % (1000 / fps));
         }
-
         float delta = time / (1000.0f / fps);
         for (TexturedModel model : entitiesWithModel.keySet()) {
             prepareTexturedModel(model);
@@ -108,11 +109,9 @@ public class EntityRenderer {
                     Matrix4f[] frame = null;
                     if (model instanceof AnimatedModel && ((AnimatedModel) model).getAnimatedFrames() != null) {
                         AnimatedFrame frame1 = ((AnimatedModel) model).getAnimatedFrames().get(currentFrame);
-                        AnimatedFrame frame2 = ((AnimatedModel) model).getAnimatedFrames().get((currentFrame + 1) % 120);
+                        AnimatedFrame frame2 = ((AnimatedModel) model).getAnimatedFrames().get((currentFrame + 1) % maxFrames);
                         frame = calculateInterpolatedFrame(frame1, frame2, delta);
                         prepareInstance(model.getTexture(), position.get(e), rotations.get(e), scales.get(e), frame);
-                    } else if (model instanceof AnimatedModel && ((AnimatedModel) model).getGltf() != null) {
-                        GlTF gltf = ((AnimatedModel) model).getGltf();
                     } else {
                         prepareInstance(model.getTexture(), position.get(e), rotations.get(e), scales.get(e), null);
                     }
@@ -138,14 +137,12 @@ public class EntityRenderer {
 
             Vector3f interpolatedPostion = Maths.lerp(position1, position2, delta);
 
-            result[i] = new Matrix4f();
-            Maths.applyQuaternionToMatrix(interpolatedRotation, result[i]);
-            result[i].m30 = interpolatedPostion.x;
-            result[i].m31 = interpolatedPostion.y;
-            result[i].m32 = interpolatedPostion.z;
+            result[i] = Maths.createTransformationMatrix(interpolatedRotation, interpolatedPostion, new Vector3f(1, 1, 1));
         }
         return result;
     }
+
+
 
     private void prepareTexturedModel(TexturedModel tModel) {
         RawModel model = tModel.getRawModel();
@@ -184,7 +181,8 @@ public class EntityRenderer {
         GUISettings.enableCulling();
     }
 
-    private void prepareInstance(ModelTexture modelTexture, Vector3f position, Vector3f rotation, Vector3f scale, Matrix4f[] frameMatrices) {
+    private void prepareInstance(ModelTexture modelTexture, Vector3f position, Vector3f rotation, Vector3f scale,
+        Matrix4f[] frameMatrices) {
         Matrix4f transformationMatrix =
             Maths.createTransformationMatrix(position, rotation.x, rotation.y, rotation.z, scale);
         shader.loadTransformationMatrix(transformationMatrix);

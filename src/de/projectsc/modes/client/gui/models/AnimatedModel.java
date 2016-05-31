@@ -26,8 +26,6 @@ public class AnimatedModel extends TexturedModel {
 
     private List<AnimatedFrame> animatedFrames;
 
-    private GlTF gltf;
-
     public AnimatedModel(RawModel rawModel, List<Matrix4f> invJointMatrices, List<AnimatedFrame> animatedFrames, ModelTexture texture) {
         super(rawModel, texture);
         this.setInvJointMatrices(invJointMatrices);
@@ -49,13 +47,4 @@ public class AnimatedModel extends TexturedModel {
     public void setAnimatedFrames(List<AnimatedFrame> animatedFrames) {
         this.animatedFrames = animatedFrames;
     }
-
-    public GlTF getGltf() {
-        return gltf;
-    }
-
-    public void setGltf(GlTF gltf) {
-        this.gltf = gltf;
-    }
-
 }
