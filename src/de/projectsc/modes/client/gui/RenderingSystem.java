@@ -26,6 +26,9 @@ import de.projectsc.core.data.physics.BoundingVolumeType;
 import de.projectsc.core.data.physics.Transform;
 import de.projectsc.core.data.physics.WireFrame;
 import de.projectsc.core.data.physics.boundings.Sphere;
+import de.projectsc.core.data.utils.gltf.GLTFLoader;
+import de.projectsc.core.data.utils.md5loader.MD5Loader;
+import de.projectsc.core.data.utils.md5loader.MD5Processor;
 import de.projectsc.core.events.entity.movement.NotifyTransformUpdateEvent;
 import de.projectsc.core.events.entity.objects.CreateLightEvent;
 import de.projectsc.core.events.entity.objects.RemoveLightEvent;
@@ -40,6 +43,7 @@ import de.projectsc.modes.client.gui.components.ParticleSystemComponent;
 import de.projectsc.modes.client.gui.data.GUIScene;
 import de.projectsc.modes.client.gui.events.UpdateMeshRendererParameterEvent;
 import de.projectsc.modes.client.gui.events.UpdateTextureEvent;
+import de.projectsc.modes.client.gui.models.AnimatedModel;
 import de.projectsc.modes.client.gui.models.TexturedModel;
 import de.projectsc.modes.client.gui.objects.particles.ParticleSystem;
 
@@ -52,6 +56,8 @@ public class RenderingSystem extends DefaultSystem {
 
     private static final String NAME = "Rendering System";
 
+    private HashMap<TexturedModel, List<String>> myModels;
+
     public RenderingSystem(EntityManager entityManager, EventManager eventManager) {
         super(NAME, entityManager, eventManager);
         eventManager.registerForEvent(NotifyTransformUpdateEvent.class, this);
@@ -59,6 +65,23 @@ public class RenderingSystem extends DefaultSystem {
         eventManager.registerForEvent(UpdateTextureEvent.class, this);
         eventManager.registerForEvent(CreateLightEvent.class, this);
         eventManager.registerForEvent(RemoveLightEvent.class, this);
+
+        myModels = new HashMap<>();
+        List<TexturedModel> gltfmodels = new GLTFLoader().loadGLTF("simple.gltf");
+        for (TexturedModel m : gltfmodels) {
+            List<String> newList = new LinkedList<>();
+            newList.add("gltf");
+            myModels.put(m, newList);
+        }
+
+        List<TexturedModel> newModels =
+            MD5Processor.process(MD5Loader.loadMD5MeshFile("monster.md5mesh"), MD5Loader.loadMD5AnimFile("monster.md5anim"));
+        for (TexturedModel m : newModels) {
+            List<String> newList = new LinkedList<>();
+            newList.add("md5");
+            myModels.put(m, newList);
+        }
+
     }
 
     @Override
@@ -151,6 +174,14 @@ public class RenderingSystem extends DefaultSystem {
     public GUIScene createScene(OctreeNode octTree) {
         Set<String> entities = entityManager.getAllEntites();
         GUIScene scene = new GUIScene();
+
+        scene.getPositions().put("gltf", new Vector3f(0, 0, 0));
+        scene.getRotations().put("gltf", new Vector3f(-90, 0, 0));
+        scene.getScales().put("gltf", new Vector3f(1f, 1f, 1f));
+        scene.getModels().putAll(myModels);
+
+        ((AnimatedModel) myModels.get("gltf")).getAnimationController().update();
+
         for (String entity : entities) {
             Transform transform = getComponent(entity, TransformComponent.class).getTransform();
             scene.getPositions().put(entity, transform.getPosition());
@@ -205,7 +236,7 @@ public class RenderingSystem extends DefaultSystem {
                     scene.getWireFrames().add(w);
                 }
             }
-            
+
         }
 
         if (octTree != null) {
@@ -218,34 +249,35 @@ public class RenderingSystem extends DefaultSystem {
                 scene.getWireFrames().add(w);
             }
         }
-        
+
         List<Joint> joints = new LinkedList<>();
         Joint t = new Joint();
         Matrix4f mat = new Matrix4f();
-        mat.m03 = 1.0f;
-        mat.m13 = 1.0f;
-        mat.m23 = 1.0f;
+        mat.m03 = 4.0f;
+        mat.m13 = 4.0f;
+        mat.m23 = 4.0f;
+        t.setWorldMatrix(mat);
+        joints.add(t);
         Joint t2 = new Joint();
         Matrix4f mat2 = new Matrix4f();
         mat2.m03 = 2.0f;
         mat2.m13 = 2.0f;
         mat2.m23 = 2.0f;
         t2.setWorldMatrix(mat2);
-        joints.add(t);
         joints.add(t2);
         t.addChild(t2);
-        for (Joint j : joints){
+        for (Joint j : joints) {
             float radius = 0.5f;
-           WireFrame wf =
-                new WireFrame(WireFrame.SPHERE,j.getWorldPosition(), new Vector3f(), new Vector3f(radius, radius, radius));
-           wf.setColor(new Vector3f(0, 0, 1.0f));
-           scene.getWireFrames().add(wf);
-           for (Joint child : j.getChildren()){
-               WireFrame wf2 =
-                   new WireFrame(WireFrame.LINE,j.getWorldPosition(), child.getWorldPosition());
-              wf2.setColor(new Vector3f(0, 0, 1.0f));
-              scene.getWireFrames().add(wf2);
-           }
+            WireFrame wf =
+                new WireFrame(WireFrame.SPHERE, j.getWorldPosition(), new Vector3f(), new Vector3f(radius, radius, radius));
+            wf.setColor(new Vector3f(0, 0, 1.0f));
+            scene.getWireFrames().add(wf);
+            for (Joint child : j.getChildren()) {
+                WireFrame wf2 =
+                    new WireFrame(WireFrame.LINE, j.getWorldPosition(), child.getWorldPosition());
+                wf2.setColor(new Vector3f(0, 0, 1.0f));
+                scene.getWireFrames().add(wf2);
+            }
         }
 
         return scene;

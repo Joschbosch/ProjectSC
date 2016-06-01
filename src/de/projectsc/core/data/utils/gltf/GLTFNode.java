@@ -2,11 +2,9 @@
  * Copyright (C) 2016 
  */
 
-package de.projectsc.core.data.utils.gltf.old;
+package de.projectsc.core.data.utils.gltf;
 
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 import org.lwjgl.util.vector.Matrix4f;
@@ -14,9 +12,8 @@ import org.lwjgl.util.vector.Quaternion;
 import org.lwjgl.util.vector.Vector3f;
 
 import de.javagl.jgltf.impl.Node;
-import de.projectsc.core.utils.Maths;
 
-public class GLTFNode extends Node {
+public class GLTFNode {
 
     private Map<String, GLTFNode> children;
 
@@ -31,40 +28,27 @@ public class GLTFNode extends Node {
     private Quaternion rotation;
 
     protected Matrix4f localMatrix;
-    
+
     protected Matrix4f worldMatrix;
 
     private boolean needsUpdate = true;
 
-    public GLTFNode() {
+    private Node node;
+
+    public GLTFNode(Node node) {
         children = new HashMap<>();
         root = null;
         parent = null;
         localMatrix = new Matrix4f();
         worldMatrix = new Matrix4f();
+        this.node = node;
     }
 
     public void applyMatrix(Matrix4f matrix) {
         Matrix4f.mul(localMatrix, matrix, localMatrix);
     }
 
-    public void updateMatrix(boolean updateChildren) {
-        if (needsUpdate) {
-            localMatrix = Maths.createTransformationMatrix(rotation, position, scale);
-        }
-        if (parent != null){
-            Matrix4f.mul(parent.getWorldMatrix(), localMatrix, worldMatrix);
-        } else {
-            worldMatrix = new Matrix4f(localMatrix);
-        }
-        if (updateChildren){
-            for (GLTFNode child : children.values()){
-                child.updateMatrix(updateChildren);
-            }
-        }
-    }
-
-    private Matrix4f getWorldMatrix() {
+    public Matrix4f getWorldMatrix() {
         return worldMatrix;
     }
 
@@ -84,8 +68,12 @@ public class GLTFNode extends Node {
         this.parent = parent;
     }
 
+    public Node getNode() {
+        return node;
+    }
+
     public void addChild(GLTFNode child) {
-        children.put(child.getName(), child);
+        children.put(child.getNode().getName(), child);
         child.setParent(this);
         if (this.root != null) {
             child.setRoot(root);

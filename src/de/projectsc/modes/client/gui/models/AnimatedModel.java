@@ -7,10 +7,8 @@ package de.projectsc.modes.client.gui.models;
 
 import java.util.List;
 
-import org.lwjgl.util.vector.Matrix4f;
-
-import de.javagl.jgltf.impl.GlTF;
 import de.projectsc.core.data.animation.AnimatedFrame;
+import de.projectsc.core.data.animation.AnimationController;
 import de.projectsc.modes.client.gui.textures.ModelTexture;
 
 /**
@@ -22,22 +20,18 @@ public class AnimatedModel extends TexturedModel {
 
     public static final int MAX_WEIGHTS = 4;
 
-    private List<Matrix4f> invJointMatrices;
-
     private List<AnimatedFrame> animatedFrames;
 
-    public AnimatedModel(RawModel rawModel, List<Matrix4f> invJointMatrices, List<AnimatedFrame> animatedFrames, ModelTexture texture) {
+    private AnimationController animationController;
+
+    public AnimatedModel(RawModel rawModel, List<AnimatedFrame> animatedFrames, ModelTexture texture) {
         super(rawModel, texture);
-        this.setInvJointMatrices(invJointMatrices);
         this.setAnimatedFrames(animatedFrames);
     }
 
-    public List<Matrix4f> getInvJointMatrices() {
-        return invJointMatrices;
-    }
-
-    public void setInvJointMatrices(List<Matrix4f> invJointMatrices) {
-        this.invJointMatrices = invJointMatrices;
+    public AnimatedModel(RawModel model, AnimationController controller, ModelTexture texture) {
+        super(model, texture);
+        this.setAnimationController(controller);
     }
 
     public List<AnimatedFrame> getAnimatedFrames() {
@@ -46,5 +40,13 @@ public class AnimatedModel extends TexturedModel {
 
     public void setAnimatedFrames(List<AnimatedFrame> animatedFrames) {
         this.animatedFrames = animatedFrames;
+    }
+
+    public AnimationController getAnimationController() {
+        return animationController;
+    }
+
+    public void setAnimationController(AnimationController animationController) {
+        this.animationController = animationController;
     }
 }

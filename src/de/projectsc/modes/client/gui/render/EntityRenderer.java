@@ -5,9 +5,7 @@
  */
 package de.projectsc.modes.client.gui.render;
 
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -19,11 +17,7 @@ import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Quaternion;
 import org.lwjgl.util.vector.Vector3f;
 
-import de.javagl.jgltf.impl.GlTF;
 import de.projectsc.core.data.animation.AnimatedFrame;
-import de.projectsc.core.data.utils.gltf.GLTFLoader;
-import de.projectsc.core.data.utils.md5loader.MD5Loader;
-import de.projectsc.core.data.utils.md5loader.MD5Processor;
 import de.projectsc.core.utils.Maths;
 import de.projectsc.modes.client.gui.models.AnimatedModel;
 import de.projectsc.modes.client.gui.models.RawModel;
@@ -54,22 +48,6 @@ public class EntityRenderer {
         shader.loadProjectionMatrix(projectionMatrix);
         shader.stop();
 
-        myModels = new HashMap<>();
-//        List<TexturedModel> gltfmodels = GLTFLoader.loadGLTF("simple.gltf");
-//        for (TexturedModel m : gltfmodels) {
-//            List<String> newList = new LinkedList<>();
-//            newList.add("gltf");
-//            myModels.put(m, newList);
-//        }
-
-        List<TexturedModel> newModels =
-            MD5Processor.process(MD5Loader.loadMD5MeshFile("monster.md5mesh"), MD5Loader.loadMD5AnimFile("monster.md5anim"));
-        for (TexturedModel m : newModels) {
-            List<String> newList = new LinkedList<>();
-            newList.add("md5");
-            myModels.put(m, newList);
-        }
-
     }
 
     /**
@@ -82,11 +60,6 @@ public class EntityRenderer {
      */
     public void render(Map<TexturedModel, List<String>> entitiesWithModel,
         Map<String, Vector3f> position, Map<String, Vector3f> rotations, Map<String, Vector3f> scales) {
-
-        entitiesWithModel.putAll(myModels);
-        position.put("gltf", new Vector3f(0, 0, 0));
-        rotations.put("gltf", new Vector3f(-90, 0, 0));
-        scales.put("gltf", new Vector3f(1f, 1f, 1f));
         float fps = 1;
         int maxFrames = 3;
         time += 15;
@@ -112,6 +85,8 @@ public class EntityRenderer {
                         AnimatedFrame frame2 = ((AnimatedModel) model).getAnimatedFrames().get((currentFrame + 1) % maxFrames);
                         frame = calculateInterpolatedFrame(frame1, frame2, delta);
                         prepareInstance(model.getTexture(), position.get(e), rotations.get(e), scales.get(e), frame);
+                    } else if (model instanceof AnimatedModel && ((AnimatedModel) model).getAnimationController() != null) {
+                        prepareInstance(model.getTexture(), position.get(e), rotations.get(e), scales.get(e), null);
                     } else {
                         prepareInstance(model.getTexture(), position.get(e), rotations.get(e), scales.get(e), null);
                     }
@@ -141,8 +116,6 @@ public class EntityRenderer {
         }
         return result;
     }
-
-
 
     private void prepareTexturedModel(TexturedModel tModel) {
         RawModel model = tModel.getRawModel();

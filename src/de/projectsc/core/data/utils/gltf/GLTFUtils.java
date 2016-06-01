@@ -51,6 +51,7 @@ public class GLTFUtils {
         result.z = source[2];
         return result;
     }
+
     public static Quaternion loadQuaternionFromArray(float[] source) {
         Quaternion result = new Quaternion();
         result.x = source[0];
@@ -59,6 +60,7 @@ public class GLTFUtils {
         result.w = source[3];
         return result;
     }
+
     public static Matrix4f loadMatrixFromArray(float[] sourceMatrix) {
         Matrix4f matrix = new Matrix4f();
         matrix.m00 = sourceMatrix[0];
@@ -102,4 +104,22 @@ public class GLTFUtils {
 
     }
 
+    public static Vector3f loadVectorFromBuffer(FloatBuffer buffer) {
+        Vector3f result = new Vector3f();
+        result.x = buffer.get();
+        result.y = buffer.get();
+        result.z = buffer.get();
+        return result;
+
+    }
+
+    public static Quaternion loadQuaternionFromBuffer(FloatBuffer buffer) {
+        Quaternion result = new Quaternion();
+        result.x = buffer.get();
+        result.y = buffer.get();
+        result.z = buffer.get();
+        result.w = buffer.get();
+        return result;
+
+    }
 }

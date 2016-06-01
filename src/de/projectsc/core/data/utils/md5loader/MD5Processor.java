@@ -56,7 +56,7 @@ public class MD5Processor {
 
             TexturedModel model = null;
             if (animModel != null) {
-                model = new AnimatedModel(mesh, invJointMatrices, animatedFrames, texture);
+                model = new AnimatedModel(mesh, animatedFrames, texture);
             } else {
                 texture.setTransparent(true);
                 model = new TexturedModel(mesh, texture);

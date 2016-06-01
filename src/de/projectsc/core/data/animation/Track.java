@@ -2,12 +2,12 @@
  * Copyright (C) 2016 
  */
 
-package de.projectsc.core.data.utils.gltf.old;
+package de.projectsc.core.data.animation;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class GLTFTrack {
+public class Track {
 
     private int jointId;
 
@@ -15,16 +15,16 @@ public class GLTFTrack {
 
     private Joint gltfJoint;
 
-    private List<GLTFKeyFrame> keyframes;
+    private List<Keyframe> keyframes;
 
-    public GLTFTrack() {
+    public Track() {
         jointId = -1;
         jointName = null;
         gltfJoint = null;
         keyframes = new ArrayList<>();
     }
-    
-    public void addKeyframe(GLTFKeyFrame frame){
+
+    public void addKeyframe(Keyframe frame) {
         keyframes.add(frame);
     }
 
@@ -47,8 +47,9 @@ public class GLTFTrack {
     public void setJoint(Joint gltfJoint) {
         this.gltfJoint = gltfJoint;
     }
-    public List<GLTFKeyFrame> getKeyframes(){
+
+    public List<Keyframe> getKeyframes() {
         return keyframes;
     }
-    
+
 }
