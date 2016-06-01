@@ -27,7 +27,7 @@ import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Quaternion;
 import org.lwjgl.util.vector.Vector3f;
 
-import de.projectsc.core.data.AnimatedFrame;
+import de.projectsc.core.data.animation.AnimatedFrame;
 import de.projectsc.core.data.utils.md5loader.anim.MD5AnimModel;
 import de.projectsc.core.data.utils.md5loader.anim.MD5BaseFrame;
 import de.projectsc.core.data.utils.md5loader.anim.MD5Frame;

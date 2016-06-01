@@ -20,7 +20,7 @@ import org.lwjgl.util.vector.Quaternion;
 import org.lwjgl.util.vector.Vector3f;
 
 import de.javagl.jgltf.impl.GlTF;
-import de.projectsc.core.data.AnimatedFrame;
+import de.projectsc.core.data.animation.AnimatedFrame;
 import de.projectsc.core.data.utils.gltf.GLTFLoader;
 import de.projectsc.core.data.utils.md5loader.MD5Loader;
 import de.projectsc.core.data.utils.md5loader.MD5Processor;
@@ -55,12 +55,12 @@ public class EntityRenderer {
         shader.stop();
 
         myModels = new HashMap<>();
-        List<TexturedModel> gltfmodels = GLTFLoader.loadGLTF("simple.gltf");
-        for (TexturedModel m : gltfmodels) {
-            List<String> newList = new LinkedList<>();
-            newList.add("gltf");
-            myModels.put(m, newList);
-        }
+//        List<TexturedModel> gltfmodels = GLTFLoader.loadGLTF("simple.gltf");
+//        for (TexturedModel m : gltfmodels) {
+//            List<String> newList = new LinkedList<>();
+//            newList.add("gltf");
+//            myModels.put(m, newList);
+//        }
 
         List<TexturedModel> newModels =
             MD5Processor.process(MD5Loader.loadMD5MeshFile("monster.md5mesh"), MD5Loader.loadMD5AnimFile("monster.md5anim"));

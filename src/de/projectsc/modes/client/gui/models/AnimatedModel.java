@@ -10,7 +10,7 @@ import java.util.List;
 import org.lwjgl.util.vector.Matrix4f;
 
 import de.javagl.jgltf.impl.GlTF;
-import de.projectsc.core.data.AnimatedFrame;
+import de.projectsc.core.data.animation.AnimatedFrame;
 import de.projectsc.modes.client.gui.textures.ModelTexture;
 
 /**

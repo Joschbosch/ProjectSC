@@ -48,7 +48,7 @@ public class GUIScene {
 
     private boolean wireframeEnabled = true;
 
-    private boolean isDebugMode = false;
+    private boolean isDebugMode = true;
 
     private List<WireFrame> wireFrames = new LinkedList<>();
 

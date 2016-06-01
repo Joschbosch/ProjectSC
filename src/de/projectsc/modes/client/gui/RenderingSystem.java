@@ -7,10 +7,12 @@ package de.projectsc.modes.client.gui;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
 
 import de.projectsc.core.component.collision.ColliderComponent;
@@ -18,6 +20,7 @@ import de.projectsc.core.component.physic.TransformComponent;
 import de.projectsc.core.component.state.EntityStateComponent;
 import de.projectsc.core.data.EntityEvent;
 import de.projectsc.core.data.Event;
+import de.projectsc.core.data.animation.Joint;
 import de.projectsc.core.data.objects.Light;
 import de.projectsc.core.data.physics.BoundingVolumeType;
 import de.projectsc.core.data.physics.Transform;
@@ -202,6 +205,7 @@ public class RenderingSystem extends DefaultSystem {
                     scene.getWireFrames().add(w);
                 }
             }
+            
         }
 
         if (octTree != null) {
@@ -213,6 +217,35 @@ public class RenderingSystem extends DefaultSystem {
                 w.setColor(new Vector3f(0, 1, 0));
                 scene.getWireFrames().add(w);
             }
+        }
+        
+        List<Joint> joints = new LinkedList<>();
+        Joint t = new Joint();
+        Matrix4f mat = new Matrix4f();
+        mat.m03 = 1.0f;
+        mat.m13 = 1.0f;
+        mat.m23 = 1.0f;
+        Joint t2 = new Joint();
+        Matrix4f mat2 = new Matrix4f();
+        mat2.m03 = 2.0f;
+        mat2.m13 = 2.0f;
+        mat2.m23 = 2.0f;
+        t2.setWorldMatrix(mat2);
+        joints.add(t);
+        joints.add(t2);
+        t.addChild(t2);
+        for (Joint j : joints){
+            float radius = 0.5f;
+           WireFrame wf =
+                new WireFrame(WireFrame.SPHERE,j.getWorldPosition(), new Vector3f(), new Vector3f(radius, radius, radius));
+           wf.setColor(new Vector3f(0, 0, 1.0f));
+           scene.getWireFrames().add(wf);
+           for (Joint child : j.getChildren()){
+               WireFrame wf2 =
+                   new WireFrame(WireFrame.LINE,j.getWorldPosition(), child.getWorldPosition());
+              wf2.setColor(new Vector3f(0, 0, 1.0f));
+              scene.getWireFrames().add(wf2);
+           }
         }
 
         return scene;

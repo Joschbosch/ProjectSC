@@ -121,7 +121,7 @@ public class WireFrameRenderer {
             if (WireFrame.LINE.equals(wireframe.getModelType())) {
                 prepareInstance(wireframe.getPosition(), wireframe.getRotation(), wireframe.getScale(), wireframe.getColor());
                 GL11.glLineWidth(wireframe.getLineWidth());
-                GL11.glDrawArrays(GL11.GL_LINES, 0, cube.getVertexCount());
+                GL11.glDrawArrays(GL11.GL_LINES, 0, line.getVertexCount());
             }
         }
         unbindTexturedModel();

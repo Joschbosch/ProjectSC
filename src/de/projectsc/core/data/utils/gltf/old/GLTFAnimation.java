@@ -2,7 +2,7 @@
  * Copyright (C) 2016 
  */
 
-package de.projectsc.core.data.utils.gltf;
+package de.projectsc.core.data.utils.gltf.old;
 
 import java.util.HashMap;
 import java.util.List;

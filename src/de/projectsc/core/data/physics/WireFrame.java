@@ -45,11 +45,21 @@ public class WireFrame {
 
     private Vector3f color = new Vector3f(0, 0, 1);
 
+    private Vector3f positionEnd;
+
     public WireFrame(String type, Vector3f position, Vector3f rotation, Vector3f scale) {
         this.modelType = type;
         this.position = position;
         this.rotation = rotation;
         this.scale = scale;
+    }
+
+    public WireFrame(String type, Vector3f positionLineStart, Vector3f positionLineEnd) {
+        this.modelType = type;
+        this.position = positionLineStart;
+        this.positionEnd = positionLineEnd;
+        this.scale = new Vector3f(1, 1, 1);
+        this.rotation = new Vector3f();
     }
 
     public String getModelType() {

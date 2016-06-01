@@ -1,4 +1,4 @@
-package de.projectsc.core.data;
+package de.projectsc.core.data.animation;
 
 import java.util.Arrays;
 
