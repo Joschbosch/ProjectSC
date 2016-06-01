@@ -86,9 +86,10 @@ public class EntityRenderer {
                         frame = calculateInterpolatedFrame(frame1, frame2, delta);
                         prepareInstance(model.getTexture(), position.get(e), rotations.get(e), scales.get(e), frame);
                     } else if (model instanceof AnimatedModel && ((AnimatedModel) model).getAnimationController() != null) {
-                        prepareInstance(model.getTexture(), position.get(e), rotations.get(e), scales.get(e), null);
+                        prepareInstance(model.getTexture(), position.get(e), rotations.get(e), scales.get(e), ((AnimatedModel) model)
+                            .getAnimationController().getJointMatrices());
                     } else {
-                        prepareInstance(model.getTexture(), position.get(e), rotations.get(e), scales.get(e), null);
+                        prepareInstance(model.getTexture(), position.get(e), rotations.get(e), scales.get(e));
                     }
                     GL11.glDrawElements(GL11.GL_TRIANGLES, model.getRawModel().getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
                 }
@@ -154,18 +155,22 @@ public class EntityRenderer {
         GUISettings.enableCulling();
     }
 
-    private void prepareInstance(ModelTexture modelTexture, Vector3f position, Vector3f rotation, Vector3f scale,
-        Matrix4f[] frameMatrices) {
+    private void prepareInstance(ModelTexture modelTexture, Vector3f position, Vector3f rotation, Vector3f scale) {
         Matrix4f transformationMatrix =
             Maths.createTransformationMatrix(position, rotation.x, rotation.y, rotation.z, scale);
         shader.loadTransformationMatrix(transformationMatrix);
         shader.loadOffset(getTextureOffsetX(modelTexture), getTextureOffsetY(modelTexture));
-        if (frameMatrices != null) {
-            shader.loadJointsMatrix(frameMatrices);
-            shader.loadAnimated(true);
-        } else {
-            shader.loadAnimated(false);
-        }
+        shader.loadAnimated(false);
+    }
+
+    private void prepareInstance(ModelTexture modelTexture, Vector3f position, Vector3f rotation, Vector3f scale,
+        Matrix4f[] jointMatrices) {
+        Matrix4f transformationMatrix =
+            Maths.createTransformationMatrix(position, rotation.x, rotation.y, rotation.z, scale);
+        shader.loadTransformationMatrix(transformationMatrix);
+        shader.loadOffset(getTextureOffsetX(modelTexture), getTextureOffsetY(modelTexture));
+        shader.loadJointsMatrix(jointMatrices);
+        shader.loadAnimated(true);
     }
 
     /**

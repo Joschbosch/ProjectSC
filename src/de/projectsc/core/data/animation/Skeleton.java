@@ -54,4 +54,8 @@ public class Skeleton {
         }
         return null;
     }
+
+    public List<Joint> getRootJoints() {
+        return rootJoints;
+    }
 }

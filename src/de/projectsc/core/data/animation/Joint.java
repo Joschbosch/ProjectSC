@@ -7,10 +7,14 @@ package de.projectsc.core.data.animation;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
 
 public class Joint {
+
+    private static final Log LOGGER = LogFactory.getLog(Joint.class);
 
     private int id;
 
@@ -29,9 +33,24 @@ public class Joint {
     private Matrix4f parentMatrix = null;
 
     public void updateMatrix(boolean updateChildren) {
+        if (parentMatrix != null && parent != null) {
+            LOGGER.error("Joint has parent matrix and parent node: " + name);
+        }
+        if (parentMatrix != null) {
+            // this.worldMatrix = Matrix4f.mul(parentMatrix, localMatrix, null);
+            this.worldMatrix = localMatrix;
+        } else {
+            this.worldMatrix = Matrix4f.mul(parent.getWorldMatrix(), localMatrix, null);
+            // this.worldMatrix = localMatrix;
+        }
         if (inverseBindMatrix == null) {
             inverseBindMatrix = new Matrix4f(worldMatrix);
             inverseBindMatrix.invert();
+        }
+        if (updateChildren) {
+            for (Joint child : children) {
+                child.updateMatrix(updateChildren);
+            }
         }
     }
 
@@ -60,7 +79,7 @@ public class Joint {
     }
 
     public Vector3f getWorldPosition() {
-        return new Vector3f(worldMatrix.m03, worldMatrix.m13, worldMatrix.m23);
+        return new Vector3f(worldMatrix.m30, worldMatrix.m31, worldMatrix.m32);
     }
 
     public void setWorldMatrix(Matrix4f worldMatrix) {

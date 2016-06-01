@@ -66,7 +66,7 @@ public class GLTFUtils {
         matrix.m00 = sourceMatrix[0];
         matrix.m01 = sourceMatrix[1];
         matrix.m02 = sourceMatrix[2];
-        matrix.m33 = sourceMatrix[3];
+        matrix.m03 = sourceMatrix[3];
         matrix.m10 = sourceMatrix[4];
         matrix.m11 = sourceMatrix[5];
         matrix.m12 = sourceMatrix[6];
@@ -104,21 +104,21 @@ public class GLTFUtils {
 
     }
 
-    public static Vector3f loadVectorFromBuffer(FloatBuffer buffer) {
+    public static Vector3f loadVectorFromBuffer(FloatBuffer buffer, int i) {
         Vector3f result = new Vector3f();
-        result.x = buffer.get();
-        result.y = buffer.get();
-        result.z = buffer.get();
+        result.x = buffer.get(i);
+        result.y = buffer.get(i + 1);
+        result.z = buffer.get(i + 2);
         return result;
 
     }
 
-    public static Quaternion loadQuaternionFromBuffer(FloatBuffer buffer) {
+    public static Quaternion loadQuaternionFromBuffer(FloatBuffer buffer, int i) {
         Quaternion result = new Quaternion();
-        result.x = buffer.get();
-        result.y = buffer.get();
-        result.z = buffer.get();
-        result.w = buffer.get();
+        result.x = buffer.get(i);
+        result.y = buffer.get(i + 1);
+        result.z = buffer.get(i + 2);
+        result.w = buffer.get(i + 3);
         return result;
 
     }

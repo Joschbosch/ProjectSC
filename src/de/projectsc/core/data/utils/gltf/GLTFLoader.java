@@ -77,7 +77,7 @@ public class GLTFLoader {
         createSkins();
         loadAnimation();
 
-        RawModel model = loadModel();
+        List<RawModel> modelList = loadModel();
         ModelTexture texture = loadTexture();
 
         System.out.println("Nodes: " + nodes.size());
@@ -101,26 +101,24 @@ public class GLTFLoader {
             System.out.println("Animation duration: " + animation.getDuration());
             System.out.println("Animation tracks size: " + animation.getTracks().size());
         }
-
-        if (animation != null) {
-            AnimationController controller = new AnimationController();
-            animation.setSkeleton(skeletons.values().iterator().next()); // improve
-            controller.setAnimation(animation);
-            controller.setId("gltf");
-            list.add(new AnimatedModel(model, controller, texture));
-        } else {
-            list.add(new TexturedModel(model, texture));
+        for (RawModel model : modelList) {
+            if (animation != null) {
+                AnimationController controller = new AnimationController();
+                animation.setSkeleton(skeletons.values().iterator().next()); // improve
+                controller.setAnimation(animation);
+                controller.setId("gltf");
+                list.add(new AnimatedModel(model, controller, texture));
+            } else {
+                list.add(new TexturedModel(model, texture));
+            }
         }
-
         return list;
     }
 
     private ModelTexture loadTexture() {
         ModelTexture result =
             new ModelTexture(Loader.loadTexture(
-                GLTFLoader.class.getResourceAsStream(GUIConstants.TEXTURE_ROOT + "dragon/dragon_scale.png"), "PNG"));
-        result.setNormalMap(Loader.loadTexture(
-            GLTFLoader.class.getResourceAsStream(GUIConstants.TEXTURE_ROOT + "dragon/dragon_scale_n.png"), "PNG"));
+                GLTFLoader.class.getResourceAsStream(GUIConstants.TEXTURE_ROOT + GUIConstants.BASIC_TEXTURE_WHITE), "PNG"));
         return result;
     }
 
@@ -242,17 +240,18 @@ public class GLTFLoader {
                     Keyframe keyframe = new Keyframe();
                     keyframe.setTime(timeBuffer.get(i));
                     for (AnimationChannel c : ani.getChannels()) {
-                        if (c.getTarget().getPath().equals("rotation")) {
-                            FloatBuffer buffer = data.getExtractedAccessorByteBuffer(ani.getParameters().get("rotation")).asFloatBuffer();
-                            keyframe.setTranslation(GLTFUtils.loadVectorFromBuffer(buffer));
+                        if (c.getTarget().getPath().equals("translation")) {
+                            FloatBuffer buffer =
+                                data.getExtractedAccessorByteBuffer(ani.getParameters().get("translation")).asFloatBuffer();
+                            keyframe.setTranslation(GLTFUtils.loadVectorFromBuffer(buffer, i * 3));
                         }
                         if (c.getTarget().getPath().equals("scale")) {
                             FloatBuffer buffer = data.getExtractedAccessorByteBuffer(ani.getParameters().get("scale")).asFloatBuffer();
-                            keyframe.setScaling(GLTFUtils.loadVectorFromBuffer(buffer));
+                            keyframe.setScaling(GLTFUtils.loadVectorFromBuffer(buffer, i * 3));
                         }
                         if (c.getTarget().getPath().equals("rotation")) {
                             FloatBuffer buffer = data.getExtractedAccessorByteBuffer(ani.getParameters().get("rotation")).asFloatBuffer();
-                            keyframe.setOrientation(GLTFUtils.loadQuaternionFromBuffer(buffer));
+                            keyframe.setOrientation(GLTFUtils.loadQuaternionFromBuffer(buffer, i * 4));
                         }
                     }
                     track.addKeyframe(keyframe);
@@ -269,9 +268,10 @@ public class GLTFLoader {
         }
     }
 
-    private RawModel loadModel() {
-        RawModel model = null;
+    private List<RawModel> loadModel() {
+        List<RawModel> result = new LinkedList<>();
         for (Mesh mesh : gltf.getMeshes().values()) {
+            RawModel model = null;
             for (MeshPrimitive p : mesh.getPrimitives()) {
                 String indicesAccessor = p.getIndices();
                 String positionsAccessor = p.getAttributes().get("POSITION");
@@ -279,11 +279,13 @@ public class GLTFLoader {
                 String texCoordAccessor = p.getAttributes().get("TEXCOORD_0");
                 String jointsAccessor = p.getAttributes().get("JOINT");
                 String weigthsAccessor = p.getAttributes().get("WEIGHT");
-                FloatBuffer texCoords = ByteBuffer.allocateDirect(4 * 4).asFloatBuffer();
-                texCoords.put(new float[] { 0, 0, 1, 1 });
-                texCoords.flip();
+                FloatBuffer texCoords = null;
                 if (texCoordAccessor != null) {
-                    GLTFUtils.getFloatBuffer(texCoordAccessor, data);
+                    texCoords = GLTFUtils.getFloatBuffer(texCoordAccessor, data);
+                } else {
+                    texCoords = ByteBuffer.allocateDirect(4 * 4).asFloatBuffer();
+                    texCoords.put(new float[] { 0, 0, 1, 1 });
+                    texCoords.flip();
                 }
 
                 if (indicesAccessor != null && positionsAccessor != null && normalsAccessor != null && weigthsAccessor == null) {
@@ -298,7 +300,8 @@ public class GLTFLoader {
                         GLTFUtils.getJointIntArray(jointsAccessor, data), GLTFUtils.getFloatBuffer(weigthsAccessor, data));
                 }
             }
+            result.add(model);
         }
-        return model;
+        return result;
     }
 }
