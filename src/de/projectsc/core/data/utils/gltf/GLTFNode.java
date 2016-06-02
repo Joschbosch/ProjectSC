@@ -44,8 +44,8 @@ public class GLTFNode {
         this.node = node;
     }
 
-    public void applyMatrix(Matrix4f matrix) {
-        Matrix4f.mul(localMatrix, matrix, localMatrix);
+    public void setLocalMatrix(Matrix4f matrix) {
+        localMatrix = matrix;
     }
 
     public Matrix4f getWorldMatrix() {
@@ -110,6 +110,10 @@ public class GLTFNode {
 
     public void setRotation(Quaternion rotation) {
         this.rotation = rotation;
+    }
+
+    public Matrix4f getLocalMatrix() {
+        return localMatrix;
     }
 
 }

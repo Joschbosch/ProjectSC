@@ -84,22 +84,22 @@ public class GLTFUtils {
 
     public static Matrix4f loadMatrixFromBuffer(int position, FloatBuffer buffer) {
         Matrix4f result = new Matrix4f();
-        result.m00 = buffer.get(position + 0);
-        result.m01 = buffer.get(position + 1);
-        result.m02 = buffer.get(position + 2);
-        result.m03 = buffer.get(position + 3);
-        result.m10 = buffer.get(position + 4);
-        result.m11 = buffer.get(position + 5);
-        result.m12 = buffer.get(position + 6);
-        result.m13 = buffer.get(position + 7);
-        result.m20 = buffer.get(position + 8);
-        result.m21 = buffer.get(position + 9);
-        result.m22 = buffer.get(position + 10);
-        result.m23 = buffer.get(position + 11);
-        result.m30 = buffer.get(position + 12);
-        result.m31 = buffer.get(position + 13);
-        result.m32 = buffer.get(position + 14);
-        result.m33 = buffer.get(position + 15);
+        result.m00 = buffer.get(16 * position + 0);
+        result.m01 = buffer.get(16 * position + 1);
+        result.m02 = buffer.get(16 * position + 2);
+        result.m03 = buffer.get(16 * position + 3);
+        result.m10 = buffer.get(16 * position + 4);
+        result.m11 = buffer.get(16 * position + 5);
+        result.m12 = buffer.get(16 * position + 6);
+        result.m13 = buffer.get(16 * position + 7);
+        result.m20 = buffer.get(16 * position + 8);
+        result.m21 = buffer.get(16 * position + 9);
+        result.m22 = buffer.get(16 * position + 10);
+        result.m23 = buffer.get(16 * position + 11);
+        result.m30 = buffer.get(16 * position + 12);
+        result.m31 = buffer.get(16 * position + 13);
+        result.m32 = buffer.get(16 * position + 14);
+        result.m33 = buffer.get(16 * position + 15);
         return result;
 
     }

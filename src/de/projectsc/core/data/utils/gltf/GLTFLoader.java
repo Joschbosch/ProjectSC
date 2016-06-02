@@ -177,12 +177,13 @@ public class GLTFLoader {
     private GLTFNode createNode(String key, Node node, Map<String, Node> origNodes) {
         GLTFNode glNode = new GLTFNode(node);
         if (node.getMatrix() != null) {
-            glNode.applyMatrix(GLTFUtils.loadMatrixFromArray(node.getMatrix()));
+            glNode.setLocalMatrix(GLTFUtils.loadMatrixFromArray(node.getMatrix()));
+            System.out.println("Load from node : " + node.getName() + "  " + glNode.getLocalMatrix());
         } else if (node.getTranslation() != null) {
             glNode.setPosition(GLTFUtils.loadVectorFromArray(node.getTranslation()));
             glNode.setScale(GLTFUtils.loadVectorFromArray(node.getScale()));
             glNode.setRotation(GLTFUtils.loadQuaternionFromArray(node.getRotation()));
-            glNode.applyMatrix(
+            glNode.setLocalMatrix(
                 Maths.createTransformationMatrix(glNode.getRotationQuaternion(), glNode.getPositionVector(), glNode.getScaleVector()));
         }
         nodes.put(key, glNode);

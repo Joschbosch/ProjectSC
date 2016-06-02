@@ -281,7 +281,7 @@ public final class Maths {
         m.m21 = (float) (2.0 * (tmp1 + tmp2) * invs);
         m.m12 = (float) (2.0 * (tmp1 - tmp2) * invs);
     }
-    
+
     public static Matrix4f createTransformationMatrix(Quaternion interpolatedRotation, Vector3f interpolatedPostion, Vector3f scale) {
         Matrix4f result = new Matrix4f();
         Maths.applyQuaternionToMatrix(interpolatedRotation, result);
@@ -289,6 +289,20 @@ public final class Maths {
         result.m30 = interpolatedPostion.x;
         result.m31 = interpolatedPostion.y;
         result.m32 = interpolatedPostion.z;
+        return result;
+    }
+
+    public static Vector3f getEulerFromMatrix(Matrix4f worldMatrix) {
+        Vector3f result = new Vector3f();
+        if (worldMatrix.m10 == 1 || worldMatrix.m10 == -1) {
+            result.x = (float) Math.atan2(worldMatrix.m02, worldMatrix.m22);
+            result.z = 0;
+        } else {
+            result.x = (float) Math.atan2(-worldMatrix.m20, worldMatrix.m00);
+            result.z = (float) Math.atan2(-worldMatrix.m12, worldMatrix.m11);
+        }
+        result.y = (float) Math.asin(worldMatrix.m10);
+        result.x = -90;
         return result;
     }
 }

@@ -67,7 +67,7 @@ public class RenderingSystem extends DefaultSystem {
         eventManager.registerForEvent(RemoveLightEvent.class, this);
 
         myModels = new HashMap<>();
-        List<TexturedModel> gltfmodels = new GLTFLoader().loadGLTF("simple.gltf");
+        List<TexturedModel> gltfmodels = new GLTFLoader().loadGLTF("monster_complete.gltf");
         for (TexturedModel m : gltfmodels) {
             List<String> newList = new LinkedList<>();
             newList.add("gltf");
@@ -187,7 +187,8 @@ public class RenderingSystem extends DefaultSystem {
                     for (Joint j : ((AnimatedModel) m).getAnimationController().getAnimation().getSkeleton().getJoints()) {
                         float radius = 0.5f;
                         WireFrame wf =
-                            new WireFrame(WireFrame.SPHERE, j.getWorldPosition(), new Vector3f(), new Vector3f(radius, radius, radius));
+                            new WireFrame(WireFrame.SPHERE, j.getWorldPosition(), Maths.getEulerFromMatrix(j.getWorldMatrix()),
+                                new Vector3f(radius, radius, radius));
                         wf.setColor(new Vector3f(0, 0, 1.0f));
                         scene.getWireFrames().add(wf);
                     }

@@ -37,8 +37,8 @@ public class Joint {
             LOGGER.error("Joint has parent matrix and parent node: " + name);
         }
         if (parentMatrix != null) {
-            // this.worldMatrix = Matrix4f.mul(parentMatrix, localMatrix, null);
-            this.worldMatrix = localMatrix;
+            this.worldMatrix = Matrix4f.mul(parentMatrix, localMatrix, null);
+            // this.worldMatrix = localMatrix;
         } else {
             this.worldMatrix = Matrix4f.mul(parent.getWorldMatrix(), localMatrix, null);
             // this.worldMatrix = localMatrix;
@@ -116,5 +116,9 @@ public class Joint {
 
     public void setParentMatrix(Matrix4f parentsWorldMatrix) {
         this.parentMatrix = parentsWorldMatrix;
+    }
+
+    public Matrix4f getParentMatrix() {
+        return parentMatrix;
     }
 }
