@@ -6,6 +6,8 @@
 
 package de.projectsc.modes.client.gui.utils;
 
+import java.awt.image.BufferedImage;
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -20,6 +22,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import javax.imageio.ImageIO;
+
+import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.lwjgl.BufferUtils;
@@ -35,6 +40,8 @@ import org.lwjgl.opengl.GL33;
 import org.lwjgl.opengl.GLContext;
 import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureLoader;
+
+import com.sun.xml.internal.messaging.saaj.util.ByteInputStream;
 
 import de.matthiasmann.twl.utils.PNGDecoder;
 import de.matthiasmann.twl.utils.PNGDecoder.Format;
@@ -129,7 +136,9 @@ public final class Loader {
         unbind();
         return new RawModel(vaoID, indices.length);
     }
-    public static RawModel loadToVAO(FloatBuffer positions,FloatBuffer textureCoordinates, FloatBuffer normals, int[] indices, int[] jointIndicesArr,
+
+    public static RawModel loadToVAO(FloatBuffer positions, FloatBuffer textureCoordinates, FloatBuffer normals, int[] indices,
+        int[] jointIndicesArr,
         FloatBuffer weightsArr) {
         int vaoID = createVAO();
         bindIndicesBuffer(indices);
@@ -142,9 +151,9 @@ public final class Loader {
         storeDataInAttributeList(4, 4, weightsArr);
         storeDataInAttributeList(5, 4, jointIndicesArr);
         unbind();
-        System.out.println("JointIndArray : " + Arrays.toString(jointIndicesArr));
         return new RawModel(vaoID, indices.length);
     }
+
     /**
      * Loading given data positions into a VAO.
      * 
@@ -178,7 +187,8 @@ public final class Loader {
      * 
      * @return the model with the vao
      */
-    public static RawModel loadToVAO(FloatBuffer positions, FloatBuffer textureCoordinates, FloatBuffer normals, FloatBuffer tangents, int[] indices) {
+    public static RawModel loadToVAO(FloatBuffer positions, FloatBuffer textureCoordinates, FloatBuffer normals, FloatBuffer tangents,
+        int[] indices) {
         int vaoID = createVAO();
         bindIndicesBuffer(indices);
         storeDataInAttributeList(0, 3, positions);
@@ -188,6 +198,7 @@ public final class Loader {
         unbind();
         return new RawModel(vaoID, indices.length);
     }
+
     /**
      * Loading given data positions into a VAO.
      * 
@@ -298,6 +309,32 @@ public final class Loader {
      * @param filename to load
      * @return location of texture
      */
+    public static int loadTexture(BufferedImage img, String name, String type) {
+        try {
+            if (textureMap.containsKey(name)) {
+                return textureMap.get(name);
+            } else {
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                ImageIO.write(img, type, stream);
+                byte[] content = stream.toByteArray();
+                InputStream in = new BufferedInputStream(new ByteInputStream(content, content.length));
+                int textureID = loadTexture(in, type);
+                textureMap.put(name, textureID);
+                in.close();
+                return textureID;
+            }
+        } catch (IOException e) {
+            LOGGER.error("Could not convert to stream.");
+            return -1;
+        }
+    }
+
+    /**
+     * Load texture with PNG format.
+     * 
+     * @param filename to load
+     * @return location of texture
+     */
     public static int loadTexture(String filename) {
         if (textureMap.containsKey(filename)) {
             return textureMap.get(filename);
@@ -368,6 +405,7 @@ public final class Loader {
         GL20.glVertexAttribPointer(attrNumber, dataSize, GL11.GL_FLOAT, false, 0, 0);
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
     }
+
     private static void storeDataInAttributeList(int attrNumber, int dataSize, FloatBuffer data) {
         int vboID = GL15.glGenBuffers();
         VBOS.add(vboID);
@@ -376,6 +414,7 @@ public final class Loader {
         GL20.glVertexAttribPointer(attrNumber, dataSize, GL11.GL_FLOAT, false, 0, 0);
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
     }
+
     private static void storeDataInAttributeList(int attrNumber, int dataSize, int[] data) {
         int vboID = GL15.glGenBuffers();
         VBOS.add(vboID);
@@ -407,13 +446,7 @@ public final class Loader {
         GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, buffer, GL15.GL_STATIC_DRAW);
 
     }
-    private static void bindIndicesBuffer(IntBuffer indices) {
-        int vboId = GL15.glGenBuffers();
-        VBOS.add(vboId);
-        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, vboId);
-        GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, indices, GL15.GL_STATIC_DRAW);
 
-    }
     /**
      * create Buffer.
      * 

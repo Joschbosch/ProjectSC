@@ -32,6 +32,7 @@ public class GLTFUtils {
 
     public static FloatBuffer getFloatBuffer(String accessor, GltfData rawData) {
         ByteBuffer tmpdata = rawData.getExtractedAccessorByteBuffer(accessor);
+
         return tmpdata.asFloatBuffer();
     }
 
@@ -106,19 +107,19 @@ public class GLTFUtils {
 
     public static Vector3f loadVectorFromBuffer(FloatBuffer buffer, int i) {
         Vector3f result = new Vector3f();
-        result.x = buffer.get(i);
-        result.y = buffer.get(i + 1);
-        result.z = buffer.get(i + 2);
+        result.x = buffer.get(3 * i);
+        result.y = buffer.get(3 * i + 1);
+        result.z = buffer.get(3 * i + 2);
         return result;
 
     }
 
     public static Quaternion loadQuaternionFromBuffer(FloatBuffer buffer, int i) {
         Quaternion result = new Quaternion();
-        result.x = buffer.get(i);
-        result.y = buffer.get(i + 1);
-        result.z = buffer.get(i + 2);
-        result.w = buffer.get(i + 3);
+        result.x = buffer.get(4 * i);
+        result.y = buffer.get(4 * i + 1);
+        result.z = buffer.get(4 * i + 2);
+        result.w = buffer.get(4 * i + 3);
         return result;
 
     }

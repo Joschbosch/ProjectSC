@@ -20,13 +20,12 @@ import de.projectsc.core.component.state.EntityStateComponent;
 import de.projectsc.core.data.EntityEvent;
 import de.projectsc.core.data.Event;
 import de.projectsc.core.data.animation.AnimationController;
-import de.projectsc.core.data.animation.Joint;
 import de.projectsc.core.data.objects.Light;
 import de.projectsc.core.data.physics.BoundingVolumeType;
 import de.projectsc.core.data.physics.Transform;
 import de.projectsc.core.data.physics.WireFrame;
 import de.projectsc.core.data.physics.boundings.Sphere;
-import de.projectsc.core.data.utils.gltf.GLTFLoader;
+import de.projectsc.core.data.utils.gltf.GLTFModel;
 import de.projectsc.core.data.utils.md5loader.MD5Loader;
 import de.projectsc.core.data.utils.md5loader.MD5Processor;
 import de.projectsc.core.events.entity.movement.NotifyTransformUpdateEvent;
@@ -67,11 +66,22 @@ public class RenderingSystem extends DefaultSystem {
         eventManager.registerForEvent(RemoveLightEvent.class, this);
 
         myModels = new HashMap<>();
-        List<TexturedModel> gltfmodels = new GLTFLoader().loadGLTF("monster_complete.gltf");
-        for (TexturedModel m : gltfmodels) {
-            List<String> newList = new LinkedList<>();
-            newList.add("gltf");
-            myModels.put(m, newList);
+
+        List<GLTFModel> models = new LinkedList<>();
+        models.add(new GLTFModel().loadGLTF("a380.gltf"));
+        models.add(new GLTFModel().loadGLTF("simple.gltf"));
+        models.add(new GLTFModel().loadGLTF("riggedFigure.gltf"));
+        models.add(new GLTFModel().loadGLTF("monster_complete.gltf"));
+        models.add(new GLTFModel().loadGLTF("dragon.gltf"));
+        models.add(new GLTFModel().loadGLTF("man.gltf"));
+        models.add(new GLTFModel().loadGLTF("brain.gltf"));
+
+        for (GLTFModel m : models) {
+            for (TexturedModel tm : m.getLoadedModels()) {
+                List<String> newList = new LinkedList<>();
+                newList.add(m.getName());
+                myModels.put(tm, newList);
+            }
         }
 
         List<TexturedModel> newModels =
@@ -164,6 +174,12 @@ public class RenderingSystem extends DefaultSystem {
         }
     }
 
+    private void testModel(String name, Vector3f position, Vector3f scale, GUIScene scene) {
+        scene.getPositions().put(name, position);
+        scene.getRotations().put(name, new Vector3f());
+        scene.getScales().put(name, scale);
+    }
+
     /**
      * Creates the scene that will be rendered afterwards.
      * 
@@ -175,23 +191,28 @@ public class RenderingSystem extends DefaultSystem {
         Set<String> entities = entityManager.getAllEntites();
         GUIScene scene = new GUIScene();
 
-        scene.getPositions().put("gltf", new Vector3f(0, 0, 0));
-        scene.getRotations().put("gltf", new Vector3f(0, 0, 0));
-        scene.getScales().put("gltf", new Vector3f(1f, 1f, 1f));
+        testModel("a380", new Vector3f(-250, 0, 20), new Vector3f(1.5f, 1.5f, 1.5f), scene);
+        testModel("dragon", new Vector3f(-120, 0, 0), new Vector3f(0.8f, 0.8f, 0.8f), scene);
+        testModel("monster_complete", new Vector3f(-70, 0, 0), new Vector3f(0.8f, 0.8f, 0.8f), scene);
+        testModel("riggedFigure", new Vector3f(-10, 0, 0), new Vector3f(15f, 15f, 15f), scene);
+        testModel("simple", new Vector3f(-5, 5, 0), new Vector3f(1f, 1f, 1f), scene);
+        testModel("man", new Vector3f(20, 0, 0), new Vector3f(15f, 15f, 15f), scene);
+        testModel("md5", new Vector3f(60, 0, 0), new Vector3f(0.5f, 0.5f, 0.5f), scene);
+        testModel("brain", new Vector3f(90, 0, 0), new Vector3f(10f, 10f, 10f), scene);
         scene.getModels().putAll(myModels);
         for (TexturedModel m : myModels.keySet()) {
             if (m instanceof AnimatedModel) {
                 AnimationController animationController = ((AnimatedModel) m).getAnimationController();
                 if (animationController != null) {
                     animationController.update();
-                    for (Joint j : ((AnimatedModel) m).getAnimationController().getAnimation().getSkeleton().getJoints()) {
-                        float radius = 0.5f;
-                        WireFrame wf =
-                            new WireFrame(WireFrame.SPHERE, j.getWorldPosition(), Maths.getEulerFromMatrix(j.getWorldMatrix()),
-                                new Vector3f(radius, radius, radius));
-                        wf.setColor(new Vector3f(0, 0, 1.0f));
-                        scene.getWireFrames().add(wf);
-                    }
+                    // for (Joint j : ((AnimatedModel) m).getAnimationController().getAnimation().getSkeleton().getJoints()) {
+                    // float radius = 0.5f;
+                    // WireFrame wf =
+                    // new WireFrame(WireFrame.SPHERE, j.getWorldPosition(), Maths.getEulerFromMatrix(j.getWorldMatrix()),
+                    // new Vector3f(radius, radius, radius));
+                    // wf.setColor(new Vector3f(0, 0, 1.0f));
+                    // scene.getWireFrames().add(wf);
+                    // }
                 }
             }
         }

@@ -5,7 +5,6 @@
  */
 package de.projectsc.modes.client.gui.render;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -14,10 +13,8 @@ import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.util.vector.Matrix4f;
-import org.lwjgl.util.vector.Quaternion;
 import org.lwjgl.util.vector.Vector3f;
 
-import de.projectsc.core.data.animation.AnimatedFrame;
 import de.projectsc.core.utils.Maths;
 import de.projectsc.modes.client.gui.models.AnimatedModel;
 import de.projectsc.modes.client.gui.models.RawModel;
@@ -34,12 +31,6 @@ import de.projectsc.modes.client.gui.textures.ModelTexture;
 public class EntityRenderer {
 
     private final EntityShader shader;
-
-    private HashMap<TexturedModel, List<String>> myModels;
-
-    private int currentFrame = 0;
-
-    private int time = 0;
 
     public EntityRenderer(EntityShader shader, Matrix4f projectionMatrix) {
         this.shader = shader;
@@ -60,17 +51,7 @@ public class EntityRenderer {
      */
     public void render(Map<TexturedModel, List<String>> entitiesWithModel,
         Map<String, Vector3f> position, Map<String, Vector3f> rotations, Map<String, Vector3f> scales) {
-        float fps = 1;
-        int maxFrames = 3;
-        time += 15;
-        if (time > 1000 / fps) {
-            currentFrame++;
-            if (currentFrame >= maxFrames) {
-                currentFrame = 0;
-            }
-            time = (int) (time % (1000 / fps));
-        }
-        float delta = time / (1000.0f / fps);
+        // GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_LINE);
         for (TexturedModel model : entitiesWithModel.keySet()) {
             prepareTexturedModel(model);
             if (model instanceof AnimatedModel) {
@@ -79,43 +60,12 @@ public class EntityRenderer {
             List<String> batch = entitiesWithModel.get(model);
             for (String e : batch) {
                 if (position.get(e) != null && rotations.get(e) != null && scales.get(e) != null) {
-                    Matrix4f[] frame = null;
-                    if (model instanceof AnimatedModel && ((AnimatedModel) model).getAnimatedFrames() != null) {
-                        AnimatedFrame frame1 = ((AnimatedModel) model).getAnimatedFrames().get(currentFrame);
-                        AnimatedFrame frame2 = ((AnimatedModel) model).getAnimatedFrames().get((currentFrame + 1) % maxFrames);
-                        frame = calculateInterpolatedFrame(frame1, frame2, delta);
-                        prepareInstance(model.getTexture(), position.get(e), rotations.get(e), scales.get(e), frame);
-                    } else if (model instanceof AnimatedModel && ((AnimatedModel) model).getAnimationController() != null) {
-                        prepareInstance(model.getTexture(), position.get(e), rotations.get(e), scales.get(e), ((AnimatedModel) model)
-                            .getAnimationController().getJointMatrices());
-                    } else {
-                        prepareInstance(model.getTexture(), position.get(e), rotations.get(e), scales.get(e));
-                    }
+                    prepareInstance(model, position.get(e), rotations.get(e), scales.get(e));
                     GL11.glDrawElements(GL11.GL_TRIANGLES, model.getRawModel().getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
                 }
             }
             unbindTexturedModel();
         }
-    }
-
-    private Matrix4f[] calculateInterpolatedFrame(AnimatedFrame frame1, AnimatedFrame frame2, float delta) {
-        Matrix4f[] result = new Matrix4f[frame1.getJointMatrices().length];
-        for (int i = 0; i < frame1.getJointMatrices().length; i++) {
-            Matrix4f m1 = new Matrix4f(frame1.getJointMatrices()[i]);
-            Matrix4f m2 = new Matrix4f(frame2.getJointMatrices()[i]);
-            Vector3f position1 = new Vector3f(m1.m30, m1.m31, m1.m32);
-            Vector3f position2 = new Vector3f(m2.m30, m2.m31, m2.m32);
-            Quaternion q1 = new Quaternion();
-            Quaternion.setFromMatrix(m1, q1);
-            Quaternion q2 = new Quaternion();
-            Quaternion.setFromMatrix(m2, q2);
-            Quaternion interpolatedRotation = Maths.slerp(q1, q2, delta);
-
-            Vector3f interpolatedPostion = Maths.lerp(position1, position2, delta);
-
-            result[i] = Maths.createTransformationMatrix(interpolatedRotation, interpolatedPostion, new Vector3f(1, 1, 1));
-        }
-        return result;
     }
 
     private void prepareTexturedModel(TexturedModel tModel) {
@@ -155,22 +105,20 @@ public class EntityRenderer {
         GUISettings.enableCulling();
     }
 
-    private void prepareInstance(ModelTexture modelTexture, Vector3f position, Vector3f rotation, Vector3f scale) {
+    private void prepareInstance(TexturedModel model, Vector3f position, Vector3f rotation, Vector3f scale) {
         Matrix4f transformationMatrix =
             Maths.createTransformationMatrix(position, rotation.x, rotation.y, rotation.z, scale);
-        shader.loadTransformationMatrix(transformationMatrix);
-        shader.loadOffset(getTextureOffsetX(modelTexture), getTextureOffsetY(modelTexture));
-        shader.loadAnimated(false);
-    }
 
-    private void prepareInstance(ModelTexture modelTexture, Vector3f position, Vector3f rotation, Vector3f scale,
-        Matrix4f[] jointMatrices) {
-        Matrix4f transformationMatrix =
-            Maths.createTransformationMatrix(position, rotation.x, rotation.y, rotation.z, scale);
+        Matrix4f.mul(model.getModelMatrix(), transformationMatrix, transformationMatrix);
+
         shader.loadTransformationMatrix(transformationMatrix);
-        shader.loadOffset(getTextureOffsetX(modelTexture), getTextureOffsetY(modelTexture));
-        shader.loadJointsMatrix(jointMatrices);
-        shader.loadAnimated(true);
+        shader.loadOffset(getTextureOffsetX(model.getTexture()), getTextureOffsetY(model.getTexture()));
+        if (model instanceof AnimatedModel && ((AnimatedModel) model).getAnimationController() != null) {
+            shader.loadJointsMatrix(((AnimatedModel) model).getAnimationController().getJointMatrices());
+            shader.loadAnimated(true);
+        } else {
+            shader.loadAnimated(false);
+        }
     }
 
     /**

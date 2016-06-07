@@ -116,15 +116,15 @@ public class MasterRenderer {
     public void renderScene(GUIScene scene, Camera camera, long elapsedTime, Vector4f clipPlane) {
         billboardRenderer.setCamera(camera);
         renderShadowMap(scene, camera);
-//        postProcessingFBO.bindFrameBuffer();
+        postProcessingFBO.bindFrameBuffer();
         render(scene, camera, elapsedTime, clipPlane);
-//        postProcessingFBO.unbindFrameBuffer();
-//        if (doPostProcessing) {
-//            postProcessingFBO.resolveToFBO(resolvingFBO);
-//            PostProcessing.doPostProcessing(resolvingFBO.getColourTexture());
-//        } else {
-//            postProcessingFBO.resolveToScreen();
-//        }
+        postProcessingFBO.unbindFrameBuffer();
+        if (doPostProcessing) {
+            postProcessingFBO.resolveToFBO(resolvingFBO);
+            PostProcessing.doPostProcessing(resolvingFBO.getColourTexture());
+        } else {
+            postProcessingFBO.resolveToScreen();
+        }
     }
 
     private void renderShadowMap(GUIScene scene, Camera camera) {
@@ -165,7 +165,7 @@ public class MasterRenderer {
         terrainShader.loadHighlightedAndSeleced(scene.getHightlightedEntites(), scene.getSelectedEntites());
         terrainShader.loadLights(scene.getLights(), scene.getPositions());
         terrainShader.loadViewMatrix(camera);
-//        terrainRenderer.render(scene.getTerrains(), shadowRenderer.getToShadowMapSpaceMatrix(), shadowRenderer.getShadowDistance());
+        terrainRenderer.render(scene.getTerrains(), shadowRenderer.getToShadowMapSpaceMatrix(), shadowRenderer.getShadowDistance());
         terrainShader.stop();
         if (scene.renderSkyBox()) {
             if (scene.getFogColor() == null) {

@@ -13,14 +13,11 @@ public class Track {
 
     private String jointName;
 
-    private Joint gltfJoint;
-
     private List<Keyframe> keyframes;
 
     public Track() {
         jointId = -1;
         jointName = null;
-        gltfJoint = null;
         keyframes = new ArrayList<>();
     }
 
@@ -42,10 +39,6 @@ public class Track {
 
     public String getJointName() {
         return jointName;
-    }
-
-    public void setJoint(Joint gltfJoint) {
-        this.gltfJoint = gltfJoint;
     }
 
     public List<Keyframe> getKeyframes() {

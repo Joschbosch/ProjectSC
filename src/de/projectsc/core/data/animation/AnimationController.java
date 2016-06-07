@@ -26,7 +26,6 @@ public class AnimationController {
     private Matrix4f[] jointMatrices;
 
     public void update() {
-
         this.time += 15f / 1000f;
         if (time > animation.getDuration()) {
             time = time % animation.getDuration();
@@ -50,7 +49,6 @@ public class AnimationController {
             Vector3f pos = Maths.lerp(startframe.getTranslation(), endframe.getTranslation(), percent);
             Quaternion rot = Maths.slerp(startframe.getOrientation(), endframe.getOrientation(), percent);
             Vector3f scale = Maths.lerp(startframe.getScaling(), endframe.getScaling(), percent);
-            System.out.println(pos);
             j.setLocalMatrix(Maths.createTransformationMatrix(rot, pos, scale));
         }
 
@@ -58,37 +56,15 @@ public class AnimationController {
         for (Joint root : animation.getSkeleton().getRootJoints()) {
             root.updateMatrix(true);
         }
-        for (Joint j : animation.getSkeleton().getJoints()) {
-            System.out.println("joint : " + j.getName());
-            System.out.println("INVERSEBIND : ");
-            System.out.println(j.getInverseBindMatrix());
-            if (j.getParentMatrix() != null) {
-                System.out.println("PARENT: ");
-                System.out.println(j.getParentMatrix());
-            }
-            System.out.println("LOCALMATRIX: ");
-            System.out.println(j.getLocalMatrix());
-            System.out.println("WORLDMATRIX: ");
-            System.out.println(j.getWorldMatrix());
-        }
-
         // create joint matrices : joint.worldmatrix * inverseBindMatrix * bindShapeMatrix
         Collection<Joint> joints = animation.getSkeleton().getJoints();
         this.jointMatrices = new Matrix4f[joints.size()];
         for (Joint joint : joints) {
             Matrix4f jointMatrix = new Matrix4f();
-
-            Matrix4f temp = new Matrix4f();
-            temp.m11 = 0.0f;
-            temp.m22 = 0.0f;
-            temp.m12 = -1.0f;
-            temp.m21 = 1.0f;
-            Matrix4f.mul(joint.getInverseBindMatrix(), temp, temp);
             Matrix4f.mul(animation.getSkeleton().getBindShapeMatrix(), jointMatrix, jointMatrix); // add later
+            Matrix4f.mul(joint.getInverseBindMatrix(), jointMatrix, jointMatrix);
             Matrix4f.mul(joint.getWorldMatrix(), jointMatrix, jointMatrix);
-            Matrix4f.mul(temp, jointMatrix, jointMatrix);
-            // Matrix4f.mul(joint.getInverseBindMatrix(), jointMatrix, jointMatrix);
-            jointMatrices[joint.getId()] = joint.getWorldMatrix();
+            jointMatrices[joint.getId()] = jointMatrix;
         }
     }
 

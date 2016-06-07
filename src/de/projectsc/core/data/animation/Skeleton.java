@@ -58,4 +58,8 @@ public class Skeleton {
     public List<Joint> getRootJoints() {
         return rootJoints;
     }
+
+    public String getName() {
+        return name;
+    }
 }

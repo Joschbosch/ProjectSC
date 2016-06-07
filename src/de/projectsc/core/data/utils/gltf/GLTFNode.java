@@ -31,8 +31,6 @@ public class GLTFNode {
 
     protected Matrix4f worldMatrix;
 
-    private boolean needsUpdate = true;
-
     private Node node;
 
     public GLTFNode(Node node) {

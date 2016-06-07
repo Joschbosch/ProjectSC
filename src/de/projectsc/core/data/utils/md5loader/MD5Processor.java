@@ -19,21 +19,30 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Quaternion;
 import org.lwjgl.util.vector.Vector3f;
 
-import de.projectsc.core.data.animation.AnimatedFrame;
+import de.projectsc.core.data.animation.Animation;
+import de.projectsc.core.data.animation.AnimationController;
+import de.projectsc.core.data.animation.Joint;
+import de.projectsc.core.data.animation.Keyframe;
+import de.projectsc.core.data.animation.Skeleton;
+import de.projectsc.core.data.animation.Track;
 import de.projectsc.core.data.utils.md5loader.anim.MD5AnimModel;
 import de.projectsc.core.data.utils.md5loader.anim.MD5BaseFrame;
 import de.projectsc.core.data.utils.md5loader.anim.MD5Frame;
 import de.projectsc.core.data.utils.md5loader.anim.MD5Hierarchy;
 import de.projectsc.core.data.utils.md5loader.mesh.MD5Joints;
+import de.projectsc.core.data.utils.md5loader.mesh.MD5Joints.MD5JointData;
 import de.projectsc.core.data.utils.md5loader.mesh.MD5Mesh;
+import de.projectsc.core.utils.Maths;
 import de.projectsc.modes.client.gui.models.AnimatedModel;
 import de.projectsc.modes.client.gui.models.RawModel;
 import de.projectsc.modes.client.gui.models.TexturedModel;
@@ -46,7 +55,6 @@ public class MD5Processor {
         List<TexturedModel> newModels = new LinkedList<>();
 
         List<Matrix4f> invJointMatrices = calcInJointMatrices(md5Model);
-        List<AnimatedFrame> animatedFrames = processAnimationFrames(md5Model, animModel, invJointMatrices);
 
         for (MD5Mesh md5Mesh : md5Model.getMeshes()) {
             RawModel mesh = null;
@@ -56,7 +64,11 @@ public class MD5Processor {
 
             TexturedModel model = null;
             if (animModel != null) {
-                model = new AnimatedModel(mesh, animatedFrames, texture);
+                Animation animation = processAnimation(md5Model, animModel, invJointMatrices);
+                model = new AnimatedModel(mesh, texture);
+                AnimationController animationController = new AnimationController();
+                animationController.setAnimation(animation);
+                ((AnimatedModel) model).setAnimationController(animationController);
             } else {
                 texture.setTransparent(true);
                 model = new TexturedModel(mesh, texture);
@@ -66,74 +78,100 @@ public class MD5Processor {
         return newModels;
     }
 
-    private static List<AnimatedFrame> processAnimationFrames(MD5Model md5Model, MD5AnimModel animModel, List<Matrix4f> invJointMatrices) {
-        List<AnimatedFrame> animatedFrames = new ArrayList<>();
+    private static Animation processAnimation(MD5Model md5Model, MD5AnimModel animModel, List<Matrix4f> invJointMatrices) {
+        Animation animation = null;
         if (animModel != null) {
-            List<MD5Frame> frames = animModel.getFrames();
-            for (MD5Frame frame : frames) {
-                AnimatedFrame data = processAnimationFrame(md5Model, animModel, frame, invJointMatrices);
-                animatedFrames.add(data);
+            animation = new Animation();
+            Skeleton s = new Skeleton();
+            animation.setSkeleton(s);
+            animation.setFrameCount(animModel.getFrames().size());
+            animation.setDuration((float) (animModel.getFrames().size() / 24.0));
+            s.setBindShapeMatrix(new Matrix4f());
+            s.setName("New MD5Skeleton");
+            List<MD5JointData> joints = md5Model.getJointInfo().getJoints();
+            Map<Integer, Joint> newJoints = new HashMap<>();
+            for (int i = 0; i < joints.size(); i++) {
+                Joint joint = new Joint();
+                joint.setId(i);
+                joint.setName(joints.get(i).getName());
+                newJoints.put(i, joint);
             }
+            for (int i = 0; i < joints.size(); i++) {
+                Joint current = newJoints.get(i);
+                int parentIndex = joints.get(i).getParentIndex();
+                if (parentIndex > -1) {
+                    current.setParent(newJoints.get(parentIndex));
+                    current.getParent().addChild(current);
+                } else {
+                    s.addRootJoint(current);
+                    current.setParentMatrix(Maths.getYUpMatrix());
+                }
+                s.addJoint(current);
+            }
+            processAnimationFrames(md5Model, animModel, invJointMatrices, animation, newJoints);
         }
-        return animatedFrames;
+        return animation;
     }
 
-    public static AnimatedFrame processAnimationFrame(MD5Model md5Model, MD5AnimModel animModel, MD5Frame frame,
-        List<Matrix4f> invJointMatrices) {
-        AnimatedFrame result = new AnimatedFrame();
+    public static void processAnimationFrames(MD5Model md5Model, MD5AnimModel animModel,
+        List<Matrix4f> invJointMatrices, Animation animation, Map<Integer, Joint> newJoints) {
 
         MD5BaseFrame baseFrame = animModel.getBaseFrame();
         List<MD5Hierarchy.MD5HierarchyData> hierarchyList = animModel.getHierarchy().getHierarchyDataList();
 
         List<MD5Joints.MD5JointData> joints = md5Model.getJointInfo().getJoints();
         int numJoints = joints.size();
-        Float[] frameData = frame.getFrameData();
         for (int i = 0; i < numJoints; i++) {
-            MD5Joints.MD5JointData joint = joints.get(i);
-            MD5BaseFrame.MD5BaseFrameData baseFrameData = baseFrame.getFrameDataList().get(i);
-            Vector3f position = baseFrameData.getPosition();
-            Quaternion orientation = baseFrameData.getOrientation();
+            Track track = new Track();
+            track.setJointId(i);
+            track.setJointName(newJoints.get(i).getName());
+            newJoints.get(i).setInverseBindMatrix(invJointMatrices.get(i));
 
-            int flags = hierarchyList.get(i).getFlags();
-            int startIndex = hierarchyList.get(i).getStartIndex();
-
-            if ((flags & 1) > 0) {
-                position.x = frameData[startIndex++];
+            for (int j = 0; j < animModel.getFrames().size(); j++) {
+                MD5Frame frame = animModel.getFrames().get(j);
+                Float[] frameData = frame.getFrameData();
+                Keyframe keyframe = new Keyframe();
+                keyframe.setTime(1f / 24.0f * j);
+                setJointInfoForKeyframe(baseFrame, hierarchyList, joints, i, frameData, keyframe);
+                track.addKeyframe(keyframe);
             }
-            if ((flags & 2) > 0) {
-                position.y = frameData[startIndex++];
-            }
-            if ((flags & 4) > 0) {
-                position.z = frameData[startIndex++];
-            }
-            if ((flags & 8) > 0) {
-                orientation.x = frameData[startIndex++];
-            }
-            if ((flags & 16) > 0) {
-                orientation.y = frameData[startIndex++];
-            }
-            if ((flags & 32) > 0) {
-                orientation.z = frameData[startIndex++];
-            }
-            // Update Quaternion's w component
-            orientation.w = MD5Utils.calculateWValue(new Vector3f(orientation.x, orientation.y, orientation.z));
-
-            // Calculate translation and rotation matrices for this joint
-            Matrix4f translateMat = new Matrix4f().translate(position);
-            Matrix4f rotationMat = transform(orientation);
-            Matrix4f jointMat = Matrix4f.mul(translateMat, rotationMat, null);
-
-            // Joint position is relative to joint's parent index position. Use parent matrices
-            // to transform it to model space
-            if (joint.getParentIndex() > -1) {
-                Matrix4f parentMatrix = result.getLocalJointMatrices()[joint.getParentIndex()];
-                jointMat = Matrix4f.mul(parentMatrix, jointMat, null);
-            }
-
-            result.setMatrix(i, jointMat, invJointMatrices.get(i));
+            animation.addTrack(track);
         }
 
-        return result;
+    }
+
+    private static void setJointInfoForKeyframe(MD5BaseFrame baseFrame, List<MD5Hierarchy.MD5HierarchyData> hierarchyList,
+        List<MD5Joints.MD5JointData> joints, int i, Float[] frameData, Keyframe keyframe) {
+        MD5BaseFrame.MD5BaseFrameData baseFrameData = baseFrame.getFrameDataList().get(i);
+        Vector3f position = new Vector3f(baseFrameData.getPosition());
+        Quaternion orientation = new Quaternion(baseFrameData.getOrientation());
+
+        int flags = hierarchyList.get(i).getFlags();
+        int startIndex = hierarchyList.get(i).getStartIndex();
+        if ((flags & 1) > 0) {
+            position.x = frameData[startIndex++];
+        }
+        if ((flags & 2) > 0) {
+            position.y = frameData[startIndex++];
+        }
+        if ((flags & 4) > 0) {
+            position.z = frameData[startIndex++];
+        }
+        if ((flags & 8) > 0) {
+            orientation.x = frameData[startIndex++];
+        }
+        if ((flags & 16) > 0) {
+            orientation.y = frameData[startIndex++];
+        }
+        if ((flags & 32) > 0) {
+            orientation.z = frameData[startIndex++];
+        }
+        // Update Quaternion's w component
+        orientation.w = MD5Utils.calculateWValue(new Vector3f(orientation.x, orientation.y, orientation.z));
+        keyframe.setOrientation(orientation);
+        keyframe.setTranslation(position);
+        keyframe.setScaling(new Vector3f(1, 1, 1));
+
     }
 
     private static List<Matrix4f> calcInJointMatrices(MD5Model md5Model) {

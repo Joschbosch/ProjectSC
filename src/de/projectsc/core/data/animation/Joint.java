@@ -38,10 +38,8 @@ public class Joint {
         }
         if (parentMatrix != null) {
             this.worldMatrix = Matrix4f.mul(parentMatrix, localMatrix, null);
-            // this.worldMatrix = localMatrix;
         } else {
             this.worldMatrix = Matrix4f.mul(parent.getWorldMatrix(), localMatrix, null);
-            // this.worldMatrix = localMatrix;
         }
         if (inverseBindMatrix == null) {
             inverseBindMatrix = new Matrix4f(worldMatrix);

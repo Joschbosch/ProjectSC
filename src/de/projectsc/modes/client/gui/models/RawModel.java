@@ -6,6 +6,7 @@
 
 package de.projectsc.modes.client.gui.models;
 
+
 /**
  * Stores the models vao.
  * 
@@ -28,7 +29,7 @@ public class RawModel {
     }
 
     public int getVertexCount() {
-        return vertexCount ;
+        return vertexCount;
     }
 
 }

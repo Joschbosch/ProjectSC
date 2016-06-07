@@ -283,12 +283,10 @@ public final class Maths {
     }
 
     public static Matrix4f createTransformationMatrix(Quaternion interpolatedRotation, Vector3f interpolatedPostion, Vector3f scale) {
-        Matrix4f result = new Matrix4f();
-        Maths.applyQuaternionToMatrix(interpolatedRotation, result);
+        Matrix4f translateMat = new Matrix4f().translate(interpolatedPostion);
+        Matrix4f rotationMat = applyQuaternionToMatrix(interpolatedRotation);
+        Matrix4f result = Matrix4f.mul(translateMat, rotationMat, null);
         Matrix4f.scale(scale, result, result);
-        result.m30 = interpolatedPostion.x;
-        result.m31 = interpolatedPostion.y;
-        result.m32 = interpolatedPostion.z;
         return result;
     }
 
@@ -304,5 +302,48 @@ public final class Maths {
         result.y = (float) Math.asin(worldMatrix.m10);
         result.x = -90;
         return result;
+    }
+
+    public static Matrix4f applyQuaternionToMatrix(Quaternion quat) {
+        float dqx = quat.x + quat.x;
+        float dqy = quat.y + quat.y;
+        float dqz = quat.z + quat.z;
+        float q00 = dqx * quat.x;
+        float q11 = dqy * quat.y;
+        float q22 = dqz * quat.z;
+        float q01 = dqx * quat.y;
+        float q02 = dqx * quat.z;
+        float q03 = dqx * quat.w;
+        float q12 = dqy * quat.z;
+        float q13 = dqy * quat.w;
+        float q23 = dqz * quat.w;
+        Matrix4f rotated = new Matrix4f();
+        rotated.m00 = 1.0f - q11 - q22;
+        rotated.m01 = q01 + q23;
+        rotated.m02 = q02 - q13;
+        rotated.m03 = 0.0f;
+        rotated.m10 = q01 - q23;
+        rotated.m11 = 1.0f - q22 - q00;
+        rotated.m12 = q12 + q03;
+        rotated.m13 = 0.0f;
+        rotated.m20 = q02 + q13;
+        rotated.m21 = q12 - q03;
+        rotated.m22 = 1.0f - q11 - q00;
+        rotated.m23 = 0.0f;
+        rotated.m30 = 0.0f;
+        rotated.m31 = 0.0f;
+        rotated.m32 = 0.0f;
+        rotated.m33 = 1.0f;
+
+        return rotated;
+    }
+
+    public static Matrix4f getYUpMatrix() {
+        Matrix4f yUpMatrix = new Matrix4f();
+        yUpMatrix.m11 = 0;
+        yUpMatrix.m22 = 0;
+        yUpMatrix.m21 = 1;
+        yUpMatrix.m12 = -1;
+        return yUpMatrix;
     }
 }
