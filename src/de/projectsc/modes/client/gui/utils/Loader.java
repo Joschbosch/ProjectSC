@@ -17,7 +17,6 @@ import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -121,82 +120,68 @@ public final class Loader {
      * 
      * @return the model with the vao
      */
-    public static RawModel loadToVAO(float[] positions, float[] textureCoordinates, float[] normals, int[] indices, int[] jointIndicesArr,
-        float[] weightsArr) {
+    public static RawModel loadToVAO(float[] positions, float[] textureCoordinates, float[] normals, float[] tangents, int[] indices,
+        int[] jointIndicesArr, float[] weightsArr) {
         int vaoID = createVAO();
+        RawModel model = new RawModel(vaoID, indices.length);
         bindIndicesBuffer(indices);
         storeDataInAttributeList(0, 3, positions);
-        storeDataInAttributeList(1, 2, textureCoordinates);
+
+        if (textureCoordinates != null) {
+            storeDataInAttributeList(1, 2, textureCoordinates);
+            model.setTexture(true);
+        } else {
+            model.setTexture(false);
+        }
         storeDataInAttributeList(2, 3, normals);
-        float[] tangents = new float[positions.length];
-        Arrays.fill(tangents, 0);
-        storeDataInAttributeList(3, 3, tangents);
-        storeDataInAttributeList(4, 4, weightsArr);
-        storeDataInAttributeList(5, 4, jointIndicesArr);
+        if (tangents != null) {
+            storeDataInAttributeList(3, 3, tangents);
+        } else {
+            model.setTangents(false);
+        }
+        if (weightsArr != null && jointIndicesArr != null) {
+            storeDataInAttributeList(4, 4, weightsArr);
+            storeDataInAttributeList(5, 4, jointIndicesArr);
+        }
         unbind();
-        return new RawModel(vaoID, indices.length);
+        return model;
     }
 
-    public static RawModel loadToVAO(FloatBuffer positions, FloatBuffer textureCoordinates, FloatBuffer normals, int[] indices,
-        int[] jointIndicesArr,
-        FloatBuffer weightsArr) {
-        int vaoID = createVAO();
-        bindIndicesBuffer(indices);
-        storeDataInAttributeList(0, 3, positions);
-        storeDataInAttributeList(1, 2, textureCoordinates);
-        storeDataInAttributeList(2, 3, normals);
-        float[] tangents = new float[positions.capacity()];
-        Arrays.fill(tangents, 0);
-        storeDataInAttributeList(3, 3, tangents);
-        storeDataInAttributeList(4, 4, weightsArr);
-        storeDataInAttributeList(5, 4, jointIndicesArr);
-        unbind();
-        return new RawModel(vaoID, indices.length);
-    }
-
-    /**
-     * Loading given data positions into a VAO.
-     * 
-     * @param positions to load
-     * @param textureCoordinates to apply to the model
-     * @param normals of each face
-     * @param tangents of the faces
-     * @param indices for vao
-     * 
-     * @return the model with the vao
-     */
-    public static RawModel loadToVAO(float[] positions, float[] textureCoordinates, float[] normals, float[] tangents, int[] indices) {
-        int vaoID = createVAO();
-        bindIndicesBuffer(indices);
-        storeDataInAttributeList(0, 3, positions);
-        storeDataInAttributeList(1, 2, textureCoordinates);
-        storeDataInAttributeList(2, 3, normals);
-        storeDataInAttributeList(3, 3, tangents);
-        unbind();
-        return new RawModel(vaoID, indices.length);
-    }
-
-    /**
-     * Loading given data positions into a VAO.
-     * 
-     * @param positions to load
-     * @param textureCoordinates to apply to the model
-     * @param normals of each face
-     * @param tangents of the faces
-     * @param indices for vao
-     * 
-     * @return the model with the vao
-     */
     public static RawModel loadToVAO(FloatBuffer positions, FloatBuffer textureCoordinates, FloatBuffer normals, FloatBuffer tangents,
-        int[] indices) {
+        int[] indices, int[] jointIndicesArr, FloatBuffer weightsArr) {
         int vaoID = createVAO();
+        RawModel model = new RawModel(vaoID, indices.length);
         bindIndicesBuffer(indices);
         storeDataInAttributeList(0, 3, positions);
-        storeDataInAttributeList(1, 2, textureCoordinates);
-        storeDataInAttributeList(2, 3, normals);
-        storeDataInAttributeList(3, 3, tangents);
+        if (textureCoordinates != null) {
+            storeDataInAttributeList(1, 2, textureCoordinates);
+        } else {
+            storeDataInAttributeList(1, 2, ByteBuffer.allocateDirect(2 * 2 * indices.length).asFloatBuffer());
+        }
+        model.setTexture(textureCoordinates != null);
+
+        if (normals != null) {
+            storeDataInAttributeList(2, 3, normals);
+        } else {
+            storeDataInAttributeList(2, 3, ByteBuffer.allocateDirect(2 * 3 * indices.length).asFloatBuffer());
+        }
+        model.setNormals(normals != null);
+
+        if (tangents != null) {
+            storeDataInAttributeList(3, 3, tangents);
+        } else {
+            storeDataInAttributeList(3, 3, ByteBuffer.allocateDirect(2 * 3 * indices.length).asFloatBuffer());
+        }
+        model.setTangents(tangents != null);
+
+        if (weightsArr != null) {
+            storeDataInAttributeList(4, 4, weightsArr);
+        }
+        if (jointIndicesArr != null) {
+            storeDataInAttributeList(5, 4, jointIndicesArr);
+        }
         unbind();
-        return new RawModel(vaoID, indices.length);
+        return model;
     }
 
     /**
@@ -336,12 +321,27 @@ public final class Loader {
      * @return location of texture
      */
     public static int loadTexture(String filename) {
+        return loadTextureFromOtherResourceLocation(GUIConstants.TEXTURE_ROOT + filename);
+    }
+
+    /**
+     * Load texture with PNG format.
+     * 
+     * @param filename to load
+     * @return location of texture
+     */
+    public static int loadTextureFromOtherResourceLocation(String filename) {
         if (textureMap.containsKey(filename)) {
             return textureMap.get(filename);
         } else {
-            int textureID = loadTexture(Loader.class.getResourceAsStream(GUIConstants.TEXTURE_ROOT + filename), IMAGE_FILETYPE);
-            textureMap.put(filename, textureID);
-            return textureID;
+            InputStream resourceAsStream = Loader.class.getResourceAsStream(filename);
+            if (resourceAsStream != null) {
+                int textureID = loadTexture(resourceAsStream, IMAGE_FILETYPE);
+                textureMap.put(filename, textureID);
+                return textureID;
+            } else {
+                return -1;
+            }
         }
     }
 

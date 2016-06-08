@@ -190,7 +190,6 @@ public class RenderingSystem extends DefaultSystem {
     public GUIScene createScene(OctreeNode octTree) {
         Set<String> entities = entityManager.getAllEntites();
         GUIScene scene = new GUIScene();
-
         testModel("a380", new Vector3f(-250, 0, 20), new Vector3f(1.5f, 1.5f, 1.5f), scene);
         testModel("dragon", new Vector3f(-120, 0, 0), new Vector3f(0.8f, 0.8f, 0.8f), scene);
         testModel("monster_complete", new Vector3f(-70, 0, 0), new Vector3f(0.8f, 0.8f, 0.8f), scene);

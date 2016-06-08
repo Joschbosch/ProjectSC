@@ -279,11 +279,13 @@ public class MD5Processor {
         float[] positionsArr = listToArray(positions);
         float[] textCoordsArr = listToArray(textCoords);
         float[] normalsArr = listToArray(normals);
+        float[] tangents = new float[positions.size()];
+        Arrays.fill(tangents, 0f);
         int[] indicesArr = listIntToArray(indices);
         int[] jointIndicesArr = listIntToArray(jointIndices);
         float[] weightsArr = listToArray(weights);
 
-        return Loader.loadToVAO(positionsArr, textCoordsArr, normalsArr, indicesArr, jointIndicesArr, weightsArr);
+        return Loader.loadToVAO(positionsArr, textCoordsArr, normalsArr, tangents, indicesArr, jointIndicesArr, weightsArr);
     }
 
     /**

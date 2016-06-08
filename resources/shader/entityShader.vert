@@ -32,7 +32,9 @@ uniform vec4 plane;
 uniform bool hasNormalMap;
 uniform mat4 jointsMatrix[MAX_JOINTS];
 uniform bool isAnimated;
-
+uniform bool hasTextureCoords;
+uniform bool hasTangents;
+uniform bool hasNormals;
 
 void main (void){
 	//Animation part
@@ -65,9 +67,8 @@ void main (void){
 	gl_Position = projectionMatrix * positionRelativeToCamera;
 	pass_textureCoords = (textureCoords/numberOfRows) + offset;
 	
-	vec3 actualNormal = initNormal.xyz; 
 	if (useFakeLighting > 0.5){
-		actualNormal = vec3 (0.0, 1.0, 0.0);
+		initNormal = vec4(0.0, 1.0, 0.0, 0.0);
 	}
 
 	surfaceNormal = (modelViewMatrix * initNormal).xyz;

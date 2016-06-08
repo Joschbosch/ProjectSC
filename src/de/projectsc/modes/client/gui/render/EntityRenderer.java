@@ -72,9 +72,15 @@ public class EntityRenderer {
         RawModel model = tModel.getRawModel();
         GL30.glBindVertexArray(model.getVaoID());
         GL20.glEnableVertexAttribArray(0);
+        // if (model.hasTexture()) {
         GL20.glEnableVertexAttribArray(1);
+        // }
+        // if (model.hasNormals()) {
         GL20.glEnableVertexAttribArray(2);
+        // }
+        // if (model.hasTangents()) {
         GL20.glEnableVertexAttribArray(3);
+        // }
         if (tModel instanceof AnimatedModel) {
             GL20.glEnableVertexAttribArray(4);
             GL20.glEnableVertexAttribArray(5);
@@ -93,7 +99,8 @@ public class EntityRenderer {
             GL13.glActiveTexture(GL13.GL_TEXTURE1);
             GL11.glBindTexture(GL11.GL_TEXTURE_2D, texture.getNormalMap());
         }
-        shader.loadHasNormalMap(texture.getNormalMap() != -1);
+        shader.loadFlags(texture.getNormalMap() != -1, model.hasTangents(), model.hasTexture(), model.hasNormals());
+
     }
 
     private void unbindTexturedModel() {
@@ -101,6 +108,8 @@ public class EntityRenderer {
         GL20.glDisableVertexAttribArray(1);
         GL20.glDisableVertexAttribArray(2);
         GL20.glDisableVertexAttribArray(3);
+        GL20.glDisableVertexAttribArray(4);
+        GL20.glDisableVertexAttribArray(5);
         GL30.glBindVertexArray(0);
         GUISettings.enableCulling();
     }

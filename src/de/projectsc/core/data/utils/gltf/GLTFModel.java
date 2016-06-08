@@ -7,7 +7,6 @@ package de.projectsc.core.data.utils.gltf;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -110,7 +109,19 @@ public class GLTFModel {
             if (textures.get(model) != null) {
                 texture = new ModelTexture(textures.get(model));
             } else {
-                texture = new ModelTexture(Loader.loadTexture(GUIConstants.BASIC_TEXTURE_WHITE));
+                int textureId =
+                    Loader.loadTextureFromOtherResourceLocation("/models/animated/textures/"
+                        + filename.substring(0, filename.lastIndexOf(".")) + ".png");
+                if (textureId != -1) {
+                    texture = new ModelTexture(textureId);
+                    int normalId =
+                        Loader.loadTexture("/models/animated/textures/" + filename.substring(0, filename.lastIndexOf(".")) + "_n.png");
+                    if (normalId != -1) {
+                        texture.setNormalMap(normalId);
+                    }
+                } else {
+                    texture = new ModelTexture(Loader.loadTexture(GUIConstants.BASIC_TEXTURE_WHITE));
+                }
             }
             if (animation != null) {
                 AnimationController controller = new AnimationController();
@@ -296,53 +307,41 @@ public class GLTFModel {
     private void loadModel(GLTFNode node, List<RawModel> result) {
         for (String meshName : node.getNode().getMeshes()) {
             Mesh mesh = gltf.getMeshes().get(meshName);
-            RawModel model = null;
             for (MeshPrimitive p : mesh.getPrimitives()) {
+                RawModel model = null;
                 String indicesAccessor = p.getIndices();
                 String positionsAccessor = p.getAttributes().get("POSITION");
                 String normalsAccessor = p.getAttributes().get("NORMAL");
                 String texCoordAccessor = p.getAttributes().get("TEXCOORD_0");
                 String jointsAccessor = p.getAttributes().get("JOINT");
                 String weigthsAccessor = p.getAttributes().get("WEIGHT");
-                FloatBuffer texCoords = null;
-                if (texCoordAccessor != null) {
-                    texCoords = GLTFUtils.getFloatBuffer(texCoordAccessor, data);
-                } else {
-                    texCoords = ByteBuffer.allocateDirect(4 * 4).asFloatBuffer();
-                    texCoords.put(new float[] { 0, 0, 1, 1 });
-                    texCoords.flip();
-                }
 
-                if (indicesAccessor != null && positionsAccessor != null && normalsAccessor != null && weigthsAccessor == null) {
-                    model = Loader.loadToVAO(GLTFUtils.getFloatBuffer(positionsAccessor, data), texCoords,
-                        GLTFUtils.getFloatBuffer(normalsAccessor, data), GLTFUtils.getFloatBuffer(positionsAccessor, data),
-                        GLTFUtils.getIndicesIntArray(indicesAccessor, data));
-
-                } else if (indicesAccessor != null && positionsAccessor != null && normalsAccessor != null
-                    && weigthsAccessor != null && jointsAccessor != null) {
-                    model = Loader.loadToVAO(GLTFUtils.getFloatBuffer(positionsAccessor, data), texCoords,
-                        GLTFUtils.getFloatBuffer(normalsAccessor, data), GLTFUtils.getIndicesIntArray(indicesAccessor, data),
+                model =
+                    Loader.loadToVAO(GLTFUtils.getFloatBuffer(positionsAccessor, data),
+                        GLTFUtils.getFloatBuffer(texCoordAccessor, data),
+                        GLTFUtils.getFloatBuffer(normalsAccessor, data), null, GLTFUtils.getIndicesIntArray(indicesAccessor, data),
                         GLTFUtils.getJointIntArray(jointsAccessor, data), GLTFUtils.getFloatBuffer(weigthsAccessor, data));
-                }
-                Material materialForMesh = gltf.getMaterials().get(p.getMaterial());
-                if (materialForMesh != null) {
-                    Object diffuseTexture = materialForMesh.getValues().get("diffuse");
-                    if (diffuseTexture instanceof String) {
-                        Texture texture = gltf.getTextures().get(diffuseTexture);
-                        String fileType = "PNG";
-                        if (((String) diffuseTexture).toLowerCase().contains("jpg")
-                            || ((String) diffuseTexture).toLowerCase().contains("jpeg")) {
-                            fileType = "jpg";
-                        }
-                        if (texture != null) {
-                            BufferedImage bufferedTexture = data.getImageAsBufferedImage(texture.getSource());
-                            int textureID = Loader.loadTexture(bufferedTexture, name + mesh.getName() + texture.getName(), fileType);
-                            textures.put(model, textureID);
+                if (model.hasTexture()) {
+                    Material materialForMesh = gltf.getMaterials().get(p.getMaterial());
+                    if (materialForMesh != null) {
+                        Object diffuseTexture = materialForMesh.getValues().get("diffuse");
+                        if (diffuseTexture instanceof String) {
+                            Texture texture = gltf.getTextures().get(diffuseTexture);
+                            String fileType = "PNG";
+                            if (((String) diffuseTexture).toLowerCase().contains("jpg")
+                                || ((String) diffuseTexture).toLowerCase().contains("jpeg")) {
+                                fileType = "jpg";
+                            }
+                            if (texture != null) {
+                                BufferedImage bufferedTexture = data.getImageAsBufferedImage(texture.getSource());
+                                int textureID = Loader.loadTexture(bufferedTexture, name + mesh.getName() + texture.getName(), fileType);
+                                textures.put(model, textureID);
+                            }
                         }
                     }
                 }
+                result.add(model);
             }
-            result.add(model);
         }
     }
 

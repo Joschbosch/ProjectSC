@@ -18,31 +18,39 @@ import de.javagl.jgltf.model.GltfData;
 public class GLTFUtils {
 
     public static int[] getIndicesIntArray(String accessor, GltfData rawData) {
-        ByteBuffer tmpdata = rawData.getExtractedAccessorByteBuffer(accessor);
-        List<Integer> temp = new ArrayList<>();
-        while (tmpdata.hasRemaining()) {
-            temp.add(Short.toUnsignedInt(tmpdata.getShort()));
+        if (accessor != null) {
+            ByteBuffer tmpdata = rawData.getExtractedAccessorByteBuffer(accessor);
+            List<Integer> temp = new ArrayList<>();
+            while (tmpdata.hasRemaining()) {
+                temp.add(Short.toUnsignedInt(tmpdata.getShort()));
+            }
+            int[] result = new int[temp.size()];
+            for (int i = 0; i < temp.size(); i++) {
+                result[i] = temp.get(i);
+            }
+            return result;
         }
-        int[] result = new int[temp.size()];
-        for (int i = 0; i < temp.size(); i++) {
-            result[i] = temp.get(i);
-        }
-        return result;
+        return null;
     }
 
     public static FloatBuffer getFloatBuffer(String accessor, GltfData rawData) {
-        ByteBuffer tmpdata = rawData.getExtractedAccessorByteBuffer(accessor);
-
-        return tmpdata.asFloatBuffer();
+        if (accessor != null) {
+            ByteBuffer tmpdata = rawData.getExtractedAccessorByteBuffer(accessor);
+            return tmpdata.asFloatBuffer();
+        }
+        return null;
     }
 
     public static int[] getJointIntArray(String accessor, GltfData rawData) {
-        FloatBuffer tmpdata = rawData.getExtractedAccessorByteBuffer(accessor).asFloatBuffer();
-        int[] result = new int[tmpdata.capacity()];
-        for (int i = 0; i < tmpdata.capacity(); i++) {
-            result[i] = (int) tmpdata.get(i);
+        if (accessor != null) {
+            FloatBuffer tmpdata = rawData.getExtractedAccessorByteBuffer(accessor).asFloatBuffer();
+            int[] result = new int[tmpdata.capacity()];
+            for (int i = 0; i < tmpdata.capacity(); i++) {
+                result[i] = (int) tmpdata.get(i);
+            }
+            return result;
         }
-        return result;
+        return null;
     }
 
     public static Vector3f loadVectorFromArray(float[] source) {

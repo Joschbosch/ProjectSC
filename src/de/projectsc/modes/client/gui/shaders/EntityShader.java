@@ -71,6 +71,12 @@ public class EntityShader extends Shader {
 
     private int locationAnimated;
 
+    private int locationHasTangents;
+
+    private int locationHasTextureCoords;
+
+    private int locationHasNormals;
+
     public EntityShader() {
         super(VERTEX_FILE, FRAGMENT_FILE);
         LOGGER.info("Static shader loaded.");
@@ -116,6 +122,10 @@ public class EntityShader extends Shader {
 
         }
         locationAnimated = super.getUniformLocation("isAnimated");
+        locationHasTangents = super.getUniformLocation("hasTangents");
+
+        locationHasTextureCoords = super.getUniformLocation("hasTextureCoords");
+        locationHasNormals = super.getUniformLocation("hasNormals");
     }
 
     public void loadJointsMatrix(Matrix4f[] matrix4fs) {
@@ -136,9 +146,16 @@ public class EntityShader extends Shader {
      * Load up if the entity has a normal map.
      * 
      * @param value true if it has a normal map.
+     * @param normals
+     * @param c
+     * @param b
      */
-    public void loadHasNormalMap(boolean value) {
+    public void loadFlags(boolean value, boolean tangents, boolean texture, boolean normals) {
         loadBoolean(locationHasNormalMap, value);
+        loadBoolean(locationHasTangents, tangents);
+        loadBoolean(locationHasTextureCoords, texture);
+        loadBoolean(locationHasNormals, normals);
+
     }
 
     /**
